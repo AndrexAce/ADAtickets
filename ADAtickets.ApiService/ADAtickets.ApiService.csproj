@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>aspnet-ADAtickets.ApiService-2a0ac79c-9f7e-4243-8355-e9eee4312da4</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+	<ProjectReference Include="..\ADAtickets.ServiceDefaults\ADAtickets.ServiceDefaults.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.4" NoWarn="NU1605" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="9.0.4" NoWarn="NU1605" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.4" />
+    <PackageReference Include="Microsoft.Identity.Web" Version="3.0.0"/>
+    <PackageReference Include="Microsoft.Identity.Web.DownstreamApi" Version="3.0.0"/>
+  </ItemGroup>
+
+</Project>
