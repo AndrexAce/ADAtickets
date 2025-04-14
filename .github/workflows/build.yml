@@ -53,8 +53,8 @@ jobs:
         run: |
           $jsonFilePath = "ADAtickets.AppHost/appsettings.json"
           $jsonContent = Get-Content -Path $jsonFilePath -Raw | ConvertFrom-Json
-          $jsonContent.Parameters.postgresUsername = "ciao"
-          $jsonContent.Parameters.postgresPassword = "ciao"
+          $jsonContent.Parameters.postgresUsername = "${{ secrets.POSTGRES_USERNAME }}"
+          $jsonContent.Parameters.postgresPassword = "${{ secrets.POSTGRES_PASSWORD }}"
           $jsonContent | ConvertTo-Json -Compress | Set-Content -Path $jsonFilePath
 
       - name: Build and analyze
@@ -62,7 +62,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
-          .\.sonar\scanner\dotnet-sonarscanner begin /k:"AndrexAce_ADAtickets" /o:"andrexace" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.dotnet.excludeTestProjects=true /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
+          .\.sonar\scanner\dotnet-sonarscanner begin /k:"AndrexAce_ADAtickets" /o:"andrexace" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.scanner.skipJreProvisioning=true /d:sonar.dotnet.excludeTestProjects=true /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
           dotnet build --no-incremental
           dotnet-coverage collect "dotnet test" -f xml -o "coverage.xml"
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
@@ -71,7 +71,6 @@ jobs:
         id: sonarqube-quality-gate-check
         uses: sonarsource/sonarqube-quality-gate-action@v1.1.0
         with:
-            pollingTimeoutSec: 600
             scanMetadataReportFile: .sonarqube/out/.sonar/report-task.txt
         env:
             SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
