@@ -3,16 +3,16 @@ var builder = DistributedApplication.CreateBuilder(args);
 var dbUsername = builder.AddParameter(name: "postgresUsername", secret: true);
 var dbPassword = builder.AddParameter(name: "postgresPassword", secret: true);
 
-var postgresdb = builder.AddPostgres(name: "postgres", userName: dbUsername, password: dbPassword, port: 5432)
+var postgresdb = builder.AddPostgres(name: "PostgreSQL", userName: dbUsername, password: dbPassword, port: 5432)
+    .WithPgWeb()
     .WithDataVolume(name: "postgres_data", isReadOnly: false)
-    .AddDatabase(name: "ADAtickets", "ADAtickets");
+    .AddDatabase(name: "ADAticketsDatabase", "ADAticketsDatabase");
 
-var apiService = builder.AddProject<Projects.ADAtickets_ApiService>(name: "apiservice")
+var apiService = builder.AddProject<Projects.ADAtickets_ApiService>(name: "ADAticketsApi")
     .WithReference(source: postgresdb)
-    .WithHttpEndpoint(name: "apiService")
     .WaitFor(dependency: postgresdb);
 
-builder.AddProject<Projects.ADAtickets_Web>(name: "webfrontend")
+builder.AddProject<Projects.ADAtickets_Web>(name: "ADAticketsWeb")
     .WithExternalHttpEndpoints()
     .WithReference(source: apiService)
     .WaitFor(dependency: apiService);

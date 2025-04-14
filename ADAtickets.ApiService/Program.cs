@@ -1,5 +1,6 @@
-using Microsoft.AspNetCore.Authentication;
+using ADAtickets.ApiService.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +18,20 @@ builder.AddServiceDefaults();
 
 // Add services to the container.
 builder.Services.AddProblemDetails();
+
+// Add the DBContext to execute queries against the database.
+builder.Services.AddDbContext<ADAticketsDbContext>(options =>
+{
+    options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSQL"), options =>
+    {
+        options.MapEnum<Priority>("priority")
+            .MapEnum<Status>("status")
+            .MapEnum<TicketType>("ticket_type")
+            .MapEnum<UserType>("user_type")
+            .EnableRetryOnFailure();
+    })
+        .UseSnakeCaseNamingConvention();
+});
 
 var app = builder.Build();
 
