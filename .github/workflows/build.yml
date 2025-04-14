@@ -48,6 +48,15 @@ jobs:
         run: |
           dotnet tool install -g dotnet-coverage
 
+      - name: Update JSON configuration with database credentials
+        shell: pwsh
+        run: |
+          $jsonFilePath = "ADAtickets.AppHost/appsettings.json"
+          $jsonContent = Get-Content -Path $jsonFilePath -Raw | ConvertFrom-Json
+          $jsonContent.Parameters.postgresUsername = "ciao"
+          $jsonContent.Parameters.postgresPassword = "ciao"
+          $jsonContent | ConvertTo-Json -Compress | Set-Content -Path $jsonFilePath
+
       - name: Build and analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
