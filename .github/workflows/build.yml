@@ -76,14 +76,35 @@ jobs:
             --arg password "${{ secrets.POSTGRES_PASSWORD }}" \
             $jsonFilePath > tmp.json && mv tmp.json $jsonFilePath
 
-      - name: Build and analyze
+      - name: Begin SonarCloud analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: bash
         run: |
-          ./.sonar/scanner/dotnet-sonarscanner begin /k:"AndrexAce_ADAtickets" /o:"andrexace" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.scanner.skipJreProvisioning=true /d:sonar.dotnet.excludeTestProjects=true /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
-          dotnet build --no-incremental
-          dotnet-coverage collect "dotnet test" -f xml -o "coverage.xml"
+          ./.sonar/scanner/dotnet-sonarscanner begin \
+          /k:"AndrexAce_ADAtickets" \
+          /o:"andrexace" \
+          /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
+          /d:sonar.host.url="https://sonarcloud.io" \
+          /d:sonar.scanner.skipJreProvisioning=true \
+          /d:sonar.dotnet.excludeTestProjects=true \
+          /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml \
+
+      - name: Build the solution
+        run: dotnet build --no-incremental
+
+      - name: Run tests with coverage
+        shell: bash
+        run: |
+          set -e
+          dotnet-coverage collect "dotnet test --no-build" -f xml -o "coverage.xml"
+
+      - name: End SonarCloud analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        if: always()
+        shell: bash
+        run: |
           ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
 
       - name: SonarQube Quality Gate check
@@ -93,6 +114,8 @@ jobs:
             scanMetadataReportFile: .sonarqube/out/.sonar/report-task.txt
         env:
             SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        if: always()
 
       - name: "Show SonarQube Quality Gate Status value"
+        if: always()
         run: echo "The Quality Gate status is ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
