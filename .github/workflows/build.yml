@@ -17,6 +17,11 @@ jobs:
           java-version: 21
           distribution: 'microsoft'
 
+      - name: Setup .NET 9.0
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
