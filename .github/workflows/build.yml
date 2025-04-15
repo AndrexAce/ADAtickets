@@ -41,17 +41,31 @@ jobs:
           key: ${{ runner.os }}-sonar-scanner
           restore-keys: ${{ runner.os }}-sonar-scanner
 
+      - name: Cache NuGet packages
+        id: cache-nuget-packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: ${{ runner.os }}-nuget-
+
       - name: Install SonarQube Cloud scanner
         if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
         shell: bash
         run: |
           mkdir -p ./.sonar/scanner
           dotnet tool update dotnet-sonarscanner --tool-path ./.sonar/scanner
-
+       
       - name: Install dotnet-coverage NuGet package and tool
+        if: steps.cache-nuget-packages.outputs.cache-hit != 'true'
         shell: bash
         run: |
           dotnet tool install -g dotnet-coverage
+      
+      - name: Trust ASP.NET certificates
+        shell: bash
+        run: |
+          dotnet dev-certs https --trust
 
       - name: Update JSON configuration with database credentials
         shell: bash

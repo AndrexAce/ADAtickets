@@ -9,6 +9,7 @@
     <Nullable>enable</Nullable>
     <UserSecretsId>42e4285a-5cc6-4998-bd13-ddb4fe3fade0</UserSecretsId>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
+	<RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
   </PropertyGroup>
 
   <ItemGroup>
