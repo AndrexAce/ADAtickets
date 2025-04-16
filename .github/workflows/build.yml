@@ -65,15 +65,6 @@ jobs:
         shell: bash
         run: dotnet dev-certs https --trust
 
-      - name: Update JSON configuration with database credentials
-        shell: bash
-        run: |
-          jsonFilePath="ADAtickets.AppHost/appsettings.json"
-          jq '.Parameters.postgresUsername = $username | .Parameters.postgresPassword = $password' \
-            --arg username "${{ secrets.POSTGRES_USERNAME }}" \
-            --arg password "${{ secrets.POSTGRES_PASSWORD }}" \
-            $jsonFilePath > tmp.json && mv tmp.json $jsonFilePath
-
       - name: Begin SonarCloud analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -89,7 +80,10 @@ jobs:
           /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml \
 
       - name: Build the solution
-        run: dotnet build -c Release --no-incremental
+        env:
+          POSTGRES_USERNAME: ${{ secrets.POSTGRES_USERNAME }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        run: dotnet build -c Release --no-incremental --property:postgresUsername=$POSTGRES_USERNAME --property:postgresPassword=$POSTGRES_PASSWORD
 
       - name: Run tests
         run: dotnet test -c Release --no-build
