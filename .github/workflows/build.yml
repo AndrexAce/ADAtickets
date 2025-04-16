@@ -92,12 +92,12 @@ jobs:
         run: dotnet build -c Release --no-incremental
 
       - name: Run tests
-        run: dotnet test --no-build
+        run: dotnet test -c Release --no-build
 
       - name: Collect code coverage
         if: always()
         shell: bash
-        run: dotnet-coverage collect "dotnet test --no-build" -f xml -o "coverage.xml"
+        run: dotnet-coverage collect "dotnet test -c Release --no-build" -f xml -o "coverage.xml"
 
       - name: End SonarCloud analysis
         env:
