@@ -1,0 +1,33 @@
+name: Tag latest commit
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.PAT }}
+
+      - name: Set up Git
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "github-actions@github.com"
+      
+      - name: Generate tag
+        run: |
+          TAG_NAME="v$(date +'%Y%m%d')"
+          echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
+      
+      - name: Push tag
+        run: |
+          git tag ${{ env.TAG_NAME }}
+          git remote set-url origin https://x-access-token:${{ secrets.PAT }}@github.com/${{ github.repository }}
+          git push origin ${{ env.TAG_NAME }}
