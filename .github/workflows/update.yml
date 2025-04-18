@@ -28,5 +28,5 @@ jobs:
       - name: Push tag
         run: |
           git tag ${{ env.TAG_NAME }}
-          git remote set-url origin https://x-access-token:${{ secrets.PAT }}@github.com/${{ github.repository }}.git
+          git remote add origin https://${{ secrets.PAT }}@github.com/${{ github.repository }}.git
           git push origin ${{ env.TAG_NAME }}
