@@ -4,16 +4,11 @@ on:
     workflows: ["Build, test and analyze"]
     types: 
     - completed
-permissions:
-    contents: read
-    packages: write
-    id-token: write
-env:
-  REGISTRY: ghcr.io
 
 jobs:
   update:
     runs-on: ubuntu-latest
+    name: Tag, containerize and update
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Set up .NET 9.0
@@ -40,7 +35,7 @@ jobs:
       
       - name: Generate tag
         run: |
-          TAG_NAME="v$(date +'%Y%m%d')"
+          TAG_NAME="v$(date +'%Y.%m.%d')"
           echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
       
       - name: Push tag
