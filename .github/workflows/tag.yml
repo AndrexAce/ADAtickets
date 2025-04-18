@@ -1,14 +1,15 @@
 name: Tag latest commit
 on:
-  push:
-    branches:
-      - master
-  pull_request:
-    types: [opened, synchronize, reopened]
+  workflow_run:
+    workflows:
+    - SonarQube
+    types: 
+    - completed
 
 jobs:
   tag:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -18,8 +19,8 @@ jobs:
 
       - name: Set up Git
         run: |
-          git config user.name "GitHub Actions"
-          git config user.email "github-actions@github.com"
+          git config user.name "Andrea Lucchese"
+          git config user.email "andrylook14@gmail.com"
       
       - name: Generate tag
         run: |
