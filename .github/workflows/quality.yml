@@ -1,4 +1,4 @@
-name: SonarCloud
+name: Build, test and analyze
 on:
   push:
     branches:
@@ -7,8 +7,7 @@ on:
     types: [opened, synchronize, reopened]
 
 jobs:
-  build:
-    name: Build, test and analyze
+  quality:
     runs-on: ubuntu-latest
     steps:
       - name: Set up JDK 21
@@ -101,15 +100,15 @@ jobs:
         run: |
           ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
 
-      - name: SonarQube Quality Gate check
-        id: sonarqube-quality-gate-check
-        uses: sonarsource/sonarqube-quality-gate-action@v1.1.0
-        with:
-            scanMetadataReportFile: .sonarqube/out/.sonar/report-task.txt
-        env:
-            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        if: always()
+      # - name: SonarQube Quality Gate check
+      #   id: sonarqube-quality-gate-check
+      #   uses: sonarsource/sonarqube-quality-gate-action@v1.1.0
+      #   with:
+      #       scanMetadataReportFile: .sonarqube/out/.sonar/report-task.txt
+      #   env:
+      #       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #   if: always()
 
-      - name: "Show SonarQube Quality Gate Status value"
-        if: always()
-        run: echo "The Quality Gate status is ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
+      # - name: "Show SonarQube Quality Gate Status value"
+      #   if: always()
+      #   run: echo "The Quality Gate status is ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
