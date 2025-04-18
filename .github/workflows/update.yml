@@ -11,22 +11,9 @@ jobs:
     name: Tag, containerize and update
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
-      - name: Set up .NET 9.0
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 9.0.x
-
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Cache NuGet packages
-        id: cache-nuget-packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
-          restore-keys: ${{ runner.os }}-nuget-
 
       - name: Set up Git
         run: |
@@ -41,5 +28,5 @@ jobs:
       - name: Push tag
         run: |
           git tag ${{ env.TAG_NAME }}
-          git remote set-url origin https://x-access-token:${{ secrets.PAT }}@github.com/${{ github.repository }}
+          git remote set-url origin https://x-access-token:${{ secrets.PAT }}@github.com/${{ github.repository }}.git
           git push origin ${{ env.TAG_NAME }}
