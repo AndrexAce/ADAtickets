@@ -1,0 +1,34 @@
+services:
+  adatickets.postgresql:
+    container_name: Database
+    image: postgres:latest
+    healthcheck:
+      test: pg_isready -U postgres -d ADAtickets
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  adatickets.apiservice:
+    container_name: Api
+    image: andrexace/adatickets-api
+    build:
+      context: .
+      dockerfile: ADAtickets.ApiService/Dockerfile
+      tags:
+        - andrexace/adatickets-api:latest
+        - andrexace/adatickets-api:${API_TAG:-latest}
+    depends_on:
+      adatickets.postgresql:
+        condition: service_healthy
+
+  adatickets.web:
+    container_name: Web
+    image: andrexace/adatickets-web
+    build:
+      context: .
+      dockerfile: ADAtickets.Web/Dockerfile
+      tags:
+        - andrexace/adatickets-web:latest
+        - andrexace/adatickets-web:${WEB_TAG:-latest} 
+    depends_on:
+      - adatickets.apiservice
