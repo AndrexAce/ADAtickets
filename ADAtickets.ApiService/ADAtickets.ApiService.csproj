@@ -6,7 +6,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-ADAtickets.ApiService-2a0ac79c-9f7e-4243-8355-e9eee4312da4</UserSecretsId>
 	<RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
-	<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 	<DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>

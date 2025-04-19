@@ -1,3 +1,5 @@
+using YamlDotNet.Core.Tokens;
+
 var builder = DistributedApplication.CreateBuilder(args);
 
 var dbUsername = builder.AddParameter(name: "postgresUsername", secret: true);
@@ -13,17 +15,24 @@ var postgresdb = builder.AddPostgres(name: "adatickets-postgresql", userName: db
     .WithDataVolume(name: "adatickets-database-data", isReadOnly: false)
     .AddDatabase(name: "adatickets-database", databaseName: "adatickets-database");
 
-var apiService = builder.AddProject<Projects.ADAtickets_ApiService>(name: "adatickets-api")
+var apiService = builder.AddDockerfile(name: "adatickets-api", contextPath: "..", dockerfilePath: "ADAtickets.ApiService/Dockerfile")
+    .WithContainerName(name: "adatickets-api")
+    .WithImageTag("dev")
+    .WithHttpEndpoint(targetPort: 8080, port: 5194)
+    .WithHttpsEndpoint(targetPort: 8081, port: 7214)
     .WithUrlForEndpoint(endpointName: "http", callback: u => u.DisplayText = "API HTTP")
     .WithUrlForEndpoint(endpointName: "https", callback: u => u.DisplayText = "API HTTPS")
     .WithReference(source: postgresdb)
     .WaitFor(dependency: postgresdb);
 
-builder.AddProject<Projects.ADAtickets_Web>(name: "adatickets-web")
+builder.AddDockerfile(name: "adatickets-web", contextPath: "..", dockerfilePath: "ADAtickets.Web/Dockerfile")
+    .WithContainerName(name: "adatickets-web")
+    .WithImageTag("dev")
     .WithExternalHttpEndpoints()
+    .WithHttpEndpoint(targetPort: 8080, port: 5207)
+    .WithHttpsEndpoint(targetPort: 8081, port: 7013)
     .WithUrlForEndpoint(endpointName: "http", callback: u => u.DisplayText = "Web HTTP")
     .WithUrlForEndpoint(endpointName: "https", callback: u => u.DisplayText = "Web HTTPS")
-    .WithReference(source: apiService)
     .WaitFor(dependency: apiService);
 
 builder.Build().Run();

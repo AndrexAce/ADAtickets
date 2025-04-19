@@ -6,7 +6,6 @@
     <Nullable>enable</Nullable>
     <IsAspireSharedProject>true</IsAspireSharedProject>
 	<RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
-	<GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
