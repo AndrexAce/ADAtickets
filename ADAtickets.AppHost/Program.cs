@@ -1,5 +1,3 @@
-using YamlDotNet.Core.Tokens;
-
 var builder = DistributedApplication.CreateBuilder(args);
 
 var dbUsername = builder.AddParameter(name: "postgresUsername", secret: true);
@@ -35,4 +33,4 @@ builder.AddDockerfile(name: "adatickets-web", contextPath: "..", dockerfilePath:
     .WithUrlForEndpoint(endpointName: "https", callback: u => u.DisplayText = "Web HTTPS")
     .WaitFor(dependency: apiService);
 
-builder.Build().Run();
+await builder.Build().RunAsync();
