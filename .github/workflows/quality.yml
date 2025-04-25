@@ -88,12 +88,12 @@ jobs:
         run: dotnet build ADAtickets.sln -c Release --no-incremental --property:postgresUsername=$POSTGRES_USERNAME --property:postgresPassword=$POSTGRES_PASSWORD
 
       - name: Run tests
-        run: dotnet test -c Release --no-build
+        run: dotnet test ADAtickets.sln -c Release --no-build
 
       - name: Collect code coverage
         if: always()
         shell: bash
-        run: dotnet-coverage collect "dotnet test -c Release --no-build" -f xml -o "coverage.xml"
+        run: dotnet-coverage collect "dotnet test ADAtickets.sln -c Release --no-build" -f xml -o "coverage.xml"
 
       - name: End SonarCloud analysis
         env:
