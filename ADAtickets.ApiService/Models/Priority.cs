@@ -22,7 +22,7 @@ namespace ADAtickets.ApiService.Models
     /// <summary>
     /// Represents the urgency of a ticket.
     /// </summary>
-    internal enum Priority
+    enum Priority
     {
         LOW,
         MEDIUM,

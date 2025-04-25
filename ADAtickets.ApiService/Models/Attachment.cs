@@ -32,15 +32,15 @@ namespace ADAtickets.ApiService.Models
         /// Gets or sets the path of the attachment on the server.
         /// </value>
         [MaxLength(4000)]
-        internal string Path { get; set; } = string.Empty;
+        public string Path { get; set; } = string.Empty;
 
         /// <value>
         /// Gets or sets the id of the ticket this attachment is related to.
         /// </value>
-        internal Guid TicketId { get; set; } = Guid.Empty;
+        public Guid TicketId { get; set; } = Guid.Empty;
         /// <value>
         /// Gets or sets the ticket this attachment is related to.
         /// </value>
-        internal Ticket Ticket { get; set; } = new Ticket();
+        public Ticket Ticket { get; set; } = new Ticket();
     }
 }

@@ -22,7 +22,7 @@ namespace ADAtickets.ApiService.Models
     /// <summary>
     /// Represents the type of user request bound to the ticket.
     /// </summary>
-    internal enum TicketType
+    enum TicketType
     {
         BUG,
         FEATURE

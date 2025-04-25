@@ -26,26 +26,26 @@ namespace ADAtickets.ApiService.Models
     /// Represents the link between users and their preferred platforms.
     /// </summary>
     [PrimaryKey(nameof(UserEmail), nameof(PlatformName))]
-    internal class UserPlatform
+    class UserPlatform
     {
         /// <value>
         /// Gets or sets the email of the user who marked the platform as preferred.
         /// </value>
         [MaxLength(254)]
-        internal string UserEmail { get; set; } = string.Empty;
+        public string UserEmail { get; set; } = string.Empty;
         /// <value>
         /// Gets or sets the user who marked the platform as preferred.
         /// </value>
-        internal User User { get; set; } = new User();
+        public User User { get; set; } = new User();
 
         /// <value>
         /// Gets or sets the name of the platform that was marked as preferred.
         /// </value>
         [MaxLength(50)]
-        internal string PlatformName { get; set; } = string.Empty;
+        public string PlatformName { get; set; } = string.Empty;
         /// <value>
         /// Gets or sets the platform that was marked as preferred.
         /// </value>
-        internal Platform Platform { get; set; } = new Platform();
+        public Platform Platform { get; set; } = new Platform();
     }
 }

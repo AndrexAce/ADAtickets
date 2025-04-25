@@ -29,34 +29,34 @@ namespace ADAtickets.ApiService.Models
         /// <value>
         /// Gets or sets the unique identifier of the reply.
         /// </value>
-        internal Guid Id { get; set; } = Guid.NewGuid();
+        public Guid Id { get; set; } = Guid.NewGuid();
         /// <value>
         /// Gets or sets the date and time when the reply was sent.
         /// </value>
-        internal DateTimeOffset ReplyDateTime { get; set; } = DateTimeOffset.Now;
+        public DateTimeOffset ReplyDateTime { get; set; } = DateTimeOffset.Now;
         /// <value>
         /// Gets or sets the message written in the reply.
         /// </value>
         [MaxLength(5000)]
-        internal string Message { get; set; } = string.Empty;
+        public string Message { get; set; } = string.Empty;
 
         /// <value>
         /// Gets or sets the email of the user who sent the reply.
         /// </value>
         [MaxLength(254)]
-        internal string AuthorUserEmail { get; set; } = string.Empty;
+        public string AuthorUserEmail { get; set; } = string.Empty;
         /// <value>
         /// Gets or sets the user who sent the reply.
         /// </value>
-        internal User AuthorUser { get; set; } = new User();
+        public User AuthorUser { get; set; } = new User();
 
         /// <value>
         /// Gets or sets the id of the ticket this reply was sent to.
         /// </value>
-        internal Guid TicketId { get; set; } = Guid.Empty;
+        public Guid TicketId { get; set; } = Guid.Empty;
         /// <value>
         /// Gets or sets the ticket this reply was sent to.
         /// </value>
-        internal Ticket Ticket { get; set; } = new Ticket();
+        public Ticket Ticket { get; set; } = new Ticket();
     }
 }

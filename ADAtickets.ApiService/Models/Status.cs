@@ -22,7 +22,7 @@ namespace ADAtickets.ApiService.Models
     /// <summary>
     /// Represents the status of the ticket.
     /// </summary>
-    internal enum Status
+    enum Status
     {
         UNASSIGNED,
         WAITING_OPERATOR,

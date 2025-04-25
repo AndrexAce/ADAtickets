@@ -22,7 +22,7 @@ namespace ADAtickets.ApiService.Models
     /// <summary>
     /// Represents the role of the user in the system.
     /// </summary>
-    internal enum UserType
+    enum UserType
     {
         USER,
         OPERATOR,

@@ -26,25 +26,25 @@ namespace ADAtickets.ApiService.Models
     /// Represents the link between users and sent notifications.
     /// </summary>
     [PrimaryKey(nameof(ReceiverUserEmail), nameof(NotificationId))]
-    internal class UserNotification : EntityBase
+    class UserNotification : EntityBase
     {
         /// <value>
         /// Gets or sets the email of the user who received the notification.
         /// </value>
         [MaxLength(254)]
-        internal string ReceiverUserEmail { get; set; } = string.Empty;
+        public string ReceiverUserEmail { get; set; } = string.Empty;
         /// <value>
         /// Gets or sets the user who received the notification.
         /// </value>
-        internal User ReceiverUser { get; set; } = new User();
+        public User ReceiverUser { get; set; } = new User();
 
         /// <value>
         /// Gets or sets the unique identifier of the sent notification.
         /// </value>
-        internal Guid NotificationId { get; set; } = Guid.Empty;
+        public Guid NotificationId { get; set; } = Guid.Empty;
         /// <value>
         /// Gets or sets the notification that was sent.
         /// </value>
-        internal Notification Notification { get; set; } = new Notification();
+        public Notification Notification { get; set; } = new Notification();
     }
 }

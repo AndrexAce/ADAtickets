@@ -25,12 +25,12 @@ namespace ADAtickets.ApiService.Models
     /// <para>Base class for all entities in the ADAtickets model.</para>
     /// <para>Contains common properties and methods.</para>
     /// </summary>
-    internal class EntityBase
+    class EntityBase
     {
         /// <value>
         /// Reserved field used to detect concurrent modification to the entity.
         /// </value>
         [Timestamp]
-        internal uint Version { get; set; } = 0;
+        public uint Version { get; set; } = 0;
     }
 }

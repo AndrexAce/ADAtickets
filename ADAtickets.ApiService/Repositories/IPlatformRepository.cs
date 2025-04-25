@@ -41,19 +41,19 @@ namespace ADAtickets.ApiService.Repositories
         /// Adds a new <see cref="Platform"/> entity to the data source asynchronously.
         /// </summary>
         /// <param name="Platform">The <see cref="Platform"/> entity to add to the data source.</param>
-        /// <returns>A <see cref="Task"/> returning <see langword="true"/> if the entity was added successfully, and <see langword="false"/> otherwise.</returns>
-        Task<bool> AddPlatformAsync(Platform platform);
+        /// <returns>A <see cref="Task"/> executing the action.</returns>
+        Task AddPlatformAsync(Platform platform);
         /// <summary>
         /// Updates an existing <see cref="Platform"/> entity in the data source asynchronously.
         /// </summary>
         /// <param name="Platform">The <see cref="Platform"/> entity to update in the data source.</param>
-        /// <returns>A <see cref="Task"/> returning <see langword="true"/> if the entity was updated successfully, and <see langword="false"/> otherwise.</returns>
-        Task<bool> UpdatePlatformAsync(Platform platform);
+        /// <returns>A <see cref="Task"/> executing the action.</returns>
+        Task UpdatePlatformAsync(Platform platform);
         /// <summary>
         /// Deletes an <see cref="Platform"/> entity from the data source asynchronously.
         /// </summary>
         /// <param name="name">The unique identifier of the <see cref="Platform"/> entity.</param>
-        /// <returns>A <see cref="Task"/> returning <see langword="true"/> if the entity was deleted successfully, and <see langword="false"/> otherwise.</returns>
-        Task<bool> DeletePlatformAsync(string name);
+        /// <returns>A <see cref="Task"/> executing the action.</returns>
+        Task DeletePlatformAsync(string name);
     }
 }

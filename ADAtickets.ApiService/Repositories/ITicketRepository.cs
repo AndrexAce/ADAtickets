@@ -41,19 +41,19 @@ namespace ADAtickets.ApiService.Repositories
         /// Adds a new <see cref="Ticket"/> entity to the data source asynchronously.
         /// </summary>
         /// <param name="Ticket">The <see cref="Ticket"/> entity to add to the data source.</param>
-        /// <returns>A <see cref="Task"/> returning <see langword="true"/> if the entity was added successfully, and <see langword="false"/> otherwise.</returns>
-        Task<bool> AddTicketAsync(Ticket ticket);
+        /// <returns>A <see cref="Task"/> executing the action.</returns>
+        Task AddTicketAsync(Ticket ticket);
         /// <summary>
         /// Updates an existing <see cref="Ticket"/> entity in the data source asynchronously.
         /// </summary>
         /// <param name="Ticket">The <see cref="Ticket"/> entity to update in the data source.</param>
-        /// <returns>A <see cref="Task"/> returning <see langword="true"/> if the entity was updated successfully, and <see langword="false"/> otherwise.</returns>
-        Task<bool> UpdateTicketAsync(Ticket ticket);
+        /// <returns>A <see cref="Task"/> executing the action.</returns>
+        Task UpdateTicketAsync(Ticket ticket);
         /// <summary>
         /// Deletes an <see cref="Ticket"/> entity from the data source asynchronously.
         /// </summary>
         /// <param name="id">The unique identifier of the <see cref="Ticket"/> entity.</param>
-        /// <returns>A <see cref="Task"/> returning <see langword="true"/> if the entity was deleted successfully, and <see langword="false"/> otherwise.</returns>
-        Task<bool> DeleteTicketAsync(Guid id);
+        /// <returns>A <see cref="Task"/> executing the action.</returns>
+        Task DeleteTicketAsync(Guid id);
     }
 }

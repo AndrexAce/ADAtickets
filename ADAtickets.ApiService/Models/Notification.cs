@@ -29,43 +29,43 @@ namespace ADAtickets.ApiService.Models
         /// <value>
         /// Gets or sets the unique identifier of the notification.
         /// </value>
-        internal Guid Id { get; set; } = Guid.NewGuid();
+        public Guid Id { get; set; } = Guid.NewGuid();
         /// <value>
         /// Gets or sets the date and time when the notification was sent.
         /// </value>
-        internal DateTimeOffset SendDateTime { get; } = DateTimeOffset.Now;
+        public DateTimeOffset SendDateTime { get; } = DateTimeOffset.Now;
         /// <value>
         /// Gets or sets the message the notification cames with.
         /// </value>
         [MaxLength(200)]
-        internal string Message { get; set; } = string.Empty;
+        public string Message { get; set; } = string.Empty;
         /// <value>
         /// Gets or sets wheter the notification has been read by the user.
         /// </value>
-        internal bool IsRead { get; set; } = false;
+        public bool IsRead { get; set; } = false;
 
         /// <value>
         /// Gets or sets the id of the ticket this notification is related to.
         /// </value>
-        internal Guid TicketId { get; set; } = Guid.Empty;
+        public Guid TicketId { get; set; } = Guid.Empty;
         /// <value>
         /// Gets or sets the ticket this notification is related to.
         /// </value>
-        internal Ticket Ticket { get; set; } = new Ticket();
+        public Ticket Ticket { get; set; } = new Ticket();
 
         /// <value>
         /// Gets or sets the id of the user this notification is related to.
         /// </value>
         [MaxLength(254)]
-        internal string UserEmail { get; set; } = string.Empty;
+        public string UserEmail { get; set; } = string.Empty;
         /// <value>
         /// Gets or sets the user this notification is related to.
         /// </value>
-        internal User User { get; set; } = new User();
+        public User User { get; set; } = new User();
 
         /// <value>
         /// Gets the collection of the sent notifications and the user they were sent to.
         /// </value>
-        internal ICollection<UserNotification> SentNotifications { get; } = [];
+        public ICollection<UserNotification> SentNotifications { get; } = [];
     }
 }

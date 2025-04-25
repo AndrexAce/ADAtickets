@@ -30,46 +30,46 @@ namespace ADAtickets.ApiService.Models
         /// <value>
         /// Gets or sets the DbSet for managing <see cref="Attachment"/> entities.
         /// </value>
-        internal DbSet<Attachment> Attachments { get; set; }
+        public DbSet<Attachment> Attachments { get; set; }
 
         /// <value>
         /// Gets or sets the DbSet for managing <see cref="Edit"/> entities.
         /// </value>
-        internal DbSet<Edit> Edits { get; set; }
+        public DbSet<Edit> Edits { get; set; }
 
         /// <value>
         /// Gets or sets the DbSet for managing <see cref="Notification"/> entities.
         /// </value>
-        internal DbSet<Notification> Notifications { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
 
         /// <value>
         /// Gets or sets the DbSet for managing <see cref="Platform"/> entities.
         /// </value>
-        internal DbSet<Platform> Platforms { get; set; }
+        public DbSet<Platform> Platforms { get; set; }
 
         /// <value>
         /// Gets or sets the DbSet for managing <see cref="Reply"/> entities.
         /// </value>
-        internal DbSet<Reply> Replies { get; set; }
+        public DbSet<Reply> Replies { get; set; }
 
         /// <value>
         /// Gets or sets the DbSet for managing <see cref="Ticket"/> entities.
         /// </value>
-        internal DbSet<Ticket> Tickets { get; set; }
+        public DbSet<Ticket> Tickets { get; set; }
 
         /// <value>
         /// Gets or sets the DbSet for managing <see cref="User"/> entities.
         /// </value>
-        internal DbSet<User> Users { get; set; }
+        public DbSet<User> Users { get; set; }
 
         /// <value>
         /// Gets or sets the DbSet for managing <see cref="UserNotification"/> entities.
         /// </value>
-        internal DbSet<UserNotification> UserNotifications { get; set; }
+        public DbSet<UserNotification> UserNotifications { get; set; }
 
         /// <value>
         /// Gets or sets the DbSet for managing <see cref="UserPlatform"/> entities.
         /// </value>
-        internal DbSet<UserPlatform> UserPlatforms { get; set; }
+        public DbSet<UserPlatform> UserPlatforms { get; set; }
     }
 }

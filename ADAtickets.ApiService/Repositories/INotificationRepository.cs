@@ -41,19 +41,19 @@ namespace ADAtickets.ApiService.Repositories
         /// Adds a new <see cref="Notification"/> entity to the data source asynchronously.
         /// </summary>
         /// <param name="Notification">The <see cref="Notification"/> entity to add to the data source.</param>
-        /// <returns>A <see cref="Task"/> returning <see langword="true"/> if the entity was added successfully, and <see langword="false"/> otherwise.</returns>
-        Task<bool> AddNotificationAsync(Notification notification);
+        /// <returns>A <see cref="Task"/> executing the action.</returns>
+        Task AddNotificationAsync(Notification notification);
         /// <summary>
         /// Updates an existing <see cref="Notification"/> entity in the data source asynchronously.
         /// </summary>
         /// <param name="Notification">The <see cref="Notification"/> entity to update in the data source.</param>
-        /// <returns>A <see cref="Task"/> returning <see langword="true"/> if the entity was updated successfully, and <see langword="false"/> otherwise.</returns>
-        Task<bool> UpdateNotificationAsync(Notification notification);
+        /// <returns>A <see cref="Task"/> executing the action.</returns>
+        Task UpdateNotificationAsync(Notification notification);
         /// <summary>
         /// Deletes an <see cref="Notification"/> entity from the data source asynchronously.
         /// </summary>
         /// <param name="id">The unique identifier of the <see cref="Notification"/> entity.</param>
-        /// <returns>A <see cref="Task"/> returning <see langword="true"/> if the entity was deleted successfully, and <see langword="false"/> otherwise.</returns>
-        Task<bool> DeleteNotificationAsync(Guid id);
+        /// <returns>A <see cref="Task"/> executing the action.</returns>
+        Task DeleteNotificationAsync(Guid id);
     }
 }

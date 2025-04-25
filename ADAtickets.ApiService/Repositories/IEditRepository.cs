@@ -41,19 +41,19 @@ namespace ADAtickets.ApiService.Repositories
         /// Adds a new <see cref="Edit"/> entity to the data source asynchronously.
         /// </summary>
         /// <param name="edit">The <see cref="Edit"/> entity to add to the data source.</param>
-        /// <returns>A <see cref="Task"/> returning <see langword="true"/> if the entity was added successfully, and <see langword="false"/> otherwise.</returns>
-        Task<bool> AddEditAsync(Edit edit);
+        /// <returns>A <see cref="Task"/> executing the action.</returns>
+        Task AddEditAsync(Edit edit);
         /// <summary>
         /// Updates an existing <see cref="Edit"/> entity in the data source asynchronously.
         /// </summary>
         /// <param name="edit">The <see cref="Edit"/> entity to update in the data source.</param>
-        /// <returns>A <see cref="Task"/> returning <see langword="true"/> if the entity was updated successfully, and <see langword="false"/> otherwise.</returns>
-        Task<bool> UpdateEditAsync(Edit edit);
+        /// <returns>A <see cref="Task"/> executing the action.</returns>
+        Task UpdateEditAsync(Edit edit);
         /// <summary>
         /// Deletes an <see cref="Edit"/> entity from the data source asynchronously.
         /// </summary>
         /// <param name="id">The unique identifier of the <see cref="Edit"/> entity.</param>
-        /// <returns>A <see cref="Task"/> returning <see langword="true"/> if the entity was deleted successfully, and <see langword="false"/> otherwise.</returns>
-        Task<bool> DeleteEditAsync(Guid id);
+        /// <returns>A <see cref="Task"/> executing the action.</returns>
+        Task DeleteEditAsync(Guid id);
     }
 }

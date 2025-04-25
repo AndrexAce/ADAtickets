@@ -1,5 +1,25 @@
-﻿using ADAtickets.ApiService.Models;
+﻿/*
+ * ADAtickets is a simple, lightweight, open source ticketing system
+ * interacting with your enterprise's repositories on Azure DevOps 
+ * with a two-way synchronization.
+ * Copyright (C) 2025  Andrea Lucchese
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+using ADAtickets.ApiService.Models;
 using ADAtickets.ApiService.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace ADAtickets.ApiService.Services
 {
@@ -11,29 +31,45 @@ namespace ADAtickets.ApiService.Services
         readonly ADAticketsDbContext _context = context;
 
         /// <inheritdoc cref="IReplyRepository.GetReplyByIdAsync(Guid)"/>
-        public Task<Reply> GetReplyByIdAsync(Guid id)
+        /// <exception cref="InvalidOperationException">When the entity was not found.</exception>
+        public async Task<Reply> GetReplyByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            return await _context.Replies.FindAsync(id) ?? throw new InvalidOperationException($"Entity of type {typeof(Reply)} with id {id} was not found.");
         }
+
         /// <inheritdoc cref="IReplyRepository.GetRepliesAsync"/>
-        public IAsyncEnumerable<Reply> GetRepliesAsync()
+        public async IAsyncEnumerable<Reply> GetRepliesAsync()
         {
-            throw new NotImplementedException();
+            await foreach (var reply in _context.Replies.AsAsyncEnumerable())
+            {
+                yield return reply;
+            }
         }
+
         /// <inheritdoc cref="IReplyRepository.AddReplyAsync(Reply)"/>
-        public Task<bool> AddReplyAsync(Reply reply)
+        /// <exception cref="DbUpdateException">When the entity was not added because of a conflict.</exception>
+        public async Task AddReplyAsync(Reply reply)
         {
-            throw new NotImplementedException();
+            await _context.Replies.AddAsync(reply);
+            await _context.SaveChangesAsync();
         }
+
         /// <inheritdoc cref="IReplyRepository.UpdateReplyAsync(Reply)"/>
-        public Task<bool> UpdateReplyAsync(Reply reply)
+        /// <exception cref="DbUpdateException">When the entity was not updated because of a conflict.</exception>
+        public async Task UpdateReplyAsync(Reply reply)
         {
-            throw new NotImplementedException();
+            _context.Replies.Update(reply);
+            await _context.SaveChangesAsync();
         }
+
         /// <inheritdoc cref="IReplyRepository.DeleteReplyAsync(Guid)"/>
-        public Task<bool> DeleteReplyAsync(Guid id)
+        /// <exception cref="InvalidOperationException">When the entity to delete was not found.</exception>
+        public async Task DeleteReplyAsync(Guid id)
         {
-            throw new NotImplementedException();
+            if (await _context.Replies.FindAsync(id) is not Reply reply)
+                throw new InvalidOperationException($"Entity of type {typeof(Reply)} with id {id} was not found.");
+            _context.Remove(reply);
+            await _context.SaveChangesAsync();
         }
     }
 }

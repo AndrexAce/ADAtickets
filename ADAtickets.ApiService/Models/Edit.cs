@@ -29,42 +29,42 @@ namespace ADAtickets.ApiService.Models
         /// <value>
         /// Gets or sets the unique identifier of the edit.
         /// </value>
-        internal Guid Id { get; set; } = Guid.NewGuid();
+        public Guid Id { get; set; } = Guid.NewGuid();
         /// <summary>
         /// Gets or sets the date and time when the edit was made.
         /// </summary>
-        internal DateTimeOffset EditDateTime { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset EditDateTime { get; set; } = DateTimeOffset.UtcNow;
         /// <summary>
         /// Gets or sets the message the edit comes with.
         /// </summary>
         [MaxLength(200)]
-        internal string Description { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
         /// <summary>
         /// Gets or sets the status the ticket was in before the edit.
         /// </summary>
-        internal Status OldStatus { get; set; } = Status.UNASSIGNED;
+        public Status OldStatus { get; set; } = Status.UNASSIGNED;
         /// <summary>
         /// Gets or sets the status the ticket will be after the edit.
         /// </summary>
-        internal Status NewStatus { get; set; } = Status.UNASSIGNED;
+        public Status NewStatus { get; set; } = Status.UNASSIGNED;
 
         /// <value>
         /// Gets or sets the id of the ticket this edit is related to.
         /// </value>
-        internal Guid TicketId { get; set; } = Guid.Empty;
+        public Guid TicketId { get; set; } = Guid.Empty;
         /// <value>
         /// Gets or sets the the ticket this edit is related to.
         /// </value>
-        internal Ticket Ticket { get; set; } = new Ticket();
+        public Ticket Ticket { get; set; } = new Ticket();
 
         /// <summary>
         /// Gets or sets the email of the user who made the edit.
         /// </summary>
         [MaxLength(254)]
-        internal string UserEmail { get; set; } = string.Empty;
+        public string UserEmail { get; set; } = string.Empty;
         /// <summary>
         /// Gets or sets the user who made the edit.
         /// </summary>
-        internal User User { get; set; } = new User();
+        public User User { get; set; } = new User();
     }
 }

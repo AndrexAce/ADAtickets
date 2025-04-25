@@ -32,21 +32,21 @@ namespace ADAtickets.ApiService.Models
         /// Gets or sets the name of the platform.
         /// </value>
         [MaxLength(254)]
-        internal string Name { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
         /// <value>
         /// Gets or sets the URL of the repository where the source code of the platform is hosted.
         /// </value>
         [MaxLength(4000)]
-        internal string RepositoryUrl { get; set; } = string.Empty;
+        public string RepositoryUrl { get; set; } = string.Empty;
 
         /// <value>
         /// Gets the collection of the tickets related to the platform.
         /// </value>
-        internal ICollection<Ticket> Tickets { get; } = [];
+        public ICollection<Ticket> Tickets { get; } = [];
 
         /// <value>
         /// Gets the collection of users who marked the platform as preferred.
         /// </value>
-        internal ICollection<UserPlatform> PreferredPlatforms { get; } = [];
+        public ICollection<UserPlatform> PreferredPlatforms { get; } = [];
     }
 }

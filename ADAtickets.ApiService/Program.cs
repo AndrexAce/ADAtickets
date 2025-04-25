@@ -40,7 +40,7 @@ builder.Services.AddDbContextPool<ADAticketsDbContext>(options =>
         .UseSnakeCaseNamingConvention();
 });
 
-// Configure the classes available for dependency injection.
+// Configure the scoped (one per request) classes available for dependency injection.
 builder.Services.AddScoped<IEditRepository, EditRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<IPlatformRepository, PlatformRepository>();

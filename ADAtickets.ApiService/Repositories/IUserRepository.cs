@@ -41,19 +41,19 @@ namespace ADAtickets.ApiService.Repositories
         /// Adds a new <see cref="User"/> entity to the data source asynchronously.
         /// </summary>
         /// <param name="User">The <see cref="User"/> entity to add to the data source.</param>
-        /// <returns>A <see cref="Task"/> returning <see langword="true"/> if the entity was added successfully, and <see langword="false"/> otherwise.</returns>
-        Task<bool> AddUserAsync(User user);
+        /// <returns>A <see cref="Task"/> executing the action.</returns>
+        Task AddUserAsync(User user);
         /// <summary>
         /// Updates an existing <see cref="User"/> entity in the data source asynchronously.
         /// </summary>
         /// <param name="User">The <see cref="User"/> entity to update in the data source.</param>
-        /// <returns>A <see cref="Task"/> returning <see langword="true"/> if the entity was updated successfully, and <see langword="false"/> otherwise.</returns>
-        Task<bool> UpdateUserAsync(User user);
+        /// <returns>A <see cref="Task"/> executing the action.</returns>
+        Task UpdateUserAsync(User user);
         /// <summary>
         /// Deletes an <see cref="User"/> entity from the data source asynchronously.
         /// </summary>
         /// <param name="name">The unique identifier of the <see cref="User"/> entity.</param>
-        /// <returns>A <see cref="Task"/> returning <see langword="true"/> if the entity was deleted successfully, and <see langword="false"/> otherwise.</returns>
-        Task<bool> DeleteUserAsync(string email);
+        /// <returns>A <see cref="Task"/> executing the action.</returns>
+        Task DeleteUserAsync(string email);
     }
 }

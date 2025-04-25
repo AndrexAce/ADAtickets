@@ -32,89 +32,89 @@ namespace ADAtickets.ApiService.Models
         /// </value>
         [Key]
         [MaxLength(254)]
-        internal string Email { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
         /// <value>
         /// <para>Gets or sets the password of the user.</para>
         /// <para>The password should is hashed so that it is not internally visible.</para>
         /// </value>
         [MaxLength(64)]
-        internal string Password { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
         /// <value>
         /// Gets or sets the name of the user.
         /// </value>
         [MaxLength(50)]
-        internal string Name { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
         /// <value>
         /// Gets or sets the surname of the user.
         /// </value>
         [MaxLength(50)]
-        internal string Surname { get; set; } = string.Empty;
+        public string Surname { get; set; } = string.Empty;
         /// <value>
         /// Gets or sets the phone number of the user.
         /// </value>
         [MaxLength(20)]
-        internal string PhoneNumber { get; set; } = string.Empty;
+        public string PhoneNumber { get; set; } = string.Empty;
         /// <value>
         /// Gets or sets whether the user enabled the two factor authentication via email.
         /// </value>
-        internal bool IsEmail2FAEnabled { get; set; } = false;
+        public bool IsEmail2FAEnabled { get; set; } = false;
         /// <value>
         /// Gets or sets whether the user enabled the two factor authentication via SMS.
         /// </value>
-        internal bool IsPhone2FAEnabled { get; set; } = false;
+        public bool IsPhone2FAEnabled { get; set; } = false;
         /// <value>
         /// Gets or sets whether the user enabled the reception of external notifications via email.
         /// </value>
-        internal bool AreEmailNotificationsEnabled { get; set; } = false;
+        public bool AreEmailNotificationsEnabled { get; set; } = false;
         /// <value>
         /// Gets or sets whether the user enabled the reception of external notifications via SMS.
         /// </value>
-        internal bool ArePhoneNotificationsEnabled { get; set; } = false;
+        public bool ArePhoneNotificationsEnabled { get; set; } = false;
         /// <value>
         /// Gets or sets the role of the user in the system.
         /// </value>
-        internal UserType Type { get; set; } = UserType.USER;
+        public UserType Type { get; set; } = UserType.USER;
         /// <value>
         /// Gets or sets the unique identifier of the user's Microsoft account.
         /// </value>
         [MaxLength(20)]
-        internal string MicrosoftAccountId { get; set; } = string.Empty;
+        public string MicrosoftAccountId { get; set; } = string.Empty;
 
         /// <value>
-        /// Gets the collection of tickets created by the user (if he is a user, otherwise it must be empty).
+        /// Gets the collection of tickets created by the user (if they are a user, otherwise it must be empty).
         /// </value>
         [InverseProperty("CreatorUser")]
-        internal ICollection<Ticket> CreatedTickets { get; } = [];
+        public ICollection<Ticket> CreatedTickets { get; } = [];
 
         /// <value>
-        /// Gets the collection of tickets assigned to the user (if he is an operator, otherwise it must be empty).
+        /// Gets the collection of tickets assigned to the user (if they are an operator, otherwise it must be empty).
         /// </value>
         [InverseProperty("OperatorUser")]
-        internal ICollection<Ticket> AssignedTickets { get; } = [];
+        public ICollection<Ticket> AssignedTickets { get; } = [];
 
         /// <value>
         /// Gets the collection of replies sent by the user to any ticket.
         /// </value>
-        internal ICollection<Reply> Replies { get; } = [];
+        public ICollection<Reply> Replies { get; } = [];
 
         /// <value>
         /// Gets the collection of edits made by the user to any ticket.
         /// </value>
-        internal ICollection<Edit> Edits { get; } = [];
+        public ICollection<Edit> Edits { get; } = [];
 
         /// <value>
-        /// Gets the collection of platforms the user prefers (if he is an operator, otherwise it must be empty).
+        /// Gets the collection of platforms the user prefers (if they are an operator, otherwise it must be empty).
         /// </value>
-        internal ICollection<UserPlatform> PreferredPlatforms { get; } = [];
+        public ICollection<UserPlatform> PreferredPlatforms { get; } = [];
 
         /// <value>
         /// Gets the collection of notifications the user triggered the sending of.
         /// </value>
-        internal ICollection<Notification> SentNotifications { get; } = [];
+        public ICollection<Notification> SentNotifications { get; } = [];
 
         /// <value>
         /// Gets the collection of notifications the user received.
         /// </value>
-        internal ICollection<UserNotification> ReceivedNotifications { get; } = [];
+        public ICollection<UserNotification> ReceivedNotifications { get; } = [];
     }
 }

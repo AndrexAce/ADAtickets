@@ -30,88 +30,88 @@ namespace ADAtickets.ApiService.Models
         /// <value>
         /// Gets or sets the unique identifier of the ticket.
         /// </value>
-        internal Guid Id { get; set; } = Guid.NewGuid();
+        public Guid Id { get; set; } = Guid.NewGuid();
         /// <value>
         /// Gets or sets the type of user request bound to the ticket.
         /// </value>
-        internal TicketType Type { get; set; } = TicketType.BUG;
+        public TicketType Type { get; set; } = TicketType.BUG;
         /// <value>
         /// Gets or sets the date and time when the ticket was created.
         /// </value>
-        internal DateTimeOffset CreationDateTime { get; } = DateTimeOffset.Now;
+        public DateTimeOffset CreationDateTime { get; } = DateTimeOffset.Now;
         [MaxLength(50)]
         /// <value>
         /// Gets or sets the title of the ticket, a brief recap of the issue.
         /// </value>
-        internal string Title { get; set; } = string.Empty;
+        public string Title { get; set; } = string.Empty;
         /// <value>
         /// Gets or sets the description of the ticket, a detailed description of the issue.
         /// </value>
         [MaxLength(5000)]
-        internal string Description { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
         /// <value>
         /// Gets or sets the urgency of the ticket.
         /// </value>
-        internal Priority Priority { get; set; } = Priority.LOW;
+        public Priority Priority { get; set; } = Priority.LOW;
         /// <value>
         /// Gets or sets the status of the ticket.
         /// </value>
-        internal Status Status { get; set; } = Status.UNASSIGNED;
+        public Status Status { get; set; } = Status.UNASSIGNED;
         /// <value>
         /// Gets or sets the id of the work item the ticket is related to in Azure DevOps.
         /// </value>
-        internal int WorkItemId { get; set; } = 0;
+        public int WorkItemId { get; set; } = 0;
 
         /// <value>
         /// Gets or sets the name of the platform the ticket is related to.
         /// </value>
         [MaxLength(4000)]
-        internal string PlatformName { get; set; } = string.Empty;
+        public string PlatformName { get; set; } = string.Empty;
         /// <value>
         /// Gets or sets the platform the ticket is related to.
         /// </value>
-        internal Platform Platform { get; set; } = new Platform();
+        public Platform Platform { get; set; } = new Platform();
 
         /// <value>
         /// Gets or sets the email of the user who created the ticket.
         /// </value>
         [ForeignKey(nameof(CreatorUser))]
         [MaxLength(254)]
-        internal string CreatorUserEmail { get; set; } = string.Empty;
+        public string CreatorUserEmail { get; set; } = string.Empty;
         /// <value>
         /// Gets or sets the user who created the ticket.
         /// </value>
-        internal User CreatorUser { get; set; } = new User();
+        public User CreatorUser { get; set; } = new User();
 
         /// <value>
         /// Gets or sets the email of the operator assigned to the ticket.
         /// </value>
         [ForeignKey(nameof(OperatorUser))]
         [MaxLength(254)]
-        internal string OperatorUserEmail { get; set; } = string.Empty;
+        public string OperatorUserEmail { get; set; } = string.Empty;
         /// <value>
         /// Gets or sets the operator assigned to the ticket.
         /// </value>
-        internal User OperatorUser { get; set; } = new User();
+        public User OperatorUser { get; set; } = new User();
 
         /// <value>
         /// Gets the collection of edits made to the ticket.
         /// </value>
-        internal ICollection<Edit> Edits { get; } = [];
+        public ICollection<Edit> Edits { get; } = [];
 
         /// <value>
         /// Gets the collection of replies sent to the ticket.
         /// </value>
-        internal ICollection<Reply> Replies { get; } = [];
+        public ICollection<Reply> Replies { get; } = [];
 
         /// <value>
         /// Gets the collection of attachments attached to the ticket.
         /// </value>
-        internal ICollection<Attachment> Attachments { get; } = [];
+        public ICollection<Attachment> Attachments { get; } = [];
 
         /// <value>
         /// Gets the collection of notifications related to the ticket.
         /// </value>
-        internal ICollection<Notification> Notifications { get; } = [];
+        public ICollection<Notification> Notifications { get; } = [];
     }
 }
