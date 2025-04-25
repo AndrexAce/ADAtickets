@@ -85,7 +85,7 @@ jobs:
         env:
           POSTGRES_USERNAME: ${{ secrets.POSTGRES_USERNAME }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-        run: dotnet build -c Release --no-incremental --property:postgresUsername=$POSTGRES_USERNAME --property:postgresPassword=$POSTGRES_PASSWORD
+        run: dotnet build ADAtickets.sln -c Release --no-incremental --property:postgresUsername=$POSTGRES_USERNAME --property:postgresPassword=$POSTGRES_PASSWORD
 
       - name: Run tests
         run: dotnet test -c Release --no-build
