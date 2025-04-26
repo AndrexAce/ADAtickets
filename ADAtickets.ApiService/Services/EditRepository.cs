@@ -17,9 +17,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using ADAtickets.ApiService.Configs;
 using ADAtickets.ApiService.Models;
 using ADAtickets.ApiService.Repositories;
-using Microsoft.EntityFrameworkCore;
 
 namespace ADAtickets.ApiService.Services
 {
@@ -31,44 +31,34 @@ namespace ADAtickets.ApiService.Services
         readonly ADAticketsDbContext _context = context;
 
         /// <inheritdoc cref="IEditRepository.GetEditByIdAsync(Guid)"/>
-        /// <exception cref="InvalidOperationException">When the entity was not found.</exception>
-        public async Task<Edit> GetEditByIdAsync(Guid id)
+        public async Task<Edit?> GetEditByIdAsync(Guid id)
         {
-            return await _context.Edits.FindAsync(id) ?? throw new InvalidOperationException($"Entity of type {typeof(Edit)} with ID {id} was not found.");
+            return await _context.Edits.FindAsync(id);
         }
 
-        /// <inheritdoc cref="IEditRepository.GetEditsAsync"/>
-        public async IAsyncEnumerable<Edit> GetEditsAsync()
+        /// <inheritdoc cref="IEditRepository.GetEdits"/>
+        public IAsyncEnumerable<Edit> GetEdits()
         {
-            await foreach (var edit in _context.Edits.AsAsyncEnumerable())
-            {
-                yield return edit;
-            }
+            return _context.Edits.AsAsyncEnumerable();
         }
 
         /// <inheritdoc cref="IEditRepository.AddEditAsync(Edit)"/>
-        /// <exception cref="DbUpdateException">When the entity was not added because of a conflict.</exception>
         public async Task AddEditAsync(Edit edit)
         {
-
-            await _context.Edits.AddAsync(edit);
+            _context.Edits.Add(edit);
             await _context.SaveChangesAsync();
         }
 
         /// <inheritdoc cref="IEditRepository.UpdateEditAsync(Edit)"/>
-        /// <exception cref="DbUpdateException">When the entity was not updated because of a conflit.</exception>
         public async Task UpdateEditAsync(Edit edit)
         {
             _context.Edits.Update(edit);
             await _context.SaveChangesAsync();
         }
 
-        /// <inheritdoc cref="IEditRepository.DeleteEditAsync(Guid)"/>
-        /// <exception cref="InvalidOperationException">When the entity to delete was not found.</exception>
-        public async Task DeleteEditAsync(Guid id)
+        /// <inheritdoc cref="IEditRepository.DeleteEditAsync(Edit)"/>
+        public async Task DeleteEditAsync(Edit edit)
         {
-            if (await _context.Edits.FindAsync(id) is not Edit edit)
-                throw new InvalidOperationException($"Entity of type {typeof(Edit)} with ID {id} was not found.");
             _context.Remove(edit);
             await _context.SaveChangesAsync();
         }

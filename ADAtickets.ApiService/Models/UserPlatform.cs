@@ -32,6 +32,7 @@ namespace ADAtickets.ApiService.Models
         /// Gets or sets the email of the user who marked the platform as preferred.
         /// </value>
         [MaxLength(254)]
+        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")]
         public string UserEmail { get; set; } = string.Empty;
         /// <value>
         /// Gets or sets the user who marked the platform as preferred.

@@ -30,30 +30,34 @@ namespace ADAtickets.ApiService.Repositories
         /// Gets a single <see cref="Edit"/> entity from the data source asynchronously.
         /// </summary>
         /// <param name="id">The unique identifier of the <see cref="Edit"/> entity.</param>
-        /// <returns>A <see cref="Task"/> returning the <see cref="Edit"/> with the given <paramref name="id"/>.</returns>
-        Task<Edit> GetEditByIdAsync(Guid id);
+        /// <returns>A <see cref="Task"/> returning the <see cref="Edit"/> with the given <paramref name="id"/>, or <see langword="null"/> if it doesn't exist.</returns>
+        Task<Edit?> GetEditByIdAsync(Guid id);
+
         /// <summary>
-        /// Gets all <see cref="Edit"/> entities from the data source asynchronously.
+        /// Gets all <see cref="Edit"/> entities from the data source.
         /// </summary>
         /// <returns>An asynchronously enumerable object containing all the <see cref="Edit"/> entities.</returns>
-        IAsyncEnumerable<Edit> GetEditsAsync();
+        IAsyncEnumerable<Edit> GetEdits();
+
         /// <summary>
         /// Adds a new <see cref="Edit"/> entity to the data source asynchronously.
         /// </summary>
         /// <param name="edit">The <see cref="Edit"/> entity to add to the data source.</param>
         /// <returns>A <see cref="Task"/> executing the action.</returns>
         Task AddEditAsync(Edit edit);
+
         /// <summary>
         /// Updates an existing <see cref="Edit"/> entity in the data source asynchronously.
         /// </summary>
         /// <param name="edit">The <see cref="Edit"/> entity to update in the data source.</param>
         /// <returns>A <see cref="Task"/> executing the action.</returns>
         Task UpdateEditAsync(Edit edit);
+
         /// <summary>
         /// Deletes an <see cref="Edit"/> entity from the data source asynchronously.
         /// </summary>
-        /// <param name="id">The unique identifier of the <see cref="Edit"/> entity.</param>
+        /// <param name="edit">The <see cref="Edit"/> entity to delete in the data source.</param>
         /// <returns>A <see cref="Task"/> executing the action.</returns>
-        Task DeleteEditAsync(Guid id);
+        Task DeleteEditAsync(Edit edit);
     }
 }

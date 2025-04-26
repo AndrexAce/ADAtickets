@@ -32,6 +32,7 @@ namespace ADAtickets.ApiService.Models
         /// Gets or sets the path of the attachment on the server.
         /// </value>
         [MaxLength(4000)]
+        [RegularExpression(@"^[a-zA-Z0-9_\-\/\.]+$")]
         public string Path { get; set; } = string.Empty;
 
         /// <value>

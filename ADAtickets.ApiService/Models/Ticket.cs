@@ -77,6 +77,7 @@ namespace ADAtickets.ApiService.Models
         /// </value>
         [ForeignKey(nameof(CreatorUser))]
         [MaxLength(254)]
+        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")]
         public string CreatorUserEmail { get; set; } = string.Empty;
         /// <value>
         /// Gets or sets the user who created the ticket.
@@ -88,6 +89,7 @@ namespace ADAtickets.ApiService.Models
         /// </value>
         [ForeignKey(nameof(OperatorUser))]
         [MaxLength(254)]
+        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")]
         public string OperatorUserEmail { get; set; } = string.Empty;
         /// <value>
         /// Gets or sets the operator assigned to the ticket.

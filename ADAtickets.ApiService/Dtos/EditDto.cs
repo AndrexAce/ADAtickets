@@ -17,16 +17,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-using AutoMapper.Configuration.Annotations;
-using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
+using ADAtickets.ApiService.Models;
 
-namespace ADAtickets.ApiService.Models
+namespace ADAtickets.ApiService.Dtos
 {
     /// <summary>
-    /// Represents a modification made to a ticket, either by a user or by the system.
+    /// <para>Represents a modification made to a ticket, either by a user or by the system.</para>
+    /// <para>It is a simplified version of the <see cref="Edit"/> class, used for data transfer.</para>
     /// </summary>
-    sealed class Edit : EntityBase
+    class EditDto
     {
         /// <value>
         /// Gets or sets the unique identifier of the edit.
@@ -39,7 +38,6 @@ namespace ADAtickets.ApiService.Models
         /// <summary>
         /// Gets or sets the message the edit comes with.
         /// </summary>
-        [MaxLength(200)]
         public string Description { get; set; } = string.Empty;
         /// <summary>
         /// Gets or sets the status the ticket was in before the edit.
@@ -54,24 +52,10 @@ namespace ADAtickets.ApiService.Models
         /// Gets or sets the id of the ticket this edit is related to.
         /// </value>
         public Guid TicketId { get; set; } = Guid.Empty;
-        /// <value>
-        /// Gets or sets the the ticket this edit is related to.
-        /// </value>
-        [Ignore]
-        [JsonIgnore]
-        public Ticket Ticket { get; set; } = new Ticket();
 
         /// <summary>
         /// Gets or sets the email of the user who made the edit.
         /// </summary>
-        [MaxLength(254)]
-        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")]
         public string UserEmail { get; set; } = string.Empty;
-        /// <summary>
-        /// Gets or sets the user who made the edit.
-        /// </summary>
-        [Ignore]
-        [JsonIgnore]
-        public User User { get; set; } = new User();
     }
 }

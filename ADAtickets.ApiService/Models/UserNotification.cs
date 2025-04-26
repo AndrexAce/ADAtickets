@@ -32,6 +32,7 @@ namespace ADAtickets.ApiService.Models
         /// Gets or sets the email of the user who received the notification.
         /// </value>
         [MaxLength(254)]
+        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")]
         public string ReceiverUserEmail { get; set; } = string.Empty;
         /// <value>
         /// Gets or sets the user who received the notification.

@@ -57,6 +57,7 @@ namespace ADAtickets.ApiService.Models
         /// Gets or sets the id of the user this notification is related to.
         /// </value>
         [MaxLength(254)]
+        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")]
         public string UserEmail { get; set; } = string.Empty;
         /// <value>
         /// Gets or sets the user this notification is related to.

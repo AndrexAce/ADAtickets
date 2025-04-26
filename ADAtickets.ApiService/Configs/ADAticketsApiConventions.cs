@@ -1,0 +1,106 @@
+﻿/*
+ * ADAtickets is a simple, lightweight, open source ticketing system
+ * interacting with your enterprise's repositories on Azure DevOps 
+ * with a two-way synchronization.
+ * Copyright (C) 2025  Andrea Lucchese
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+
+namespace ADAtickets.ApiService.Configs
+{
+    /// <summary>
+    /// Defines a set of methods with annotations (called conventions) that is used to personalize the behavior of the ASP.NET Core API controller.
+    /// </summary>
+    static class ADAticketsApiConventions
+    {
+#pragma warning disable IDE0060 // Remove unused parameter
+        /// <summary>
+        /// GET api methods convention.
+        /// </summary>
+        /// <param name="id">The identifier of the resource to fetch.</param>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
+        [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
+        public static void Get(
+            [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Suffix)]
+            [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.Any)]
+
+            object id)
+        {
+            // This method is intentionally left empty. The attributes above are used to define the convention.
+        }
+
+        /// <summary>
+        /// POST api methods convention.
+        /// </summary>
+        /// <param name="model">The resource to create.</param>
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesDefaultResponseType]
+        [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
+        public static void Post(
+            [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Any)]
+            [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.Any)]
+            object model)
+        {
+            // This method is intentionally left empty. The attributes above are used to define the convention.
+        }
+
+        /// <summary>
+        /// PUT api methods convention.
+        /// </summary>
+        /// <param name="id">The identifier of the resource to edit.</param>
+        /// <param name="model">The resource to edit.</param>
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesDefaultResponseType]
+        [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
+        public static void Put(
+            [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Suffix)]
+            [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.Any)]
+            object id,
+
+            [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Any)]
+            [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.Any)]
+            object model)
+        {
+            // This method is intentionally left empty. The attributes above are used to define the convention.
+        }
+
+        /// <summary>
+        /// DELETE api methods convention.
+        /// </summary>
+        /// <param name="id">The identifier of the resource to delete.</param>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
+        [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
+        public static void Delete(
+            [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Suffix)]
+            [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.Any)]
+            object id)
+        {
+            // This method is intentionally left empty. The attributes above are used to define the convention.
+        }
+    }
+#pragma warning restore IDE0060 // Remove unused parameter
+}

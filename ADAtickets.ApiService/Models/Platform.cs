@@ -37,6 +37,7 @@ namespace ADAtickets.ApiService.Models
         /// Gets or sets the URL of the repository where the source code of the platform is hosted.
         /// </value>
         [MaxLength(4000)]
+        [RegularExpression(@"^(https?:\/\/)?(www\.)?([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}\/?$")]
         public string RepositoryUrl { get; set; } = string.Empty;
 
         /// <value>

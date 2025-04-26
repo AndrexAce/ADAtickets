@@ -32,10 +32,11 @@ namespace ADAtickets.ApiService.Models
         /// </value>
         [Key]
         [MaxLength(254)]
+        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")]
         public string Email { get; set; } = string.Empty;
         /// <value>
         /// <para>Gets or sets the password of the user.</para>
-        /// <para>The password should is hashed so that it is not internally visible.</para>
+        /// <para>The password is hashed so that it is not internally visible.</para>
         /// </value>
         [MaxLength(64)]
         public string Password { get; set; } = string.Empty;
@@ -53,6 +54,7 @@ namespace ADAtickets.ApiService.Models
         /// Gets or sets the phone number of the user.
         /// </value>
         [MaxLength(20)]
+        [RegularExpression(@"^\+?[0-9\s\-()]+$")]
         public string PhoneNumber { get; set; } = string.Empty;
         /// <value>
         /// Gets or sets whether the user enabled the two factor authentication via email.
