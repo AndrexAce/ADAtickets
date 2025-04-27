@@ -24,7 +24,7 @@ namespace ADAtickets.ApiService.Repositories
     /// <summary>
     /// Exposes the methods to manage the <see cref="Edit"/> entities from a data source.
     /// </summary>
-    internal interface IEditRepository
+    public interface IEditRepository
     {
         /// <summary>
         /// Gets a single <see cref="Edit"/> entity from the data source asynchronously.
@@ -36,8 +36,8 @@ namespace ADAtickets.ApiService.Repositories
         /// <summary>
         /// Gets all <see cref="Edit"/> entities from the data source.
         /// </summary>
-        /// <returns>An asynchronously enumerable object containing all the <see cref="Edit"/> entities.</returns>
-        IAsyncEnumerable<Edit> GetEdits();
+        /// <returns>A <see cref="Task"/> returning all the <see cref="Edit"/> entities, or an empty collection if there are none.</returns>
+        Task<IEnumerable<Edit>> GetEdits();
 
         /// <summary>
         /// Adds a new <see cref="Edit"/> entity to the data source asynchronously.

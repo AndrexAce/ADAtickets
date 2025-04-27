@@ -7,7 +7,7 @@ namespace ADAtickets.ApiService.Configs
     /// <summary>
     /// Defines the AutoMapper profile to map the entities to DTOs and vice versa.
     /// </summary>
-    class ADAticketsProfile : Profile
+    sealed class ADAticketsProfile : Profile
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ADAticketsProfile"/> class.

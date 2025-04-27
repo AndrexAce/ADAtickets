@@ -18,6 +18,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using ADAtickets.ApiService.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System.ComponentModel.DataAnnotations;
 
 namespace ADAtickets.ApiService.Dtos
 {
@@ -25,37 +28,54 @@ namespace ADAtickets.ApiService.Dtos
     /// <para>Represents a modification made to a ticket, either by a user or by the system.</para>
     /// <para>It is a simplified version of the <see cref="Edit"/> class, used for data transfer.</para>
     /// </summary>
-    class EditDto
+    public sealed class EditDto
     {
-        /// <value>
-        /// Gets or sets the unique identifier of the edit.
-        /// </value>
+        /// <summary>
+        /// The unique identifier of the edit.
+        /// </summary>
+        [Key]
+        [Required]
         public Guid Id { get; set; } = Guid.NewGuid();
+
         /// <summary>
-        /// Gets or sets the date and time when the edit was made.
+        /// The date and time when the edit was made.
         /// </summary>
+        [Required]
         public DateTimeOffset EditDateTime { get; set; } = DateTimeOffset.UtcNow;
+
         /// <summary>
-        /// Gets or sets the message the edit comes with.
+        /// The message the edit comes with.
         /// </summary>
+        [Required]
+        [MaxLength(200)]
         public string Description { get; set; } = string.Empty;
+
         /// <summary>
-        /// Gets or sets the status the ticket was in before the edit.
+        /// The status the ticket was in before the edit.
         /// </summary>
+        [Required]
+        [JsonConverter(typeof(StringEnumConverter))]
         public Status OldStatus { get; set; } = Status.UNASSIGNED;
+
         /// <summary>
-        /// Gets or sets the status the ticket will be after the edit.
+        /// The status the ticket will be after the edit.
         /// </summary>
+        [Required]
+        [JsonConverter(typeof(StringEnumConverter))]
         public Status NewStatus { get; set; } = Status.UNASSIGNED;
 
-        /// <value>
-        /// Gets or sets the id of the ticket this edit is related to.
-        /// </value>
+        /// <summary>
+        /// The id of the ticket this edit is related to.
+        /// </summary>
+        [Required]
         public Guid TicketId { get; set; } = Guid.Empty;
 
         /// <summary>
-        /// Gets or sets the email of the user who made the edit.
+        /// The email of the user who made the edit.
         /// </summary>
+        [Required]
+        [MaxLength(254)]
+        [EmailAddress]
         public string UserEmail { get; set; } = string.Empty;
     }
 }

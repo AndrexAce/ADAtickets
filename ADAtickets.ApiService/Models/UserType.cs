@@ -22,10 +22,19 @@ namespace ADAtickets.ApiService.Models
     /// <summary>
     /// Represents the role of the user in the system.
     /// </summary>
-    enum UserType
+    public enum UserType
     {
+        /// <summary>
+        /// The user can create and reply to their tickets.
+        /// </summary>
         USER,
+        /// <summary>
+        /// The operator can manage all the tickets.
+        /// </summary>
         OPERATOR,
+        /// <summary>
+        /// The administrator can manage all the tickets, platforms and users.
+        /// </summary>
         ADMIN
     }
 }

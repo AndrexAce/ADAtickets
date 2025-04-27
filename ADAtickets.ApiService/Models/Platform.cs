@@ -17,37 +17,52 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using AutoMapper.Configuration.Annotations;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace ADAtickets.ApiService.Models
 {
     /// <summary>
     /// Represents a platform managed by the enterprise which tickets are related to.
     /// </summary>
-    [PrimaryKey(nameof(Name), nameof(RepositoryUrl))]
-    sealed class Platform : EntityBase
+    [Index(nameof(RepositoryUrl), IsUnique = true)]
+    public sealed class Platform : EntityBase
     {
-        /// <value>
-        /// Gets or sets the name of the platform.
-        /// </value>
+        /// <summary>
+        /// The name of the platform.
+        /// </summary>
+        [Key]
+        [Required]
         [MaxLength(254)]
         public string Name { get; set; } = string.Empty;
-        /// <value>
-        /// Gets or sets the URL of the repository where the source code of the platform is hosted.
-        /// </value>
+
+        /// <summary>
+        /// The URL of the repository where the source code of the platform is hosted.
+        /// </summary>
+        [Required]
         [MaxLength(4000)]
         [RegularExpression(@"^(https?:\/\/)?(www\.)?([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}\/?$")]
         public string RepositoryUrl { get; set; } = string.Empty;
 
-        /// <value>
-        /// Gets the collection of the tickets related to the platform.
-        /// </value>
+        /// <summary>
+        /// The collection of the tickets related to the platform.
+        /// </summary>
+        [Required]
+        [InverseProperty(nameof(Ticket.Platform))]
+        [Ignore]
+        [JsonIgnore]
         public ICollection<Ticket> Tickets { get; } = [];
 
-        /// <value>
-        /// Gets the collection of users who marked the platform as preferred.
-        /// </value>
-        public ICollection<UserPlatform> PreferredPlatforms { get; } = [];
+        /// <summary>
+        /// The collection of users who marked the platform as preferred.
+        /// </summary>
+        [Required]
+        [InverseProperty(nameof(UserPlatform.Platform))]
+        [Ignore]
+        [JsonIgnore]
+        public ICollection<UserPlatform> UsersPreferred { get; } = [];
     }
 }

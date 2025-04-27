@@ -17,8 +17,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using AutoMapper.Configuration.Annotations;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace ADAtickets.ApiService.Models
 {
@@ -26,26 +29,38 @@ namespace ADAtickets.ApiService.Models
     /// Represents the link between users and sent notifications.
     /// </summary>
     [PrimaryKey(nameof(ReceiverUserEmail), nameof(NotificationId))]
-    class UserNotification : EntityBase
+    public class UserNotification : EntityBase
     {
-        /// <value>
-        /// Gets or sets the email of the user who received the notification.
-        /// </value>
+        /// <summary>
+        /// The email of the user who received the notification.
+        /// </summary>
+        [Required]
+        [ForeignKey(nameof(ReceiverUser))]
         [MaxLength(254)]
-        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")]
+        [EmailAddress]
         public string ReceiverUserEmail { get; set; } = string.Empty;
-        /// <value>
-        /// Gets or sets the user who received the notification.
-        /// </value>
+
+        /// <summary>
+        /// The user who received the notification.
+        /// </summary>
+        [Required]
+        [Ignore]
+        [JsonIgnore]
         public User ReceiverUser { get; set; } = new User();
 
-        /// <value>
-        /// Gets or sets the unique identifier of the sent notification.
-        /// </value>
+        /// <summary>
+        /// The unique identifier of the sent notification.
+        /// </summary>
+        [Required]
+        [ForeignKey(nameof(Notification))]
         public Guid NotificationId { get; set; } = Guid.Empty;
-        /// <value>
-        /// Gets or sets the notification that was sent.
-        /// </value>
+
+        /// <summary>
+        /// The notification that was sent.
+        /// </summary>
+        [Required]
+        [Ignore]
+        [JsonIgnore]
         public Notification Notification { get; set; } = new Notification();
     }
 }

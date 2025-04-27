@@ -24,7 +24,7 @@ namespace ADAtickets.ApiService.Repositories
     /// <summary>
     /// Exposes the methods to manage the <see cref="Reply"/> entities from a data source.
     /// </summary>
-    internal interface IReplyRepository
+    public interface IReplyRepository
     {
         /// <summary>
         /// Gets a single <see cref="Reply"/> entity from the data source asynchronously.
@@ -40,13 +40,13 @@ namespace ADAtickets.ApiService.Repositories
         /// <summary>
         /// Adds a new <see cref="Reply"/> entity to the data source asynchronously.
         /// </summary>
-        /// <param name="Reply">The <see cref="Reply"/> entity to add to the data source.</param>
+        /// <param name="reply">The <see cref="Reply"/> entity to add to the data source.</param>
         /// <returns>A <see cref="Task"/> executing the action.</returns>
         Task AddReplyAsync(Reply reply);
         /// <summary>
         /// Updates an existing <see cref="Reply"/> entity in the data source asynchronously.
         /// </summary>
-        /// <param name="Reply">The <see cref="Reply"/> entity to update in the data source.</param>
+        /// <param name="reply">The <see cref="Reply"/> entity to update in the data source.</param>
         /// <returns>A <see cref="Task"/> executing the action.</returns>
         Task UpdateReplyAsync(Reply reply);
         /// <summary>

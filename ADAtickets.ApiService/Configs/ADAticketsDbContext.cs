@@ -28,49 +28,49 @@ namespace ADAtickets.ApiService.Configs
     /// </summary>
     sealed class ADAticketsDbContext(DbContextOptions<ADAticketsDbContext> options) : DbContext(options)
     {
-        /// <value>
+        /// <summary>
         /// Gets or sets the DbSet for managing <see cref="Attachment"/> entities.
-        /// </value>
+        /// </summary>
         public DbSet<Attachment> Attachments { get; set; }
 
-        /// <value>
+        /// <summary>
         /// Gets or sets the DbSet for managing <see cref="Edit"/> entities.
-        /// </value>
+        /// </summary>
         public DbSet<Edit> Edits { get; set; }
 
-        /// <value>
+        /// <summary>
         /// Gets or sets the DbSet for managing <see cref="Notification"/> entities.
-        /// </value>
+        /// </summary>
         public DbSet<Notification> Notifications { get; set; }
 
-        /// <value>
+        /// <summary>
         /// Gets or sets the DbSet for managing <see cref="Platform"/> entities.
-        /// </value>
+        /// </summary>
         public DbSet<Platform> Platforms { get; set; }
 
-        /// <value>
+        /// <summary>
         /// Gets or sets the DbSet for managing <see cref="Reply"/> entities.
-        /// </value>
+        /// </summary>
         public DbSet<Reply> Replies { get; set; }
 
-        /// <value>
+        /// <summary>
         /// Gets or sets the DbSet for managing <see cref="Ticket"/> entities.
-        /// </value>
+        /// </summary>
         public DbSet<Ticket> Tickets { get; set; }
 
-        /// <value>
+        /// <summary>
         /// Gets or sets the DbSet for managing <see cref="User"/> entities.
-        /// </value>
+        /// </summary>
         public DbSet<User> Users { get; set; }
 
-        /// <value>
+        /// <summary>
         /// Gets or sets the DbSet for managing <see cref="UserNotification"/> entities.
-        /// </value>
+        /// </summary>
         public DbSet<UserNotification> UserNotifications { get; set; }
 
-        /// <value>
+        /// <summary>
         /// Gets or sets the DbSet for managing <see cref="UserPlatform"/> entities.
-        /// </value>
+        /// </summary>
         public DbSet<UserPlatform> UserPlatforms { get; set; }
     }
 }

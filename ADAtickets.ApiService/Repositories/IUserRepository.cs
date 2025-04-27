@@ -24,12 +24,12 @@ namespace ADAtickets.ApiService.Repositories
     /// <summary>
     /// Exposes the methods to manage the <see cref="User"/> entities from a data source.
     /// </summary>
-    internal interface IUserRepository
+    public interface IUserRepository
     {
         /// <summary>
         /// Gets a single <see cref="User"/> entity from the data source asynchronously.
         /// </summary>
-        /// <param name="name">The unique identifier of the <see cref="User"/> entity.</param>
+        /// <param name="email">The unique identifier of the <see cref="User"/> entity.</param>
         /// <returns>A <see cref="Task"/> returning the <see cref="User"/> with the given <paramref name="name"/>.</returns>
         Task<User> GetUserByEmailAsync(string email);
         /// <summary>
@@ -40,19 +40,19 @@ namespace ADAtickets.ApiService.Repositories
         /// <summary>
         /// Adds a new <see cref="User"/> entity to the data source asynchronously.
         /// </summary>
-        /// <param name="User">The <see cref="User"/> entity to add to the data source.</param>
+        /// <param name="user">The <see cref="User"/> entity to add to the data source.</param>
         /// <returns>A <see cref="Task"/> executing the action.</returns>
         Task AddUserAsync(User user);
         /// <summary>
         /// Updates an existing <see cref="User"/> entity in the data source asynchronously.
         /// </summary>
-        /// <param name="User">The <see cref="User"/> entity to update in the data source.</param>
+        /// <param name="user">The <see cref="User"/> entity to update in the data source.</param>
         /// <returns>A <see cref="Task"/> executing the action.</returns>
         Task UpdateUserAsync(User user);
         /// <summary>
         /// Deletes an <see cref="User"/> entity from the data source asynchronously.
         /// </summary>
-        /// <param name="name">The unique identifier of the <see cref="User"/> entity.</param>
+        /// <param name="email">The unique identifier of the <see cref="User"/> entity.</param>
         /// <returns>A <see cref="Task"/> executing the action.</returns>
         Task DeleteUserAsync(string email);
     }

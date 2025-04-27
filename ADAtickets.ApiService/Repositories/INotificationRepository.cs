@@ -24,7 +24,7 @@ namespace ADAtickets.ApiService.Repositories
     /// <summary>
     /// Exposes the methods to manage the <see cref="Notification"/> entities from a data source.
     /// </summary>
-    internal interface INotificationRepository
+    public interface INotificationRepository
     {
         /// <summary>
         /// Gets a single <see cref="Notification"/> entity from the data source asynchronously.
@@ -40,13 +40,13 @@ namespace ADAtickets.ApiService.Repositories
         /// <summary>
         /// Adds a new <see cref="Notification"/> entity to the data source asynchronously.
         /// </summary>
-        /// <param name="Notification">The <see cref="Notification"/> entity to add to the data source.</param>
+        /// <param name="notification">The <see cref="Notification"/> entity to add to the data source.</param>
         /// <returns>A <see cref="Task"/> executing the action.</returns>
         Task AddNotificationAsync(Notification notification);
         /// <summary>
         /// Updates an existing <see cref="Notification"/> entity in the data source asynchronously.
         /// </summary>
-        /// <param name="Notification">The <see cref="Notification"/> entity to update in the data source.</param>
+        /// <param name="notification">The <see cref="Notification"/> entity to update in the data source.</param>
         /// <returns>A <see cref="Task"/> executing the action.</returns>
         Task UpdateNotificationAsync(Notification notification);
         /// <summary>

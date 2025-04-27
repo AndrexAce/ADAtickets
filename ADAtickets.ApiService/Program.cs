@@ -6,7 +6,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
+using Microsoft.OpenApi.Models;
+using Scalar.AspNetCore;
 using System.Net.Mime;
+using System.Reflection;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,10 +33,33 @@ builder.Services
                 ContentTypes = { MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml }
             };
     })
-    .AddXmlSerializerFormatters(); // Add XML serialization support for the APIs.
+    .AddXmlSerializerFormatters() // Add XML serialization support for the APIs.
+    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter())); // Configure enumerations serialization support.
 
-// Add OpenAPI support for the APIs.
-builder.Services.AddOpenApi();
+// Add Swagger documentation for the APIs.
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Version = "v1",
+        Title = "ADAtickets API",
+        Description = "Web MCV APIs to interact with the ADAtickets ticketing system.",
+        Contact = new OpenApiContact
+        {
+            Name = "Andrea Lucchese",
+            Email = "andrylook14@gmail.com"
+        },
+        License = new OpenApiLicense
+        {
+            Name = "GPL v3",
+            Url = new("https://github.com/AndrexAce/ADAtickets/blob/master/LICENSE.txt")
+        }
+    });
+
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+});
 
 // Add services used to return detailed error messages for failed requests.
 builder.Services.AddProblemDetails();
@@ -67,20 +94,26 @@ builder.Services.AddAutoMapper(typeof(ADAticketsProfile));
 
 var app = builder.Build();
 
-// Apply migrations on startup if the app is in development to ensure the database is up to date.
 if (app.Environment.IsDevelopment())
 {
+    // Apply migrations on startup if the app is in development to ensure the database is up to date.
     var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<ADAticketsDbContext>();
     await db.Database.MigrateAsync();
-}
 
-// Create an endpoint to access the Swagger UI if the app is in development.
-// Create an exception handler to show a personalised error message based on the environment.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
+    // Create an endpoint to access the API documentation.
+    app.UseSwagger(options =>
+    {
+        options.RouteTemplate = "/openapi/{documentName}.json";
+    });
 
+    // Create an endpoint to access the API documentation via Scalar.
+    app.MapScalarApiReference(options =>
+    {
+        options.Theme = ScalarTheme.BluePlanet;
+    });
+
+    // Create an exception handler to show a personalised error message based on the environment.
     app.UseExceptionHandler("/error-dev");
 }
 else

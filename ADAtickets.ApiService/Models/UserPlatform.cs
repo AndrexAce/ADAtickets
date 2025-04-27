@@ -17,8 +17,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using AutoMapper.Configuration.Annotations;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace ADAtickets.ApiService.Models
 {
@@ -26,27 +29,38 @@ namespace ADAtickets.ApiService.Models
     /// Represents the link between users and their preferred platforms.
     /// </summary>
     [PrimaryKey(nameof(UserEmail), nameof(PlatformName))]
-    class UserPlatform
+    public class UserPlatform
     {
-        /// <value>
-        /// Gets or sets the email of the user who marked the platform as preferred.
-        /// </value>
+        /// <summary>
+        /// The email of the user who marked the platform as preferred.
+        /// </summary>
+        [Required]
+        [ForeignKey(nameof(User))]
         [MaxLength(254)]
-        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")]
+        [EmailAddress]
         public string UserEmail { get; set; } = string.Empty;
-        /// <value>
-        /// Gets or sets the user who marked the platform as preferred.
-        /// </value>
+
+        /// <summary>
+        /// The user who marked the platform as preferred.
+        /// </summary>
+        [Required]
+        [Ignore]
+        [JsonIgnore]
         public User User { get; set; } = new User();
 
-        /// <value>
-        /// Gets or sets the name of the platform that was marked as preferred.
-        /// </value>
+        /// <summary>
+        /// The name of the platform that was marked as preferred.
+        /// </summary>
+        [Required]
         [MaxLength(50)]
         public string PlatformName { get; set; } = string.Empty;
-        /// <value>
-        /// Gets or sets the platform that was marked as preferred.
-        /// </value>
+
+        /// <summary>
+        /// The platform that was marked as preferred.
+        /// </summary>
+        [Required]
+        [Ignore]
+        [JsonIgnore]
         public Platform Platform { get; set; } = new Platform();
     }
 }

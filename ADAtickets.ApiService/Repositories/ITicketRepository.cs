@@ -24,7 +24,7 @@ namespace ADAtickets.ApiService.Repositories
     /// <summary>
     /// Exposes the methods to manage the <see cref="Ticket"/> entities from a data source.
     /// </summary>
-    internal interface ITicketRepository
+    public interface ITicketRepository
     {
         /// <summary>
         /// Gets a single <see cref="Ticket"/> entity from the data source asynchronously.
@@ -40,13 +40,13 @@ namespace ADAtickets.ApiService.Repositories
         /// <summary>
         /// Adds a new <see cref="Ticket"/> entity to the data source asynchronously.
         /// </summary>
-        /// <param name="Ticket">The <see cref="Ticket"/> entity to add to the data source.</param>
+        /// <param name="ticket">The <see cref="Ticket"/> entity to add to the data source.</param>
         /// <returns>A <see cref="Task"/> executing the action.</returns>
         Task AddTicketAsync(Ticket ticket);
         /// <summary>
         /// Updates an existing <see cref="Ticket"/> entity in the data source asynchronously.
         /// </summary>
-        /// <param name="Ticket">The <see cref="Ticket"/> entity to update in the data source.</param>
+        /// <param name="ticket">The <see cref="Ticket"/> entity to update in the data source.</param>
         /// <returns>A <see cref="Task"/> executing the action.</returns>
         Task UpdateTicketAsync(Ticket ticket);
         /// <summary>

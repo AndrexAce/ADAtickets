@@ -17,56 +17,83 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using AutoMapper.Configuration.Annotations;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace ADAtickets.ApiService.Models
 {
     /// <summary>
     /// Represents a notification sent to a user triggered by an action like ticket modification, reply or assignment.
     /// </summary>
-    sealed class Notification : EntityBase
+    public sealed class Notification : EntityBase
     {
-        /// <value>
-        /// Gets or sets the unique identifier of the notification.
-        /// </value>
+        /// <summary>
+        /// The unique identifier of the notification.
+        /// </summary>
+        [Key]
+        [Required]
         public Guid Id { get; set; } = Guid.NewGuid();
-        /// <value>
-        /// Gets or sets the date and time when the notification was sent.
-        /// </value>
+
+        /// <summary>
+        /// The date and time when the notification was sent.
+        /// </summary>
+        [Required]
         public DateTimeOffset SendDateTime { get; } = DateTimeOffset.Now;
-        /// <value>
-        /// Gets or sets the message the notification cames with.
-        /// </value>
+
+        /// <summary>
+        /// The message the notification comes with.
+        /// </summary>
+        [Required]
         [MaxLength(200)]
         public string Message { get; set; } = string.Empty;
-        /// <value>
-        /// Gets or sets wheter the notification has been read by the user.
-        /// </value>
+
+        /// <summary>
+        /// Whether the notification has been read by the user.
+        /// </summary>
+        [Required]
         public bool IsRead { get; set; } = false;
 
-        /// <value>
-        /// Gets or sets the id of the ticket this notification is related to.
-        /// </value>
+        /// <summary>
+        /// The id of the ticket this notification is related to.
+        /// </summary>
+        [Required]
+        [ForeignKey(nameof(Ticket))]
         public Guid TicketId { get; set; } = Guid.Empty;
-        /// <value>
-        /// Gets or sets the ticket this notification is related to.
-        /// </value>
+
+        /// <summary>
+        /// The ticket this notification is related to.
+        /// </summary>
+        [Required]
+        [Ignore]
+        [JsonIgnore]
         public Ticket Ticket { get; set; } = new Ticket();
 
-        /// <value>
-        /// Gets or sets the id of the user this notification is related to.
-        /// </value>
+        /// <summary>
+        /// The email of the user this notification is related to.
+        /// </summary>
+        [Required]
+        [ForeignKey(nameof(User))]
         [MaxLength(254)]
-        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")]
+        [EmailAddress]
         public string UserEmail { get; set; } = string.Empty;
-        /// <value>
-        /// Gets or sets the user this notification is related to.
-        /// </value>
+
+        /// <summary>
+        /// The user this notification is related to.
+        /// </summary>
+        [Required]
+        [Ignore]
+        [JsonIgnore]
         public User User { get; set; } = new User();
 
-        /// <value>
-        /// Gets the collection of the sent notifications and the user they were sent to.
-        /// </value>
+        /// <summary>
+        /// The collection of the sent notifications and the user they were sent to.
+        /// </summary>
+        [Required]
+        [InverseProperty(nameof(UserNotification.Notification))]
+        [Ignore]
+        [JsonIgnore]
         public ICollection<UserNotification> SentNotifications { get; } = [];
     }
 }

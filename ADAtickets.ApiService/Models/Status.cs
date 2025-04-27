@@ -22,11 +22,23 @@ namespace ADAtickets.ApiService.Models
     /// <summary>
     /// Represents the status of the ticket.
     /// </summary>
-    enum Status
+    public enum Status
     {
+        /// <summary>
+        /// The ticket is open and waiting to be assigned to an operator.
+        /// </summary>
         UNASSIGNED,
+        /// <summary>
+        /// The ticket is assigned to an operator and is waiting for a reply from them.
+        /// </summary>
         WAITING_OPERATOR,
+        /// <summary>
+        /// The ticket is assigned to an operator and is waiting for a reply from the user.
+        /// </summary>
         WAITING_USER,
+        /// <summary>
+        /// The ticket is closed.
+        /// </summary>
         CLOSED
     }
 }

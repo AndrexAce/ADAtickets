@@ -19,6 +19,7 @@
  */
 using AutoMapper.Configuration.Annotations;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace ADAtickets.ApiService.Models
@@ -26,50 +27,68 @@ namespace ADAtickets.ApiService.Models
     /// <summary>
     /// Represents a modification made to a ticket, either by a user or by the system.
     /// </summary>
-    sealed class Edit : EntityBase
+    public sealed class Edit : EntityBase
     {
-        /// <value>
-        /// Gets or sets the unique identifier of the edit.
-        /// </value>
+        /// <summary>
+        /// The unique identifier of the edit.
+        /// </summary>
+        [Key]
+        [Required]
         public Guid Id { get; set; } = Guid.NewGuid();
+
         /// <summary>
-        /// Gets or sets the date and time when the edit was made.
+        /// The date and time when the edit was made.
         /// </summary>
+        [Required]
         public DateTimeOffset EditDateTime { get; set; } = DateTimeOffset.UtcNow;
+
         /// <summary>
-        /// Gets or sets the message the edit comes with.
+        /// The message the edit comes with.
         /// </summary>
+        [Required]
         [MaxLength(200)]
         public string Description { get; set; } = string.Empty;
+
         /// <summary>
-        /// Gets or sets the status the ticket was in before the edit.
+        /// The status the ticket was in before the edit.
         /// </summary>
+        [Required]
         public Status OldStatus { get; set; } = Status.UNASSIGNED;
+
         /// <summary>
-        /// Gets or sets the status the ticket will be after the edit.
+        /// The status the ticket will be after the edit.
         /// </summary>
+        [Required]
         public Status NewStatus { get; set; } = Status.UNASSIGNED;
 
-        /// <value>
-        /// Gets or sets the id of the ticket this edit is related to.
-        /// </value>
+        /// <summary>
+        /// The id of the ticket this edit is related to.
+        /// </summary>
+        [Required]
+        [ForeignKey(nameof(Ticket))]
         public Guid TicketId { get; set; } = Guid.Empty;
-        /// <value>
-        /// Gets or sets the the ticket this edit is related to.
-        /// </value>
+
+        /// <summary>
+        /// The ticket this edit is related to.
+        /// </summary>
+        [Required]
         [Ignore]
         [JsonIgnore]
         public Ticket Ticket { get; set; } = new Ticket();
 
         /// <summary>
-        /// Gets or sets the email of the user who made the edit.
+        /// The email of the user who made the edit.
         /// </summary>
+        [Required]
+        [ForeignKey(nameof(User))]
         [MaxLength(254)]
-        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")]
+        [EmailAddress]
         public string UserEmail { get; set; } = string.Empty;
+
         /// <summary>
-        /// Gets or sets the user who made the edit.
+        /// The user who made the edit.
         /// </summary>
+        [Required]
         [Ignore]
         [JsonIgnore]
         public User User { get; set; } = new User();

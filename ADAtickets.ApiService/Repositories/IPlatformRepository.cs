@@ -24,7 +24,7 @@ namespace ADAtickets.ApiService.Repositories
     /// <summary>
     /// Exposes the methods to manage the <see cref="Platform"/> entities from a data source.
     /// </summary>
-    internal interface IPlatformRepository
+    public interface IPlatformRepository
     {
         /// <summary>
         /// Gets a single <see cref="Platform"/> entity from the data source asynchronously.
@@ -40,13 +40,13 @@ namespace ADAtickets.ApiService.Repositories
         /// <summary>
         /// Adds a new <see cref="Platform"/> entity to the data source asynchronously.
         /// </summary>
-        /// <param name="Platform">The <see cref="Platform"/> entity to add to the data source.</param>
+        /// <param name="platform">The <see cref="Platform"/> entity to add to the data source.</param>
         /// <returns>A <see cref="Task"/> executing the action.</returns>
         Task AddPlatformAsync(Platform platform);
         /// <summary>
         /// Updates an existing <see cref="Platform"/> entity in the data source asynchronously.
         /// </summary>
-        /// <param name="Platform">The <see cref="Platform"/> entity to update in the data source.</param>
+        /// <param name="platform">The <see cref="Platform"/> entity to update in the data source.</param>
         /// <returns>A <see cref="Task"/> executing the action.</returns>
         Task UpdatePlatformAsync(Platform platform);
         /// <summary>

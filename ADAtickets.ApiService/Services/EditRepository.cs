@@ -20,13 +20,14 @@
 using ADAtickets.ApiService.Configs;
 using ADAtickets.ApiService.Models;
 using ADAtickets.ApiService.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace ADAtickets.ApiService.Services
 {
     /// <summary>
     /// Implements the methods to manage the <see cref="Edit"/> entities in the underlying database.
     /// </summary>
-    class EditRepository(ADAticketsDbContext context) : IEditRepository
+    sealed class EditRepository(ADAticketsDbContext context) : IEditRepository
     {
         readonly ADAticketsDbContext _context = context;
 
@@ -37,9 +38,9 @@ namespace ADAtickets.ApiService.Services
         }
 
         /// <inheritdoc cref="IEditRepository.GetEdits"/>
-        public IAsyncEnumerable<Edit> GetEdits()
+        public async Task<IEnumerable<Edit>> GetEdits()
         {
-            return _context.Edits.AsAsyncEnumerable();
+            return await _context.Edits.ToListAsync();
         }
 
         /// <inheritdoc cref="IEditRepository.AddEditAsync(Edit)"/>

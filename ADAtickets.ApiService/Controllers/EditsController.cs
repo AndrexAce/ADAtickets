@@ -22,7 +22,6 @@ using ADAtickets.ApiService.Dtos;
 using ADAtickets.ApiService.Models;
 using ADAtickets.ApiService.Repositories;
 using AutoMapper;
-using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net.Mime;
@@ -36,36 +35,39 @@ namespace ADAtickets.ApiService.Controllers
     /// <param name="mapper">Object definining the mappings of fields between the <see cref="Edit"/> entity and its <see cref="EditDto"/> correspondant.</param>
     [Route("api/Edits")]
     [ApiController]
-    [Consumes(MediaTypeNames.Application.Json)]
+    [Consumes(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
     [Produces(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
     [FormatFilter]
     [ApiConventionType(typeof(ADAticketsApiConventions))]
-    class EditsController(IEditRepository editRepository, IMapper mapper) : ControllerBase
+    public sealed class EditsController(IEditRepository editRepository, IMapper mapper) : ControllerBase
     {
         private readonly IEditRepository _editRepository = editRepository;
         private readonly IMapper _mapper = mapper;
 
         /// <summary>
-        /// Handles the GET request to fetch all the <see cref="Edit"/> entities.
+        /// Fetch all the <see cref="Edit"/> entities.
         /// </summary>
-        /// <returns>A response with an asynchronously enumerable sequence of <see cref="EditDto"/> in its body.</returns>
+        /// <returns>A <see cref="Task"/> returning an <see cref="ActionResult"/>, which wraps the server response and the list of entities.</returns>
+        /// <response code="200">The entities were found.</response>
+        /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpGet]
-        public async IAsyncEnumerable<EditDto> GetEdits()
+        public async Task<ActionResult<IEnumerable<EditDto>>> GetEdits()
         {
-            // Iterate all the elements in the sequence.
-            await foreach (var edit in _editRepository.GetEdits())
-            {
-                // Insert the entity data into a new DTO and send it to the client.
-                yield return _mapper.Map(edit, new EditDto());
-            }
+            var edits = await _editRepository.GetEdits();
+
+            return Ok(edits.Select(edit => _mapper.Map(edit, new EditDto())));
         }
 
         /// <summary>
-        /// Handles the GET request to fetch a specific <see cref="Edit"/> entity.
+        /// Fetch a specific <see cref="Edit"/> entity.
         /// </summary>
         /// <param name="id">Identifier of the <see cref="Edit"/> entity to fetch.</param>
-        /// <returns>A <see cref="Task"/> returning an <see cref="ActionResult"/>, which wraps the server response.</returns>
-        [HttpGet("{id}.{format?}")]
+        /// <returns>A <see cref="Task"/> returning an <see cref="ActionResult"/>, which wraps the server response and the requested entity.</returns>
+        /// <response code="200">The entity was found.</response>
+        /// <response code="400">The provided id was not a Guid.</response>
+        /// <response code="404">The entity with the given id didn't exist.</response>
+        /// <response code="406">The client asked for an unsupported response format.</response>
+        [HttpGet("{id}")]
         public async Task<ActionResult<EditDto>> GetEdit(Guid id)
         {
             // Check if the requested entity exists.
@@ -79,11 +81,42 @@ namespace ADAtickets.ApiService.Controllers
         }
 
         /// <summary>
-        /// Handles the PUT request to update a specific <see cref="Edit"/> entity.
+        /// Update a specific <see cref="Edit"/> entity.
         /// </summary>
+        /// <remarks>
+        /// JSON request body example:
+        /// 
+        ///     {
+        ///         "id": "123e4567-e89b-12d3-a456-426614174000",
+        ///         "editDateTime": "2025-04-27T16:31:17.512Z",
+        ///         "description": "Example description.",
+        ///         "oldStatus": "UNASSIGNED",
+        ///         "newStatus": "WAITING_OPERATOR",
+        ///         "ticketId": "123e4567-e89b-12d3-a456-426614174000",
+        ///         "userEmail": "example@email.com"
+        ///      }
+        ///
+        /// XML request body example:
+        /// 
+        ///     <EditDto>
+        ///         <Id>123e4567-e89b-12d3-a456-426614174000</Id>
+        ///         <EditDateTime>2025-04-27T16:31:17.512Z</EditDateTime>
+        ///         <Description>Example description.</Description>
+        ///         <OldStatus>UNASSIGNED</OldStatus>
+        ///         <NewStatus>WAITING_OPERATOR</NewStatus>
+        ///         <TicketId>123e4567-e89b-12d3-a456-426614174000</TicketId>
+        ///         <UserEmail>example@email.com</UserEmail>
+        ///     </EditDto>
+        /// </remarks>
         /// <param name="id">Identifier of the <see cref="Edit"/> entity to update.</param>
         /// <param name="editDto">Object containing the new values the fields should be updated to.</param>
-        /// <returns>A <see cref="Task"/> returning an <see cref="ActionResult"/>, which wraps the server response and the new object.</returns>
+        /// <returns>A <see cref="Task"/> returning an <see cref="ActionResult"/>, which wraps the server response and the new or updated entity.</returns>
+        /// <response code="201">The entity didn't exist, it was created.</response>
+        /// <response code="204">The entity existed, it was updated.</response>
+        /// <response code="400">The given id and the entity id didn't match, the entity was malformed, or the provided id was not a Guid.</response>
+        /// <response code="404">The entity was deleted before the update.</response>
+        /// <response code="406">The client asked for an unsupported response format.</response>
+        /// <response code="409">The entity was updated by another request at the same time.</response>
         [HttpPut("{id}")]
         public async Task<ActionResult<EditDto>> PutEdit(Guid id, EditDto editDto)
         {
@@ -120,10 +153,38 @@ namespace ADAtickets.ApiService.Controllers
         }
 
         /// <summary>
-        /// Handles the POST request to create a new <see cref="Edit"/> entity.
+        /// Create a new <see cref="Edit"/> entity.
         /// </summary>
+        /// <remarks>
+        /// JSON request body example:
+        /// 
+        ///     {
+        ///         "id": "123e4567-e89b-12d3-a456-426614174000",
+        ///         "editDateTime": "2025-04-27T16:31:17.512Z",
+        ///         "description": "Example description.",
+        ///         "oldStatus": "UNASSIGNED",
+        ///         "newStatus": "WAITING_OPERATOR",
+        ///         "ticketId": "123e4567-e89b-12d3-a456-426614174000",
+        ///         "userEmail": "example@email.com"
+        ///      }
+        ///
+        /// XML request body example:
+        /// 
+        ///     <EditDto>
+        ///         <Id>123e4567-e89b-12d3-a456-426614174000</Id>
+        ///         <EditDateTime>2025-04-27T16:31:17.512Z</EditDateTime>
+        ///         <Description>Example description.</Description>
+        ///         <OldStatus>UNASSIGNED</OldStatus>
+        ///         <NewStatus>WAITING_OPERATOR</NewStatus>
+        ///         <TicketId>123e4567-e89b-12d3-a456-426614174000</TicketId>
+        ///         <UserEmail>example@email.com</UserEmail>
+        ///     </EditDto>
+        /// </remarks>
         /// <param name="edit">Object containing the values the new entity should have.</param>
-        /// <returns>A <see cref="Task"/> returning an <see cref="ActionResult"/>, which wraps the server response and the new object.</returns>
+        /// <returns>A <see cref="Task"/> returning an <see cref="ActionResult"/>, which wraps the server response and the new entity.</returns>
+        /// <response code="201">The entity was created.</response>
+        /// <response code="400">The entity was malformed.</response>
+        /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpPost]
         public async Task<ActionResult<EditDto>> PostEdit(EditDto edit)
         {
@@ -135,10 +196,14 @@ namespace ADAtickets.ApiService.Controllers
         }
 
         /// <summary>
-        /// Handles the DELETE request to delete a specific <see cref="Edit"/> entity.
+        /// Delete a specific <see cref="Edit"/> entity.
         /// </summary>
         /// <param name="id">Identifier of the <see cref="Edit"/> entity to delete.</param>
         /// <returns>A <see cref="Task"/> returning an <see cref="IActionResult"/>, which wraps the server response.</returns>
+        /// <response code="204">The entity was deleted.</response>
+        /// <response code="400">The provided id was not a Guid.</response>
+        /// <response code="404">The entity with the given id didn't exist.</response>
+        /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEdit(Guid id)
         {
@@ -151,39 +216,6 @@ namespace ADAtickets.ApiService.Controllers
             await _editRepository.DeleteEditAsync(edit);
 
             return NoContent();
-        }
-
-        /// <summary>
-        /// Handles the exceptions and errors in development environment.
-        /// </summary>
-        /// <param name="hostEnvironment">Object containing information about the current runtime environment.</param>
-        /// <returns>An <see cref="IActionResult"/> which wraps the server response.</returns>
-        [Route("/error-dev")]
-        [ApiExplorerSettings(IgnoreApi = true)]
-        public IActionResult HandleErrorDevelopment([FromServices] IHostEnvironment hostEnvironment)
-        {
-            // Makes the endpoint unaccessible in non-development environments.
-            if (!hostEnvironment.IsDevelopment())
-            {
-                return NotFound();
-            }
-
-            // Configure the exception handler to show the error message.
-            var exceptionHandlerFeature = HttpContext.Features.Get<IExceptionHandlerFeature>()!;
-
-            return Problem(detail: exceptionHandlerFeature.Error.StackTrace, title: exceptionHandlerFeature.Error.Message, statusCode: StatusCodes.Status500InternalServerError);
-        }
-
-        /// <summary>
-        /// Handles the exceptions and errors in production environment.
-        /// </summary>
-        /// <returns>An <see cref="IActionResult"/> which wraps the server response.</returns>
-        [Route("/error")]
-        [ApiExplorerSettings(IgnoreApi = true)]
-        public IActionResult HandleError()
-        {
-            // Configure the exception handler to show the error message.
-            return Problem(detail: "An unexpected error occurred. Please try again later.", title: "Internal Server Error", statusCode: StatusCodes.Status500InternalServerError);
         }
     }
 }

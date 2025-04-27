@@ -17,8 +17,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using AutoMapper.Configuration.Annotations;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace ADAtickets.ApiService.Models
 {
@@ -26,22 +29,29 @@ namespace ADAtickets.ApiService.Models
     /// Represents an attachment associated with a ticket.
     /// </summary>
     [PrimaryKey(nameof(Path), nameof(TicketId))]
-    sealed class Attachment : EntityBase
+    public sealed class Attachment : EntityBase
     {
-        /// <value>
-        /// Gets or sets the path of the attachment on the server.
-        /// </value>
+        /// <summary>
+        /// The path of the attachment on the server.
+        /// </summary>
+        [Required]
         [MaxLength(4000)]
         [RegularExpression(@"^[a-zA-Z0-9_\-\/\.]+$")]
         public string Path { get; set; } = string.Empty;
 
-        /// <value>
-        /// Gets or sets the id of the ticket this attachment is related to.
-        /// </value>
+        /// <summary>
+        /// The id of the ticket this attachment is related to.
+        /// </summary>
+        [Required]
+        [ForeignKey(nameof(Ticket))]
         public Guid TicketId { get; set; } = Guid.Empty;
-        /// <value>
-        /// Gets or sets the ticket this attachment is related to.
-        /// </value>
+
+        /// <summary>
+        /// The ticket this attachment is related to.
+        /// </summary>
+        [Required]
+        [Ignore]
+        [JsonIgnore]
         public Ticket Ticket { get; set; } = new Ticket();
     }
 }

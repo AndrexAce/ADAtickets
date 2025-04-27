@@ -17,46 +17,68 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using AutoMapper.Configuration.Annotations;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace ADAtickets.ApiService.Models
 {
     /// <summary>
     /// Represents a reply in a ticket comment thread.
     /// </summary>
-    sealed class Reply : EntityBase
+    public sealed class Reply : EntityBase
     {
-        /// <value>
-        /// Gets or sets the unique identifier of the reply.
-        /// </value>
+        /// <summary>
+        /// The unique identifier of the reply.
+        /// </summary>
+        [Key]
+        [Required]
         public Guid Id { get; set; } = Guid.NewGuid();
-        /// <value>
-        /// Gets or sets the date and time when the reply was sent.
-        /// </value>
+
+        /// <summary>
+        /// The date and time when the reply was sent.
+        /// </summary>
+        [Required]
         public DateTimeOffset ReplyDateTime { get; set; } = DateTimeOffset.Now;
-        /// <value>
-        /// Gets or sets the message written in the reply.
-        /// </value>
+
+        /// <summary>
+        /// The message written in the reply.
+        /// </summary>
+        [Required]
         [MaxLength(5000)]
         public string Message { get; set; } = string.Empty;
 
-        /// <value>
-        /// Gets or sets the email of the user who sent the reply.
-        /// </value>
+        /// <summary>
+        /// The email of the user who sent the reply.
+        /// </summary>
+        [Required]
+        [ForeignKey(nameof(AuthorUser))]
         [MaxLength(254)]
+        [EmailAddress]
         public string AuthorUserEmail { get; set; } = string.Empty;
-        /// <value>
-        /// Gets or sets the user who sent the reply.
-        /// </value>
+
+        /// <summary>
+        /// The user who sent the reply.
+        /// </summary>
+        [Required]
+        [Ignore]
+        [JsonIgnore]
         public User AuthorUser { get; set; } = new User();
 
-        /// <value>
-        /// Gets or sets the id of the ticket this reply was sent to.
-        /// </value>
+        /// <summary>
+        /// The id of the ticket this reply was sent to.
+        /// </summary>
+        [Required]
+        [ForeignKey(nameof(Ticket))]
         public Guid TicketId { get; set; } = Guid.Empty;
-        /// <value>
-        /// Gets or sets the ticket this reply was sent to.
-        /// </value>
+
+        /// <summary>
+        /// The ticket this reply was sent to.
+        /// </summary>
+        [Required]
+        [Ignore]
+        [JsonIgnore]
         public Ticket Ticket { get; set; } = new Ticket();
     }
 }

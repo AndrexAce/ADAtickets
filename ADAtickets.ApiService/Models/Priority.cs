@@ -22,10 +22,19 @@ namespace ADAtickets.ApiService.Models
     /// <summary>
     /// Represents the urgency of a ticket.
     /// </summary>
-    enum Priority
+    public enum Priority
     {
+        /// <summary>
+        /// The ticket can be dealt with at a later time.
+        /// </summary>
         LOW,
+        /// <summary>
+        /// The ticket should be dealt with whenever possible.
+        /// </summary>
         MEDIUM,
+        /// <summary>
+        /// The ticket must be dealt with as soon as possible.
+        /// </summary>
         HIGH
     }
 }

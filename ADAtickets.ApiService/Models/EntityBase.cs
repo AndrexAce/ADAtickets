@@ -17,7 +17,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using AutoMapper.Configuration.Annotations;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace ADAtickets.ApiService.Models
 {
@@ -25,12 +27,14 @@ namespace ADAtickets.ApiService.Models
     /// <para>Base class for all entities in the ADAtickets model.</para>
     /// <para>Contains common properties and methods.</para>
     /// </summary>
-    class EntityBase
+    public abstract class EntityBase
     {
-        /// <value>
+        /// <summary>
         /// Reserved field used to detect concurrent modification to the entity.
-        /// </value>
+        /// </summary>
         [Timestamp]
-        public uint Version { get; set; } = 0;
+        [Ignore]
+        [JsonIgnore]
+        public uint Version { get; } = 0;
     }
 }

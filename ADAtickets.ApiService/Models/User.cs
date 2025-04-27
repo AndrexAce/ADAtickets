@@ -17,106 +17,154 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using AutoMapper.Configuration.Annotations;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace ADAtickets.ApiService.Models
 {
     /// <summary>
     /// Represents a user of the system.
     /// </summary>
-    sealed class User : EntityBase
+    public sealed class User : EntityBase
     {
-        /// <value>
-        /// Gets or sets the email of the user.
-        /// </value>
+        /// <summary>
+        /// The email of the user.
+        /// </summary>
         [Key]
+        [Required]
         [MaxLength(254)]
-        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")]
+        [EmailAddress]
         public string Email { get; set; } = string.Empty;
-        /// <value>
-        /// <para>Gets or sets the password of the user.</para>
+
+        /// <summary>
+        /// <para>The password of the user.</para>
         /// <para>The password is hashed so that it is not internally visible.</para>
-        /// </value>
+        /// </summary>
+        [Required]
+        [MinLength(8)]
         [MaxLength(64)]
         public string Password { get; set; } = string.Empty;
-        /// <value>
-        /// Gets or sets the name of the user.
-        /// </value>
+
+        /// <summary>
+        /// The name of the user.
+        /// </summary>
+        [Required]
         [MaxLength(50)]
         public string Name { get; set; } = string.Empty;
-        /// <value>
-        /// Gets or sets the surname of the user.
-        /// </value>
+
+        /// <summary>
+        /// The surname of the user.
+        /// </summary>
+        [Required]
         [MaxLength(50)]
         public string Surname { get; set; } = string.Empty;
-        /// <value>
-        /// Gets or sets the phone number of the user.
-        /// </value>
-        [MaxLength(20)]
-        [RegularExpression(@"^\+?[0-9\s\-()]+$")]
-        public string PhoneNumber { get; set; } = string.Empty;
-        /// <value>
-        /// Gets or sets whether the user enabled the two factor authentication via email.
-        /// </value>
-        public bool IsEmail2FAEnabled { get; set; } = false;
-        /// <value>
-        /// Gets or sets whether the user enabled the two factor authentication via SMS.
-        /// </value>
-        public bool IsPhone2FAEnabled { get; set; } = false;
-        /// <value>
-        /// Gets or sets whether the user enabled the reception of external notifications via email.
-        /// </value>
-        public bool AreEmailNotificationsEnabled { get; set; } = false;
-        /// <value>
-        /// Gets or sets whether the user enabled the reception of external notifications via SMS.
-        /// </value>
-        public bool ArePhoneNotificationsEnabled { get; set; } = false;
-        /// <value>
-        /// Gets or sets the role of the user in the system.
-        /// </value>
-        public UserType Type { get; set; } = UserType.USER;
-        /// <value>
-        /// Gets or sets the unique identifier of the user's Microsoft account.
-        /// </value>
-        [MaxLength(20)]
-        public string MicrosoftAccountId { get; set; } = string.Empty;
 
-        /// <value>
-        /// Gets the collection of tickets created by the user (if they are a user, otherwise it must be empty).
-        /// </value>
-        [InverseProperty("CreatorUser")]
+        /// <summary>
+        /// The phone number of the user.
+        /// </summary>
+        [MaxLength(20)]
+        [Phone]
+        public string? PhoneNumber { get; set; } = null;
+
+        /// <summary>
+        /// Whether the user enabled the two-factor authentication via email.
+        /// </summary>
+        [Required]
+        public bool IsEmail2FAEnabled { get; set; } = false;
+
+        /// <summary>
+        /// Whether the user enabled the two-factor authentication via SMS.
+        /// </summary>
+        [Required]
+        public bool IsPhone2FAEnabled { get; set; } = false;
+
+        /// <summary>
+        /// Whether the user enabled the reception of external notifications via email.
+        /// </summary>
+        [Required]
+        public bool AreEmailNotificationsEnabled { get; set; } = false;
+
+        /// <summary>
+        /// Whether the user enabled the reception of external notifications via SMS.
+        /// </summary>
+        [Required]
+        public bool ArePhoneNotificationsEnabled { get; set; } = false;
+
+        /// <summary>
+        /// The role of the user in the system.
+        /// </summary>
+        [Required]
+        public UserType Type { get; set; } = UserType.USER;
+
+        /// <summary>
+        /// The unique identifier of the user's Microsoft account.
+        /// </summary>
+        [MaxLength(20)]
+        public string? MicrosoftAccountId { get; set; } = null;
+
+        /// <summary>
+        /// The collection of tickets created by the user (if they are a user, otherwise it must be empty).
+        /// </summary>
+        [Required]
+        [InverseProperty(nameof(Ticket.CreatorUser))]
+        [Ignore]
+        [JsonIgnore]
         public ICollection<Ticket> CreatedTickets { get; } = [];
 
-        /// <value>
-        /// Gets the collection of tickets assigned to the user (if they are an operator, otherwise it must be empty).
-        /// </value>
-        [InverseProperty("OperatorUser")]
+        /// <summary>
+        /// The collection of tickets assigned to the user (if they are an operator, otherwise it must be empty).
+        /// </summary>
+        [Required]
+        [InverseProperty(nameof(Ticket.OperatorUser))]
+        [Ignore]
+        [JsonIgnore]
         public ICollection<Ticket> AssignedTickets { get; } = [];
 
-        /// <value>
-        /// Gets the collection of replies sent by the user to any ticket.
-        /// </value>
+        /// <summary>
+        /// The collection of replies sent by the user to any ticket.
+        /// </summary>
+        [Required]
+        [InverseProperty(nameof(Reply.AuthorUser))]
+        [Ignore]
+        [JsonIgnore]
         public ICollection<Reply> Replies { get; } = [];
 
-        /// <value>
-        /// Gets the collection of edits made by the user to any ticket.
-        /// </value>
+        /// <summary>
+        /// The collection of edits made by the user to any ticket.
+        /// </summary>
+        [Required]
+        [InverseProperty(nameof(Edit.User))]
+        [Ignore]
+        [JsonIgnore]
         public ICollection<Edit> Edits { get; } = [];
 
-        /// <value>
-        /// Gets the collection of platforms the user prefers (if they are an operator, otherwise it must be empty).
-        /// </value>
+        /// <summary>
+        /// The collection of platforms the user prefers (if they are an operator, otherwise it must be empty).
+        /// </summary>
+        [Required]
+        [InverseProperty(nameof(UserPlatform.User))]
+        [Ignore]
+        [JsonIgnore]
         public ICollection<UserPlatform> PreferredPlatforms { get; } = [];
 
-        /// <value>
-        /// Gets the collection of notifications the user triggered the sending of.
-        /// </value>
+        /// <summary>
+        /// The collection of notifications the user triggered the sending of.
+        /// </summary>
+        [Required]
+        [InverseProperty(nameof(Notification.User))]
+        [Ignore]
+        [JsonIgnore]
         public ICollection<Notification> SentNotifications { get; } = [];
 
-        /// <value>
-        /// Gets the collection of notifications the user received.
-        /// </value>
+        /// <summary>
+        /// The collection of notifications the user received.
+        /// </summary>
+        [Required]
+        [InverseProperty(nameof(UserNotification.ReceiverUser))]
+        [Ignore]
+        [JsonIgnore]
         public ICollection<UserNotification> ReceivedNotifications { get; } = [];
     }
 }
