@@ -34,9 +34,6 @@ builder.Services
 // Add OpenAPI support for the APIs.
 builder.Services.AddOpenApi();
 
-// Add service defaults & Aspire client integrations.
-builder.AddServiceDefaults();
-
 // Add services used to return detailed error messages for failed requests.
 builder.Services.AddProblemDetails();
 
