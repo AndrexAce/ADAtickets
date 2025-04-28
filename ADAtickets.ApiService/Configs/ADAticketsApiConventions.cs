@@ -29,7 +29,7 @@ namespace ADAtickets.ApiService.Configs
     {
 #pragma warning disable IDE0060 // Remove unused parameter
         /// <summary>
-        /// GET api methods convention.
+        /// GET api methods convention (single entity).
         /// </summary>
         /// <param name="id">The identifier of the resource to fetch.</param>
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -42,6 +42,17 @@ namespace ADAtickets.ApiService.Configs
             [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.Any)]
 
             object id)
+        {
+            // This method is intentionally left empty. The attributes above are used to define the convention.
+        }
+
+        /// <summary>
+        /// GET api methods convention (all entities).
+        /// </summary>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
+        [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
+        public static void Get()
         {
             // This method is intentionally left empty. The attributes above are used to define the convention.
         }

@@ -113,13 +113,12 @@ if (app.Environment.IsDevelopment())
         options.Theme = ScalarTheme.BluePlanet;
     });
 
-    // Create an exception handler to show a personalised error message based on the environment.
-    app.UseExceptionHandler("/error-dev");
+    // When exceptions happen dunring development, show a detailed screen.
+    app.UseDeveloperExceptionPage();
 }
-else
-{
-    app.UseExceptionHandler("/error");
-}
+
+// Create an exception handler to handle exceptions in APIs.
+app.UseExceptionHandler();
 
 // Configure an interceptor for 4xx and 5xx errors to return a JSON response with the error details.
 app.UseStatusCodePages();
