@@ -1,8 +1,28 @@
+/*
+ * ADAtickets is a simple, lightweight, open source ticketing system
+ * interacting with your enterprise's repositories on Azure DevOps 
+ * with a two-way synchronization.
+ * Copyright (C) 2025  Andrea Lucchese
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 using ADAtickets.ApiService.Configs;
 using ADAtickets.ApiService.Models;
 using ADAtickets.ApiService.Repositories;
 using ADAtickets.ApiService.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
@@ -14,13 +34,63 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add the Azure authentication services.
+// Configure EntraID authentication for Microsoft work accounts.
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"), "AzureAd");
+
+// Configure local authentication with Identity.
+builder.Services.AddIdentityApiEndpoints<IdentityUser<Guid>>(options =>
+{
+    options.Password.RequiredLength = 8;
+
+    options.SignIn.RequireConfirmedAccount = true;
+    options.SignIn.RequireConfirmedEmail = true;
+
+    options.User.RequireUniqueEmail = true;
+})
+    .AddEntityFrameworkStores<ADAticketsDbContext>();
+
+const string identityScheme = "Identity.Application";
+const string azureAdScheme = "AzureAd";
+
+// Configure the authorization.
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("AuthenticatedUserOnly", policy =>
+    {
+        policy.RequireRole(nameof(UserType.User))
+        .RequireAuthenticatedUser()
+        .AddAuthenticationSchemes(identityScheme, azureAdScheme);
+    })
+    .AddPolicy("AuthenticatedOperatorOnly", policy =>
+    {
+        policy.RequireRole(nameof(UserType.Operator))
+        .RequireAuthenticatedUser()
+        .AddAuthenticationSchemes(identityScheme, azureAdScheme);
+    })
+    .AddPolicy("AuthenticatedAdminOnly", policy =>
+    {
+        policy.RequireRole(nameof(UserType.Admin))
+        .RequireAuthenticatedUser()
+        .AddAuthenticationSchemes(identityScheme, azureAdScheme);
+    })
+    .AddPolicy("AuthenticatedOperator", policy =>
+    {
+        policy.RequireRole(nameof(UserType.Operator), nameof(UserType.Admin))
+        .RequireAuthenticatedUser()
+        .AddAuthenticationSchemes(identityScheme, azureAdScheme);
+    })
+    .AddPolicy("AuthenticatedEveryone", policy =>
+    {
+        policy.RequireRole(nameof(UserType.User), nameof(UserType.Operator), nameof(UserType.Admin))
+        .RequireAuthenticatedUser()
+        .AddAuthenticationSchemes(identityScheme, azureAdScheme);
+    })
+    .AddDefaultPolicy("Unauthenticated", policy => policy.RequireAssertion(_ => true));
+
 
 // Add services commonly used with controllers APIs.
 builder.Services
-    .AddControllers(options => // Require the APIs to respect the broswer request media type, and return a 406 Not Acceptable response if the media type is not supported.
+    .AddControllers(options =>// Require the APIs to respect the broswer request media type, and return a 406 Not Acceptable response if the media type is not supported.
     {
         options.RespectBrowserAcceptHeader = true;
         options.ReturnHttpNotAcceptable = true;
@@ -101,13 +171,13 @@ if (app.Environment.IsDevelopment())
     var db = scope.ServiceProvider.GetRequiredService<ADAticketsDbContext>();
     await db.Database.MigrateAsync();
 
-    // Create an endpoint to access the API documentation.
+    // Map an endpoint to access the API documentation.
     app.UseSwagger(options =>
     {
         options.RouteTemplate = "/openapi/{documentName}.json";
     });
 
-    // Create an endpoint to access the API documentation via Scalar.
+    // Map an endpoint to access the API documentation via Scalar.
     app.MapScalarApiReference(options =>
     {
         options.Theme = ScalarTheme.BluePlanet;
@@ -126,10 +196,16 @@ app.UseStatusCodePages();
 // Add the redirection from HTTP to HTTPS.
 app.UseHttpsRedirection();
 
-// Add the authentication service for the API.
+// Add the authentication middleware.
+app.UseAuthentication();
+
+// Add the authentication middleware.
 app.UseAuthorization();
 
-// Add the controllers endpoints.
+// Map the authentication endpoints.
+app.MapIdentityApi<IdentityUser<Guid>>();
+
+// Map the controllers endpoints.
 app.MapControllers();
 
 // Start the application.

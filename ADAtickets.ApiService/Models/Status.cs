@@ -27,18 +27,18 @@ namespace ADAtickets.ApiService.Models
         /// <summary>
         /// The ticket is open and waiting to be assigned to an operator.
         /// </summary>
-        UNASSIGNED,
+        Unassigned,
         /// <summary>
         /// The ticket is assigned to an operator and is waiting for a reply from them.
         /// </summary>
-        WAITING_OPERATOR,
+        WaitingOperator,
         /// <summary>
         /// The ticket is assigned to an operator and is waiting for a reply from the user.
         /// </summary>
-        WAITING_USER,
+        WaitingUser,
         /// <summary>
         /// The ticket is closed.
         /// </summary>
-        CLOSED
+        Closed
     }
 }

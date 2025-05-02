@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using AutoMapper.Configuration.Annotations;
+using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
@@ -30,22 +31,11 @@ namespace ADAtickets.ApiService.Models
     public sealed class User : EntityBase
     {
         /// <summary>
-        /// The email of the user.
+        /// The unique identifier of the user.
         /// </summary>
         [Key]
         [Required]
-        [MaxLength(254)]
-        [EmailAddress]
-        public string Email { get; set; } = string.Empty;
-
-        /// <summary>
-        /// <para>The password of the user.</para>
-        /// <para>The password is hashed so that it is not internally visible.</para>
-        /// </summary>
-        [Required]
-        [MinLength(8)]
-        [MaxLength(64)]
-        public string Password { get; set; } = string.Empty;
+        public Guid Id { get; set; } = Guid.NewGuid();
 
         /// <summary>
         /// The name of the user.
@@ -60,13 +50,6 @@ namespace ADAtickets.ApiService.Models
         [Required]
         [MaxLength(50)]
         public string Surname { get; set; } = string.Empty;
-
-        /// <summary>
-        /// The phone number of the user.
-        /// </summary>
-        [MaxLength(20)]
-        [Phone]
-        public string? PhoneNumber { get; set; } = null;
 
         /// <summary>
         /// Whether the user enabled the two-factor authentication via email.
@@ -96,13 +79,23 @@ namespace ADAtickets.ApiService.Models
         /// The role of the user in the system.
         /// </summary>
         [Required]
-        public UserType Type { get; set; } = UserType.USER;
+        public UserType Type { get; set; } = UserType.User;
 
         /// <summary>
         /// The unique identifier of the user's Microsoft account.
         /// </summary>
         [MaxLength(20)]
         public string? MicrosoftAccountId { get; set; } = null;
+
+        /// <summary>
+        /// The unique identifier of the user's ASP.NET Identity User.
+        /// </summary>
+        public Guid IdentityUserId { get; set; } = Guid.Empty;
+
+        /// <summary>
+        /// The ASP.NET Identity User associated with this user.
+        /// </summary>
+        public IdentityUser<Guid> IdentityUser { get; set; } = new IdentityUser<Guid>();
 
         /// <summary>
         /// The collection of tickets created by the user (if they are a user, otherwise it must be empty).

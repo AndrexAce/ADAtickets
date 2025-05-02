@@ -31,11 +31,11 @@ namespace ADAtickets.ApiService.Services
     {
         readonly ADAticketsDbContext _context = context;
 
-        /// <inheritdoc cref="IPlatformRepository.GetPlatformByNameAsync(string)"/>
+        /// <inheritdoc cref="IPlatformRepository.GetPlatformByIdAsync(Guid)"/>
         /// <exception cref="InvalidOperationException">When the entity was not found.</exception>
-        public async Task<Platform> GetPlatformByNameAsync(string name)
+        public async Task<Platform> GetPlatformByIdAsync(Guid id)
         {
-            return await _context.Platforms.FindAsync(name) ?? throw new InvalidOperationException($"Entity of type {typeof(Platform)} with name {name} was not found.");
+            return await _context.Platforms.FindAsync(id) ?? throw new InvalidOperationException($"Entity of type {typeof(Platform)} with id {id} was not found.");
         }
 
         /// <inheritdoc cref="IPlatformRepository.GetPlatformsAsync"/>
@@ -63,12 +63,12 @@ namespace ADAtickets.ApiService.Services
             await _context.SaveChangesAsync();
         }
 
-        /// <inheritdoc cref="IPlatformRepository.DeletePlatformAsync(string)"/>
+        /// <inheritdoc cref="IPlatformRepository.DeletePlatformAsync(Guid)"/>
         /// <exception cref="InvalidOperationException">When the entity to delete was not found.</exception>""
-        public async Task DeletePlatformAsync(string name)
+        public async Task DeletePlatformAsync(Guid id)
         {
-            if (await _context.Platforms.FindAsync(name) is not Platform platform)
-                throw new InvalidOperationException($"Entity of type {typeof(Platform)} with name {name} was not found.");
+            if (await _context.Platforms.FindAsync(id) is not Platform platform)
+                throw new InvalidOperationException($"Entity of type {typeof(Platform)} with id {id} was not found.");
             _context.Remove(platform);
             await _context.SaveChangesAsync();
         }

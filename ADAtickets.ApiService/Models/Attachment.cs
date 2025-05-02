@@ -28,9 +28,16 @@ namespace ADAtickets.ApiService.Models
     /// <summary>
     /// Represents an attachment associated with a ticket.
     /// </summary>
-    [PrimaryKey(nameof(Path), nameof(TicketId))]
+    [Index(nameof(Path), nameof(TicketId), IsUnique = true)]
     public sealed class Attachment : EntityBase
     {
+        /// <summary>
+        /// The unique identifier of the attachment.
+        /// </summary>
+        [Key]
+        [Required]
+        public Guid Id { get; set; } = Guid.Empty;
+
         /// <summary>
         /// The path of the attachment on the server.
         /// </summary>

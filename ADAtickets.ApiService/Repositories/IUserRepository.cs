@@ -29,9 +29,9 @@ namespace ADAtickets.ApiService.Repositories
         /// <summary>
         /// Gets a single <see cref="User"/> entity from the data source asynchronously.
         /// </summary>
-        /// <param name="email">The unique identifier of the <see cref="User"/> entity.</param>
-        /// <returns>A <see cref="Task"/> returning the <see cref="User"/> with the given <paramref name="name"/>.</returns>
-        Task<User> GetUserByEmailAsync(string email);
+        /// <param name="id">The unique identifier of the <see cref="User"/> entity.</param>
+        /// <returns>A <see cref="Task"/> returning the <see cref="User"/> with the given <paramref name="id"/>.</returns>
+        Task<User> GetUserByIdAsync(Guid id);
         /// <summary>
         /// Gets all <see cref="User"/> entities from the data source asynchronously.
         /// </summary>
@@ -52,8 +52,8 @@ namespace ADAtickets.ApiService.Repositories
         /// <summary>
         /// Deletes an <see cref="User"/> entity from the data source asynchronously.
         /// </summary>
-        /// <param name="email">The unique identifier of the <see cref="User"/> entity.</param>
+        /// <param name="id">The unique identifier of the <see cref="User"/> entity.</param>
         /// <returns>A <see cref="Task"/> executing the action.</returns>
-        Task DeleteUserAsync(string email);
+        Task DeleteUserAsync(Guid id);
     }
 }

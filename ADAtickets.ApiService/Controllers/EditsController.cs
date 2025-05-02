@@ -22,6 +22,7 @@ using ADAtickets.ApiService.Dtos;
 using ADAtickets.ApiService.Models;
 using ADAtickets.ApiService.Repositories;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net.Mime;
@@ -45,15 +46,27 @@ namespace ADAtickets.ApiService.Controllers
         private readonly IMapper _mapper = mapper;
 
         /// <summary>
-        /// Fetch all the <see cref="Edit"/> entities.
+        /// Fetch all the <see cref="Edit"/> entities or all the entities respecting the given criteria.
         /// </summary>
+        /// <remarks>
+        /// For example, the following request:
+        /// 
+        ///     GET /api/Edits?ticketId=123e4567-e89b-12d3-a456-426614174000&amp;oldStatus=Unassigned
+        ///     
+        /// Retrieves the entities linked to the ticket with id <b>123e4567-e89b-12d3-a456-426614174000</b> and which were, before the edit, in the <b>Unassigned</b> status.
+        /// </remarks>
+        /// <param name="filters">A group of key-value pairs defining the property name and value <see cref="Edit"/> entities should be filtered by.</param>
         /// <returns>A <see cref="Task"/> returning an <see cref="ActionResult"/>, which wraps the server response and the list of entities.</returns>
         /// <response code="200">The entities were found.</response>
+        /// <response code="400">The provided filters were not formatted correctly.</response>
+        /// <response code="401">The client was not authenticated.</response>
+        /// <response code="403">The client was authenticated but had not enough privileges.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<EditDto>>> GetEdits()
+        [Authorize(Policy = "AuthenticatedEveryone")]
+        public async Task<ActionResult<IEnumerable<EditDto>>> GetEdits([FromQuery] IEnumerable<KeyValuePair<string, string>>? filters)
         {
-            var edits = await _editRepository.GetEdits();
+            var edits = await (filters != null ? _editRepository.GetEditsBy(filters) : _editRepository.GetEdits());
 
             return Ok(edits.Select(edit => _mapper.Map(edit, new EditDto())));
         }
@@ -65,9 +78,12 @@ namespace ADAtickets.ApiService.Controllers
         /// <returns>A <see cref="Task"/> returning an <see cref="ActionResult"/>, which wraps the server response and the requested entity.</returns>
         /// <response code="200">The entity was found.</response>
         /// <response code="400">The provided id was not a Guid.</response>
+        /// <response code="401">The client was not authenticated.</response>
+        /// <response code="403">The client was authenticated but had not enough privileges.</response>
         /// <response code="404">The entity with the given id didn't exist.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpGet("{id}")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<ActionResult<EditDto>> GetEdit(Guid id)
         {
             // Check if the requested entity exists.
@@ -90,8 +106,8 @@ namespace ADAtickets.ApiService.Controllers
         ///         "id": "123e4567-e89b-12d3-a456-426614174000",
         ///         "editDateTime": "2025-04-27T16:31:17.512Z",
         ///         "description": "Example description.",
-        ///         "oldStatus": "UNASSIGNED",
-        ///         "newStatus": "WAITING_OPERATOR",
+        ///         "oldStatus": "Unassigned",
+        ///         "newStatus": "WaitingOperator",
         ///         "ticketId": "123e4567-e89b-12d3-a456-426614174000",
         ///         "userEmail": "example@email.com"
         ///      }
@@ -102,8 +118,8 @@ namespace ADAtickets.ApiService.Controllers
         ///         <Id>123e4567-e89b-12d3-a456-426614174000</Id>
         ///         <EditDateTime>2025-04-27T16:31:17.512Z</EditDateTime>
         ///         <Description>Example description.</Description>
-        ///         <OldStatus>UNASSIGNED</OldStatus>
-        ///         <NewStatus>WAITING_OPERATOR</NewStatus>
+        ///         <OldStatus>Unassigned</OldStatus>
+        ///         <NewStatus>WaitingOperator</NewStatus>
         ///         <TicketId>123e4567-e89b-12d3-a456-426614174000</TicketId>
         ///         <UserEmail>example@email.com</UserEmail>
         ///     </EditDto>
@@ -114,10 +130,13 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="201">The entity didn't exist, it was created.</response>
         /// <response code="204">The entity existed, it was updated.</response>
         /// <response code="400">The given id and the entity id didn't match, the entity was malformed, or the provided id was not a Guid.</response>
+        /// <response code="401">The client was not authenticated.</response>
+        /// <response code="403">The client was authenticated but had not enough privileges.</response>
         /// <response code="404">The entity was deleted before the update.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
         /// <response code="409">The entity was updated by another request at the same time.</response>
         [HttpPut("{id}")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<ActionResult<EditDto>> PutEdit(Guid id, EditDto editDto)
         {
             // Check the consistency of the request.
@@ -162,8 +181,8 @@ namespace ADAtickets.ApiService.Controllers
         ///         "id": "123e4567-e89b-12d3-a456-426614174000",
         ///         "editDateTime": "2025-04-27T16:31:17.512Z",
         ///         "description": "Example description.",
-        ///         "oldStatus": "UNASSIGNED",
-        ///         "newStatus": "WAITING_OPERATOR",
+        ///         "oldStatus": "Unassigned",
+        ///         "newStatus": "WaitingOperator",
         ///         "ticketId": "123e4567-e89b-12d3-a456-426614174000",
         ///         "userEmail": "example@email.com"
         ///      }
@@ -174,8 +193,8 @@ namespace ADAtickets.ApiService.Controllers
         ///         <Id>123e4567-e89b-12d3-a456-426614174000</Id>
         ///         <EditDateTime>2025-04-27T16:31:17.512Z</EditDateTime>
         ///         <Description>Example description.</Description>
-        ///         <OldStatus>UNASSIGNED</OldStatus>
-        ///         <NewStatus>WAITING_OPERATOR</NewStatus>
+        ///         <OldStatus>Unassigned</OldStatus>
+        ///         <NewStatus>WaitingOperator</NewStatus>
         ///         <TicketId>123e4567-e89b-12d3-a456-426614174000</TicketId>
         ///         <UserEmail>example@email.com</UserEmail>
         ///     </EditDto>
@@ -184,8 +203,11 @@ namespace ADAtickets.ApiService.Controllers
         /// <returns>A <see cref="Task"/> returning an <see cref="ActionResult"/>, which wraps the server response and the new entity.</returns>
         /// <response code="201">The entity was created.</response>
         /// <response code="400">The entity was malformed.</response>
+        /// <response code="401">The client was not authenticated.</response>
+        /// <response code="403">The client was authenticated but had not enough privileges.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpPost]
+        [Authorize(Policy = "AuthenticatedEveryone")]
         public async Task<ActionResult<EditDto>> PostEdit(EditDto edit)
         {
             // Insert the DTO info into a new entity and add it to the data source.
@@ -202,9 +224,12 @@ namespace ADAtickets.ApiService.Controllers
         /// <returns>A <see cref="Task"/> returning an <see cref="IActionResult"/>, which wraps the server response.</returns>
         /// <response code="204">The entity was deleted.</response>
         /// <response code="400">The provided id was not a Guid.</response>
+        /// <response code="401">The client was not authenticated.</response>
+        /// <response code="403">The client was authenticated but had not enough privileges.</response>
         /// <response code="404">The entity with the given id didn't exist.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpDelete("{id}")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> DeleteEdit(Guid id)
         {
             // Check if the requested entity exists.

@@ -34,6 +34,8 @@ namespace ADAtickets.ApiService.Configs
         /// <param name="id">The identifier of the resource to fetch.</param>
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
         [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
@@ -41,7 +43,7 @@ namespace ADAtickets.ApiService.Configs
             [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Suffix)]
             [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.Any)]
 
-            object id)
+            Guid id)
         {
             // This method is intentionally left empty. The attributes above are used to define the convention.
         }
@@ -49,10 +51,18 @@ namespace ADAtickets.ApiService.Configs
         /// <summary>
         /// GET api methods convention (all entities).
         /// </summary>
+        /// <param name="filters">A group of key-value pairs defining the property name and value entities should be filtered by.</param>
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
         [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
-        public static void Get()
+        public static void Get(
+            [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Suffix)]
+            [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.Any)]
+
+            IEnumerable<KeyValuePair<string, string>> filters)
         {
             // This method is intentionally left empty. The attributes above are used to define the convention.
         }
@@ -63,6 +73,8 @@ namespace ADAtickets.ApiService.Configs
         /// <param name="model">The resource to create.</param>
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
         [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
         public static void Post(
@@ -81,6 +93,8 @@ namespace ADAtickets.ApiService.Configs
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
@@ -88,7 +102,7 @@ namespace ADAtickets.ApiService.Configs
         public static void Put(
             [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Suffix)]
             [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.Any)]
-            object id,
+            Guid id,
 
             [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Any)]
             [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.Any)]
@@ -103,13 +117,15 @@ namespace ADAtickets.ApiService.Configs
         /// <param name="id">The identifier of the resource to delete.</param>
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
         [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
         public static void Delete(
             [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Suffix)]
             [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.Any)]
-            object id)
+            Guid id)
         {
             // This method is intentionally left empty. The attributes above are used to define the convention.
         }

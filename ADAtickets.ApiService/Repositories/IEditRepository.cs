@@ -40,6 +40,13 @@ namespace ADAtickets.ApiService.Repositories
         Task<IEnumerable<Edit>> GetEdits();
 
         /// <summary>
+        /// Gets all <see cref="Edit"/> entities from the data source which meet the given criteria.
+        /// </summary>
+        /// <param name="filters">Group of key-value pairs representing the criteria to filter the <see cref="Edit"/> entities.</param>
+        /// <returns>A <see cref="Task"/> returning all the <see cref="Edit"/> entities, or an empty collection if there are none.</returns>
+        Task<IEnumerable<Edit>> GetEditsBy(IEnumerable<KeyValuePair<string, string>> filters);
+
+        /// <summary>
         /// Adds a new <see cref="Edit"/> entity to the data source asynchronously.
         /// </summary>
         /// <param name="edit">The <see cref="Edit"/> entity to add to the data source.</param>

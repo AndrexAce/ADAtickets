@@ -28,17 +28,15 @@ namespace ADAtickets.ApiService.Models
     /// <summary>
     /// Represents the link between users and their preferred platforms.
     /// </summary>
-    [PrimaryKey(nameof(UserEmail), nameof(PlatformName))]
+    [PrimaryKey(nameof(UserId), nameof(PlatformId))]
     public class UserPlatform
     {
         /// <summary>
-        /// The email of the user who marked the platform as preferred.
+        /// The unique identifier of the user who marked the platform as preferred.
         /// </summary>
         [Required]
         [ForeignKey(nameof(User))]
-        [MaxLength(254)]
-        [EmailAddress]
-        public string UserEmail { get; set; } = string.Empty;
+        public Guid UserId { get; set; } = Guid.Empty;
 
         /// <summary>
         /// The user who marked the platform as preferred.
@@ -49,11 +47,11 @@ namespace ADAtickets.ApiService.Models
         public User User { get; set; } = new User();
 
         /// <summary>
-        /// The name of the platform that was marked as preferred.
+        /// The unique identifier of the platform that was marked as preferred.
         /// </summary>
         [Required]
         [MaxLength(50)]
-        public string PlatformName { get; set; } = string.Empty;
+        public Guid PlatformId { get; set; } = Guid.Empty;
 
         /// <summary>
         /// The platform that was marked as preferred.

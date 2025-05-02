@@ -55,14 +55,14 @@ namespace ADAtickets.ApiService.Dtos
         /// </summary>
         [Required]
         [JsonConverter(typeof(StringEnumConverter))]
-        public Status OldStatus { get; set; } = Status.UNASSIGNED;
+        public Status OldStatus { get; set; } = Status.Unassigned;
 
         /// <summary>
         /// The status the ticket will be after the edit.
         /// </summary>
         [Required]
         [JsonConverter(typeof(StringEnumConverter))]
-        public Status NewStatus { get; set; } = Status.UNASSIGNED;
+        public Status NewStatus { get; set; } = Status.Unassigned;
 
         /// <summary>
         /// The id of the ticket this edit is related to.

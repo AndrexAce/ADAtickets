@@ -53,13 +53,13 @@ namespace ADAtickets.ApiService.Models
         /// The status the ticket was in before the edit.
         /// </summary>
         [Required]
-        public Status OldStatus { get; set; } = Status.UNASSIGNED;
+        public Status OldStatus { get; set; } = Status.Unassigned;
 
         /// <summary>
         /// The status the ticket will be after the edit.
         /// </summary>
         [Required]
-        public Status NewStatus { get; set; } = Status.UNASSIGNED;
+        public Status NewStatus { get; set; } = Status.Unassigned;
 
         /// <summary>
         /// The id of the ticket this edit is related to.
@@ -77,13 +77,11 @@ namespace ADAtickets.ApiService.Models
         public Ticket Ticket { get; set; } = new Ticket();
 
         /// <summary>
-        /// The email of the user who made the edit.
+        /// The id of the user who made the edit.
         /// </summary>
         [Required]
         [ForeignKey(nameof(User))]
-        [MaxLength(254)]
-        [EmailAddress]
-        public string UserEmail { get; set; } = string.Empty;
+        public Guid UserId { get; set; } = Guid.Empty;
 
         /// <summary>
         /// The user who made the edit.

@@ -50,13 +50,11 @@ namespace ADAtickets.ApiService.Models
         public string Message { get; set; } = string.Empty;
 
         /// <summary>
-        /// The email of the user who sent the reply.
+        /// The id of the user who sent the reply.
         /// </summary>
         [Required]
         [ForeignKey(nameof(AuthorUser))]
-        [MaxLength(254)]
-        [EmailAddress]
-        public string AuthorUserEmail { get; set; } = string.Empty;
+        public Guid AuthorUserId { get; set; } = Guid.Empty;
 
         /// <summary>
         /// The user who sent the reply.

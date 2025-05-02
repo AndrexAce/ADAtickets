@@ -27,14 +27,14 @@ namespace ADAtickets.ApiService.Models
         /// <summary>
         /// The ticket can be dealt with at a later time.
         /// </summary>
-        LOW,
+        Low,
         /// <summary>
         /// The ticket should be dealt with whenever possible.
         /// </summary>
-        MEDIUM,
+        Medium,
         /// <summary>
         /// The ticket must be dealt with as soon as possible.
         /// </summary>
-        HIGH
+        High
     }
 }

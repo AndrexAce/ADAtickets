@@ -28,13 +28,20 @@ namespace ADAtickets.ApiService.Models
     /// <summary>
     /// Represents a platform managed by the enterprise which tickets are related to.
     /// </summary>
+    [Index(nameof(Name), IsUnique = true)]
     [Index(nameof(RepositoryUrl), IsUnique = true)]
     public sealed class Platform : EntityBase
     {
         /// <summary>
-        /// The name of the platform.
+        /// The unique identifier of the platform.
         /// </summary>
         [Key]
+        [Required]
+        public Guid Id { get; set; } = Guid.NewGuid();
+
+        /// <summary>
+        /// The name of the platform.
+        /// </summary>
         [Required]
         [MaxLength(254)]
         public string Name { get; set; } = string.Empty;

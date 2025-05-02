@@ -31,18 +31,18 @@ namespace ADAtickets.ApiService.Services
     {
         readonly ADAticketsDbContext _context = context;
 
-        /// <inheritdoc cref="IUserRepository.GetUserByEmailAsync(string)"/>
+        /// <inheritdoc cref="IUserRepository.GetUserByIdAsync(Guid)"/>
         /// <exception cref="InvalidOperationException">When the entity was not found.</exception>
 
-        public async Task<User> GetUserByEmailAsync(string email)
+        public async Task<User> GetUserByIdAsync(Guid id)
         {
-            return await _context.Users.FindAsync(email) ?? throw new InvalidOperationException($"Entity of type {typeof(User)} with email {email} was not found.");
+            return await _context.AppUsers.FindAsync(id) ?? throw new InvalidOperationException($"Entity of type {typeof(User)} with id {id} was not found.");
         }
 
         /// <inheritdoc cref="IUserRepository.GetUsersAsync"/>
         public async IAsyncEnumerable<User> GetUsersAsync()
         {
-            await foreach (var user in _context.Users.AsAsyncEnumerable())
+            await foreach (var user in _context.AppUsers.AsAsyncEnumerable())
             {
                 yield return user;
             }
@@ -52,7 +52,7 @@ namespace ADAtickets.ApiService.Services
         /// <exception cref="DbUpdateException">When the entity was not added because of a conflict.</exception>
         public async Task AddUserAsync(User user)
         {
-            await _context.Users.AddAsync(user);
+            await _context.AppUsers.AddAsync(user);
             await _context.SaveChangesAsync();
         }
 
@@ -61,17 +61,17 @@ namespace ADAtickets.ApiService.Services
 
         public async Task UpdateUserAsync(User user)
         {
-            _context.Users.Update(user);
+            _context.AppUsers.Update(user);
             await _context.SaveChangesAsync();
         }
 
-        /// <inheritdoc cref="IUserRepository.DeleteUserAsync(string)"/>
+        /// <inheritdoc cref="IUserRepository.DeleteUserAsync(Guid)"/>
         /// <exception cref="InvalidOperationException">When the entity to delete was not found.</exception>
 
-        public async Task DeleteUserAsync(string email)
+        public async Task DeleteUserAsync(Guid id)
         {
-            if (await _context.Users.FindAsync(email) is not User user)
-                throw new InvalidOperationException($"Entity of type {typeof(User)} with email {email} was not found.");
+            if (await _context.AppUsers.FindAsync(id) is not User user)
+                throw new InvalidOperationException($"Entity of type {typeof(User)} with email {id} was not found.");
             _context.Remove(user);
             await _context.SaveChangesAsync();
         }

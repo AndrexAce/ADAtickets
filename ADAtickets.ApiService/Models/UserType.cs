@@ -27,14 +27,14 @@ namespace ADAtickets.ApiService.Models
         /// <summary>
         /// The user can create and reply to their tickets.
         /// </summary>
-        USER,
+        User,
         /// <summary>
         /// The operator can manage all the tickets.
         /// </summary>
-        OPERATOR,
+        Operator,
         /// <summary>
         /// The administrator can manage all the tickets, platforms and users.
         /// </summary>
-        ADMIN
+        Admin
     }
 }

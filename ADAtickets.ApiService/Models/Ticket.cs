@@ -40,7 +40,7 @@ namespace ADAtickets.ApiService.Models
         /// The type of user request bound to the ticket.
         /// </summary>
         [Required]
-        public TicketType Type { get; set; } = TicketType.BUG;
+        public TicketType Type { get; set; } = TicketType.Bug;
 
         /// <summary>
         /// The date and time when the ticket was created.
@@ -66,13 +66,13 @@ namespace ADAtickets.ApiService.Models
         /// The urgency of the ticket.
         /// </summary>
         [Required]
-        public Priority Priority { get; set; } = Priority.LOW;
+        public Priority Priority { get; set; } = Priority.Low;
 
         /// <summary>
         /// The status of the ticket.
         /// </summary>
         [Required]
-        public Status Status { get; set; } = Status.UNASSIGNED;
+        public Status Status { get; set; } = Status.Unassigned;
 
         /// <summary>
         /// The id of the work item the ticket is related to in Azure DevOps.
@@ -81,12 +81,11 @@ namespace ADAtickets.ApiService.Models
         public int WorkItemId { get; set; } = 0;
 
         /// <summary>
-        /// The name of the platform the ticket is related to.
+        /// The id of the platform the ticket is related to.
         /// </summary>
         [Required]
         [ForeignKey(nameof(Platform))]
-        [MaxLength(4000)]
-        public string PlatformName { get; set; } = string.Empty;
+        public Guid PlatformId { get; set; } = Guid.Empty;
 
         /// <summary>
         /// The platform the ticket is related to.
@@ -97,13 +96,11 @@ namespace ADAtickets.ApiService.Models
         public Platform Platform { get; set; } = new Platform();
 
         /// <summary>
-        /// The email of the user who created the ticket.
+        /// The id of the user who created the ticket.
         /// </summary>
         [Required]
         [ForeignKey(nameof(CreatorUser))]
-        [MaxLength(254)]
-        [EmailAddress]
-        public string CreatorUserEmail { get; set; } = string.Empty;
+        public Guid CreatorUserId { get; set; } = Guid.Empty;
 
         /// <summary>
         /// The user who created the ticket.
@@ -114,12 +111,11 @@ namespace ADAtickets.ApiService.Models
         public User CreatorUser { get; set; } = new User();
 
         /// <summary>
-        /// The email of the operator assigned to the ticket.
+        /// The id of the operator assigned to the ticket.
         /// </summary>
         [ForeignKey(nameof(OperatorUser))]
         [MaxLength(254)]
-        [EmailAddress]
-        public string? OperatorUserEmail { get; set; } = null;
+        public Guid? OperatorUserId { get; set; } = null;
 
         /// <summary>
         /// The operator assigned to the ticket.

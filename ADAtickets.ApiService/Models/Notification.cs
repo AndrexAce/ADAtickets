@@ -71,13 +71,11 @@ namespace ADAtickets.ApiService.Models
         public Ticket Ticket { get; set; } = new Ticket();
 
         /// <summary>
-        /// The email of the user this notification is related to.
+        /// The id of the user this notification is related to.
         /// </summary>
         [Required]
         [ForeignKey(nameof(User))]
-        [MaxLength(254)]
-        [EmailAddress]
-        public string UserEmail { get; set; } = string.Empty;
+        public Guid UserId { get; set; } = Guid.Empty;
 
         /// <summary>
         /// The user this notification is related to.

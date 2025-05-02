@@ -21,6 +21,7 @@ using ADAtickets.ApiService.Configs;
 using ADAtickets.ApiService.Models;
 using ADAtickets.ApiService.Repositories;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace ADAtickets.ApiService.Services
 {
@@ -41,6 +42,48 @@ namespace ADAtickets.ApiService.Services
         public async Task<IEnumerable<Edit>> GetEdits()
         {
             return await _context.Edits.ToListAsync();
+        }
+
+        /// <inheritdoc cref="IEditRepository.GetEditsBy"/>
+        public async Task<IEnumerable<Edit>> GetEditsBy(IEnumerable<KeyValuePair<string, string>> filters)
+        {
+            IQueryable<Edit> query = _context.Edits;
+
+            foreach (var filter in filters)
+            {
+                switch (filter.Key)
+                {
+                    case nameof(Edit.Id):
+                        query = query.Where(e => e.Id == Guid.Parse(filter.Value));
+                        break;
+
+                    case nameof(Edit.TicketId):
+                        query = query.Where(e => e.TicketId == Guid.Parse(filter.Value));
+                        break;
+
+                    case nameof(Edit.UserId):
+                        query = query.Where(e => e.UserId == Guid.Parse(filter.Value));
+                        break;
+
+                    case nameof(Edit.OldStatus):
+                        query = query.Where(e => e.OldStatus == Enum.Parse<Status>(filter.Value));
+                        break;
+
+                    case nameof(Edit.NewStatus):
+                        query = query.Where(e => e.NewStatus == Enum.Parse<Status>(filter.Value));
+                        break;
+
+                    case nameof(Edit.EditDateTime):
+                        query = query.Where(e => e.EditDateTime == DateTimeOffset.Parse(filter.Value, CultureInfo.InvariantCulture));
+                        break;
+
+                    case nameof(Edit.Description):
+                        query = query.Where(e => e.Description.Contains(filter.Value));
+                        break;
+                }
+            }
+
+            return await query.ToListAsync();
         }
 
         /// <inheritdoc cref="IEditRepository.AddEditAsync(Edit)"/>

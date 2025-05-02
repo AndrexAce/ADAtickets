@@ -29,9 +29,9 @@ namespace ADAtickets.ApiService.Repositories
         /// <summary>
         /// Gets a single <see cref="Platform"/> entity from the data source asynchronously.
         /// </summary>
-        /// <param name="name">The unique identifier of the <see cref="Platform"/> entity.</param>
-        /// <returns>A <see cref="Task"/> returning the <see cref="Platform"/> with the given <paramref name="name"/>.</returns>
-        Task<Platform> GetPlatformByNameAsync(string name);
+        /// <param name="id">The unique identifier of the <see cref="Platform"/> entity.</param>
+        /// <returns>A <see cref="Task"/> returning the <see cref="Platform"/> with the given <paramref name="id"/>.</returns>
+        Task<Platform> GetPlatformByIdAsync(Guid id);
         /// <summary>
         /// Gets all <see cref="Platform"/> entities from the data source asynchronously.
         /// </summary>
@@ -52,8 +52,8 @@ namespace ADAtickets.ApiService.Repositories
         /// <summary>
         /// Deletes an <see cref="Platform"/> entity from the data source asynchronously.
         /// </summary>
-        /// <param name="name">The unique identifier of the <see cref="Platform"/> entity.</param>
+        /// <param name="id">The unique identifier of the <see cref="Platform"/> entity.</param>
         /// <returns>A <see cref="Task"/> executing the action.</returns>
-        Task DeletePlatformAsync(string name);
+        Task DeletePlatformAsync(Guid id);
     }
 }

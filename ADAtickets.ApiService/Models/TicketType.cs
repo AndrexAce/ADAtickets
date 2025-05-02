@@ -27,10 +27,10 @@ namespace ADAtickets.ApiService.Models
         /// <summary>
         /// The ticket is a bug report.
         /// </summary>
-        BUG,
+        Bug,
         /// <summary>
         /// The ticket is a feature request.
         /// </summary>
-        FEATURE
+        Feature
     }
 }
