@@ -81,6 +81,7 @@ jobs:
           /d:sonar.dotnet.excludeTestProjects=true \
           /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml \
           /d:sonar.exclusions=**/Migrations/** \
+          /v:v$(date +'%Y.%m.%d')
 
       - name: Build the solution
         env:
