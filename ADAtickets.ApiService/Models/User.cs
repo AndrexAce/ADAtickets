@@ -90,11 +90,16 @@ namespace ADAtickets.ApiService.Models
         /// <summary>
         /// The unique identifier of the user's ASP.NET Identity User.
         /// </summary>
+        [Required]
+        [ForeignKey(nameof(IdentityUser))]
         public Guid IdentityUserId { get; set; } = Guid.Empty;
 
         /// <summary>
         /// The ASP.NET Identity User associated with this user.
         /// </summary>
+        [Required]
+        [Ignore]
+        [JsonIgnore]
         public IdentityUser<Guid> IdentityUser { get; set; } = new IdentityUser<Guid>();
 
         /// <summary>
@@ -102,7 +107,6 @@ namespace ADAtickets.ApiService.Models
         /// </summary>
         [Required]
         [InverseProperty(nameof(Ticket.CreatorUser))]
-        [Ignore]
         [JsonIgnore]
         public ICollection<Ticket> CreatedTickets { get; } = [];
 
@@ -111,7 +115,6 @@ namespace ADAtickets.ApiService.Models
         /// </summary>
         [Required]
         [InverseProperty(nameof(Ticket.OperatorUser))]
-        [Ignore]
         [JsonIgnore]
         public ICollection<Ticket> AssignedTickets { get; } = [];
 
@@ -120,7 +123,6 @@ namespace ADAtickets.ApiService.Models
         /// </summary>
         [Required]
         [InverseProperty(nameof(Reply.AuthorUser))]
-        [Ignore]
         [JsonIgnore]
         public ICollection<Reply> Replies { get; } = [];
 
@@ -129,7 +131,6 @@ namespace ADAtickets.ApiService.Models
         /// </summary>
         [Required]
         [InverseProperty(nameof(Edit.User))]
-        [Ignore]
         [JsonIgnore]
         public ICollection<Edit> Edits { get; } = [];
 
@@ -137,17 +138,24 @@ namespace ADAtickets.ApiService.Models
         /// The collection of platforms the user prefers (if they are an operator, otherwise it must be empty).
         /// </summary>
         [Required]
+        [InverseProperty(nameof(Platform.UsersPreferred))]
+        [JsonIgnore]
+        public ICollection<Platform> PreferredPlatforms { get; } = [];
+
+        /// <summary>
+        /// Join entity between the platform and the users who marked it as preferred.
+        /// </summary>
+        [Required]
         [InverseProperty(nameof(UserPlatform.User))]
         [Ignore]
         [JsonIgnore]
-        public ICollection<UserPlatform> PreferredPlatforms { get; } = [];
+        public ICollection<UserPlatform> UserPlatforms { get; } = [];
 
         /// <summary>
         /// The collection of notifications the user triggered the sending of.
         /// </summary>
         [Required]
         [InverseProperty(nameof(Notification.User))]
-        [Ignore]
         [JsonIgnore]
         public ICollection<Notification> SentNotifications { get; } = [];
 
@@ -155,9 +163,17 @@ namespace ADAtickets.ApiService.Models
         /// The collection of notifications the user received.
         /// </summary>
         [Required]
+        [InverseProperty(nameof(Notification.Recipients))]
+        [JsonIgnore]
+        public ICollection<Notification> ReceivedNotifications { get; } = [];
+
+        /// <summary>
+        /// Join entity between the user and the notifications they received.
+        /// </summary>
+        [Required]
         [InverseProperty(nameof(UserNotification.ReceiverUser))]
         [Ignore]
         [JsonIgnore]
-        public ICollection<UserNotification> ReceivedNotifications { get; } = [];
+        public ICollection<UserNotification> UserNotifications { get; } = [];
     }
 }

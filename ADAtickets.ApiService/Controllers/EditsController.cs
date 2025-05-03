@@ -200,7 +200,7 @@ namespace ADAtickets.ApiService.Controllers
         ///         <UserEmail>example@email.com</UserEmail>
         ///     </EditDto>
         /// </remarks>
-        /// <param name="edit">Object containing the values the new entity should have.</param>
+        /// <param name="editDto">Object containing the values the new entity should have.</param>
         /// <returns>A <see cref="Task"/> returning an <see cref="ActionResult"/>, which wraps the server response and the new entity.</returns>
         /// <response code="201">The entity was created.</response>
         /// <response code="400">The entity was malformed.</response>
@@ -209,13 +209,13 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpPost]
         [Authorize(Policy = "AuthenticatedEveryone")]
-        public async Task<ActionResult<EditDto>> PostEdit(EditDto edit)
+        public async Task<ActionResult<EditDto>> PostEdit(EditDto editDto)
         {
             // Insert the DTO info into a new entity and add it to the data source.
-            await _editRepository.AddEditAsync(_mapper.Map(edit, new Edit()));
+            await _editRepository.AddEditAsync(_mapper.Map(editDto, new Edit()));
 
             // Return the created entity and its location to the client.
-            return CreatedAtAction(nameof(GetEdit), new { id = edit.Id }, edit);
+            return CreatedAtAction(nameof(GetEdit), new { id = editDto.Id }, editDto);
         }
 
         /// <summary>

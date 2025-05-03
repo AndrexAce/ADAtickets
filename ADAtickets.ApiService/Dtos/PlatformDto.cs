@@ -17,66 +17,42 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using ADAtickets.ApiService.Models;
 using AutoMapper.Configuration.Annotations;
-using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
 
-namespace ADAtickets.ApiService.Models
+namespace ADAtickets.ApiService.Dtos
 {
     /// <summary>
-    /// Represents a platform managed by the enterprise which tickets are related to.
+    /// <para>Represents a platform managed by the enterprise which tickets are related to.</para>
+    /// <para>It is a simplified version of the <see cref="Platform"/> class, used for data transfer.</para>
     /// </summary>
-    [Index(nameof(Name), IsUnique = true)]
-    [Index(nameof(RepositoryUrl), IsUnique = true)]
-    public sealed class Platform : EntityBase
+    public sealed class PlatformDto
     {
         /// <summary>
         /// The unique identifier of the platform.
         /// </summary>
-        [Key]
-        [Required]
         public Guid Id { get; set; } = Guid.NewGuid();
 
         /// <summary>
         /// The name of the platform.
         /// </summary>
-        [Required]
-        [MaxLength(254)]
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The URL of the repository where the source code of the platform is hosted.
         /// </summary>
-        [Required]
-        [MaxLength(4000)]
-        [RegularExpression(@"^(https?:\/\/)?(www\.)?([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}\/?$")]
         public string RepositoryUrl { get; set; } = string.Empty;
 
         /// <summary>
-        /// The collection of the tickets related to the platform.
+        /// The collection of ids of the tickets related to the platform.
         /// </summary>
-        [Required]
-        [InverseProperty(nameof(Ticket.Platform))]
-        [JsonIgnore]
-        public ICollection<Ticket> Tickets { get; } = [];
-
-        /// <summary>
-        /// The collection of users who marked the platform as preferred.
-        /// </summary>
-        [Required]
-        [InverseProperty(nameof(User.PreferredPlatforms))]
-        [JsonIgnore]
-        public ICollection<User> UsersPreferred { get; } = [];
-
-        /// <summary>
-        /// Join entity between the platform and the users who marked it as preferred.
-        /// </summary>
-        [Required]
-        [InverseProperty(nameof(UserPlatform.User))]
         [Ignore]
-        [JsonIgnore]
-        public ICollection<UserPlatform> UserPlatforms { get; } = [];
+        public ICollection<Guid> Tickets { get; } = [];
+
+        /// <summary>
+        /// The collection of ids of the users who preferred the platform.
+        /// </summary>
+        [Ignore]
+        public ICollection<Guid> UsersPreferred { get; } = [];
     }
 }

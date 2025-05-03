@@ -18,52 +18,38 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using ADAtickets.ApiService.Models;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace ADAtickets.ApiService.Dtos
 {
     /// <summary>
-    /// <para>Represents a modification made to a ticket, either by a user or by the system.</para>
-    /// <para>It is a simplified version of the <see cref="Edit"/> class, used for data transfer.</para>
+    /// <para>Represents a reply in a ticket comment thread.</para>
+    /// <para>It is a simplified version of the <see cref="Reply"/> class, used for data transfer.</para>
     /// </summary>
-    public sealed class EditDto
+    public sealed class ReplyDto
     {
         /// <summary>
-        /// The unique identifier of the edit.
+        /// The unique identifier of the reply.
         /// </summary>
         public Guid Id { get; set; } = Guid.NewGuid();
 
         /// <summary>
-        /// The date and time when the edit was made.
+        /// The date and time when the reply was sent.
         /// </summary>
-        public DateTimeOffset EditDateTime { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset ReplyDateTime { get; set; } = DateTimeOffset.Now;
 
         /// <summary>
-        /// The message the edit comes with.
+        /// The message written in the reply.
         /// </summary>
-        public string Description { get; set; } = string.Empty;
+        public string Message { get; set; } = string.Empty;
 
         /// <summary>
-        /// The status the ticket was in before the edit.
+        /// The id of the user who sent the reply.
         /// </summary>
-        [JsonConverter(typeof(StringEnumConverter))]
-        public Status OldStatus { get; set; } = Status.Unassigned;
+        public Guid AuthorUserId { get; set; } = Guid.Empty;
 
         /// <summary>
-        /// The status the ticket will be after the edit.
-        /// </summary>
-        [JsonConverter(typeof(StringEnumConverter))]
-        public Status NewStatus { get; set; } = Status.Unassigned;
-
-        /// <summary>
-        /// The id of the ticket this edit is related to.
+        /// The id of the ticket this reply was sent to.
         /// </summary>
         public Guid TicketId { get; set; } = Guid.Empty;
-
-        /// <summary>
-        /// The id of the user who made the edit.
-        /// </summary>
-        public Guid UserId { get; set; } = Guid.Empty;
     }
 }

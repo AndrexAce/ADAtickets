@@ -33,8 +33,35 @@ namespace ADAtickets.ApiService.Configs
         /// </summary>
         public ADAticketsProfile()
         {
-            CreateMap<Edit, EditDto>();
-            CreateMap<EditDto, Edit>();
+            CreateMap<Edit, EditDto>().ReverseMap();
+
+            CreateMap<Reply, ReplyDto>().ReverseMap();
+
+            CreateMap<Notification, NotificationDto>()
+                .ForMember(notificationDto => notificationDto.Recipients, opt => opt.MapFrom(src => src.Recipients.Select(recipient => recipient.Id)))
+                .ReverseMap();
+
+            CreateMap<Platform, PlatformDto>()
+                .ForMember(platformDto => platformDto.Tickets, opt => opt.MapFrom(src => src.Tickets.Select(ticket => ticket.Id)))
+                .ForMember(platformDto => platformDto.UsersPreferred, opt => opt.MapFrom(src => src.UsersPreferred.Select(user => user.Id)))
+                .ReverseMap();
+
+            CreateMap<Ticket, TicketDto>()
+                .ForMember(ticketDto => ticketDto.Edits, opt => opt.MapFrom(src => src.Edits.Select(edit => edit.Id)))
+                .ForMember(ticketDto => ticketDto.Replies, opt => opt.MapFrom(src => src.Replies.Select(reply => reply.Id)))
+                .ForMember(ticketDto => ticketDto.Attachments, opt => opt.MapFrom(src => src.Attachments.Select(attachment => attachment.Id)))
+                .ForMember(ticketDto => ticketDto.Notifications, opt => opt.MapFrom(src => src.Notifications.Select(notifications => notifications.Id)))
+                .ReverseMap();
+
+            CreateMap<User, UserDto>()
+                .ForMember(userDto => userDto.CreatedTickets, opt => opt.MapFrom(src => src.CreatedTickets.Select(ticket => ticket.Id)))
+                .ForMember(userDto => userDto.AssignedTickets, opt => opt.MapFrom(src => src.AssignedTickets.Select(ticket => ticket.Id)))
+                .ForMember(userDto => userDto.Replies, opt => opt.MapFrom(src => src.Replies.Select(reply => reply.Id)))
+                .ForMember(userDto => userDto.Edits, opt => opt.MapFrom(src => src.Edits.Select(edit => edit.Id)))
+                .ForMember(userDto => userDto.PreferredPlatforms, opt => opt.MapFrom(src => src.PreferredPlatforms.Select(platform => platform.Id)))
+                .ForMember(userDto => userDto.SentNotifications, opt => opt.MapFrom(src => src.SentNotifications.Select(notification => notification.Id)))
+                .ForMember(userDto => userDto.ReceivedNotifications, opt => opt.MapFrom(src => src.ReceivedNotifications.Select(notification => notification.Id)))
+                .ReverseMap();
         }
     }
 }

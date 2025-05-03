@@ -17,89 +17,51 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using ADAtickets.ApiService.Models;
 using AutoMapper.Configuration.Annotations;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
 
-namespace ADAtickets.ApiService.Models
+namespace ADAtickets.ApiService.Dtos
 {
     /// <summary>
-    /// Represents a notification sent to a user triggered by an action like ticket modification, reply or assignment.
+    /// <para>Represents a notification sent to a user triggered by an action like ticket modification, reply or assignment.</para>
+    /// <para>It is a simplified version of the <see cref="Notification"/> class, used for data transfer.</para>
     /// </summary>
-    public sealed class Notification : EntityBase
+    public sealed class NotificationDto
     {
         /// <summary>
         /// The unique identifier of the notification.
         /// </summary>
-        [Key]
-        [Required]
         public Guid Id { get; set; } = Guid.NewGuid();
 
         /// <summary>
         /// The date and time when the notification was sent.
         /// </summary>
-        [Required]
         public DateTimeOffset SendDateTime { get; } = DateTimeOffset.Now;
 
         /// <summary>
         /// The message the notification comes with.
         /// </summary>
-        [Required]
-        [MaxLength(200)]
         public string Message { get; set; } = string.Empty;
 
         /// <summary>
         /// Whether the notification has been read by the user.
         /// </summary>
-        [Required]
         public bool IsRead { get; set; } = false;
 
         /// <summary>
         /// The id of the ticket this notification is related to.
         /// </summary>
-        [Required]
-        [ForeignKey(nameof(Ticket))]
         public Guid TicketId { get; set; } = Guid.Empty;
-
-        /// <summary>
-        /// The ticket this notification is related to.
-        /// </summary>
-        [Required]
-        [Ignore]
-        [JsonIgnore]
-        public Ticket Ticket { get; set; } = new Ticket();
 
         /// <summary>
         /// The id of the user this notification is related to.
         /// </summary>
-        [Required]
-        [ForeignKey(nameof(User))]
         public Guid UserId { get; set; } = Guid.Empty;
 
         /// <summary>
-        /// The user this notification is related to.
+        /// The collection of ids of the users the notification was sent to.
         /// </summary>
-        [Required]
         [Ignore]
-        [JsonIgnore]
-        public User User { get; set; } = new User();
-
-        /// <summary>
-        /// The collection of the users the notification was sent to.
-        /// </summary>
-        [Required]
-        [InverseProperty(nameof(User.ReceivedNotifications))]
-        [JsonIgnore]
-        public ICollection<User> Recipients { get; } = [];
-
-        /// <summary>
-        /// Join entity between the notification and the users it was sent to.
-        /// </summary>
-        [Required]
-        [InverseProperty(nameof(UserNotification.Notification))]
-        [Ignore]
-        [JsonIgnore]
-        public ICollection<UserNotification> UserNotifications { get; } = [];
+        public ICollection<Guid> Recipients { get; } = [];
     }
 }
