@@ -40,6 +40,7 @@ namespace ADAtickets.ApiService.Controllers
     [Produces(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
     [FormatFilter]
     [ApiConventionType(typeof(ADAticketsApiConventions))]
+    [AutoValidateAntiforgeryToken]
     public sealed class EditsController(IEditRepository editRepository, IMapper mapper) : ControllerBase
     {
         private readonly IEditRepository _editRepository = editRepository;

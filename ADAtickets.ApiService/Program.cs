@@ -21,6 +21,7 @@ using ADAtickets.ApiService.Configs;
 using ADAtickets.ApiService.Models;
 using ADAtickets.ApiService.Repositories;
 using ADAtickets.ApiService.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -49,6 +50,36 @@ builder.Services.AddIdentityApiEndpoints<IdentityUser<Guid>>(options =>
     options.User.RequireUniqueEmail = true;
 })
     .AddEntityFrameworkStores<ADAticketsDbContext>();
+
+// Configure the authorization cookie.
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.AccessDeniedPath = "/denied";
+    options.LoginPath = "/login";
+    options.LogoutPath = "/logout";
+    options.ExpireTimeSpan = TimeSpan.FromDays(30);
+    options.ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter;
+    options.SlidingExpiration = true;
+
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.Cookie.Name = "ADAtickets";
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.Strict;
+});
+
+// Configure the antiforgery token to prevent Cross-Site Request Forgery (CSRF) attacks.
+builder.Services.AddAntiforgery(options =>
+{
+    options.HeaderName = "X-XSRF-TOKEN";
+    options.FormFieldName = "__RequestVerificationToken";
+
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.Cookie.Name = "ADAtickets-Xsrf";
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.Strict;
+});
 
 const string identityScheme = "Identity.Application";
 const string azureAdScheme = "AzureAd";
@@ -201,6 +232,9 @@ app.UseAuthentication();
 
 // Add the authentication middleware.
 app.UseAuthorization();
+
+// Add the antiforgery middleware.
+app.UseAntiforgery();
 
 // Map the authentication endpoints.
 app.MapIdentityApi<IdentityUser<Guid>>();

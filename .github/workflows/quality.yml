@@ -80,6 +80,7 @@ jobs:
           /d:sonar.scanner.skipJreProvisioning=true \
           /d:sonar.dotnet.excludeTestProjects=true \
           /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml \
+          /d:sonar.exclusions=**/Migrations/** \
 
       - name: Build the solution
         env:

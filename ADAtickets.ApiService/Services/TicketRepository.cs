@@ -47,7 +47,7 @@ namespace ADAtickets.ApiService.Services
             }
         }
 
-        /// <inheritdoc cref="ITicketRepository.GetTicketsByUserIdAsync(Guid)"/>
+        /// <inheritdoc cref="ITicketRepository.AddTicketAsync(Ticket)"/>
         /// <exception cref="DbUpdateException">When the entity was not added because of a conflict.</exception>
         public async Task AddTicketAsync(Ticket ticket)
         {
