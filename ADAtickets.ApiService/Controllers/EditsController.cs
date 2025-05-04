@@ -18,7 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using ADAtickets.ApiService.Configs;
-using ADAtickets.ApiService.Dtos;
+using ADAtickets.ApiService.Dtos.Requests;
+using ADAtickets.ApiService.Dtos.Responses;
 using ADAtickets.ApiService.Models;
 using ADAtickets.ApiService.Repositories;
 using AutoMapper;
@@ -33,7 +34,7 @@ namespace ADAtickets.ApiService.Controllers
     /// Web API controller managing requests involving <see cref="Edit"/> etities.
     /// </summary>
     /// <param name="editRepository">Object defining the operations allowed on the entity type.</param>
-    /// <param name="mapper">Object definining the mappings of fields between the <see cref="Edit"/> entity and its <see cref="EditDto"/> correspondant.</param>
+    /// <param name="mapper">Object definining the mappings of fields between the <see cref="Edit"/> entity and its <see cref="EditRequestDto"/> or <see cref="EditResponseDto"/> correspondant.</param>
     [Route("api/Edits")]
     [ApiController]
     [Consumes(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
@@ -51,9 +52,7 @@ namespace ADAtickets.ApiService.Controllers
         /// </summary>
         /// <remarks>
         /// For example, the following request:
-        /// 
-        ///     GET /api/Edits?ticketId=123e4567-e89b-12d3-a456-426614174000&amp;oldStatus=Unassigned
-        ///     
+        /// <c>GET /api/Edits?ticketId=123e4567-e89b-12d3-a456-426614174000&amp;oldStatus=Unassigned</c>
         /// Retrieves the entities linked to the ticket with id <b>123e4567-e89b-12d3-a456-426614174000</b> and which were, before the edit, in the <b>Unassigned</b> status.
         /// </remarks>
         /// <param name="filters">A group of key-value pairs defining the property name and value <see cref="Edit"/> entities should be filtered by.</param>
@@ -65,11 +64,11 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpGet]
         [Authorize(Policy = "AuthenticatedEveryone")]
-        public async Task<ActionResult<IEnumerable<EditDto>>> GetEdits([FromQuery] IEnumerable<KeyValuePair<string, string>>? filters)
+        public async Task<ActionResult<IEnumerable<EditResponseDto>>> GetEdits([FromQuery] IEnumerable<KeyValuePair<string, string>>? filters)
         {
             var edits = await (filters != null ? _editRepository.GetEditsBy(filters) : _editRepository.GetEdits());
 
-            return Ok(edits.Select(edit => _mapper.Map(edit, new EditDto())));
+            return Ok(edits.Select(edit => _mapper.Map(edit, new EditResponseDto())));
         }
 
         /// <summary>
@@ -85,7 +84,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpGet("{id}")]
         [Authorize(Policy = "AdminOnly")]
-        public async Task<ActionResult<EditDto>> GetEdit(Guid id)
+        public async Task<ActionResult<EditResponseDto>> GetEdit(Guid id)
         {
             // Check if the requested entity exists.
             if (await _editRepository.GetEditByIdAsync(id) is not Edit edit)
@@ -94,7 +93,7 @@ namespace ADAtickets.ApiService.Controllers
             }
 
             // Insert the entity data into a new DTO and send it to the client.
-            return Ok(_mapper.Map(edit, new EditDto()));
+            return Ok(_mapper.Map(edit, new EditResponseDto()));
         }
 
         /// <summary>
@@ -102,35 +101,34 @@ namespace ADAtickets.ApiService.Controllers
         /// </summary>
         /// <remarks>
         /// JSON request body example:
-        /// 
-        ///     {
-        ///         "id": "123e4567-e89b-12d3-a456-426614174000",
-        ///         "editDateTime": "2025-04-27T16:31:17.512Z",
-        ///         "description": "Example description.",
-        ///         "oldStatus": "Unassigned",
-        ///         "newStatus": "WaitingOperator",
-        ///         "ticketId": "123e4567-e89b-12d3-a456-426614174000",
-        ///         "userEmail": "example@email.com"
-        ///      }
-        ///
+        /// <code>
+        /// {
+        ///     "editDateTime": "2025-04-27T16:31:17.512Z",
+        ///     "description": "Example description.",
+        ///     "oldStatus": "Unassigned",
+        ///     "newStatus": "WaitingOperator",
+        ///     "ticketId": "123e4567-e89b-12d3-a456-426614174000",
+        ///     "userId": "123e4567-e89b-12d3-a456-426614174000"
+        /// }
+        /// </code>
         /// XML request body example:
-        /// 
-        ///     <EditDto>
-        ///         <Id>123e4567-e89b-12d3-a456-426614174000</Id>
-        ///         <EditDateTime>2025-04-27T16:31:17.512Z</EditDateTime>
-        ///         <Description>Example description.</Description>
-        ///         <OldStatus>Unassigned</OldStatus>
-        ///         <NewStatus>WaitingOperator</NewStatus>
-        ///         <TicketId>123e4567-e89b-12d3-a456-426614174000</TicketId>
-        ///         <UserEmail>example@email.com</UserEmail>
-        ///     </EditDto>
+        /// <code>
+        /// &lt;EditDto&gt;
+        ///     &lt;EditDateTime&gt;2025-04-27T16:31:17.512Z&lt;/EditDateTime&gt;
+        ///     &lt;Description&gt;Example description.&lt;/Description&gt;
+        ///     &lt;OldStatus&gt;Unassigned&lt;/OldStatus&gt;
+        ///     &lt;NewStatus&gt;WaitingOperator&lt;/NewStatus&gt;
+        ///     &lt;TicketId&gt;123e4567-e89b-12d3-a456-426614174000&lt;/TicketId&gt;
+        ///     &lt;UserId&gt;123e4567-e89b-12d3-a456-426614174000&lt;/UserId&gt;
+        /// &lt;/EditDto&gt;
+        /// </code>
         /// </remarks>
         /// <param name="id">Identifier of the <see cref="Edit"/> entity to update.</param>
         /// <param name="editDto">Object containing the new values the fields should be updated to.</param>
         /// <returns>A <see cref="Task"/> returning an <see cref="ActionResult"/>, which wraps the server response and the new or updated entity.</returns>
         /// <response code="201">The entity didn't exist, it was created.</response>
         /// <response code="204">The entity existed, it was updated.</response>
-        /// <response code="400">The given id and the entity id didn't match, the entity was malformed, or the provided id was not a Guid.</response>
+        /// <response code="400">The entity was malformed or the provided id was not a Guid.</response>
         /// <response code="401">The client was not authenticated.</response>
         /// <response code="403">The client was authenticated but had not enough privileges.</response>
         /// <response code="404">The entity was deleted before the update.</response>
@@ -138,14 +136,8 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="409">The entity was updated by another request at the same time.</response>
         [HttpPut("{id}")]
         [Authorize(Policy = "AdminOnly")]
-        public async Task<ActionResult<EditDto>> PutEdit(Guid id, EditDto editDto)
+        public async Task<ActionResult<EditResponseDto>> PutEdit(Guid id, EditRequestDto editDto)
         {
-            // Check the consistency of the request.
-            if (id != editDto.Id)
-            {
-                return BadRequest();
-            }
-
             // If the requested entity does not exist, create a new one.
             if (await _editRepository.GetEditByIdAsync(id) is not Edit edit)
             {
@@ -177,28 +169,27 @@ namespace ADAtickets.ApiService.Controllers
         /// </summary>
         /// <remarks>
         /// JSON request body example:
-        /// 
-        ///     {
-        ///         "id": "123e4567-e89b-12d3-a456-426614174000",
-        ///         "editDateTime": "2025-04-27T16:31:17.512Z",
-        ///         "description": "Example description.",
-        ///         "oldStatus": "Unassigned",
-        ///         "newStatus": "WaitingOperator",
-        ///         "ticketId": "123e4567-e89b-12d3-a456-426614174000",
-        ///         "userEmail": "example@email.com"
-        ///      }
-        ///
+        /// <code>
+        /// {
+        ///     "editDateTime": "2025-04-27T16:31:17.512Z",
+        ///     "description": "Example description.",
+        ///     "oldStatus": "Unassigned",
+        ///     "newStatus": "WaitingOperator",
+        ///     "ticketId": "123e4567-e89b-12d3-a456-426614174000",
+        ///     "userId": "123e4567-e89b-12d3-a456-426614174000"
+        /// }
+        /// </code>
         /// XML request body example:
-        /// 
-        ///     <EditDto>
-        ///         <Id>123e4567-e89b-12d3-a456-426614174000</Id>
-        ///         <EditDateTime>2025-04-27T16:31:17.512Z</EditDateTime>
-        ///         <Description>Example description.</Description>
-        ///         <OldStatus>Unassigned</OldStatus>
-        ///         <NewStatus>WaitingOperator</NewStatus>
-        ///         <TicketId>123e4567-e89b-12d3-a456-426614174000</TicketId>
-        ///         <UserEmail>example@email.com</UserEmail>
-        ///     </EditDto>
+        /// <code>
+        /// &lt;EditDto&gt;
+        ///     &lt;EditDateTime&gt;2025-04-27T16:31:17.512Z&lt;/EditDateTime&gt;
+        ///     &lt;Description&gt;Example description.&lt;/Description&gt;
+        ///     &lt;OldStatus&gt;Unassigned&lt;/OldStatus&gt;
+        ///     &lt;NewStatus&gt;WaitingOperator&lt;/NewStatus&gt;
+        ///     &lt;TicketId&gt;123e4567-e89b-12d3-a456-426614174000&lt;/TicketId&gt;
+        ///     &lt;UserId&gt;123e4567-e89b-12d3-a456-426614174000&lt;/UserId&gt;
+        /// &lt;/EditDto&gt;
+        /// </code>
         /// </remarks>
         /// <param name="editDto">Object containing the values the new entity should have.</param>
         /// <returns>A <see cref="Task"/> returning an <see cref="ActionResult"/>, which wraps the server response and the new entity.</returns>
@@ -209,13 +200,15 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpPost]
         [Authorize(Policy = "AuthenticatedEveryone")]
-        public async Task<ActionResult<EditDto>> PostEdit(EditDto editDto)
+        public async Task<ActionResult<EditResponseDto>> PostEdit(EditRequestDto editDto)
         {
+            var edit = _mapper.Map(editDto, new Edit());
+
             // Insert the DTO info into a new entity and add it to the data source.
-            await _editRepository.AddEditAsync(_mapper.Map(editDto, new Edit()));
+            await _editRepository.AddEditAsync(edit);
 
             // Return the created entity and its location to the client.
-            return CreatedAtAction(nameof(GetEdit), new { id = editDto.Id }, editDto);
+            return CreatedAtAction(nameof(GetEdit), new { id = edit.Id }, edit);
         }
 
         /// <summary>

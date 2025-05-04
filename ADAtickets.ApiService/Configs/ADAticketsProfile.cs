@@ -17,7 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-using ADAtickets.ApiService.Dtos;
+using ADAtickets.ApiService.Dtos.Requests;
+using ADAtickets.ApiService.Dtos.Responses;
 using ADAtickets.ApiService.Models;
 using AutoMapper;
 
@@ -33,35 +34,37 @@ namespace ADAtickets.ApiService.Configs
         /// </summary>
         public ADAticketsProfile()
         {
-            CreateMap<Edit, EditDto>().ReverseMap();
+            CreateMap<Edit, EditResponseDto>();
+            CreateMap<EditRequestDto, Edit>();
 
-            CreateMap<Reply, ReplyDto>().ReverseMap();
+            CreateMap<Reply, ReplyResponseDto>();
+            CreateMap<ReplyRequestDto, Edit>();
 
-            CreateMap<Notification, NotificationDto>()
-                .ForMember(notificationDto => notificationDto.Recipients, opt => opt.MapFrom(src => src.Recipients.Select(recipient => recipient.Id)))
-                .ReverseMap();
+            CreateMap<Notification, NotificationResponseDto>()
+                .ForMember(notificationDto => notificationDto.Recipients, opt => opt.MapFrom(src => src.Recipients.Select(recipient => recipient.Id)));
+            CreateMap<NotificationRequestDto, Notification>();
 
-            CreateMap<Platform, PlatformDto>()
+            CreateMap<Platform, PlatformResponseDto>()
                 .ForMember(platformDto => platformDto.Tickets, opt => opt.MapFrom(src => src.Tickets.Select(ticket => ticket.Id)))
-                .ForMember(platformDto => platformDto.UsersPreferred, opt => opt.MapFrom(src => src.UsersPreferred.Select(user => user.Id)))
-                .ReverseMap();
+                .ForMember(platformDto => platformDto.UsersPreferred, opt => opt.MapFrom(src => src.UsersPreferred.Select(user => user.Id)));
+            CreateMap<PlatformRequestDto, Platform>();
 
-            CreateMap<Ticket, TicketDto>()
+            CreateMap<Ticket, TicketResponseDto>()
                 .ForMember(ticketDto => ticketDto.Edits, opt => opt.MapFrom(src => src.Edits.Select(edit => edit.Id)))
                 .ForMember(ticketDto => ticketDto.Replies, opt => opt.MapFrom(src => src.Replies.Select(reply => reply.Id)))
                 .ForMember(ticketDto => ticketDto.Attachments, opt => opt.MapFrom(src => src.Attachments.Select(attachment => attachment.Id)))
-                .ForMember(ticketDto => ticketDto.Notifications, opt => opt.MapFrom(src => src.Notifications.Select(notifications => notifications.Id)))
-                .ReverseMap();
+                .ForMember(ticketDto => ticketDto.Notifications, opt => opt.MapFrom(src => src.Notifications.Select(notifications => notifications.Id)));
+            CreateMap<TicketRequestDto, Ticket>();
 
-            CreateMap<User, UserDto>()
+            CreateMap<User, UserResponseDto>()
                 .ForMember(userDto => userDto.CreatedTickets, opt => opt.MapFrom(src => src.CreatedTickets.Select(ticket => ticket.Id)))
                 .ForMember(userDto => userDto.AssignedTickets, opt => opt.MapFrom(src => src.AssignedTickets.Select(ticket => ticket.Id)))
                 .ForMember(userDto => userDto.Replies, opt => opt.MapFrom(src => src.Replies.Select(reply => reply.Id)))
                 .ForMember(userDto => userDto.Edits, opt => opt.MapFrom(src => src.Edits.Select(edit => edit.Id)))
                 .ForMember(userDto => userDto.PreferredPlatforms, opt => opt.MapFrom(src => src.PreferredPlatforms.Select(platform => platform.Id)))
                 .ForMember(userDto => userDto.SentNotifications, opt => opt.MapFrom(src => src.SentNotifications.Select(notification => notification.Id)))
-                .ForMember(userDto => userDto.ReceivedNotifications, opt => opt.MapFrom(src => src.ReceivedNotifications.Select(notification => notification.Id)))
-                .ReverseMap();
+                .ForMember(userDto => userDto.ReceivedNotifications, opt => opt.MapFrom(src => src.ReceivedNotifications.Select(notification => notification.Id)));
+            CreateMap<UserRequestDto, User>();
         }
     }
 }

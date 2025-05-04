@@ -19,37 +19,37 @@
  */
 using ADAtickets.ApiService.Models;
 
-namespace ADAtickets.ApiService.Dtos
+namespace ADAtickets.ApiService.Dtos.Responses
 {
     /// <summary>
-    /// <para>Represents a reply in a ticket comment thread.</para>
-    /// <para>It is a simplified version of the <see cref="Reply"/> class, used for data transfer.</para>
+    /// <para>Represents a platform managed by the enterprise which tickets are related to.</para>
+    /// <para>It is a simplified version of the <see cref="Platform"/> class, used for data transfer to the client.</para>
     /// </summary>
-    public sealed class ReplyDto
+    public sealed class PlatformResponseDto
     {
         /// <summary>
-        /// The unique identifier of the reply.
+        /// The unique identifier of the platform.
         /// </summary>
         public Guid Id { get; set; } = Guid.NewGuid();
 
         /// <summary>
-        /// The date and time when the reply was sent.
+        /// The name of the platform.
         /// </summary>
-        public DateTimeOffset ReplyDateTime { get; set; } = DateTimeOffset.Now;
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// The message written in the reply.
+        /// The URL of the repository where the source code of the platform is hosted.
         /// </summary>
-        public string Message { get; set; } = string.Empty;
+        public string RepositoryUrl { get; set; } = string.Empty;
 
         /// <summary>
-        /// The id of the user who sent the reply.
+        /// The collection of ids of the tickets related to the platform.
         /// </summary>
-        public Guid AuthorUserId { get; set; } = Guid.Empty;
+        public ICollection<Guid> Tickets { get; } = [];
 
         /// <summary>
-        /// The id of the ticket this reply was sent to.
+        /// The collection of ids of the users who preferred the platform.
         /// </summary>
-        public Guid TicketId { get; set; } = Guid.Empty;
+        public ICollection<Guid> UsersPreferred { get; } = [];
     }
 }

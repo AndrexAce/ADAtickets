@@ -18,50 +18,38 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using ADAtickets.ApiService.Models;
-using AutoMapper.Configuration.Annotations;
+using System.ComponentModel.DataAnnotations;
 
-namespace ADAtickets.ApiService.Dtos
+namespace ADAtickets.ApiService.Dtos.Requests
 {
     /// <summary>
-    /// <para>Represents a notification sent to a user triggered by an action like ticket modification, reply or assignment.</para>
-    /// <para>It is a simplified version of the <see cref="Notification"/> class, used for data transfer.</para>
+    /// <para>Represents a reply in a ticket comment thread.</para>
+    /// <para>It is a simplified version of the <see cref="Reply"/> class, used for data transfer to the server.</para>
     /// </summary>
-    public sealed class NotificationDto
+    public sealed class ReplyRequestDto
     {
         /// <summary>
-        /// The unique identifier of the notification.
+        /// The date and time when the reply was sent.
         /// </summary>
-        public Guid Id { get; set; } = Guid.NewGuid();
+        [Required]
+        public DateTimeOffset ReplyDateTime { get; set; } = DateTimeOffset.Now;
 
         /// <summary>
-        /// The date and time when the notification was sent.
+        /// The message written in the reply.
         /// </summary>
-        public DateTimeOffset SendDateTime { get; } = DateTimeOffset.Now;
-
-        /// <summary>
-        /// The message the notification comes with.
-        /// </summary>
+        [Required]
         public string Message { get; set; } = string.Empty;
 
         /// <summary>
-        /// Whether the notification has been read by the user.
+        /// The id of the user who sent the reply.
         /// </summary>
-        public bool IsRead { get; set; } = false;
+        [Required]
+        public Guid AuthorUserId { get; set; } = Guid.Empty;
 
         /// <summary>
-        /// The id of the ticket this notification is related to.
+        /// The id of the ticket this reply was sent to.
         /// </summary>
+        [Required]
         public Guid TicketId { get; set; } = Guid.Empty;
-
-        /// <summary>
-        /// The id of the user this notification is related to.
-        /// </summary>
-        public Guid UserId { get; set; } = Guid.Empty;
-
-        /// <summary>
-        /// The collection of ids of the users the notification was sent to.
-        /// </summary>
-        [Ignore]
-        public ICollection<Guid> Recipients { get; } = [];
     }
 }

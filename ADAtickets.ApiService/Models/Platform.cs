@@ -74,7 +74,7 @@ namespace ADAtickets.ApiService.Models
         /// Join entity between the platform and the users who marked it as preferred.
         /// </summary>
         [Required]
-        [InverseProperty(nameof(UserPlatform.User))]
+        [InverseProperty(nameof(UserPlatform.Platform))]
         [Ignore]
         [JsonIgnore]
         public ICollection<UserPlatform> UserPlatforms { get; } = [];

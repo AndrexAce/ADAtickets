@@ -18,52 +18,48 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using ADAtickets.ApiService.Models;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
-namespace ADAtickets.ApiService.Dtos
+namespace ADAtickets.ApiService.Dtos.Responses
 {
     /// <summary>
-    /// <para>Represents a modification made to a ticket, either by a user or by the system.</para>
-    /// <para>It is a simplified version of the <see cref="Edit"/> class, used for data transfer.</para>
+    /// <para>Represents a notification sent to a user triggered by an action like ticket modification, reply or assignment.</para>
+    /// <para>It is a simplified version of the <see cref="Notification"/> class, used for data transfer to the client.</para>
     /// </summary>
-    public sealed class EditDto
+    public sealed class NotificationResponseDto
     {
         /// <summary>
-        /// The unique identifier of the edit.
+        /// The unique identifier of the notification.
         /// </summary>
         public Guid Id { get; set; } = Guid.NewGuid();
 
         /// <summary>
-        /// The date and time when the edit was made.
+        /// The date and time when the notification was sent.
         /// </summary>
-        public DateTimeOffset EditDateTime { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset SendDateTime { get; } = DateTimeOffset.Now;
 
         /// <summary>
-        /// The message the edit comes with.
+        /// The message the notification comes with.
         /// </summary>
-        public string Description { get; set; } = string.Empty;
+        public string Message { get; set; } = string.Empty;
 
         /// <summary>
-        /// The status the ticket was in before the edit.
+        /// Whether the notification has been read by the user.
         /// </summary>
-        [JsonConverter(typeof(StringEnumConverter))]
-        public Status OldStatus { get; set; } = Status.Unassigned;
+        public bool IsRead { get; set; } = false;
 
         /// <summary>
-        /// The status the ticket will be after the edit.
-        /// </summary>
-        [JsonConverter(typeof(StringEnumConverter))]
-        public Status NewStatus { get; set; } = Status.Unassigned;
-
-        /// <summary>
-        /// The id of the ticket this edit is related to.
+        /// The id of the ticket this notification is related to.
         /// </summary>
         public Guid TicketId { get; set; } = Guid.Empty;
 
         /// <summary>
-        /// The id of the user who made the edit.
+        /// The id of the user this notification is related to.
         /// </summary>
         public Guid UserId { get; set; } = Guid.Empty;
+
+        /// <summary>
+        /// The collection of ids of the users the notification was sent to.
+        /// </summary>
+        public ICollection<Guid> Recipients { get; } = [];
     }
 }

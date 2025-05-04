@@ -18,17 +18,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using ADAtickets.ApiService.Models;
-using AutoMapper.Configuration.Annotations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace ADAtickets.ApiService.Dtos
+namespace ADAtickets.ApiService.Dtos.Responses
 {
     /// <summary>
     /// <para>Represents a ticket sent by a user to the system.</para>
-    /// <para>It is a simplified version of the <see cref="Ticket"/> class, used for data transfer.</para>
+    /// <para>It is a simplified version of the <see cref="Ticket"/> class, used for data transfer to the client.</para>
     /// </summary>
-    public sealed class TicketDto
+    public sealed class TicketResponseDto
     {
         /// <summary>
         /// The unique identifier of the ticket.
@@ -91,25 +90,21 @@ namespace ADAtickets.ApiService.Dtos
         /// <summary>
         /// The collection of ids of edits made to the ticket.
         /// </summary>
-        [Ignore]
         public ICollection<Guid> Edits { get; } = [];
 
         /// <summary>
         /// The collection of ids of replies sent to the ticket.
         /// </summary>
-        [Ignore]
         public ICollection<Guid> Replies { get; } = [];
 
         /// <summary>
         /// The collection of ids of attachments attached to the ticket.
         /// </summary>
-        [Ignore]
         public ICollection<Guid> Attachments { get; } = [];
 
         /// <summary>
         /// The collection of ids of notifications related to the ticket.
         /// </summary>
-        [Ignore]
         public ICollection<Guid> Notifications { get; } = [];
     }
 }

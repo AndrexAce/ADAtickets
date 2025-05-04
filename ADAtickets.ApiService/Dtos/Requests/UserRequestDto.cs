@@ -18,54 +18,56 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using ADAtickets.ApiService.Models;
-using AutoMapper.Configuration.Annotations;
+using System.ComponentModel.DataAnnotations;
 
-namespace ADAtickets.ApiService.Dtos
+namespace ADAtickets.ApiService.Dtos.Requests
 {
     /// <summary>
     /// <para>Represents a user of the system.</para>
-    /// <para>It is a simplified version of the <see cref="User"/> class, used for data transfer.</para>
+    /// <para>It is a simplified version of the <see cref="User"/> class, used for data transfer to the server.</para>
     /// </summary>
-    public sealed class UserDto
+    public sealed class UserRequestDto
     {
-        /// <summary>
-        /// The unique identifier of the user.
-        /// </summary>
-        public Guid Id { get; set; } = Guid.NewGuid();
-
         /// <summary>
         /// The name of the user.
         /// </summary>
+        [Required]
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The surname of the user.
         /// </summary>
+        [Required]
         public string Surname { get; set; } = string.Empty;
 
         /// <summary>
         /// Whether the user enabled the two-factor authentication via email.
         /// </summary>
+        [Required]
         public bool IsEmail2FAEnabled { get; set; } = false;
 
         /// <summary>
         /// Whether the user enabled the two-factor authentication via SMS.
         /// </summary>
+        [Required]
         public bool IsPhone2FAEnabled { get; set; } = false;
 
         /// <summary>
         /// Whether the user enabled the reception of external notifications via email.
         /// </summary>
+        [Required]
         public bool AreEmailNotificationsEnabled { get; set; } = false;
 
         /// <summary>
         /// Whether the user enabled the reception of external notifications via SMS.
         /// </summary>
+        [Required]
         public bool ArePhoneNotificationsEnabled { get; set; } = false;
 
         /// <summary>
         /// The role of the user in the system.
         /// </summary>
+        [Required]
         public UserType Type { get; set; } = UserType.User;
 
         /// <summary>
@@ -76,48 +78,7 @@ namespace ADAtickets.ApiService.Dtos
         /// <summary>
         /// The unique identifier of the user's ASP.NET Identity User.
         /// </summary>
+        [Required]
         public Guid IdentityUserId { get; set; } = Guid.Empty;
-
-        /// <summary>
-        /// The collection of ids of tickets created by the user (if they are a user, otherwise it must be empty).
-        /// </summary>
-        [Ignore]
-        public ICollection<Guid> CreatedTickets { get; } = [];
-
-        /// <summary>
-        /// The collection of ids of tickets assigned to the user (if they are an operator, otherwise it must be empty).
-        /// </summary>
-        [Ignore]
-        public ICollection<Guid> AssignedTickets { get; } = [];
-
-        /// <summary>
-        /// The collection of ids of replies sent by the user to any ticket.
-        /// </summary>
-        [Ignore]
-        public ICollection<Guid> Replies { get; } = [];
-
-        /// <summary>
-        /// The collection of ids of edits made by the user to any ticket.
-        /// </summary>
-        [Ignore]
-        public ICollection<Guid> Edits { get; } = [];
-
-        /// <summary>
-        /// The collection of ids of platforms the user prefers (if they are an operator, otherwise it must be empty).
-        /// </summary>
-        [Ignore]
-        public ICollection<Guid> PreferredPlatforms { get; } = [];
-
-        /// <summary>
-        /// The collection of ids of notifications the user triggered the sending of.
-        /// </summary>
-        [Ignore]
-        public ICollection<Guid> SentNotifications { get; } = [];
-
-        /// <summary>
-        /// The collection of ids of notifications the user received.
-        /// </summary>
-        [Ignore]
-        public ICollection<Guid> ReceivedNotifications { get; } = [];
     }
 }

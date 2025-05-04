@@ -18,41 +18,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using ADAtickets.ApiService.Models;
-using AutoMapper.Configuration.Annotations;
+using System.ComponentModel.DataAnnotations;
 
-namespace ADAtickets.ApiService.Dtos
+namespace ADAtickets.ApiService.Dtos.Requests
 {
     /// <summary>
     /// <para>Represents a platform managed by the enterprise which tickets are related to.</para>
-    /// <para>It is a simplified version of the <see cref="Platform"/> class, used for data transfer.</para>
+    /// <para>It is a simplified version of the <see cref="Platform"/> class, used for data transfer to the server.</para>
     /// </summary>
-    public sealed class PlatformDto
+    public sealed class PlatformRequestDto
     {
-        /// <summary>
-        /// The unique identifier of the platform.
-        /// </summary>
-        public Guid Id { get; set; } = Guid.NewGuid();
-
         /// <summary>
         /// The name of the platform.
         /// </summary>
+        [Required]
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The URL of the repository where the source code of the platform is hosted.
         /// </summary>
+        [Required]
         public string RepositoryUrl { get; set; } = string.Empty;
-
-        /// <summary>
-        /// The collection of ids of the tickets related to the platform.
-        /// </summary>
-        [Ignore]
-        public ICollection<Guid> Tickets { get; } = [];
-
-        /// <summary>
-        /// The collection of ids of the users who preferred the platform.
-        /// </summary>
-        [Ignore]
-        public ICollection<Guid> UsersPreferred { get; } = [];
     }
 }
