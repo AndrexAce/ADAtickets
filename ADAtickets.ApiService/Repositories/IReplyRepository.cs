@@ -30,30 +30,41 @@ namespace ADAtickets.ApiService.Repositories
         /// Gets a single <see cref="Reply"/> entity from the data source asynchronously.
         /// </summary>
         /// <param name="id">The unique identifier of the <see cref="Reply"/> entity.</param>
-        /// <returns>A <see cref="Task"/> returning the <see cref="Reply"/> with the given <paramref name="id"/>.</returns>
-        Task<Reply> GetReplyByIdAsync(Guid id);
+        /// <returns>A <see cref="Task"/> returning the <see cref="Reply"/> with the given <paramref name="id"/>, or <see langword="null"/> if it doesn't exist.</returns>
+        Task<Reply?> GetReplyByIdAsync(Guid id);
+
         /// <summary>
         /// Gets all <see cref="Reply"/> entities from the data source asynchronously.
         /// </summary>
-        /// <returns>An asynchronously enumerable object containing all the <see cref="Reply"/> entities.</returns>
-        IAsyncEnumerable<Reply> GetRepliesAsync();
+        /// <returns>A <see cref="Task"/> returning all the <see cref="Reply"/> entities, or an empty collection if there are none.</returns>
+        Task<IEnumerable<Reply>> GetRepliesAsync();
+
+        /// <summary>
+        /// Gets all <see cref="Reply"/> entities from the data source which meet the given criteria asynchronously.
+        /// </summary>
+        /// <param name="filters">Group of key-value pairs representing the criteria to filter the <see cref="Reply"/> entities.</param>
+        /// <returns>A <see cref="Task"/> returning all the <see cref="Reply"/> entities, or an empty collection if there are none.</returns>
+        Task<IEnumerable<Reply>> GetRepliesByAsync(IEnumerable<KeyValuePair<string, string>> filters);
+
         /// <summary>
         /// Adds a new <see cref="Reply"/> entity to the data source asynchronously.
         /// </summary>
         /// <param name="reply">The <see cref="Reply"/> entity to add to the data source.</param>
         /// <returns>A <see cref="Task"/> executing the action.</returns>
         Task AddReplyAsync(Reply reply);
+
         /// <summary>
         /// Updates an existing <see cref="Reply"/> entity in the data source asynchronously.
         /// </summary>
         /// <param name="reply">The <see cref="Reply"/> entity to update in the data source.</param>
         /// <returns>A <see cref="Task"/> executing the action.</returns>
         Task UpdateReplyAsync(Reply reply);
+
         /// <summary>
         /// Deletes an <see cref="Reply"/> entity from the data source asynchronously.
         /// </summary>
-        /// <param name="id">The unique identifier of the <see cref="Reply"/> entity.</param>
+        /// <param name="reply">The <see cref="Reply"/> entity to delete in the data source.</param>
         /// <returns>A <see cref="Task"/> executing the action.</returns>
-        Task DeleteReplyAsync(Guid id);
+        Task DeleteReplyAsync(Reply reply);
     }
 }

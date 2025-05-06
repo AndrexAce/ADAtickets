@@ -4,6 +4,7 @@ using ADAtickets.ApiService.Configs;
 using ADAtickets.ApiService.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ADAtickets.ApiService.Migrations
 {
     [DbContext(typeof(ADAticketsDbContext))]
-    partial class ADAticketsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250506170734_SetterFix")]
+    partial class SetterFix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

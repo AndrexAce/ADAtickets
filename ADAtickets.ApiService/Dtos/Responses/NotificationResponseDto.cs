@@ -35,7 +35,7 @@ namespace ADAtickets.ApiService.Dtos.Responses
         /// <summary>
         /// The date and time when the notification was sent.
         /// </summary>
-        public DateTimeOffset SendDateTime { get; } = DateTimeOffset.Now;
+        public DateTimeOffset SendDateTime { get; set; } = DateTimeOffset.UtcNow;
 
         /// <summary>
         /// The message the notification comes with.

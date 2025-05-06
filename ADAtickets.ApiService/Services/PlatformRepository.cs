@@ -20,6 +20,7 @@
 using ADAtickets.ApiService.Configs;
 using ADAtickets.ApiService.Models;
 using ADAtickets.ApiService.Repositories;
+using Humanizer;
 using Microsoft.EntityFrameworkCore;
 
 namespace ADAtickets.ApiService.Services
@@ -31,44 +32,64 @@ namespace ADAtickets.ApiService.Services
     {
         readonly ADAticketsDbContext _context = context;
 
-        /// <inheritdoc cref="IPlatformRepository.GetPlatformByIdAsync(Guid)"/>
-        /// <exception cref="InvalidOperationException">When the entity was not found.</exception>
-        public async Task<Platform> GetPlatformByIdAsync(Guid id)
+        /// <inheritdoc cref="IPlatformRepository.GetPlatformByIdAsync"/>
+        public async Task<Platform?> GetPlatformByIdAsync(Guid id)
         {
-            return await _context.Platforms.FindAsync(id) ?? throw new InvalidOperationException($"Entity of type {typeof(Platform)} with id {id} was not found.");
+            return await _context.Platforms.FindAsync(id);
         }
 
         /// <inheritdoc cref="IPlatformRepository.GetPlatformsAsync"/>
-        public async IAsyncEnumerable<Platform> GetPlatformsAsync()
+        public async Task<IEnumerable<Platform>> GetPlatformsAsync()
         {
-            await foreach (var platform in _context.Platforms.AsAsyncEnumerable())
-            {
-                yield return platform;
-            }
+            return await _context.Platforms.ToListAsync();
         }
 
-        /// <inheritdoc cref="IPlatformRepository.AddPlatformAsync(Platform)"/>
-        /// <exception cref="DbUpdateException">When the entity was not added because of a conflict.</exception>
+        /// <inheritdoc cref="IPlatformRepository.GetPlatformsByAsync"/>
+        public async Task<IEnumerable<Platform>> GetPlatformsByAsync(IEnumerable<KeyValuePair<string, string>> filters)
+        {
+            IQueryable<Platform> query = _context.Platforms;
+
+            foreach (var filter in filters)
+            {
+                switch (filter.Key.Pascalize())
+                {
+                    case nameof(Platform.Id) when Guid.TryParse(filter.Value, out Guid outGuid):
+                        query = query.Where(platform => platform.Id == outGuid);
+                        break;
+
+                    case nameof(Platform.Name):
+                        query = query.Where(platform => platform.Name.Contains(filter.Value, StringComparison.InvariantCultureIgnoreCase));
+                        break;
+
+                    case nameof(Platform.RepositoryUrl):
+                        query = query.Where(platform => platform.RepositoryUrl.Contains(filter.Value, StringComparison.InvariantCultureIgnoreCase));
+                        break;
+
+                    default:
+                        return [];
+                }
+            }
+
+            return await query.ToListAsync();
+        }
+
+        /// <inheritdoc cref="IPlatformRepository.AddPlatformAsync"/>
         public async Task AddPlatformAsync(Platform platform)
         {
-            await _context.Platforms.AddAsync(platform);
+            _context.Platforms.Add(platform);
             await _context.SaveChangesAsync();
         }
 
-        /// <inheritdoc cref="IPlatformRepository.UpdatePlatformAsync(Platform)"/>
-        /// <exception cref="DbUpdateException">When the entity was not updated because of a conflict.</exception>
+        /// <inheritdoc cref="IPlatformRepository.UpdatePlatformAsync"/>
         public async Task UpdatePlatformAsync(Platform platform)
         {
             _context.Platforms.Update(platform);
             await _context.SaveChangesAsync();
         }
 
-        /// <inheritdoc cref="IPlatformRepository.DeletePlatformAsync(Guid)"/>
-        /// <exception cref="InvalidOperationException">When the entity to delete was not found.</exception>""
-        public async Task DeletePlatformAsync(Guid id)
+        /// <inheritdoc cref="IPlatformRepository.DeletePlatformAsync"/>
+        public async Task DeletePlatformAsync(Platform platform)
         {
-            if (await _context.Platforms.FindAsync(id) is not Platform platform)
-                throw new InvalidOperationException($"Entity of type {typeof(Platform)} with id {id} was not found.");
             _context.Remove(platform);
             await _context.SaveChangesAsync();
         }

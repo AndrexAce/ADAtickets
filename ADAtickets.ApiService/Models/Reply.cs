@@ -40,7 +40,7 @@ namespace ADAtickets.ApiService.Models
         /// The date and time when the reply was sent.
         /// </summary>
         [Required]
-        public DateTimeOffset ReplyDateTime { get; set; } = DateTimeOffset.Now;
+        public DateTimeOffset ReplyDateTime { get; set; } = DateTimeOffset.UtcNow;
 
         /// <summary>
         /// The message written in the reply.

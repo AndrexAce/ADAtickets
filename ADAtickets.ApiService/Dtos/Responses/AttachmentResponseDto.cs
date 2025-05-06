@@ -18,38 +18,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using ADAtickets.ApiService.Models;
-using System.ComponentModel.DataAnnotations;
 
-namespace ADAtickets.ApiService.Dtos.Requests
+namespace ADAtickets.ApiService.Dtos.Responses
 {
     /// <summary>
-    /// <para>Represents a reply in a ticket comment thread.</para>
-    /// <para>It is a simplified version of the <see cref="Reply"/> class, used for data transfer to the server.</para>
+    /// <para>Represents an attachment associated with a ticket.</para>
+    /// <para>It is a simplified version of the <see cref="Attachment"/> class, used for data transfer to the client.</para>
     /// </summary>
-    public sealed class ReplyRequestDto
+    public class AttachmentResponseDto
     {
         /// <summary>
-        /// The date and time when the reply was sent.
+        /// The unique identifier of the attachment.
         /// </summary>
-        [Required]
-        public DateTimeOffset ReplyDateTime { get; set; } = DateTimeOffset.UtcNow;
+        public Guid Id { get; set; } = Guid.Empty;
 
         /// <summary>
-        /// The message written in the reply.
+        /// The path of the attachment on the server.
         /// </summary>
-        [Required]
-        public string Message { get; set; } = string.Empty;
+        public string Path { get; set; } = string.Empty;
 
         /// <summary>
-        /// The id of the user who sent the reply.
+        /// The id of the ticket this attachment is related to.
         /// </summary>
-        [Required]
-        public Guid AuthorUserId { get; set; } = Guid.Empty;
-
-        /// <summary>
-        /// The id of the ticket this reply was sent to.
-        /// </summary>
-        [Required]
         public Guid TicketId { get; set; } = Guid.Empty;
     }
 }

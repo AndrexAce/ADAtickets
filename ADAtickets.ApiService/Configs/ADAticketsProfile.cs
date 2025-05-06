@@ -65,6 +65,10 @@ namespace ADAtickets.ApiService.Configs
                 .ForMember(userDto => userDto.SentNotifications, opt => opt.MapFrom(src => src.SentNotifications.Select(notification => notification.Id)))
                 .ForMember(userDto => userDto.ReceivedNotifications, opt => opt.MapFrom(src => src.ReceivedNotifications.Select(notification => notification.Id)));
             CreateMap<UserRequestDto, User>();
+
+            CreateMap<Attachment, AttachmentResponseDto>();
+            CreateMap<AttachmentRequestDto, Attachment>()
+                .ForMember(attachment => attachment.Path, opt => opt.MapFrom(src => src.Name));
         }
     }
 }

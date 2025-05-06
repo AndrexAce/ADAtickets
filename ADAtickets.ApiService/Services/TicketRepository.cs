@@ -20,7 +20,9 @@
 using ADAtickets.ApiService.Configs;
 using ADAtickets.ApiService.Models;
 using ADAtickets.ApiService.Repositories;
+using Humanizer;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace ADAtickets.ApiService.Services
 {
@@ -31,44 +33,96 @@ namespace ADAtickets.ApiService.Services
     {
         readonly ADAticketsDbContext _context = context;
 
-        /// <inheritdoc cref="ITicketRepository.GetTicketByIdAsync(Guid)"/>
-        /// <exception cref="NotImplementedException">This method is not implemented.</exception>
-        public async Task<Ticket> GetTicketByIdAsync(Guid id)
+        /// <inheritdoc cref="ITicketRepository.GetTicketByIdAsync"/>
+        public async Task<Ticket?> GetTicketByIdAsync(Guid id)
         {
-            return await _context.Tickets.FindAsync(id) ?? throw new InvalidOperationException($"Entity of type {typeof(Ticket)} with id {id} was not found.");
+            return await _context.Tickets.FindAsync(id);
         }
 
         /// <inheritdoc cref="ITicketRepository.GetTicketsAsync"/>
-        public async IAsyncEnumerable<Ticket> GetTicketsAsync()
+        public async Task<IEnumerable<Ticket>> GetTicketsAsync()
         {
-            await foreach (var ticket in _context.Tickets.AsAsyncEnumerable())
-            {
-                yield return ticket;
-            }
+            return await _context.Tickets.ToListAsync();
         }
 
-        /// <inheritdoc cref="ITicketRepository.AddTicketAsync(Ticket)"/>
-        /// <exception cref="DbUpdateException">When the entity was not added because of a conflict.</exception>
+        /// <inheritdoc cref="ITicketRepository.GetTicketsByAsync"/>
+        public async Task<IEnumerable<Ticket>> GetTicketsByAsync(IEnumerable<KeyValuePair<string, string>> filters)
+        {
+            IQueryable<Ticket> query = _context.Tickets;
+
+            foreach (var filter in filters)
+            {
+                switch (filter.Key.Pascalize())
+                {
+                    case nameof(Ticket.Id) when Guid.TryParse(filter.Value, out Guid outGuid):
+                        query = query.Where(ticket => ticket.Id == outGuid);
+                        break;
+
+                    case nameof(Ticket.Type) when Enum.TryParse(filter.Value, true, out TicketType outTicketType):
+                        query = query.Where(ticket => ticket.Type == outTicketType);
+                        break;
+
+                    case nameof(Ticket.CreationDateTime) when DateTimeOffset.TryParse(filter.Value, CultureInfo.InvariantCulture, out DateTimeOffset outDateTimeOffset):
+                        query = query.Where(ticket => ticket.CreationDateTime.Date == outDateTimeOffset.Date);
+                        break;
+
+                    case nameof(Ticket.Title):
+                        query = query.Where(ticket => ticket.Title.Contains(filter.Value, StringComparison.InvariantCultureIgnoreCase));
+                        break;
+
+                    case nameof(Ticket.Description):
+                        query = query.Where(ticket => ticket.Description.Contains(filter.Value, StringComparison.InvariantCultureIgnoreCase));
+                        break;
+
+                    case nameof(Ticket.Priority) when Enum.TryParse(filter.Value, true, out Priority outPriority):
+                        query = query.Where(ticket => ticket.Priority == outPriority);
+                        break;
+
+                    case nameof(Ticket.Status) when Enum.TryParse(filter.Value, true, out Status outStatus):
+                        query = query.Where(ticket => ticket.Status == outStatus);
+                        break;
+
+                    case nameof(Ticket.WorkItemId) when int.TryParse(filter.Value, out int outInt):
+                        query = query.Where(ticket => ticket.WorkItemId == outInt);
+                        break;
+
+                    case nameof(Ticket.PlatformId) when Guid.TryParse(filter.Value, out Guid outGuid):
+                        query = query.Where(ticket => ticket.PlatformId == outGuid);
+                        break;
+
+                    case nameof(Ticket.CreatorUserId) when Guid.TryParse(filter.Value, out Guid outGuid):
+                        query = query.Where(ticket => ticket.CreatorUserId == outGuid);
+                        break;
+
+                    case nameof(Ticket.OperatorUserId) when Guid.TryParse(filter.Value, out Guid outGuid):
+                        query = query.Where(ticket => ticket.OperatorUserId == outGuid);
+                        break;
+
+                    default:
+                        return [];
+                }
+            }
+
+            return await query.ToListAsync();
+        }
+
+        /// <inheritdoc cref="ITicketRepository.AddTicketAsync"/>
         public async Task AddTicketAsync(Ticket ticket)
         {
-            await _context.Tickets.AddAsync(ticket);
+            _context.Tickets.Add(ticket);
             await _context.SaveChangesAsync();
         }
 
-        /// <inheritdoc cref="ITicketRepository.UpdateTicketAsync(Ticket)"/>
-        /// <exception cref="DbUpdateException">When the entity was not updated because of a conflict.</exception>
+        /// <inheritdoc cref="ITicketRepository.UpdateTicketAsync"/>
         public async Task UpdateTicketAsync(Ticket ticket)
         {
             _context.Tickets.Update(ticket);
             await _context.SaveChangesAsync();
         }
 
-        /// <inheritdoc cref="ITicketRepository.DeleteTicketAsync(Guid)"/>
-        /// <exception cref="InvalidOperationException">When the entity to delete was not found.</exception>
-        public async Task DeleteTicketAsync(Guid id)
+        /// <inheritdoc cref="ITicketRepository.DeleteTicketAsync"/>
+        public async Task DeleteTicketAsync(Ticket ticket)
         {
-            if (await _context.Tickets.FindAsync(id) is not Ticket ticket)
-                throw new InvalidOperationException($"Entity of type {typeof(Ticket)} with id {id} was not found.");
             _context.Remove(ticket);
             await _context.SaveChangesAsync();
         }

@@ -30,30 +30,41 @@ namespace ADAtickets.ApiService.Repositories
         /// Gets a single <see cref="Notification"/> entity from the data source asynchronously.
         /// </summary>
         /// <param name="id">The unique identifier of the <see cref="Notification"/> entity.</param>
-        /// <returns>A <see cref="Task"/> returning the <see cref="Notification"/> with the given <paramref name="id"/>.</returns>
-        Task<Notification> GetNotificationByIdAsync(Guid id);
+        /// <returns>A <see cref="Task"/> returning the <see cref="Notification"/> with the given <paramref name="id"/>, or <see langword="null"/> if it doesn't exist.</returns>
+        Task<Notification?> GetNotificationByIdAsync(Guid id);
+
         /// <summary>
         /// Gets all <see cref="Notification"/> entities from the data source asynchronously.
         /// </summary>
-        /// <returns>An asynchronously enumerable object containing all the <see cref="Notification"/> entities.</returns>
-        IAsyncEnumerable<Notification> GetNotificationsAsync();
+        /// <returns>A <see cref="Task"/> returning all the <see cref="Notification"/> entities, or an empty collection if there are none.</returns>
+        Task<IEnumerable<Notification>> GetNotificationsAsync();
+
+        /// <summary>
+        /// Gets all <see cref="Notification"/> entities from the data source which meet the given criteria asynchronously.
+        /// </summary>
+        /// <param name="filters">Group of key-value pairs representing the criteria to filter the <see cref="Notification"/> entities.</param>
+        /// <returns>A <see cref="Task"/> returning all the <see cref="Notification"/> entities, or an empty collection if there are none.</returns>
+        Task<IEnumerable<Notification>> GetNotificationsByAsync(IEnumerable<KeyValuePair<string, string>> filters);
+
         /// <summary>
         /// Adds a new <see cref="Notification"/> entity to the data source asynchronously.
         /// </summary>
         /// <param name="notification">The <see cref="Notification"/> entity to add to the data source.</param>
         /// <returns>A <see cref="Task"/> executing the action.</returns>
         Task AddNotificationAsync(Notification notification);
+
         /// <summary>
         /// Updates an existing <see cref="Notification"/> entity in the data source asynchronously.
         /// </summary>
         /// <param name="notification">The <see cref="Notification"/> entity to update in the data source.</param>
         /// <returns>A <see cref="Task"/> executing the action.</returns>
         Task UpdateNotificationAsync(Notification notification);
+
         /// <summary>
         /// Deletes an <see cref="Notification"/> entity from the data source asynchronously.
         /// </summary>
-        /// <param name="id">The unique identifier of the <see cref="Notification"/> entity.</param>
+        /// <param name="notification">The <see cref="Notification"/> entity to delete in the data source.</param>
         /// <returns>A <see cref="Task"/> executing the action.</returns>
-        Task DeleteNotificationAsync(Guid id);
+        Task DeleteNotificationAsync(Notification notification);
     }
 }

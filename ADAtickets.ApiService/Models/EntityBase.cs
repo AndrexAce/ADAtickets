@@ -35,6 +35,6 @@ namespace ADAtickets.ApiService.Models
         [Timestamp]
         [Ignore]
         [JsonIgnore]
-        public uint Version { get; } = 0;
+        public uint Version { get; set; } = 0;
     }
 }

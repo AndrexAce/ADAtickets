@@ -34,17 +34,17 @@ namespace ADAtickets.ApiService.Repositories
         Task<Edit?> GetEditByIdAsync(Guid id);
 
         /// <summary>
-        /// Gets all <see cref="Edit"/> entities from the data source.
+        /// Gets all <see cref="Edit"/> entities from the data source asynchronously.
         /// </summary>
         /// <returns>A <see cref="Task"/> returning all the <see cref="Edit"/> entities, or an empty collection if there are none.</returns>
-        Task<IEnumerable<Edit>> GetEdits();
+        Task<IEnumerable<Edit>> GetEditsAsync();
 
         /// <summary>
-        /// Gets all <see cref="Edit"/> entities from the data source which meet the given criteria.
+        /// Gets all <see cref="Edit"/> entities from the data source which meet the given criteria asynchronously.
         /// </summary>
         /// <param name="filters">Group of key-value pairs representing the criteria to filter the <see cref="Edit"/> entities.</param>
         /// <returns>A <see cref="Task"/> returning all the <see cref="Edit"/> entities, or an empty collection if there are none.</returns>
-        Task<IEnumerable<Edit>> GetEditsBy(IEnumerable<KeyValuePair<string, string>> filters);
+        Task<IEnumerable<Edit>> GetEditsByAsync(IEnumerable<KeyValuePair<string, string>> filters);
 
         /// <summary>
         /// Adds a new <see cref="Edit"/> entity to the data source asynchronously.

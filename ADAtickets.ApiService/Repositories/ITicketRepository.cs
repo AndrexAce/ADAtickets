@@ -30,30 +30,41 @@ namespace ADAtickets.ApiService.Repositories
         /// Gets a single <see cref="Ticket"/> entity from the data source asynchronously.
         /// </summary>
         /// <param name="id">The unique identifier of the <see cref="Ticket"/> entity.</param>
-        /// <returns>A <see cref="Task"/> returning the <see cref="Ticket"/> with the given <paramref name="id"/>.</returns>
-        Task<Ticket> GetTicketByIdAsync(Guid id);
+        /// <returns>A <see cref="Task"/> returning the <see cref="Ticket"/> with the given <paramref name="id"/>, or <see langword="null"/> if it doesn't exist.</returns>
+        Task<Ticket?> GetTicketByIdAsync(Guid id);
+
         /// <summary>
         /// Gets all <see cref="Ticket"/> entities from the data source asynchronously.
         /// </summary>
-        /// <returns>An asynchronously enumerable object containing all the <see cref="Ticket"/> entities.</returns>
-        IAsyncEnumerable<Ticket> GetTicketsAsync();
+        /// <returns>A <see cref="Task"/> returning all the <see cref="Ticket"/> entities, or an empty collection if there are none.</returns>
+        Task<IEnumerable<Ticket>> GetTicketsAsync();
+
+        /// <summary>
+        /// Gets all <see cref="Ticket"/> entities from the data source which meet the given criteria asynchronously.
+        /// </summary>
+        /// <param name="filters">Group of key-value pairs representing the criteria to filter the <see cref="Ticket"/> entities.</param>
+        /// <returns>A <see cref="Task"/> returning all the <see cref="Ticket"/> entities, or an empty collection if there are none.</returns>
+        Task<IEnumerable<Ticket>> GetTicketsByAsync(IEnumerable<KeyValuePair<string, string>> filters);
+
         /// <summary>
         /// Adds a new <see cref="Ticket"/> entity to the data source asynchronously.
         /// </summary>
         /// <param name="ticket">The <see cref="Ticket"/> entity to add to the data source.</param>
         /// <returns>A <see cref="Task"/> executing the action.</returns>
         Task AddTicketAsync(Ticket ticket);
+
         /// <summary>
         /// Updates an existing <see cref="Ticket"/> entity in the data source asynchronously.
         /// </summary>
         /// <param name="ticket">The <see cref="Ticket"/> entity to update in the data source.</param>
         /// <returns>A <see cref="Task"/> executing the action.</returns>
         Task UpdateTicketAsync(Ticket ticket);
+
         /// <summary>
         /// Deletes an <see cref="Ticket"/> entity from the data source asynchronously.
         /// </summary>
-        /// <param name="id">The unique identifier of the <see cref="Ticket"/> entity.</param>
+        /// <param name="ticket">The <see cref="Ticket"/> entity to delete in the data source.</param>
         /// <returns>A <see cref="Task"/> executing the action.</returns>
-        Task DeleteTicketAsync(Guid id);
+        Task DeleteTicketAsync(Ticket ticket);
     }
 }

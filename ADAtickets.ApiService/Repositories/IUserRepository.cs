@@ -30,30 +30,42 @@ namespace ADAtickets.ApiService.Repositories
         /// Gets a single <see cref="User"/> entity from the data source asynchronously.
         /// </summary>
         /// <param name="id">The unique identifier of the <see cref="User"/> entity.</param>
-        /// <returns>A <see cref="Task"/> returning the <see cref="User"/> with the given <paramref name="id"/>.</returns>
-        Task<User> GetUserByIdAsync(Guid id);
+        /// <returns>A <see cref="Task"/> returning the <see cref="User"/> with the given <paramref name="id"/>, or <see langword="null"/> if it doesn't exist..</returns>
+        Task<User?> GetUserByIdAsync(Guid id);
+
         /// <summary>
         /// Gets all <see cref="User"/> entities from the data source asynchronously.
         /// </summary>
-        /// <returns>An asynchronously enumerable object containing all the <see cref="User"/> entities.</returns>
-        IAsyncEnumerable<User> GetUsersAsync();
+        /// <returns>A <see cref="Task"/> returning all the <see cref="User"/> entities, or an empty collection if there are none.</returns>
+        Task<IEnumerable<User>> GetUsersAsync();
+
+        /// <summary>
+        /// Gets all <see cref="User"/> entities from the data source which meet the given criteria asynchronously.
+        /// </summary>
+        /// <param name="filters">Group of key-value pairs representing the criteria to filter the <see cref="User"/> entities.</param>
+        /// <returns>A <see cref="Task"/> returning all the <see cref="User"/> entities, or an empty collection if there are none.</returns>
+        Task<IEnumerable<User>> GetUsersByAsync(IEnumerable<KeyValuePair<string, string>> filters);
+
+
         /// <summary>
         /// Adds a new <see cref="User"/> entity to the data source asynchronously.
         /// </summary>
         /// <param name="user">The <see cref="User"/> entity to add to the data source.</param>
         /// <returns>A <see cref="Task"/> executing the action.</returns>
         Task AddUserAsync(User user);
+
         /// <summary>
         /// Updates an existing <see cref="User"/> entity in the data source asynchronously.
         /// </summary>
         /// <param name="user">The <see cref="User"/> entity to update in the data source.</param>
         /// <returns>A <see cref="Task"/> executing the action.</returns>
         Task UpdateUserAsync(User user);
+
         /// <summary>
         /// Deletes an <see cref="User"/> entity from the data source asynchronously.
         /// </summary>
-        /// <param name="id">The unique identifier of the <see cref="User"/> entity.</param>
+        /// <param name="user">The <see cref="User"/> entity to delete in the data source.</param>
         /// <returns>A <see cref="Task"/> executing the action.</returns>
-        Task DeleteUserAsync(Guid id);
+        Task DeleteUserAsync(User user);
     }
 }

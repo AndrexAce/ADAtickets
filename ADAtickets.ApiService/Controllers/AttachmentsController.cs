@@ -31,31 +31,31 @@ using System.Net.Mime;
 namespace ADAtickets.ApiService.Controllers
 {
     /// <summary>
-    /// Web API controller managing requests involving <see cref="Edit"/> etities.
+    /// Web API controller managing requests involving <see cref="Attachment"/> etities.
     /// </summary>
-    /// <param name="editRepository">Object defining the operations allowed on the entity type.</param>
-    /// <param name="mapper">Object definining the mappings of fields between the <see cref="Edit"/> entity and its <see cref="EditRequestDto"/> or <see cref="EditResponseDto"/> correspondant.</param>
-    [Route("api/Edits")]
+    /// <param name="attachmentRepository">Object defining the operations allowed on the entity type.</param>
+    /// <param name="mapper">Object definining the mappings of fields between the <see cref="Attachment"/> entity and its <see cref="AttachmentRequestDto"/> or <see cref="AttachmentResponseDto"/> correspondant.</param>
+    [Route("api/Attachments")]
     [ApiController]
     [Consumes(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
     [Produces(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
     [FormatFilter]
     [ApiConventionType(typeof(ADAticketsApiConventions))]
     [AutoValidateAntiforgeryToken]
-    public sealed class EditsController(IEditRepository editRepository, IMapper mapper) : ControllerBase
+    public sealed class AttachmentsController(IAttachmentRepository attachmentRepository, IMapper mapper) : ControllerBase
     {
-        private readonly IEditRepository _editRepository = editRepository;
+        private readonly IAttachmentRepository _attachmentRepository = attachmentRepository;
         private readonly IMapper _mapper = mapper;
 
         /// <summary>
-        /// Fetch all the <see cref="Edit"/> entities or all the entities respecting the given criteria.
+        /// Fetch all the <see cref="Attachment"/> entities or all the entities respecting the given criteria.
         /// </summary>
         /// <remarks>
         /// For example, the following request:
-        /// <c>GET /api/Edits?ticketId=123e4567-e89b-12d3-a456-426614174000&amp;oldStatus=unassigned</c>
-        /// Retrieves the entities linked to the ticket with id <b>123e4567-e89b-12d3-a456-426614174000</b> and which were, before the edit, in the <b>Unassigned</b> status.
+        /// <c>GET /api/Attachments?ticketId=123e4567-e89b-12d3-a456-426614174000&amp;path=example.png</c>
+        /// Retrieves the entities linked to the ticket with id <b>123e4567-e89b-12d3-a456-426614174000</b> and which contain <b>example.png</b> in the path.
         /// </remarks>
-        /// <param name="filters">A group of key-value pairs defining the property name and value <see cref="Edit"/> entities should be filtered by.</param>
+        /// <param name="filters">A group of key-value pairs defining the property name and value <see cref="Attachment"/> entities should be filtered by.</param>
         /// <returns>A <see cref="Task"/> returning an <see cref="ActionResult"/>, which wraps the server response and the list of entities.</returns>
         /// <response code="200">The entities were found.</response>
         /// <response code="400">The provided filters were not formatted correctly.</response>
@@ -63,18 +63,18 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="403">The client was authenticated but had not enough privileges.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpGet]
-        [Authorize(Policy = "AuthenticatedEveryone")]
-        public async Task<ActionResult<IEnumerable<EditResponseDto>>> GetEdits([FromQuery] IEnumerable<KeyValuePair<string, string>>? filters)
+        [Authorize(Policy = "AdminOnly")]
+        public async Task<ActionResult<IEnumerable<AttachmentResponseDto>>> GetAttachments([FromQuery] IEnumerable<KeyValuePair<string, string>>? filters)
         {
-            var edits = await (filters != null ? _editRepository.GetEditsByAsync(filters) : _editRepository.GetEditsAsync());
+            var attachments = await (filters != null ? _attachmentRepository.GetAttachmentsByAsync(filters) : _attachmentRepository.GetAttachmentsAsync());
 
-            return Ok(edits.Select(edit => _mapper.Map(edit, new EditResponseDto())));
+            return Ok(attachments.Select(attachment => _mapper.Map(attachment, new AttachmentResponseDto())));
         }
 
         /// <summary>
-        /// Fetch a specific <see cref="Edit"/> entity.
+        /// Fetch a specific <see cref="Attachment"/> entity.
         /// </summary>
-        /// <param name="id">Identifier of the <see cref="Edit"/> entity to fetch.</param>
+        /// <param name="id">Identifier of the <see cref="Attachment"/> entity to fetch.</param>
         /// <returns>A <see cref="Task"/> returning an <see cref="ActionResult"/>, which wraps the server response and the requested entity.</returns>
         /// <response code="200">The entity was found.</response>
         /// <response code="400">The provided id was not a Guid.</response>
@@ -84,47 +84,41 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpGet("{id}")]
         [Authorize(Policy = "AdminOnly")]
-        public async Task<ActionResult<EditResponseDto>> GetEdit(Guid id)
+        public async Task<ActionResult<AttachmentResponseDto>> GetAttachment(Guid id)
         {
             // Check if the requested entity exists.
-            if (await _editRepository.GetEditByIdAsync(id) is not Edit edit)
+            if (await _attachmentRepository.GetAttachmentByIdAsync(id) is not Attachment attachment)
             {
                 return NotFound();
             }
 
             // Insert the entity data into a new DTO and send it to the client.
-            return Ok(_mapper.Map(edit, new EditResponseDto()));
+            return Ok(_mapper.Map(attachment, new AttachmentResponseDto()));
         }
 
         /// <summary>
-        /// Update a specific <see cref="Edit"/> entity.
+        /// Update a specific <see cref="Attachment"/> entity.
         /// </summary>
         /// <remarks>
         /// JSON request body example:
         /// <code>
         /// {
-        ///     "EditDateTime": "2025-04-27T16:31:17.512Z",
-        ///     "Description": "Example description.",
-        ///     "OldStatus": "Unassigned",
-        ///     "NewStatus": "WaitingOperator",
+        ///     "Name": "photo.png",
         ///     "TicketId": "123e4567-e89b-12d3-a456-426614174000",
-        ///     "UserId": "123e4567-e89b-12d3-a456-426614174000"
+        ///     "Content": [0, 0, 0, 0, 0, 0]
         /// }
         /// </code>
         /// XML request body example:
         /// <code>
-        /// &lt;EditRequestDto&gt;
-        ///     &lt;EditDateTime&gt;2025-04-27T16:31:17.512Z&lt;/EditDateTime&gt;
-        ///     &lt;Description&gt;Example description.&lt;/Description&gt;
-        ///     &lt;OldStatus&gt;Unassigned&lt;/OldStatus&gt;
-        ///     &lt;NewStatus&gt;WaitingOperator&lt;/NewStatus&gt;
+        /// &lt;AttachmentRequestDto&gt;
+        ///     &lt;Name&gt;photo.png&lt;/AttachmentDateTime&gt;
         ///     &lt;TicketId&gt;123e4567-e89b-12d3-a456-426614174000&lt;/TicketId&gt;
-        ///     &lt;UserId&gt;123e4567-e89b-12d3-a456-426614174000&lt;/UserId&gt;
-        /// &lt;/EditRequestDto&gt;
+        ///     &lt;Content&gt;AAECAwQFBg==&lt;/Content&gt;
+        /// &lt;/AttachmentRequestDto&gt;
         /// </code>
         /// </remarks>
-        /// <param name="id">Identifier of the <see cref="Edit"/> entity to update.</param>
-        /// <param name="editDto">Object containing the new values the fields should be updated to.</param>
+        /// <param name="id">Identifier of the <see cref="Attachment"/> entity to update.</param>
+        /// <param name="attachmentDto">Object containing the new values the fields should be updated to.</param>
         /// <returns>A <see cref="Task"/> returning an <see cref="ActionResult"/>, which wraps the server response and the new or updated entity.</returns>
         /// <response code="201">The entity didn't exist, it was created.</response>
         /// <response code="204">The entity existed, it was updated.</response>
@@ -136,23 +130,23 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="409">The entity was updated by another request at the same time.</response>
         [HttpPut("{id}")]
         [Authorize(Policy = "AdminOnly")]
-        public async Task<ActionResult<EditResponseDto>> PutEdit(Guid id, EditRequestDto editDto)
+        public async Task<ActionResult<AttachmentResponseDto>> PutAttachment(Guid id, AttachmentRequestDto attachmentDto)
         {
             // If the requested entity does not exist, create a new one.
-            if (await _editRepository.GetEditByIdAsync(id) is not Edit edit)
+            if (await _attachmentRepository.GetAttachmentByIdAsync(id) is not Attachment attachment)
             {
-                return await PostEdit(editDto);
+                return await PostAttachment(attachmentDto);
             }
 
             try
             {
                 // Update the existing entity with the new data.
-                await _editRepository.UpdateEditAsync(_mapper.Map(editDto, edit));
+                await _attachmentRepository.UpdateAttachmentAsync(_mapper.Map(attachmentDto, attachment), attachmentDto.Content, attachment.Path);
             }
             catch (DbUpdateConcurrencyException)
             {
                 // If the entity is not found in the data source, it was deleted by another user while updating.
-                if (await _editRepository.GetEditByIdAsync(id) is null)
+                if (await _attachmentRepository.GetAttachmentByIdAsync(id) is null)
                 {
                     return NotFound();
                 }
@@ -165,33 +159,27 @@ namespace ADAtickets.ApiService.Controllers
         }
 
         /// <summary>
-        /// Create a new <see cref="Edit"/> entity.
+        /// Create a new <see cref="Attachment"/> entity.
         /// </summary>
         /// <remarks>
         /// JSON request body example:
         /// <code>
         /// {
-        ///     "EditDateTime": "2025-04-27T16:31:17.512Z",
-        ///     "Description": "Example description.",
-        ///     "OldStatus": "Unassigned",
-        ///     "NewStatus": "WaitingOperator",
+        ///     "Name": "photo.png",
         ///     "TicketId": "123e4567-e89b-12d3-a456-426614174000",
-        ///     "UserId": "123e4567-e89b-12d3-a456-426614174000"
+        ///     "Content": [0, 0, 0, 0, 0, 0]
         /// }
         /// </code>
         /// XML request body example:
         /// <code>
-        /// &lt;EditRequestDto&gt;
-        ///     &lt;EditDateTime&gt;2025-04-27T16:31:17.512Z&lt;/EditDateTime&gt;
-        ///     &lt;Description&gt;Example description.&lt;/Description&gt;
-        ///     &lt;OldStatus&gt;Unassigned&lt;/OldStatus&gt;
-        ///     &lt;NewStatus&gt;WaitingOperator&lt;/NewStatus&gt;
+        /// &lt;AttachmentRequestDto&gt;
+        ///     &lt;Name&gt;photo.png&lt;/AttachmentDateTime&gt;
         ///     &lt;TicketId&gt;123e4567-e89b-12d3-a456-426614174000&lt;/TicketId&gt;
-        ///     &lt;UserId&gt;123e4567-e89b-12d3-a456-426614174000&lt;/UserId&gt;
-        /// &lt;/EditRequestDto&gt;
+        ///     &lt;Content&gt;AAECAwQFBg==&lt;/Content&gt;
+        /// &lt;/AttachmentRequestDto&gt;
         /// </code>
         /// </remarks>
-        /// <param name="editDto">Object containing the values the new entity should have.</param>
+        /// <param name="attachmentDto">Object containing the values the new entity should have.</param>
         /// <returns>A <see cref="Task"/> returning an <see cref="ActionResult"/>, which wraps the server response and the new entity.</returns>
         /// <response code="201">The entity was created.</response>
         /// <response code="400">The entity was malformed.</response>
@@ -200,21 +188,21 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpPost]
         [Authorize(Policy = "AdminOnly")]
-        public async Task<ActionResult<EditResponseDto>> PostEdit(EditRequestDto editDto)
+        public async Task<ActionResult<AttachmentResponseDto>> PostAttachment(AttachmentRequestDto attachmentDto)
         {
-            var edit = _mapper.Map(editDto, new Edit());
+            var attachment = _mapper.Map(attachmentDto, new Attachment());
 
             // Insert the DTO info into a new entity and add it to the data source.
-            await _editRepository.AddEditAsync(edit);
+            await _attachmentRepository.AddAttachmentAsync(attachment, attachmentDto.Content);
 
             // Return the created entity and its location to the client.
-            return CreatedAtAction(nameof(GetEdit), new { id = edit.Id }, edit);
+            return CreatedAtAction(nameof(GetAttachment), new { id = attachment.Id }, attachment);
         }
 
         /// <summary>
-        /// Delete a specific <see cref="Edit"/> entity.
+        /// Delete a specific <see cref="Attachment"/> entity.
         /// </summary>
-        /// <param name="id">Identifier of the <see cref="Edit"/> entity to delete.</param>
+        /// <param name="id">Identifier of the <see cref="Attachment"/> entity to delete.</param>
         /// <returns>A <see cref="Task"/> returning an <see cref="IActionResult"/>, which wraps the server response.</returns>
         /// <response code="204">The entity was deleted.</response>
         /// <response code="400">The provided id was not a Guid.</response>
@@ -224,15 +212,15 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpDelete("{id}")]
         [Authorize(Policy = "AdminOnly")]
-        public async Task<IActionResult> DeleteEdit(Guid id)
+        public async Task<IActionResult> DeleteAttachment(Guid id)
         {
             // Check if the requested entity exists.
-            if (await _editRepository.GetEditByIdAsync(id) is not Edit edit)
+            if (await _attachmentRepository.GetAttachmentByIdAsync(id) is not Attachment attachment)
             {
                 return NotFound();
             }
 
-            await _editRepository.DeleteEditAsync(edit);
+            await _attachmentRepository.DeleteAttachmentAsync(attachment);
 
             return NoContent();
         }

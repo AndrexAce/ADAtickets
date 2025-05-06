@@ -32,7 +32,7 @@ namespace ADAtickets.ApiService.Dtos.Requests
         /// The date and time when the notification was sent.
         /// </summary>
         [Required]
-        public DateTimeOffset SendDateTime { get; } = DateTimeOffset.Now;
+        public DateTimeOffset SendDateTime { get; set; } = DateTimeOffset.UtcNow;
 
         /// <summary>
         /// The message the notification comes with.

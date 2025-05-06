@@ -30,30 +30,41 @@ namespace ADAtickets.ApiService.Repositories
         /// Gets a single <see cref="Platform"/> entity from the data source asynchronously.
         /// </summary>
         /// <param name="id">The unique identifier of the <see cref="Platform"/> entity.</param>
-        /// <returns>A <see cref="Task"/> returning the <see cref="Platform"/> with the given <paramref name="id"/>.</returns>
-        Task<Platform> GetPlatformByIdAsync(Guid id);
+        /// <returns>A <see cref="Task"/> returning the <see cref="Platform"/> with the given <paramref name="id"/>, or <see langword="null"/> if it doesn't exist.</returns>
+        Task<Platform?> GetPlatformByIdAsync(Guid id);
+
         /// <summary>
         /// Gets all <see cref="Platform"/> entities from the data source asynchronously.
         /// </summary>
-        /// <returns>An asynchronously enumerable object containing all the <see cref="Platform"/> entities.</returns>
-        IAsyncEnumerable<Platform> GetPlatformsAsync();
+        /// <returns>A <see cref="Task"/> returning all the <see cref="Platform"/> entities, or an empty collection if there are none.</returns>
+        Task<IEnumerable<Platform>> GetPlatformsAsync();
+
+        /// <summary>
+        /// Gets all <see cref="Platform"/> entities from the data source which meet the given criteria asynchronously.
+        /// </summary>
+        /// <param name="filters">Group of key-value pairs representing the criteria to filter the <see cref="Platform"/> entities.</param>
+        /// <returns>A <see cref="Task"/> returning all the <see cref="Platform"/> entities, or an empty collection if there are none.</returns>
+        Task<IEnumerable<Platform>> GetPlatformsByAsync(IEnumerable<KeyValuePair<string, string>> filters);
+
         /// <summary>
         /// Adds a new <see cref="Platform"/> entity to the data source asynchronously.
         /// </summary>
         /// <param name="platform">The <see cref="Platform"/> entity to add to the data source.</param>
         /// <returns>A <see cref="Task"/> executing the action.</returns>
         Task AddPlatformAsync(Platform platform);
+
         /// <summary>
         /// Updates an existing <see cref="Platform"/> entity in the data source asynchronously.
         /// </summary>
         /// <param name="platform">The <see cref="Platform"/> entity to update in the data source.</param>
         /// <returns>A <see cref="Task"/> executing the action.</returns>
         Task UpdatePlatformAsync(Platform platform);
+
         /// <summary>
         /// Deletes an <see cref="Platform"/> entity from the data source asynchronously.
         /// </summary>
-        /// <param name="id">The unique identifier of the <see cref="Platform"/> entity.</param>
+        /// <param name="platform">The <see cref="Platform"/> entity to delete in the data source.</param>
         /// <returns>A <see cref="Task"/> executing the action.</returns>
-        Task DeletePlatformAsync(Guid id);
+        Task DeletePlatformAsync(Platform platform);
     }
 }

@@ -20,7 +20,9 @@
 using ADAtickets.ApiService.Configs;
 using ADAtickets.ApiService.Models;
 using ADAtickets.ApiService.Repositories;
+using Humanizer;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace ADAtickets.ApiService.Services
 {
@@ -31,44 +33,72 @@ namespace ADAtickets.ApiService.Services
     {
         readonly ADAticketsDbContext _context = context;
 
-        /// <inheritdoc cref="IReplyRepository.GetReplyByIdAsync(Guid)"/>
-        /// <exception cref="InvalidOperationException">When the entity was not found.</exception>
-        public async Task<Reply> GetReplyByIdAsync(Guid id)
+        /// <inheritdoc cref="IReplyRepository.GetReplyByIdAsync"/>
+        public async Task<Reply?> GetReplyByIdAsync(Guid id)
         {
-            return await _context.Replies.FindAsync(id) ?? throw new InvalidOperationException($"Entity of type {typeof(Reply)} with id {id} was not found.");
+            return await _context.Replies.FindAsync(id);
         }
 
         /// <inheritdoc cref="IReplyRepository.GetRepliesAsync"/>
-        public async IAsyncEnumerable<Reply> GetRepliesAsync()
+        public async Task<IEnumerable<Reply>> GetRepliesAsync()
         {
-            await foreach (var reply in _context.Replies.AsAsyncEnumerable())
-            {
-                yield return reply;
-            }
+            return await _context.Replies.ToListAsync();
         }
 
-        /// <inheritdoc cref="IReplyRepository.AddReplyAsync(Reply)"/>
-        /// <exception cref="DbUpdateException">When the entity was not added because of a conflict.</exception>
+        /// <inheritdoc cref="IReplyRepository.GetRepliesByAsync"/>
+        public async Task<IEnumerable<Reply>> GetRepliesByAsync(IEnumerable<KeyValuePair<string, string>> filters)
+        {
+            IQueryable<Reply> query = _context.Replies;
+
+            foreach (var filter in filters)
+            {
+                switch (filter.Key.Pascalize())
+                {
+                    case nameof(Platform.Id) when Guid.TryParse(filter.Value, out Guid outGuid):
+                        query = query.Where(platform => platform.Id == outGuid);
+                        break;
+
+                    case nameof(Reply.ReplyDateTime) when DateTimeOffset.TryParse(filter.Value, CultureInfo.InvariantCulture, out DateTimeOffset outDateTimeOffset):
+                        query = query.Where(reply => reply.ReplyDateTime.Date == outDateTimeOffset.Date);
+                        break;
+
+                    case nameof(Reply.Message):
+                        query = query.Where(reply => reply.Message.Contains(filter.Value, StringComparison.InvariantCultureIgnoreCase));
+                        break;
+
+                    case nameof(Reply.AuthorUserId) when Guid.TryParse(filter.Value, out Guid outGuid):
+                        query = query.Where(reply => reply.AuthorUserId == outGuid);
+                        break;
+
+                    case nameof(Reply.TicketId) when Guid.TryParse(filter.Value, out Guid outGuid):
+                        query = query.Where(reply => reply.TicketId == outGuid);
+                        break;
+
+                    default:
+                        return [];
+                }
+            }
+
+            return await query.ToListAsync();
+        }
+
+        /// <inheritdoc cref="IReplyRepository.AddReplyAsync"/>
         public async Task AddReplyAsync(Reply reply)
         {
             await _context.Replies.AddAsync(reply);
             await _context.SaveChangesAsync();
         }
 
-        /// <inheritdoc cref="IReplyRepository.UpdateReplyAsync(Reply)"/>
-        /// <exception cref="DbUpdateException">When the entity was not updated because of a conflict.</exception>
+        /// <inheritdoc cref="IReplyRepository.UpdateReplyAsync"/>
         public async Task UpdateReplyAsync(Reply reply)
         {
             _context.Replies.Update(reply);
             await _context.SaveChangesAsync();
         }
 
-        /// <inheritdoc cref="IReplyRepository.DeleteReplyAsync(Guid)"/>
-        /// <exception cref="InvalidOperationException">When the entity to delete was not found.</exception>
-        public async Task DeleteReplyAsync(Guid id)
+        /// <inheritdoc cref="IReplyRepository.DeleteReplyAsync"/>
+        public async Task DeleteReplyAsync(Reply reply)
         {
-            if (await _context.Replies.FindAsync(id) is not Reply reply)
-                throw new InvalidOperationException($"Entity of type {typeof(Reply)} with id {id} was not found.");
             _context.Remove(reply);
             await _context.SaveChangesAsync();
         }

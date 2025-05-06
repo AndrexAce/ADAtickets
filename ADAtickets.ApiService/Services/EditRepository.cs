@@ -20,6 +20,7 @@
 using ADAtickets.ApiService.Configs;
 using ADAtickets.ApiService.Models;
 using ADAtickets.ApiService.Repositories;
+using Humanizer;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 
@@ -32,75 +33,78 @@ namespace ADAtickets.ApiService.Services
     {
         readonly ADAticketsDbContext _context = context;
 
-        /// <inheritdoc cref="IEditRepository.GetEditByIdAsync(Guid)"/>
+        /// <inheritdoc cref="IEditRepository.GetEditByIdAsync"/>
         public async Task<Edit?> GetEditByIdAsync(Guid id)
         {
             return await _context.Edits.FindAsync(id);
         }
 
-        /// <inheritdoc cref="IEditRepository.GetEdits"/>
-        public async Task<IEnumerable<Edit>> GetEdits()
+        /// <inheritdoc cref="IEditRepository.GetEditsAsync"/>
+        public async Task<IEnumerable<Edit>> GetEditsAsync()
         {
             return await _context.Edits.ToListAsync();
         }
 
-        /// <inheritdoc cref="IEditRepository.GetEditsBy"/>
-        public async Task<IEnumerable<Edit>> GetEditsBy(IEnumerable<KeyValuePair<string, string>> filters)
+        /// <inheritdoc cref="IEditRepository.GetEditsByAsync"/>
+        public async Task<IEnumerable<Edit>> GetEditsByAsync(IEnumerable<KeyValuePair<string, string>> filters)
         {
             IQueryable<Edit> query = _context.Edits;
 
             foreach (var filter in filters)
             {
-                switch (filter.Key)
+                switch (filter.Key.Pascalize())
                 {
-                    case nameof(Edit.Id):
-                        query = query.Where(e => e.Id == Guid.Parse(filter.Value));
+                    case nameof(Edit.Id) when Guid.TryParse(filter.Value, out Guid outGuid):
+                        query = query.Where(edit => edit.Id == outGuid);
                         break;
 
-                    case nameof(Edit.TicketId):
-                        query = query.Where(e => e.TicketId == Guid.Parse(filter.Value));
+                    case nameof(Edit.TicketId) when Guid.TryParse(filter.Value, out Guid outGuid):
+                        query = query.Where(edit => edit.TicketId == outGuid);
                         break;
 
-                    case nameof(Edit.UserId):
-                        query = query.Where(e => e.UserId == Guid.Parse(filter.Value));
+                    case nameof(Edit.UserId) when Guid.TryParse(filter.Value, out Guid outGuid):
+                        query = query.Where(edit => edit.UserId == outGuid);
                         break;
 
-                    case nameof(Edit.OldStatus):
-                        query = query.Where(e => e.OldStatus == Enum.Parse<Status>(filter.Value));
+                    case nameof(Edit.OldStatus) when Enum.TryParse(filter.Value, true, out Status outStatus):
+                        query = query.Where(edit => edit.OldStatus == outStatus);
                         break;
 
-                    case nameof(Edit.NewStatus):
-                        query = query.Where(e => e.NewStatus == Enum.Parse<Status>(filter.Value));
+                    case nameof(Edit.NewStatus) when Enum.TryParse(filter.Value, true, out Status outStatus):
+                        query = query.Where(edit => edit.NewStatus == outStatus);
                         break;
 
-                    case nameof(Edit.EditDateTime):
-                        query = query.Where(e => e.EditDateTime == DateTimeOffset.Parse(filter.Value, CultureInfo.InvariantCulture));
+                    case nameof(Edit.EditDateTime) when DateTimeOffset.TryParse(filter.Value, CultureInfo.InvariantCulture, out DateTimeOffset outDateTimeOffset):
+                        query = query.Where(edit => edit.EditDateTime.Date == outDateTimeOffset.Date);
                         break;
 
                     case nameof(Edit.Description):
-                        query = query.Where(e => e.Description.Contains(filter.Value));
+                        query = query.Where(edit => edit.Description.Contains(filter.Value, StringComparison.InvariantCultureIgnoreCase));
                         break;
+
+                    default:
+                        return [];
                 }
             }
 
             return await query.ToListAsync();
         }
 
-        /// <inheritdoc cref="IEditRepository.AddEditAsync(Edit)"/>
+        /// <inheritdoc cref="IEditRepository.AddEditAsync"/>
         public async Task AddEditAsync(Edit edit)
         {
             _context.Edits.Add(edit);
             await _context.SaveChangesAsync();
         }
 
-        /// <inheritdoc cref="IEditRepository.UpdateEditAsync(Edit)"/>
+        /// <inheritdoc cref="IEditRepository.UpdateEditAsync"/>
         public async Task UpdateEditAsync(Edit edit)
         {
             _context.Edits.Update(edit);
             await _context.SaveChangesAsync();
         }
 
-        /// <inheritdoc cref="IEditRepository.DeleteEditAsync(Edit)"/>
+        /// <inheritdoc cref="IEditRepository.DeleteEditAsync"/>
         public async Task DeleteEditAsync(Edit edit)
         {
             _context.Remove(edit);

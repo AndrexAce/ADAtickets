@@ -23,33 +23,27 @@ using System.ComponentModel.DataAnnotations;
 namespace ADAtickets.ApiService.Dtos.Requests
 {
     /// <summary>
-    /// <para>Represents a reply in a ticket comment thread.</para>
-    /// <para>It is a simplified version of the <see cref="Reply"/> class, used for data transfer to the server.</para>
+    /// <para>Represents an attachment associated with a ticket.</para>
+    /// <para>It is a simplified version of the <see cref="Attachment"/> class, used for data transfer to the server.</para>
     /// </summary>
-    public sealed class ReplyRequestDto
+    public class AttachmentRequestDto
     {
         /// <summary>
-        /// The date and time when the reply was sent.
+        /// The name of the attachment.
         /// </summary>
         [Required]
-        public DateTimeOffset ReplyDateTime { get; set; } = DateTimeOffset.UtcNow;
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// The message written in the reply.
-        /// </summary>
-        [Required]
-        public string Message { get; set; } = string.Empty;
-
-        /// <summary>
-        /// The id of the user who sent the reply.
-        /// </summary>
-        [Required]
-        public Guid AuthorUserId { get; set; } = Guid.Empty;
-
-        /// <summary>
-        /// The id of the ticket this reply was sent to.
+        /// The id of the ticket this attachment is related to.
         /// </summary>
         [Required]
         public Guid TicketId { get; set; } = Guid.Empty;
+
+        /// <summary>
+        /// The content of the attachment.
+        /// </summary>
+        [Required]
+        public byte[] Content { get; set; } = [];
     }
 }

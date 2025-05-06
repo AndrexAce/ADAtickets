@@ -35,7 +35,7 @@ namespace ADAtickets.ApiService.Dtos.Responses
         /// <summary>
         /// The date and time when the reply was sent.
         /// </summary>
-        public DateTimeOffset ReplyDateTime { get; set; } = DateTimeOffset.Now;
+        public DateTimeOffset ReplyDateTime { get; set; } = DateTimeOffset.UtcNow;
 
         /// <summary>
         /// The message written in the reply.

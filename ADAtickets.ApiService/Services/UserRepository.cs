@@ -20,6 +20,7 @@
 using ADAtickets.ApiService.Configs;
 using ADAtickets.ApiService.Models;
 using ADAtickets.ApiService.Repositories;
+using Humanizer;
 using Microsoft.EntityFrameworkCore;
 
 namespace ADAtickets.ApiService.Services
@@ -31,47 +32,92 @@ namespace ADAtickets.ApiService.Services
     {
         readonly ADAticketsDbContext _context = context;
 
-        /// <inheritdoc cref="IUserRepository.GetUserByIdAsync(Guid)"/>
-        /// <exception cref="InvalidOperationException">When the entity was not found.</exception>
-
-        public async Task<User> GetUserByIdAsync(Guid id)
+        /// <inheritdoc cref="IUserRepository.GetUserByIdAsync"/>
+        public async Task<User?> GetUserByIdAsync(Guid id)
         {
-            return await _context.AppUsers.FindAsync(id) ?? throw new InvalidOperationException($"Entity of type {typeof(User)} with id {id} was not found.");
+            return await _context.AppUsers.FindAsync(id);
         }
 
         /// <inheritdoc cref="IUserRepository.GetUsersAsync"/>
-        public async IAsyncEnumerable<User> GetUsersAsync()
+        public async Task<IEnumerable<User>> GetUsersAsync()
         {
-            await foreach (var user in _context.AppUsers.AsAsyncEnumerable())
-            {
-                yield return user;
-            }
+            return await _context.AppUsers.ToListAsync();
         }
 
-        /// <inheritdoc cref="IUserRepository.AddUserAsync(User)"/>
-        /// <exception cref="DbUpdateException">When the entity was not added because of a conflict.</exception>
+        /// <inheritdoc cref="IUserRepository.GetUsersByAsync"/>
+        public async Task<IEnumerable<User>> GetUsersByAsync(IEnumerable<KeyValuePair<string, string>> filters)
+        {
+            IQueryable<User> query = _context.AppUsers;
+
+            foreach (var filter in filters)
+            {
+                switch (filter.Key.Pascalize())
+                {
+                    case nameof(User.Id) when Guid.TryParse(filter.Value, out Guid outGuid):
+                        query = query.Where(u => u.Id == outGuid);
+                        break;
+
+                    case nameof(User.Name):
+                        query = query.Where(u => u.Name.Contains(filter.Value, StringComparison.InvariantCultureIgnoreCase));
+                        break;
+
+                    case nameof(User.Surname):
+                        query = query.Where(u => u.Surname.Contains(filter.Value, StringComparison.InvariantCultureIgnoreCase));
+                        break;
+
+                    case nameof(User.IsEmail2FAEnabled) when bool.TryParse(filter.Value, out bool outBool):
+                        query = query.Where(u => u.IsEmail2FAEnabled == outBool);
+                        break;
+
+                    case nameof(User.IsPhone2FAEnabled) when bool.TryParse(filter.Value, out bool outBool):
+                        query = query.Where(u => u.IsPhone2FAEnabled == outBool);
+                        break;
+
+                    case nameof(User.AreEmailNotificationsEnabled) when bool.TryParse(filter.Value, out bool outBool):
+                        query = query.Where(u => u.AreEmailNotificationsEnabled == outBool);
+                        break;
+
+                    case nameof(User.ArePhoneNotificationsEnabled) when bool.TryParse(filter.Value, out bool outBool):
+                        query = query.Where(u => u.ArePhoneNotificationsEnabled == outBool);
+                        break;
+
+                    case nameof(User.Type) when Enum.TryParse(filter.Value, true, out UserType outUserType):
+                        query = query.Where(u => u.Type == outUserType);
+                        break;
+
+                    case nameof(User.MicrosoftAccountId):
+                        query = query.Where(u => u.MicrosoftAccountId != null && u.MicrosoftAccountId.Contains(filter.Value, StringComparison.InvariantCultureIgnoreCase));
+                        break;
+
+                    case nameof(User.IdentityUserId) when Guid.TryParse(filter.Value, out Guid outGuid):
+                        query = query.Where(u => u.IdentityUserId == outGuid);
+                        break;
+
+                    default:
+                        return [];
+                }
+            }
+
+            return await query.ToListAsync();
+        }
+
+        /// <inheritdoc cref="IUserRepository.AddUserAsync"/>
         public async Task AddUserAsync(User user)
         {
-            await _context.AppUsers.AddAsync(user);
+            _context.AppUsers.Add(user);
             await _context.SaveChangesAsync();
         }
 
-        /// <inheritdoc cref="IUserRepository.UpdateUserAsync(User)"/>
-        /// <exception cref="DbUpdateException">When the entity was not updated because of a conflict.</exception>
-
+        /// <inheritdoc cref="IUserRepository.UpdateUserAsync"/>
         public async Task UpdateUserAsync(User user)
         {
             _context.AppUsers.Update(user);
             await _context.SaveChangesAsync();
         }
 
-        /// <inheritdoc cref="IUserRepository.DeleteUserAsync(Guid)"/>
-        /// <exception cref="InvalidOperationException">When the entity to delete was not found.</exception>
-
-        public async Task DeleteUserAsync(Guid id)
+        /// <inheritdoc cref="IUserRepository.DeleteUserAsync"/>
+        public async Task DeleteUserAsync(User user)
         {
-            if (await _context.AppUsers.FindAsync(id) is not User user)
-                throw new InvalidOperationException($"Entity of type {typeof(User)} with email {id} was not found.");
             _context.Remove(user);
             await _context.SaveChangesAsync();
         }

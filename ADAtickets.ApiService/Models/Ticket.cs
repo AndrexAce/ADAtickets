@@ -46,7 +46,7 @@ namespace ADAtickets.ApiService.Models
         /// The date and time when the ticket was created.
         /// </summary>
         [Required]
-        public DateTimeOffset CreationDateTime { get; } = DateTimeOffset.Now;
+        public DateTimeOffset CreationDateTime { get; set; } = DateTimeOffset.UtcNow;
 
         /// <summary>
         /// The title of the ticket, a brief recap of the issue.

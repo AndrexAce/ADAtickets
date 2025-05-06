@@ -20,7 +20,9 @@
 using ADAtickets.ApiService.Configs;
 using ADAtickets.ApiService.Models;
 using ADAtickets.ApiService.Repositories;
+using Humanizer;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace ADAtickets.ApiService.Services
 {
@@ -31,44 +33,76 @@ namespace ADAtickets.ApiService.Services
     {
         readonly ADAticketsDbContext _context = context;
 
-        /// <inheritdoc cref="INotificationRepository.GetNotificationByIdAsync(Guid)"/>
-        /// <exception cref="InvalidOperationException">When the entity was not found.</exception>
-        public async Task<Notification> GetNotificationByIdAsync(Guid id)
+        /// <inheritdoc cref="INotificationRepository.GetNotificationByIdAsync"/>
+        public async Task<Notification?> GetNotificationByIdAsync(Guid id)
         {
-            return await _context.Notifications.FindAsync(id) ?? throw new InvalidOperationException($"Entity of type {typeof(Notification)} with id {id} was not found.");
+            return await _context.Notifications.FindAsync(id);
         }
 
         /// <inheritdoc cref="INotificationRepository.GetNotificationsAsync"/>
-        public async IAsyncEnumerable<Notification> GetNotificationsAsync()
+        public async Task<IEnumerable<Notification>> GetNotificationsAsync()
         {
-            await foreach (var notification in _context.Notifications.AsAsyncEnumerable())
-            {
-                yield return notification;
-            }
+            return await _context.Notifications.ToListAsync();
         }
 
-        /// <inheritdoc cref="INotificationRepository.AddNotificationAsync(Notification)"/>
-        /// <exception cref="DbUpdateException">When the entity was not added because of a conflict.</exception>
+        /// <inheritdoc cref="INotificationRepository.GetNotificationsByAsync"/>
+        public async Task<IEnumerable<Notification>> GetNotificationsByAsync(IEnumerable<KeyValuePair<string, string>> filters)
+        {
+            IQueryable<Notification> query = _context.Notifications;
+
+            foreach (var filter in filters)
+            {
+                switch (filter.Key.Pascalize())
+                {
+                    case nameof(Notification.Id) when Guid.TryParse(filter.Value, out Guid outGuid):
+                        query = query.Where(notification => notification.Id == outGuid);
+                        break;
+
+                    case nameof(Notification.TicketId) when Guid.TryParse(filter.Value, out Guid outGuid):
+                        query = query.Where(notification => notification.TicketId == outGuid);
+                        break;
+
+                    case nameof(Notification.UserId) when Guid.TryParse(filter.Value, out Guid outGuid):
+                        query = query.Where(notification => notification.UserId == outGuid);
+                        break;
+
+                    case nameof(Notification.IsRead) when bool.TryParse(filter.Value, out bool outBool):
+                        query = query.Where(notification => notification.IsRead == outBool);
+                        break;
+
+                    case nameof(Notification.SendDateTime) when DateTimeOffset.TryParse(filter.Value, CultureInfo.InvariantCulture, out DateTimeOffset outDateTimeOffset):
+                        query = query.Where(notification => notification.SendDateTime.Date == outDateTimeOffset.Date);
+                        break;
+
+                    case nameof(Notification.Message):
+                        query = query.Where(notification => notification.Message.Contains(filter.Value, StringComparison.InvariantCultureIgnoreCase));
+                        break;
+
+                    default:
+                        return [];
+                }
+            }
+
+            return await query.ToListAsync();
+        }
+
+        /// <inheritdoc cref="INotificationRepository.AddNotificationAsync"/>
         public async Task AddNotificationAsync(Notification notification)
         {
-            await _context.Notifications.AddAsync(notification);
+            _context.Notifications.Add(notification);
             await _context.SaveChangesAsync();
         }
 
-        /// <inheritdoc cref="INotificationRepository.UpdateNotificationAsync(Notification)"/>
-        /// <exception cref="DbUpdateException">When the entity was not updated because of a conflict.</exception>
+        /// <inheritdoc cref="INotificationRepository.UpdateNotificationAsync"/>
         public async Task UpdateNotificationAsync(Notification notification)
         {
             _context.Notifications.Update(notification);
             await _context.SaveChangesAsync();
         }
 
-        /// <inheritdoc cref="INotificationRepository.DeleteNotificationAsync(Guid)"/>
-        /// <exception cref="InvalidOperationException">When the entity to delete was not found.</exception>
-        public async Task DeleteNotificationAsync(Guid id)
+        /// <inheritdoc cref="INotificationRepository.DeleteNotificationAsync"/>
+        public async Task DeleteNotificationAsync(Notification notification)
         {
-            if (await _context.Notifications.FindAsync(id) is not Notification notification)
-                throw new InvalidOperationException($"Entity of type {typeof(Notification)} with id {id} was not found.");
             _context.Remove(notification);
             await _context.SaveChangesAsync();
         }
