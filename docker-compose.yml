@@ -1,0 +1,37 @@
+services:
+  adatickets.postgresql:
+    container_name: Database
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:?error}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?error}
+      - POSTGRES_DB=adatickets
+    healthcheck:
+      test: pg_isready -U postgres -d adatickets
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    image: postgres:latest
+    networks:
+      - network
+    ports:
+      - "5432:5432"
+    volumes:
+      - database-data:/var/lib/postgresql/data
+    
+  adatickets.apiservice:
+    container_name: Api
+    depends_on:
+      adatickets.postgresql:
+        condition: service_healthy
+    networks:
+      - network
+    ports:
+      - "5194:8080"
+      - "7214:8081" 
+
+networks:
+  network:
+    driver: bridge
+
+volumes:
+  database-data:

@@ -35,6 +35,23 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add the DBContext to execute queries against the database.
+// The context is pooled so that the application spends less time creating and destroying contexts.
+builder.Services.AddDbContextPool<ADAticketsDbContext>(options =>
+{
+    // Configure the DBContext to use PostgreSQL.
+    options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSQL"), options =>
+    {
+        // Create the enumerations in the connected database.
+        options.MapEnum<Priority>("priority")
+            .MapEnum<Status>("status")
+            .MapEnum<TicketType>("ticket_type")
+            .MapEnum<UserType>("user_type")
+            .EnableRetryOnFailure();
+    })
+        .UseSnakeCaseNamingConvention();
+});
+
 // Configure EntraID authentication for Microsoft work accounts.
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"), "AzureAd");
@@ -164,23 +181,6 @@ builder.Services.AddSwaggerGen(options =>
 
 // Add services used to return detailed error messages for failed requests.
 builder.Services.AddProblemDetails();
-
-// Add the DBContext to execute queries against the database.
-// The context is pooled so that the application spends less time creating and destroying contexts.
-builder.Services.AddDbContextPool<ADAticketsDbContext>(options =>
-{
-    // Configure the DBContext to use PostgreSQL.
-    options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSQL"), options =>
-    {
-        // Create the enumerations in the connected database.
-        options.MapEnum<Priority>("priority")
-            .MapEnum<Status>("status")
-            .MapEnum<TicketType>("ticket_type")
-            .MapEnum<UserType>("user_type")
-            .EnableRetryOnFailure();
-    })
-        .UseSnakeCaseNamingConvention();
-});
 
 // Configure the scoped (one per request) classes available for dependency injection.
 builder.Services.AddScoped<IEditRepository, EditRepository>();

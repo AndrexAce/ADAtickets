@@ -1,0 +1,33 @@
+name: ADAtickets-dev
+
+services:
+  adatickets.pgweb:
+    container_name: Pgweb
+    restart: always
+    image: sosedoff/pgweb
+    ports: 
+      - "8081:8081" 
+    environment:
+      - PGWEB_DATABASE_URL=postgres://${POSTGRES_USER:?error}:${POSTGRES_PASSWORD:?error}@adatickets.postgresql:5432/adatickets?sslmode=disable
+    depends_on:
+      adatickets.postgresql:
+        condition: service_healthy
+    networks:
+      - network
+
+  adatickets.apiservice:
+    build:
+      context: .
+      args:
+       - BUILD_CONFIGURATION=Debug
+      dockerfile: ADAtickets.ApiService/Dockerfile
+      tags:
+        - andrexace/adatickets-api:dev
+    image: andrexace/adatickets-api:dev
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:8081;http://+:8080;
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${CERT_PASSWORD:?error}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${CERT_PATH:-/https/aspnetapp.pfx}
+    volumes:
+      - ${VOLUME_PATH:-~/.aspnet/https}:/https:ro

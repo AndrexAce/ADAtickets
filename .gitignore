@@ -403,3 +403,4 @@ FodyWeavers.xsd
 ADAtickets.ApiService/appsettings.Development.json
 ADAtickets.AppHost/appsettings.Development.json
 ADAtickets.Web/appsettings.Development.json
+/.env
