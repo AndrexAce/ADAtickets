@@ -27,4 +27,5 @@ RUN dotnet publish "./ADAtickets.ApiService.csproj" -c $BUILD_CONFIGURATION -o /
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+USER $APP_UID
 ENTRYPOINT ["dotnet", "ADAtickets.ApiService.dll"]
