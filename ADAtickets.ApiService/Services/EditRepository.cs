@@ -107,7 +107,7 @@ namespace ADAtickets.ApiService.Services
         /// <inheritdoc cref="IEditRepository.DeleteEditAsync"/>
         public async Task DeleteEditAsync(Edit edit)
         {
-            _context.Remove(edit);
+            _context.Edits.Remove(edit);
             await _context.SaveChangesAsync();
         }
     }

@@ -99,7 +99,7 @@ namespace ADAtickets.ApiService.Services
         /// <inheritdoc cref="IReplyRepository.DeleteReplyAsync"/>
         public async Task DeleteReplyAsync(Reply reply)
         {
-            _context.Remove(reply);
+            _context.Replies.Remove(reply);
             await _context.SaveChangesAsync();
         }
     }

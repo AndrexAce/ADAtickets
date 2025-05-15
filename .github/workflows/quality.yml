@@ -58,10 +58,10 @@ jobs:
           mkdir -p ./.sonar/scanner
           dotnet tool update dotnet-sonarscanner --tool-path ./.sonar/scanner
        
-      - name: Install dotnet-coverage NuGet package and tool
+      - name: Install Coverlet NuGet tool
         if: steps.cache-nuget-packages.outputs.cache-hit != 'true'
         shell: bash
-        run: dotnet tool install -g dotnet-coverage
+        run: dotnet tool install -g coverlet.console
       
       - name: Trust ASP.NET certificates
         shell: bash
@@ -79,7 +79,7 @@ jobs:
           /d:sonar.host.url="https://sonarcloud.io" \
           /d:sonar.scanner.skipJreProvisioning=true \
           /d:sonar.dotnet.excludeTestProjects=true \
-          /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml \
+          /d:sonar.cs.opencover.reportsPaths=coverage.xml \
           /d:sonar.exclusions=**/Migrations/** \
           /d:sonar.coverage.exclusions=**/*.yml,**/*.json \
           /v:v$(date +'%Y.%m.%d')
@@ -91,12 +91,8 @@ jobs:
         run: dotnet build ADAtickets.sln -c Release --no-incremental --property:postgresUsername=$POSTGRES_USERNAME --property:postgresPassword=$POSTGRES_PASSWORD
 
       - name: Run tests
-        run: dotnet test ADAtickets.sln -c Release --no-build
-
-      - name: Collect code coverage
-        if: always()
-        shell: bash
-        run: dotnet-coverage collect "dotnet test ADAtickets.sln -c Release --no-build" -f xml -o "coverage.xml"
+        run: |
+          coverlet .\ADAtickets.ApiService.Test\bin\Release\net9.0\ADAtickets.ApiService.Test.dll --target "dotnet"  --targetargs "test --no-build" -f=opencover  -o="coverage.xml"
 
       - name: End SonarCloud analysis
         env:
@@ -106,15 +102,15 @@ jobs:
         run: |
           ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
 
-      # - name: SonarQube Quality Gate check
-      #   id: sonarqube-quality-gate-check
-      #   uses: sonarsource/sonarqube-quality-gate-action@v1.1.0
-      #   with:
-      #       scanMetadataReportFile: .sonarqube/out/.sonar/report-task.txt
-      #   env:
-      #       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      #   if: always()
+      - name: SonarQube Quality Gate check
+        id: sonarqube-quality-gate-check
+        uses: sonarsource/sonarqube-quality-gate-action@v1.1.0
+        with:
+            scanMetadataReportFile: .sonarqube/out/.sonar/report-task.txt
+        env:
+            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        if: always()
 
-      # - name: "Show SonarQube Quality Gate Status value"
-      #   if: always()
-      #   run: echo "The Quality Gate status is ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
+      - name: "Show SonarQube Quality Gate Status value"
+        if: always()
+        run: echo "The Quality Gate status is ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"

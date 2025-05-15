@@ -123,7 +123,7 @@ namespace ADAtickets.ApiService.Services
         /// <inheritdoc cref="ITicketRepository.DeleteTicketAsync"/>
         public async Task DeleteTicketAsync(Ticket ticket)
         {
-            _context.Remove(ticket);
+            _context.Tickets.Remove(ticket);
             await _context.SaveChangesAsync();
         }
     }

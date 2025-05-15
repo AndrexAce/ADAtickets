@@ -103,7 +103,7 @@ namespace ADAtickets.ApiService.Services
         /// <inheritdoc cref="INotificationRepository.DeleteNotificationAsync"/>
         public async Task DeleteNotificationAsync(Notification notification)
         {
-            _context.Remove(notification);
+            _context.Notifications.Remove(notification);
             await _context.SaveChangesAsync();
         }
     }

@@ -90,7 +90,7 @@ namespace ADAtickets.ApiService.Services
         /// <inheritdoc cref="IPlatformRepository.DeletePlatformAsync"/>
         public async Task DeletePlatformAsync(Platform platform)
         {
-            _context.Remove(platform);
+            _context.Platforms.Remove(platform);
             await _context.SaveChangesAsync();
         }
     }

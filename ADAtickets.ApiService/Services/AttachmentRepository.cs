@@ -22,13 +22,14 @@ using ADAtickets.ApiService.Models;
 using ADAtickets.ApiService.Repositories;
 using Humanizer;
 using Microsoft.EntityFrameworkCore;
+using System.Text.RegularExpressions;
 
 namespace ADAtickets.ApiService.Services
 {
     /// <summary>
     /// Implements the methods to manage the <see cref="Attachment"/> entities in the underlying database.
     /// </summary>
-    sealed class AttachmentRepository(ADAticketsDbContext context) : IAttachmentRepository
+    sealed partial class AttachmentRepository(ADAticketsDbContext context) : IAttachmentRepository
     {
         readonly ADAticketsDbContext _context = context;
 
@@ -79,7 +80,7 @@ namespace ADAtickets.ApiService.Services
             if (await SaveAttachmentToFileSystem(attachment.Path, data))
             {
                 // Since the path contains only the file name, make the attachment path match with the file system path.
-                attachment.Path = Path.Combine("media/", attachment.TicketId.ToString(), attachment.Path);
+                attachment.Path = Path.Combine("media/", DateTime.UtcNow.Year.ToString(), DateTime.UtcNow.Month.ToString(), DateTime.UtcNow.Day.ToString(), attachment.Path);
 
                 _context.Attachments.Add(attachment);
                 await _context.SaveChangesAsync();
@@ -92,7 +93,7 @@ namespace ADAtickets.ApiService.Services
             if (await ReplaceAttachmentInFileSystem(attachment.Path, data, oldAttachmentPath))
             {
                 // Since the path contains only the file name, make the attachment path match with the file system path.
-                attachment.Path = Path.Combine("media/", attachment.TicketId.ToString(), attachment.Path);
+                attachment.Path = Path.Combine("media/", DateTime.UtcNow.Year.ToString(), DateTime.UtcNow.Month.ToString(), DateTime.UtcNow.Day.ToString(), attachment.Path);
 
                 _context.Attachments.Update(attachment);
                 await _context.SaveChangesAsync();
@@ -104,12 +105,19 @@ namespace ADAtickets.ApiService.Services
         {
             if (DeleteAttachmentFromFileSystem(attachment.Path))
             {
-                _context.Remove(attachment);
+                _context.Attachments.Remove(attachment);
                 await _context.SaveChangesAsync();
             }
         }
 
-        private async static Task<bool> SaveAttachmentToFileSystem(string attachmentPath, byte[] attachmentData)
+        /// <summary>
+        /// <para>Stores an attachment file on the server's filesystem.</para>
+        /// <para>If <paramref name="attachmentData"/> is empty, the method will save an empty file without launching exceptions.</para>
+        /// </summary>
+        /// <param name="attachmentName">The name of the attachment file.</param>
+        /// <param name="attachmentData">Byte array encoding the file data.</param>
+        /// <returns>A <see cref="Task"/> returning <see langword="true"/> if the attachment was successfully saved, and <see langword="false"/> otherwise.</returns>
+        private async static Task<bool> SaveAttachmentToFileSystem(string attachmentName, byte[] attachmentData)
         {
             try
             {
@@ -117,7 +125,7 @@ namespace ADAtickets.ApiService.Services
 
                 Directory.CreateDirectory(saveDirectoryPath);
 
-                await File.WriteAllBytesAsync(Path.Combine(saveDirectoryPath, attachmentPath), attachmentData);
+                await File.WriteAllBytesAsync(Path.Combine(saveDirectoryPath, attachmentName), attachmentData);
             }
             catch
             {
@@ -127,31 +135,50 @@ namespace ADAtickets.ApiService.Services
             return true;
         }
 
+        /// <summary>
+        /// Deletes an attachment file from the server's filesystem.
+        /// </summary>
+        /// <param name="attachmentPath">Full path of the attachment file.</param>
+        /// <returns>A <see cref="Task"/> returning <see langword="true"/> if the attachment was successfully deleted, and <see langword="false"/> otherwise.</returns>
         private static bool DeleteAttachmentFromFileSystem(string attachmentPath)
         {
             try
             {
-                if (File.Exists(attachmentPath))
+                if (!PathRegex().IsMatch(attachmentPath))
+                {
+                    return false;
+                }
+                else if (File.Exists(attachmentPath))
                 {
                     File.Delete(attachmentPath);
                 }
+
+                return true;
             }
             catch
             {
                 return false;
             }
-
-            return true;
         }
 
-        private static async Task<bool> ReplaceAttachmentInFileSystem(string attachmentPath, byte[] attachmentData, string oldAttachmentPath)
+        /// <summary>
+        /// <para>Replaces an attachment file on the server's filesystem.</para>
+        /// </summary>
+        /// <param name="attachmentName">The new name of the attachment file.</param>
+        /// <param name="attachmentData">Byte array encoding the file data.</param>
+        /// <param name="oldAttachmentPath">Full path of the old attachment file.</param>
+        /// <returns></returns>
+        private static async Task<bool> ReplaceAttachmentInFileSystem(string attachmentName, byte[] attachmentData, string oldAttachmentPath)
         {
             if (DeleteAttachmentFromFileSystem(oldAttachmentPath))
             {
-                return await SaveAttachmentToFileSystem(attachmentPath, attachmentData);
+                return await SaveAttachmentToFileSystem(attachmentName, attachmentData);
             }
 
             return false;
         }
+
+        [GeneratedRegex(@"^(?!.*//)[a-zA-Z0-9_\-\\/\.]+$")]
+        private static partial Regex PathRegex();
     }
 }

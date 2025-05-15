@@ -221,15 +221,17 @@ if (app.Environment.IsDevelopment())
     // When exceptions happen dunring development, show a detailed screen.
     app.UseDeveloperExceptionPage();
 }
+else
+{
+    // Add the redirection from HTTP to HTTPS.
+    app.UseHttpsRedirection();
+}
 
 // Create an exception handler to handle exceptions in APIs.
 app.UseExceptionHandler();
 
 // Configure an interceptor for 4xx and 5xx errors to return a JSON response with the error details.
 app.UseStatusCodePages();
-
-// Add the redirection from HTTP to HTTPS.
-app.UseHttpsRedirection();
 
 // Add the authentication middleware.
 app.UseAuthentication();

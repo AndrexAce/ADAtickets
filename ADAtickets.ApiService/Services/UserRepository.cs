@@ -118,7 +118,7 @@ namespace ADAtickets.ApiService.Services
         /// <inheritdoc cref="IUserRepository.DeleteUserAsync"/>
         public async Task DeleteUserAsync(User user)
         {
-            _context.Remove(user);
+            _context.AppUsers.Remove(user);
             await _context.SaveChangesAsync();
         }
     }

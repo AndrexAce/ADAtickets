@@ -28,51 +28,51 @@ namespace ADAtickets.ApiService.Configs
     /// <para>Represents the Entity Framework Core database context for the ADAtickets application.</para>
     /// <para>This context is used to interact with the database and manage the application's entities.</para>
     /// </summary>
-    sealed class ADAticketsDbContext(DbContextOptions<ADAticketsDbContext> options) : IdentityDbContext<IdentityUser<Guid>, IdentityRole<Guid>, Guid>(options)
+    public class ADAticketsDbContext : IdentityDbContext<IdentityUser<Guid>, IdentityRole<Guid>, Guid>
     {
         /// <summary>
         /// Gets or sets the DbSet for managing <see cref="Attachment"/> entities.
         /// </summary>
-        public DbSet<Attachment> Attachments { get; set; }
+        public virtual DbSet<Attachment> Attachments { get; set; }
 
         /// <summary>
         /// Gets or sets the DbSet for managing <see cref="Edit"/> entities.
         /// </summary>
-        public DbSet<Edit> Edits { get; set; }
+        public virtual DbSet<Edit> Edits { get; set; }
 
         /// <summary>
         /// Gets or sets the DbSet for managing <see cref="Notification"/> entities.
         /// </summary>
-        public DbSet<Notification> Notifications { get; set; }
+        public virtual DbSet<Notification> Notifications { get; set; }
 
         /// <summary>
         /// Gets or sets the DbSet for managing <see cref="Platform"/> entities.
         /// </summary>
-        public DbSet<Platform> Platforms { get; set; }
+        public virtual DbSet<Platform> Platforms { get; set; }
 
         /// <summary>
         /// Gets or sets the DbSet for managing <see cref="Reply"/> entities.
         /// </summary>
-        public DbSet<Reply> Replies { get; set; }
+        public virtual DbSet<Reply> Replies { get; set; }
 
         /// <summary>
         /// Gets or sets the DbSet for managing <see cref="Ticket"/> entities.
         /// </summary>
-        public DbSet<Ticket> Tickets { get; set; }
+        public virtual DbSet<Ticket> Tickets { get; set; }
 
         /// <summary>
         /// Gets or sets the DbSet for managing <see cref="User"/> entities.
         /// </summary>
-        public DbSet<User> AppUsers { get; set; }
+        public virtual DbSet<User> AppUsers { get; set; }
 
         /// <summary>
         /// Gets or sets the DbSet for managing <see cref="UserNotification"/> entities.
         /// </summary>
-        public DbSet<UserNotification> UserNotifications { get; set; }
+        public virtual DbSet<UserNotification> UserNotifications { get; set; }
 
         /// <summary>
         /// Gets or sets the DbSet for managing <see cref="UserPlatform"/> entities.
         /// </summary>
-        public DbSet<UserPlatform> UserPlatforms { get; set; }
+        public virtual DbSet<UserPlatform> UserPlatforms { get; set; }
     }
 }

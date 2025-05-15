@@ -29,7 +29,7 @@ namespace ADAtickets.ApiService.Models
     /// Represents the link between users and sent notifications.
     /// </summary>
     [PrimaryKey(nameof(ReceiverUserId), nameof(NotificationId))]
-    public class UserNotification : EntityBase
+    public sealed class UserNotification : EntityBase
     {
         /// <summary>
         /// The unique identifier of the user who received the notification.

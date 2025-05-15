@@ -36,7 +36,7 @@ namespace ADAtickets.ApiService.Models
         /// </summary>
         [Key]
         [Required]
-        public Guid Id { get; set; } = Guid.Empty;
+        public Guid Id { get; set; } = Guid.NewGuid();
 
         /// <summary>
         /// The path of the attachment on the server.

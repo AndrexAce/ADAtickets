@@ -29,7 +29,7 @@ namespace ADAtickets.ApiService.Models
     /// Represents the link between users and their preferred platforms.
     /// </summary>
     [PrimaryKey(nameof(UserId), nameof(PlatformId))]
-    public class UserPlatform
+    public sealed class UserPlatform
     {
         /// <summary>
         /// The unique identifier of the user who marked the platform as preferred.
