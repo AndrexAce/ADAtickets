@@ -36,7 +36,7 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
     ///     <item>Valid new entity, valid data, invalid old path</item>
     /// </list>
     /// </summary>
-    public partial class PutTests
+    public class PutTests
     {
         public static TheoryData<Attachment> InvalidAttachmentData =>
         [
@@ -47,7 +47,7 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
 
         public static TheoryData<Attachment> ValidAttachmentData =>
         [
-            Utilities.CreateAttachment(path: "valid.png", ticketId: Guid.AllBitsSet)
+            Utilities.CreateAttachment(path: "valid2.png", ticketId: Guid.AllBitsSet)
         ];
 
         [Theory]
@@ -64,7 +64,7 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
             mockAttachmentSet.Setup(s => s.Update(It.IsAny<Attachment>()))
                 .Callback<Attachment>(a =>
                 {
-                    if (a.Id == attachments[0].Id && a.Path.Length <= 4000 && PathRegex().IsMatch(a.Path) && mockTicketSet.Object.Single().Id == a.TicketId)
+                    if (a.Id == attachments[0].Id && a.Path.Length <= 4000 && Regex.IsMatch(a.Path, @"^(?!.*//)[a-zA-Z0-9_\-\\/\.]+$") && mockTicketSet.Object.Single().Id == a.TicketId)
                         attachments[0].Path = a.Path;
                 });
             mockContext.Setup(c => c.Attachments)
@@ -76,12 +76,12 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
 
             // Act
             await service.UpdateAttachmentAsync(inAttachment, [], attachments[0].Path);
-            var addedAttachment = await mockContext.Object.Attachments.SingleOrDefaultAsync(cancellationToken);
+            var updatedAttachment = await mockContext.Object.Attachments.SingleOrDefaultAsync(cancellationToken);
 
             // Assert
-            Assert.NotNull(addedAttachment);
-            Assert.Equal(inAttachment.Path, addedAttachment.Path);
-            Assert.Null(Record.Exception(() => File.Delete(addedAttachment.Path)));
+            Assert.NotNull(updatedAttachment);
+            Assert.Equal(inAttachment.Path, updatedAttachment.Path);
+            Assert.Null(Record.Exception(() => File.Delete(updatedAttachment.Path)));
         }
 
         [Theory]
@@ -98,7 +98,7 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
             mockAttachmentSet.Setup(s => s.Update(It.IsAny<Attachment>()))
                 .Callback<Attachment>(a =>
                 {
-                    if (a.Id == attachments[0].Id && a.Path.Length <= 4000 && PathRegex().IsMatch(a.Path) && mockTicketSet.Object.Single().Id == a.TicketId)
+                    if (a.Id == attachments[0].Id && a.Path.Length <= 4000 && Regex.IsMatch(a.Path, @"^(?!.*//)[a-zA-Z0-9_\-\\/\.]+$") && mockTicketSet.Object.Single().Id == a.TicketId)
                         attachments[0].Path = a.Path;
                 });
             mockContext.Setup(c => c.Attachments)
@@ -110,12 +110,12 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
 
             // Act
             await service.UpdateAttachmentAsync(inAttachment, [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A], attachments[0].Path);
-            var addedAttachment = await mockContext.Object.Attachments.SingleOrDefaultAsync(cancellationToken);
+            var updatedAttachment = await mockContext.Object.Attachments.SingleOrDefaultAsync(cancellationToken);
 
             // Assert
-            Assert.NotNull(addedAttachment);
-            Assert.Equal(inAttachment.Path, addedAttachment.Path);
-            Assert.Null(Record.Exception(() => File.Delete(addedAttachment.Path)));
+            Assert.NotNull(updatedAttachment);
+            Assert.Equal(inAttachment.Path, updatedAttachment.Path);
+            Assert.Null(Record.Exception(() => File.Delete(updatedAttachment.Path)));
         }
 
         [Theory]
@@ -132,7 +132,7 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
             mockAttachmentSet.Setup(s => s.Update(It.IsAny<Attachment>()))
                 .Callback<Attachment>(a =>
                 {
-                    if (a.Id == attachments[0].Id && a.Path.Length <= 4000 && PathRegex().IsMatch(a.Path) && mockTicketSet.Object.Single().Id == a.TicketId)
+                    if (a.Id == attachments[0].Id && a.Path.Length <= 4000 && Regex.IsMatch(a.Path, @"^(?!.*//)[a-zA-Z0-9_\-\\/\.]+$") && mockTicketSet.Object.Single().Id == a.TicketId)
                         attachments[0].Path = a.Path;
                 });
             mockContext.Setup(c => c.Attachments)
@@ -144,11 +144,11 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
 
             // Act
             await service.UpdateAttachmentAsync(inAttachment, [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A], attachments[0].Path);
-            var addedAttachment = await mockContext.Object.Attachments.SingleOrDefaultAsync(cancellationToken);
+            var updatedAttachment = await mockContext.Object.Attachments.SingleOrDefaultAsync(cancellationToken);
 
             // Assert
-            Assert.NotNull(addedAttachment);
-            Assert.NotEqual(inAttachment.Path, addedAttachment.Path);
+            Assert.NotNull(updatedAttachment);
+            Assert.NotEqual(inAttachment.Path, updatedAttachment.Path);
         }
 
         [Theory]
@@ -165,7 +165,7 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
             mockAttachmentSet.Setup(s => s.Update(It.IsAny<Attachment>()))
                 .Callback<Attachment>(a =>
                 {
-                    if (a.Id == attachments[0].Id && a.Path.Length <= 4000 && PathRegex().IsMatch(a.Path) && mockTicketSet.Object.Single().Id == a.TicketId)
+                    if (a.Id == attachments[0].Id && a.Path.Length <= 4000 && Regex.IsMatch(a.Path, @"^(?!.*//)[a-zA-Z0-9_\-\\/\.]+$") && mockTicketSet.Object.Single().Id == a.TicketId)
                         attachments[0].Path = a.Path;
                 });
             mockContext.Setup(c => c.Attachments)
@@ -177,14 +177,11 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
 
             // Act
             await service.UpdateAttachmentAsync(inAttachment, [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A], "//" + attachments[0].Path);
-            var addedAttachment = await mockContext.Object.Attachments.SingleOrDefaultAsync(cancellationToken);
+            var updatedAttachment = await mockContext.Object.Attachments.SingleOrDefaultAsync(cancellationToken);
 
             // Assert
-            Assert.NotNull(addedAttachment);
-            Assert.NotEqual(inAttachment.Path, addedAttachment.Path);
+            Assert.NotNull(updatedAttachment);
+            Assert.NotEqual(inAttachment.Path, updatedAttachment.Path);
         }
-
-        [GeneratedRegex(@"^(?!.*//)[a-zA-Z0-9_\-\\/\.]+$")]
-        private static partial Regex PathRegex();
     }
 }

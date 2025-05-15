@@ -29,7 +29,7 @@ namespace ADAtickets.ApiService.Services
     /// <summary>
     /// Implements the methods to manage the <see cref="Attachment"/> entities in the underlying database.
     /// </summary>
-    sealed partial class AttachmentRepository(ADAticketsDbContext context) : IAttachmentRepository
+    sealed class AttachmentRepository(ADAticketsDbContext context) : IAttachmentRepository
     {
         readonly ADAticketsDbContext _context = context;
 
@@ -144,7 +144,7 @@ namespace ADAtickets.ApiService.Services
         {
             try
             {
-                if (!PathRegex().IsMatch(attachmentPath))
+                if (!Regex.IsMatch(attachmentPath, @"^(?!.*//)[a-zA-Z0-9_\-\\/\.]+$"))
                 {
                     return false;
                 }
@@ -177,8 +177,5 @@ namespace ADAtickets.ApiService.Services
 
             return false;
         }
-
-        [GeneratedRegex(@"^(?!.*//)[a-zA-Z0-9_\-\\/\.]+$")]
-        private static partial Regex PathRegex();
     }
 }

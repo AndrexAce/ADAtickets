@@ -35,7 +35,7 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
     ///     <item>Invalid entity, valid data</item>
     /// </list>
     /// </summary>
-    public partial class PostTests
+    public class PostTests
     {
         public static TheoryData<Attachment> InvalidAttachmentData =>
         [
@@ -46,7 +46,7 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
 
         public static TheoryData<Attachment> ValidAttachmentData =>
         [
-            Utilities.CreateAttachment(path: "valid.png", ticketId: Guid.AllBitsSet)
+            Utilities.CreateAttachment(path: "valid1.png", ticketId: Guid.AllBitsSet)
         ];
 
         [Theory]
@@ -63,7 +63,7 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
             mockAttachmentSet.Setup(s => s.Add(It.IsAny<Attachment>()))
                 .Callback<Attachment>(a =>
                 {
-                    if (a.Path.Length <= 4000 && PathRegex().IsMatch(a.Path) && mockTicketSet.Object.Single().Id == a.TicketId)
+                    if (a.Path.Length <= 4000 && Regex.IsMatch(a.Path, @"^(?!.*//)[a-zA-Z0-9_\-\\/\.]+$") && mockTicketSet.Object.Single().Id == a.TicketId)
                     {
                         attachments.Add(a);
                     }
@@ -96,12 +96,10 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
             var mockContext = new Mock<ADAticketsDbContext>();
             var mockAttachmentSet = attachments.BuildMockDbSet();
             var mockTicketSet = tickets.BuildMockDbSet();
-            mockTicketSet.Setup(s => s.Find(It.IsAny<Guid>()))
-                .Returns((Guid id) => tickets.SingleOrDefault(t => t.Id == id));
             mockAttachmentSet.Setup(s => s.Add(It.IsAny<Attachment>()))
                 .Callback<Attachment>(a =>
                 {
-                    if (a.Path.Length <= 4000 && PathRegex().IsMatch(a.Path) && mockTicketSet.Object.Single().Id == a.TicketId)
+                    if (a.Path.Length <= 4000 && Regex.IsMatch(a.Path, @"^(?!.*//)[a-zA-Z0-9_\-\\/\.]+$") && mockTicketSet.Object.Single().Id == a.TicketId)
                     {
                         attachments.Add(a);
                     }
@@ -134,12 +132,10 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
             var mockContext = new Mock<ADAticketsDbContext>();
             var mockAttachmentSet = attachments.BuildMockDbSet();
             var mockTicketSet = tickets.BuildMockDbSet();
-            mockTicketSet.Setup(s => s.Find(It.IsAny<Guid>()))
-                .Returns((Guid id) => tickets.SingleOrDefault(t => t.Id == id));
             mockAttachmentSet.Setup(s => s.Add(It.IsAny<Attachment>()))
                 .Callback<Attachment>(a =>
                 {
-                    if (a.Path.Length <= 4000 && PathRegex().IsMatch(a.Path) && mockTicketSet.Object.Single().Id == a.TicketId)
+                    if (a.Path.Length <= 4000 && Regex.IsMatch(a.Path, @"^(?!.*//)[a-zA-Z0-9_\-\\/\.]+$") && mockTicketSet.Object.Single().Id == a.TicketId)
                     {
                         attachments.Add(a);
                     }
@@ -159,8 +155,5 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
             Assert.Null(addedAttachment);
             Assert.Empty(attachments);
         }
-
-        [GeneratedRegex(@"^(?!.*//)[a-zA-Z0-9_\-\\/\.]+$")]
-        private static partial Regex PathRegex();
     }
 }
