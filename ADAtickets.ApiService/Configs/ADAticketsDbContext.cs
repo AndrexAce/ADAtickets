@@ -31,6 +31,20 @@ namespace ADAtickets.ApiService.Configs
     public class ADAticketsDbContext : IdentityDbContext<IdentityUser<Guid>, IdentityRole<Guid>, Guid>
     {
         /// <summary>
+        /// Paramteless constructor for testing purposes.
+        /// </summary>
+        public ADAticketsDbContext() { }
+
+        /// <summary>
+        /// Costructor to use dependency injection with ASP.NET.
+        /// </summary>
+        /// <param name="options">The database configuration options.</param>
+        public ADAticketsDbContext(DbContextOptions<ADAticketsDbContext> options)
+            : base(options)
+        {
+        }
+
+        /// <summary>
         /// Gets or sets the DbSet for managing <see cref="Attachment"/> entities.
         /// </summary>
         public virtual DbSet<Attachment> Attachments { get; set; }

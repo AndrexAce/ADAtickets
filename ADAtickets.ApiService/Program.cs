@@ -191,11 +191,7 @@ builder.Services.AddScoped<ITicketRepository, TicketRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 // Add automapping of entities.
-builder.Services.AddAutoMapper(config =>
-{
-    config.AddMaps(Assembly.GetExecutingAssembly());
-    config.AddProfile<ADAticketsProfile>();
-});
+builder.Services.AddAutoMapper(typeof(ADAticketsProfile));
 
 var app = builder.Build();
 

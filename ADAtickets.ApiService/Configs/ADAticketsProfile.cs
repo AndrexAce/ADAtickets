@@ -34,29 +34,29 @@ namespace ADAtickets.ApiService.Configs
         /// </summary>
         public ADAticketsProfile()
         {
-            CreateMap<Edit, EditResponseDto>();
-            CreateMap<EditRequestDto, Edit>();
+            CreateMap<Edit, EditResponseDto>(MemberList.Destination);
+            CreateMap<EditRequestDto, Edit>(MemberList.Source);
 
-            CreateMap<Reply, ReplyResponseDto>();
-            CreateMap<ReplyRequestDto, Edit>();
+            CreateMap<Reply, ReplyResponseDto>(MemberList.Destination);
+            CreateMap<ReplyRequestDto, Reply>(MemberList.Source);
 
-            CreateMap<Notification, NotificationResponseDto>()
+            CreateMap<Notification, NotificationResponseDto>(MemberList.Destination)
                 .ForMember(notificationDto => notificationDto.Recipients, opt => opt.MapFrom(src => src.Recipients.Select(recipient => recipient.Id)));
-            CreateMap<NotificationRequestDto, Notification>();
+            CreateMap<NotificationRequestDto, Notification>(MemberList.Source);
 
-            CreateMap<Platform, PlatformResponseDto>()
+            CreateMap<Platform, PlatformResponseDto>(MemberList.Destination)
                 .ForMember(platformDto => platformDto.Tickets, opt => opt.MapFrom(src => src.Tickets.Select(ticket => ticket.Id)))
                 .ForMember(platformDto => platformDto.UsersPreferred, opt => opt.MapFrom(src => src.UsersPreferred.Select(user => user.Id)));
-            CreateMap<PlatformRequestDto, Platform>();
+            CreateMap<PlatformRequestDto, Platform>(MemberList.Source);
 
-            CreateMap<Ticket, TicketResponseDto>()
+            CreateMap<Ticket, TicketResponseDto>(MemberList.Destination)
                 .ForMember(ticketDto => ticketDto.Edits, opt => opt.MapFrom(src => src.Edits.Select(edit => edit.Id)))
                 .ForMember(ticketDto => ticketDto.Replies, opt => opt.MapFrom(src => src.Replies.Select(reply => reply.Id)))
                 .ForMember(ticketDto => ticketDto.Attachments, opt => opt.MapFrom(src => src.Attachments.Select(attachment => attachment.Id)))
                 .ForMember(ticketDto => ticketDto.Notifications, opt => opt.MapFrom(src => src.Notifications.Select(notifications => notifications.Id)));
-            CreateMap<TicketRequestDto, Ticket>();
+            CreateMap<TicketRequestDto, Ticket>(MemberList.Source);
 
-            CreateMap<User, UserResponseDto>()
+            CreateMap<User, UserResponseDto>(MemberList.Destination)
                 .ForMember(userDto => userDto.CreatedTickets, opt => opt.MapFrom(src => src.CreatedTickets.Select(ticket => ticket.Id)))
                 .ForMember(userDto => userDto.AssignedTickets, opt => opt.MapFrom(src => src.AssignedTickets.Select(ticket => ticket.Id)))
                 .ForMember(userDto => userDto.Replies, opt => opt.MapFrom(src => src.Replies.Select(reply => reply.Id)))
@@ -64,11 +64,12 @@ namespace ADAtickets.ApiService.Configs
                 .ForMember(userDto => userDto.PreferredPlatforms, opt => opt.MapFrom(src => src.PreferredPlatforms.Select(platform => platform.Id)))
                 .ForMember(userDto => userDto.SentNotifications, opt => opt.MapFrom(src => src.SentNotifications.Select(notification => notification.Id)))
                 .ForMember(userDto => userDto.ReceivedNotifications, opt => opt.MapFrom(src => src.ReceivedNotifications.Select(notification => notification.Id)));
-            CreateMap<UserRequestDto, User>();
+            CreateMap<UserRequestDto, User>(MemberList.Source);
 
-            CreateMap<Attachment, AttachmentResponseDto>();
-            CreateMap<AttachmentRequestDto, Attachment>()
-                .ForMember(attachment => attachment.Path, opt => opt.MapFrom(src => src.Name));
+            CreateMap<Attachment, AttachmentResponseDto>(MemberList.Destination);
+            CreateMap<AttachmentRequestDto, Attachment>(MemberList.Source)
+                .ForMember(attachment => attachment.Path, opt => opt.MapFrom(src => src.Name))
+                .ForSourceMember(attachmentDto => attachmentDto.Content, opt => opt.DoNotValidate());
         }
     }
 }

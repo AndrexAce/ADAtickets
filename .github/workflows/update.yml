@@ -40,4 +40,4 @@ jobs:
           build-args: BUILD_CONFIGURATION=Release
           context: ./ADAtickets.ApiService
           push: true
-          tags: adatickets.apiservice:latest,adatickets.apiservice:v$(cat VERSION)
+          tags: adatickets-api:latest,adatickets-api:v$(cat VERSION)
