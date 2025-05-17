@@ -145,7 +145,7 @@ namespace ADAtickets.ApiService.Services
             try
             {
 #pragma warning disable SYSLIB1045 // Convert to 'GeneratedRegexAttribute'.
-                if (!Regex.IsMatch(attachmentPath, @"^(?!.*//)[a-zA-Z0-9_\-\\/\.]+$"))
+                if (!Regex.IsMatch(attachmentPath, @"^(?!.*//)[a-zA-Z0-9_\-\\/\.]+$", RegexOptions.None, TimeSpan.FromMilliseconds(100)))
                 {
                     return false;
                 }
