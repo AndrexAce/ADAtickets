@@ -82,7 +82,7 @@ jobs:
           /d:sonar.cs.opencover.reportsPaths=coverage.xml \
           /d:sonar.exclusions=**/Migrations/** \
           /d:sonar.coverage.exclusions=**/*.yml,**/*.json \
-          /v:v$(date +'%Y.%m.%d')
+          /v:v$(cat VERSION)
 
       - name: Build the solution
         env:
