@@ -52,7 +52,7 @@ namespace ADAtickets.ApiService.Tests.Services.PlatformRepository
             var mockContext = new Mock<ADAticketsDbContext>();
             var mockSet = platforms.BuildMockDbSet();
             mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
-                .ReturnsAsync(platforms.Find(a => a.Id == existingId));
+                .ReturnsAsync((object[] arguments) => platforms.Find(p => p.Id == (Guid)arguments[0]));
             mockContext.Setup(c => c.Platforms)
                 .Returns(mockSet.Object);
 
@@ -70,22 +70,19 @@ namespace ADAtickets.ApiService.Tests.Services.PlatformRepository
         public async Task GetPlatformByIdAsync_NonExistingId_ReturnsNull()
         {
             // Arrange
-            var existingId = Guid.NewGuid();
-            var nonExistingId = Guid.NewGuid();
-
-            var platforms = new List<Platform> { new() { Id = existingId } };
+            var platforms = new List<Platform> { new() { Id = Guid.NewGuid() } };
 
             var mockContext = new Mock<ADAticketsDbContext>();
             var mockSet = platforms.BuildMockDbSet();
             mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
-                .ReturnsAsync(platforms.Find(a => a.Id == nonExistingId));
+                .ReturnsAsync((object[] arguments) => platforms.Find(p => p.Id == (Guid)arguments[0]));
             mockContext.Setup(c => c.Platforms)
                 .Returns(mockSet.Object);
 
             var service = new PlatformService(mockContext.Object);
 
             // Act
-            var result = await service.GetPlatformByIdAsync(nonExistingId);
+            var result = await service.GetPlatformByIdAsync(Guid.NewGuid());
 
             // Assert
             Assert.Null(result);
@@ -95,21 +92,19 @@ namespace ADAtickets.ApiService.Tests.Services.PlatformRepository
         public async Task GetPlatformByIdAsync_EmptyId_ReturnsNull()
         {
             // Arrange
-            var emptyGuid = Guid.Empty;
-
             var platforms = new List<Platform> { new() { Id = Guid.NewGuid() } };
 
             var mockContext = new Mock<ADAticketsDbContext>();
             var mockSet = platforms.BuildMockDbSet();
             mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
-                .ReturnsAsync(platforms.Find(a => a.Id == emptyGuid));
+                .ReturnsAsync((object[] arguments) => platforms.Find(p => p.Id == (Guid)arguments[0]));
             mockContext.Setup(c => c.Platforms)
                 .Returns(mockSet.Object);
 
             var service = new PlatformService(mockContext.Object);
 
             // Act
-            var result = await service.GetPlatformByIdAsync(emptyGuid);
+            var result = await service.GetPlatformByIdAsync(Guid.Empty);
 
             // Assert
             Assert.Null(result);

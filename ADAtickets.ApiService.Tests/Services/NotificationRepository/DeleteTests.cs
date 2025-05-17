@@ -35,18 +35,16 @@ namespace ADAtickets.ApiService.Tests.Services.NotificationRepository
     sealed public class DeleteTests
     {
         [Fact]
-        public async Task GetNotificationByIdAsync_ExistingEntity_DeletesEntity()
+        public async Task DeleteNotificationByIdAsync_ExistingEntity_DeletesEntity()
         {
             // Arrange
-            var guid = Guid.NewGuid();
-
-            var notification = new Notification { Id = guid };
+            var notification = new Notification { Id = Guid.NewGuid() };
             var notifications = new List<Notification> { notification };
 
             var mockContext = new Mock<ADAticketsDbContext>();
             var mockSet = notifications.BuildMockDbSet();
             mockSet.Setup(s => s.Remove(It.IsAny<Notification>()))
-                .Callback(() => notifications.RemoveAt(0));
+                .Callback<Notification>(notification => notifications.RemoveAll(n => n.Id == notification.Id));
             mockContext.Setup(c => c.Notifications)
                 .Returns(mockSet.Object);
 

@@ -52,7 +52,7 @@ namespace ADAtickets.ApiService.Tests.Services.NotificationRepository
             var mockContext = new Mock<ADAticketsDbContext>();
             var mockSet = notifications.BuildMockDbSet();
             mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
-                .ReturnsAsync(notifications.Find(a => a.Id == existingId));
+                .ReturnsAsync((object[] arguments) => notifications.Find(n => n.Id == (Guid)arguments[0]));
             mockContext.Setup(c => c.Notifications)
                 .Returns(mockSet.Object);
 
@@ -70,22 +70,19 @@ namespace ADAtickets.ApiService.Tests.Services.NotificationRepository
         public async Task GetNotificationByIdAsync_NonExistingId_ReturnsNull()
         {
             // Arrange
-            var existingId = Guid.NewGuid();
-            var nonExistingId = Guid.NewGuid();
-
-            var notifications = new List<Notification> { new() { Id = existingId } };
+            var notifications = new List<Notification> { new() { Id = Guid.NewGuid() } };
 
             var mockContext = new Mock<ADAticketsDbContext>();
             var mockSet = notifications.BuildMockDbSet();
             mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
-                .ReturnsAsync(notifications.Find(a => a.Id == nonExistingId));
+                .ReturnsAsync((object[] arguments) => notifications.Find(n => n.Id == (Guid)arguments[0]));
             mockContext.Setup(c => c.Notifications)
                 .Returns(mockSet.Object);
 
             var service = new NotificationService(mockContext.Object);
 
             // Act
-            var result = await service.GetNotificationByIdAsync(nonExistingId);
+            var result = await service.GetNotificationByIdAsync(Guid.NewGuid());
 
             // Assert
             Assert.Null(result);
@@ -95,21 +92,19 @@ namespace ADAtickets.ApiService.Tests.Services.NotificationRepository
         public async Task GetNotificationByIdAsync_EmptyId_ReturnsNull()
         {
             // Arrange
-            var emptyGuid = Guid.Empty;
-
             var notifications = new List<Notification> { new() { Id = Guid.NewGuid() } };
 
             var mockContext = new Mock<ADAticketsDbContext>();
             var mockSet = notifications.BuildMockDbSet();
             mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
-                .ReturnsAsync(notifications.Find(a => a.Id == emptyGuid));
+                .ReturnsAsync((object[] arguments) => notifications.Find(n => n.Id == (Guid)arguments[0]));
             mockContext.Setup(c => c.Notifications)
                 .Returns(mockSet.Object);
 
             var service = new NotificationService(mockContext.Object);
 
             // Act
-            var result = await service.GetNotificationByIdAsync(emptyGuid);
+            var result = await service.GetNotificationByIdAsync(Guid.Empty);
 
             // Assert
             Assert.Null(result);

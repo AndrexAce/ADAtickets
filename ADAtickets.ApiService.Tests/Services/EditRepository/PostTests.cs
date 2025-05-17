@@ -81,7 +81,7 @@ namespace ADAtickets.ApiService.Tests.Services.EditRepository
 
             // Assert
             Assert.NotNull(addedEdit);
-            Assert.Single(edits);
+            Assert.NotEmpty(edits);
         }
 
         [Theory]

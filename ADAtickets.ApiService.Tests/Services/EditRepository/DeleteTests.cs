@@ -35,18 +35,16 @@ namespace ADAtickets.ApiService.Tests.Services.EditRepository
     sealed public class DeleteTests
     {
         [Fact]
-        public async Task GetEditByIdAsync_ExistingEntity_DeletesEntity()
+        public async Task DeleteEditByIdAsync_ExistingEntity_DeletesEntity()
         {
             // Arrange
-            var guid = Guid.NewGuid();
-
-            var edit = new Edit { Id = guid };
+            var edit = new Edit { Id = Guid.NewGuid() };
             var edits = new List<Edit> { edit };
 
             var mockContext = new Mock<ADAticketsDbContext>();
             var mockSet = edits.BuildMockDbSet();
             mockSet.Setup(s => s.Remove(It.IsAny<Edit>()))
-                .Callback(() => edits.RemoveAt(0));
+                .Callback<Edit>(edit => edits.RemoveAll(e => e.Id == edit.Id));
             mockContext.Setup(c => c.Edits)
                 .Returns(mockSet.Object);
 

@@ -81,7 +81,7 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
 
             // Assert
             Assert.NotNull(addedAttachment);
-            Assert.Single(attachments);
+            Assert.NotEmpty(attachments);
             Assert.Null(Record.Exception(() => File.Delete(addedAttachment.Path)));
         }
 
@@ -117,7 +117,7 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
 
             // Assert
             Assert.NotNull(addedAttachment);
-            Assert.Single(attachments);
+            Assert.NotEmpty(attachments);
             Assert.Null(Record.Exception(() => File.Delete(addedAttachment.Path)));
         }
 

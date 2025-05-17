@@ -85,7 +85,7 @@ namespace ADAtickets.ApiService.Services
         /// <inheritdoc cref="IReplyRepository.AddReplyAsync"/>
         public async Task AddReplyAsync(Reply reply)
         {
-            await _context.Replies.AddAsync(reply);
+            _context.Replies.Add(reply);
             await _context.SaveChangesAsync();
         }
 

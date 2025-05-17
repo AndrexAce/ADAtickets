@@ -52,7 +52,7 @@ namespace ADAtickets.ApiService.Tests.Services.EditRepository
             var mockContext = new Mock<ADAticketsDbContext>();
             var mockSet = edits.BuildMockDbSet();
             mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
-                .ReturnsAsync(edits.Find(a => a.Id == existingId));
+                .ReturnsAsync((object[] arguments) => edits.Find(e => e.Id == (Guid)arguments[0]));
             mockContext.Setup(c => c.Edits)
                 .Returns(mockSet.Object);
 
@@ -70,22 +70,19 @@ namespace ADAtickets.ApiService.Tests.Services.EditRepository
         public async Task GetEditByIdAsync_NonExistingId_ReturnsNull()
         {
             // Arrange
-            var existingId = Guid.NewGuid();
-            var nonExistingId = Guid.NewGuid();
-
-            var edits = new List<Edit> { new() { Id = existingId } };
+            var edits = new List<Edit> { new() { Id = Guid.NewGuid() } };
 
             var mockContext = new Mock<ADAticketsDbContext>();
             var mockSet = edits.BuildMockDbSet();
             mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
-                .ReturnsAsync(edits.Find(a => a.Id == nonExistingId));
+                .ReturnsAsync((object[] arguments) => edits.Find(e => e.Id == (Guid)arguments[0]));
             mockContext.Setup(c => c.Edits)
                 .Returns(mockSet.Object);
 
             var service = new EditService(mockContext.Object);
 
             // Act
-            var result = await service.GetEditByIdAsync(nonExistingId);
+            var result = await service.GetEditByIdAsync(Guid.NewGuid());
 
             // Assert
             Assert.Null(result);
@@ -95,21 +92,19 @@ namespace ADAtickets.ApiService.Tests.Services.EditRepository
         public async Task GetEditByIdAsync_EmptyId_ReturnsNull()
         {
             // Arrange
-            var emptyGuid = Guid.Empty;
-
             var edits = new List<Edit> { new() { Id = Guid.NewGuid() } };
 
             var mockContext = new Mock<ADAticketsDbContext>();
             var mockSet = edits.BuildMockDbSet();
             mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
-                .ReturnsAsync(edits.Find(a => a.Id == emptyGuid));
+                .ReturnsAsync((object[] arguments) => edits.Find(e => e.Id == (Guid)arguments[0]));
             mockContext.Setup(c => c.Edits)
                 .Returns(mockSet.Object);
 
             var service = new EditService(mockContext.Object);
 
             // Act
-            var result = await service.GetEditByIdAsync(emptyGuid);
+            var result = await service.GetEditByIdAsync(Guid.Empty);
 
             // Assert
             Assert.Null(result);

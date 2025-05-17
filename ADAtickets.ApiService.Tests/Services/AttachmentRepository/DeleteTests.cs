@@ -35,18 +35,16 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
     sealed public class DeleteTests
     {
         [Fact]
-        public async Task GetAttachmentByIdAsync_ExistingEntity_DeletesEntity()
+        public async Task DeleteAttachmentByIdAsync_ExistingEntity_DeletesEntity()
         {
             // Arrange
-            var guid = Guid.NewGuid();
-
-            var attachment = new Attachment { Id = guid, Path = "delete.png" };
+            var attachment = new Attachment { Id = Guid.NewGuid(), Path = "delete.png" };
             var attachments = new List<Attachment> { attachment };
 
             var mockContext = new Mock<ADAticketsDbContext>();
             var mockSet = attachments.BuildMockDbSet();
             mockSet.Setup(s => s.Remove(It.IsAny<Attachment>()))
-                .Callback(() => attachments.RemoveAt(0));
+                .Callback<Attachment>(attachment => attachments.RemoveAll(a => a.Id == attachment.Id));
             mockContext.Setup(c => c.Attachments)
                 .Returns(mockSet.Object);
 

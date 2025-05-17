@@ -55,7 +55,7 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
         public async Task UpdateAttachment_ValidNewEntityEmptyDataValidOldPath_ReturnsNew(Attachment inAttachment)
         {
             // Arrange
-            var attachments = new List<Attachment> { new() { Id = inAttachment.Id, Path = "old.png", TicketId = inAttachment.TicketId } };
+            var attachments = new List<Attachment> { new() { Id = inAttachment.Id, Path = "old.png", TicketId = Guid.AllBitsSet } };
             var tickets = new List<Ticket> { new() { Id = Guid.AllBitsSet } };
 
             var mockContext = new Mock<ADAticketsDbContext>();
@@ -89,7 +89,7 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
         public async Task UpdateAttachment_ValidNewEntityValidDataValidOldPath_ReturnsNew(Attachment inAttachment)
         {
             // Arrange
-            var attachments = new List<Attachment> { new() { Id = inAttachment.Id, Path = "old.png", TicketId = inAttachment.TicketId } };
+            var attachments = new List<Attachment> { new() { Id = inAttachment.Id, Path = "old.png", TicketId = Guid.AllBitsSet } };
             var tickets = new List<Ticket> { new() { Id = Guid.AllBitsSet } };
 
             var mockContext = new Mock<ADAticketsDbContext>();
@@ -123,7 +123,7 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
         public async Task UpdateAttachment_InvalidNewEntityValidDataValidOldPath_ReturnsOld(Attachment inAttachment)
         {
             // Arrange
-            var attachments = new List<Attachment> { new() { Id = inAttachment.Id, Path = "old.png", TicketId = inAttachment.TicketId } };
+            var attachments = new List<Attachment> { new() { Id = inAttachment.Id, Path = "old.png", TicketId = Guid.AllBitsSet } };
             var tickets = new List<Ticket> { new() { Id = Guid.AllBitsSet } };
 
             var mockContext = new Mock<ADAticketsDbContext>();
@@ -156,7 +156,7 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
         public async Task UpdateAttachment_ValidNewEntityValidDataInvalidOldPath_ReturnsOld(Attachment inAttachment)
         {
             // Arrange
-            var attachments = new List<Attachment> { new() { Id = inAttachment.Id, Path = "old.png", TicketId = inAttachment.TicketId } };
+            var attachments = new List<Attachment> { new() { Id = inAttachment.Id, Path = "old.png", TicketId = Guid.AllBitsSet } };
             var tickets = new List<Ticket> { new() { Id = Guid.AllBitsSet } };
 
             var mockContext = new Mock<ADAticketsDbContext>();

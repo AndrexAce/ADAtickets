@@ -52,7 +52,7 @@ namespace ADAtickets.ApiService.Tests.Services.EditRepository
         public async Task UpdateEdit_ValidEntity_ReturnsNew(Edit inEdit)
         {
             // Arrange
-            var edits = new List<Edit> { new() { Id = inEdit.Id, Description = "Old description.", TicketId = inEdit.TicketId, UserId = inEdit.UserId } };
+            var edits = new List<Edit> { new() { Id = inEdit.Id, Description = "Old description.", TicketId = Guid.AllBitsSet, UserId = Guid.AllBitsSet } };
             var tickets = new List<Ticket> { new() { Id = Guid.AllBitsSet } };
             var users = new List<User> { new() { Id = Guid.AllBitsSet } };
 
@@ -89,7 +89,7 @@ namespace ADAtickets.ApiService.Tests.Services.EditRepository
         public async Task UpdateEdit_InvalidEntity_ReturnsOld(Edit inEdit)
         {
             // Arrange
-            var edits = new List<Edit> { new() { Id = inEdit.Id, Description = "Old description.", TicketId = inEdit.TicketId, UserId = inEdit.UserId } };
+            var edits = new List<Edit> { new() { Id = inEdit.Id, Description = "Old description.", TicketId = Guid.AllBitsSet, UserId = Guid.AllBitsSet } };
             var tickets = new List<Ticket> { new() { Id = Guid.AllBitsSet } };
             var users = new List<User> { new() { Id = Guid.AllBitsSet } };
 

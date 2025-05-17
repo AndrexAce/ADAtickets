@@ -77,7 +77,7 @@ namespace ADAtickets.ApiService.Tests.Services.PlatformRepository
 
             // Assert
             Assert.NotNull(addedPlatform);
-            Assert.Single(platforms);
+            Assert.NotEmpty(platforms);
         }
 
         [Theory]

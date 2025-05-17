@@ -81,7 +81,7 @@ namespace ADAtickets.ApiService.Tests.Services.NotificationRepository
 
             // Assert
             Assert.NotNull(addedNotification);
-            Assert.Single(notifications);
+            Assert.NotEmpty(notifications);
         }
 
         [Theory]

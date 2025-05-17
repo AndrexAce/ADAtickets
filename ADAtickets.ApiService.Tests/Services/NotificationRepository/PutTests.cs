@@ -52,7 +52,7 @@ namespace ADAtickets.ApiService.Tests.Services.NotificationRepository
         public async Task UpdateNotification_ValidEntity_ReturnsNew(Notification inNotification)
         {
             // Arrange
-            var notifications = new List<Notification> { new() { Id = inNotification.Id, Message = "Old message.", TicketId = inNotification.TicketId, UserId = inNotification.UserId } };
+            var notifications = new List<Notification> { new() { Id = inNotification.Id, Message = "Old message.", TicketId = Guid.AllBitsSet, UserId = Guid.AllBitsSet } };
             var tickets = new List<Ticket> { new() { Id = Guid.AllBitsSet } };
             var users = new List<User> { new() { Id = Guid.AllBitsSet } };
 
@@ -89,7 +89,7 @@ namespace ADAtickets.ApiService.Tests.Services.NotificationRepository
         public async Task UpdateNotification_InvalidEntity_ReturnsOld(Notification inNotification)
         {
             // Arrange
-            var notifications = new List<Notification> { new() { Id = inNotification.Id, Message = "Old message.", TicketId = inNotification.TicketId, UserId = inNotification.UserId } };
+            var notifications = new List<Notification> { new() { Id = inNotification.Id, Message = "Old message.", TicketId = Guid.AllBitsSet, UserId = Guid.AllBitsSet } };
             var tickets = new List<Ticket> { new() { Id = Guid.AllBitsSet } };
             var users = new List<User> { new() { Id = Guid.AllBitsSet } };
 
