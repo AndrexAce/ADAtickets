@@ -163,5 +163,113 @@ namespace ADAtickets.ApiService.Tests.Services.EditRepository
             Assert.Equal(guid3, result.ElementAt(2).Id);
         }
         #endregion
+
+        #region GetBy
+        [Fact]
+        public async Task GetEditsBy_OneFilterWithMatch_ReturnsEdits()
+        {
+            // Arrange
+            var edits = new List<Edit> {
+                new() { Description = "Example description." },
+                new() { Description = "Trial description."},
+                new() { Description = "Test description." }
+            };
+
+            var mockContext = new Mock<ADAticketsDbContext>();
+            var mockSet = edits.BuildMockDbSet();
+            mockContext.Setup(c => c.Edits)
+                .Returns(mockSet.Object);
+
+            var service = new EditService(mockContext.Object);
+
+            // Act
+            var result = await service.GetEditsByAsync([new KeyValuePair<string, string>("Description", "description")]);
+
+            // Assert
+            Assert.Equal(3, result.Count());
+            Assert.Contains("description", result.ElementAt(0).Description, StringComparison.InvariantCultureIgnoreCase);
+            Assert.Contains("description", result.ElementAt(1).Description, StringComparison.InvariantCultureIgnoreCase);
+            Assert.Contains("description", result.ElementAt(2).Description, StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        [Fact]
+        public async Task GetEditsBy_MoreFiltersWithMatch_ReturnEdits()
+        {
+            // Arrange
+            var edits = new List<Edit> {
+                new() { Description = "Example description.", EditDateTime = DateTimeOffset.UnixEpoch },
+                new() { Description = "Trial description." },
+                new() { Description = "Test description.", EditDateTime = DateTimeOffset.UnixEpoch }
+            };
+
+            var mockContext = new Mock<ADAticketsDbContext>();
+            var mockSet = edits.BuildMockDbSet();
+            mockContext.Setup(c => c.Edits)
+                .Returns(mockSet.Object);
+
+            var service = new EditService(mockContext.Object);
+
+            // Act
+            var result = await service.GetEditsByAsync([
+                new KeyValuePair<string, string>("Description", "description"),
+                new KeyValuePair<string, string>("EditDateTime", DateTimeOffset.UnixEpoch.ToString())
+                ]);
+
+            // Assert
+            Assert.Equal(2, result.Count());
+            Assert.Contains("description", result.ElementAt(0).Description, StringComparison.InvariantCultureIgnoreCase);
+            Assert.Contains("description", result.ElementAt(1).Description, StringComparison.InvariantCultureIgnoreCase);
+            Assert.True(DateTimeOffset.UnixEpoch <= result.ElementAt(0).EditDateTime);
+            Assert.True(DateTimeOffset.UnixEpoch <= result.ElementAt(1).EditDateTime);
+        }
+
+        [Fact]
+        public async Task GetEditsBy_NoMatch_ReturnsNothing()
+        {
+            // Arrange
+            var edits = new List<Edit> {
+                new() { Description = "Example description." },
+                new() { Description = "Trial description."},
+                new() { Description = "Test description." }
+            };
+
+            var mockContext = new Mock<ADAticketsDbContext>();
+            var mockSet = edits.BuildMockDbSet();
+            mockContext.Setup(c => c.Edits)
+                .Returns(mockSet.Object);
+
+            var service = new EditService(mockContext.Object);
+
+            // Act
+            var result = await service.GetEditsByAsync([new KeyValuePair<string, string>("Description", "text")]);
+
+            // Assert
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public async Task GetAttachmentsBy_InvalidFilter_ReturnsNothing()
+        {
+            // Arrange
+            var edits = new List<Edit> {
+                new() { Description = "Example description." },
+                new() { Description = "Trial description."},
+                new() { Description = "Test description." }
+            };
+
+            var mockContext = new Mock<ADAticketsDbContext>();
+            var mockSet = edits.BuildMockDbSet();
+            mockContext.Setup(c => c.Edits)
+                .Returns(mockSet.Object);
+
+            var service = new EditService(mockContext.Object);
+
+            // Act
+            var result = await service.GetEditsByAsync([new KeyValuePair<string, string>("SomeName", "value")]);
+
+            // Assert
+            Assert.Empty(result);
+        }
+        #endregion
     }
 }

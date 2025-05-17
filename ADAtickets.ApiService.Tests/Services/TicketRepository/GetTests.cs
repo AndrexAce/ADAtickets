@@ -163,5 +163,113 @@ namespace ADAtickets.ApiService.Tests.Services.TicketRepository
             Assert.Equal(guid3, result.ElementAt(2).Id);
         }
         #endregion
+
+        #region GetBy
+        [Fact]
+        public async Task GetTicketsBy_OneFilterWithMatch_ReturnsTickets()
+        {
+            // Arrange
+            var tickets = new List<Ticket> {
+                new() { Description = "Example description." },
+                new() { Description = "Trial description."},
+                new() { Description = "Test description." }
+            };
+
+            var mockContext = new Mock<ADAticketsDbContext>();
+            var mockSet = tickets.BuildMockDbSet();
+            mockContext.Setup(c => c.Tickets)
+                .Returns(mockSet.Object);
+
+            var service = new TicketService(mockContext.Object);
+
+            // Act
+            var result = await service.GetTicketsByAsync([new KeyValuePair<string, string>("Description", "description")]);
+
+            // Assert
+            Assert.Equal(3, result.Count());
+            Assert.Contains("description", result.ElementAt(0).Description, StringComparison.InvariantCultureIgnoreCase);
+            Assert.Contains("description", result.ElementAt(1).Description, StringComparison.InvariantCultureIgnoreCase);
+            Assert.Contains("description", result.ElementAt(2).Description, StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        [Fact]
+        public async Task GetTicketsBy_MoreFiltersWithMatch_ReturnTickets()
+        {
+            // Arrange
+            var tickets = new List<Ticket> {
+                new() { Description = "Example description.", Status = Status.Closed },
+                new() { Description = "Trial description." },
+                new() { Description = "Test description.", Status = Status.Closed }
+            };
+
+            var mockContext = new Mock<ADAticketsDbContext>();
+            var mockSet = tickets.BuildMockDbSet();
+            mockContext.Setup(c => c.Tickets)
+                .Returns(mockSet.Object);
+
+            var service = new TicketService(mockContext.Object);
+
+            // Act
+            var result = await service.GetTicketsByAsync([
+                new KeyValuePair<string, string>("Description", "description"),
+                new KeyValuePair<string, string>("Status", Status.Closed.ToString())
+                ]);
+
+            // Assert
+            Assert.Equal(2, result.Count());
+            Assert.Contains("description", result.ElementAt(0).Description, StringComparison.InvariantCultureIgnoreCase);
+            Assert.Contains("description", result.ElementAt(1).Description, StringComparison.InvariantCultureIgnoreCase);
+            Assert.Equal(Status.Closed, result.ElementAt(0).Status);
+            Assert.Equal(Status.Closed, result.ElementAt(1).Status);
+        }
+
+        [Fact]
+        public async Task GetTicketsBy_NoMatch_ReturnsNothing()
+        {
+            // Arrange
+            var tickets = new List<Ticket> {
+                new() { Description = "Example description." },
+                new() { Description = "Trial description."},
+                new() { Description = "Test description." }
+            };
+
+            var mockContext = new Mock<ADAticketsDbContext>();
+            var mockSet = tickets.BuildMockDbSet();
+            mockContext.Setup(c => c.Tickets)
+                .Returns(mockSet.Object);
+
+            var service = new TicketService(mockContext.Object);
+
+            // Act
+            var result = await service.GetTicketsByAsync([new KeyValuePair<string, string>("Description", "text")]);
+
+            // Assert
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public async Task GetAttachmentsBy_InvalidFilter_ReturnsNothing()
+        {
+            // Arrange
+            var tickets = new List<Ticket> {
+                new() { Description = "Example description." },
+                new() { Description = "Trial description."},
+                new() { Description = "Test description." }
+            };
+
+            var mockContext = new Mock<ADAticketsDbContext>();
+            var mockSet = tickets.BuildMockDbSet();
+            mockContext.Setup(c => c.Tickets)
+                .Returns(mockSet.Object);
+
+            var service = new TicketService(mockContext.Object);
+
+            // Act
+            var result = await service.GetTicketsByAsync([new KeyValuePair<string, string>("SomeName", "value")]);
+
+            // Assert
+            Assert.Empty(result);
+        }
+        #endregion
     }
 }

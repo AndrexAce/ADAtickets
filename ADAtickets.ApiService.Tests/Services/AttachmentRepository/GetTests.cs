@@ -163,5 +163,113 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
             Assert.Equal(guid3, result.ElementAt(2).Id);
         }
         #endregion
+
+        #region GetBy
+        [Fact]
+        public async Task GetAttachmentsBy_OneFilterWithMatch_ReturnsAttachments()
+        {
+            // Arrange
+            var attachments = new List<Attachment> {
+                new() { Path = "/path/example.png" },
+                new() { Path = "/path/trial.png"},
+                new() { Path = "/path/test.png" }
+            };
+
+            var mockContext = new Mock<ADAticketsDbContext>();
+            var mockSet = attachments.BuildMockDbSet();
+            mockContext.Setup(c => c.Attachments)
+                .Returns(mockSet.Object);
+
+            var service = new AttachmentService(mockContext.Object);
+
+            // Act
+            var result = await service.GetAttachmentsByAsync([new KeyValuePair<string, string>("Path", "path")]);
+
+            // Assert
+            Assert.Equal(3, result.Count());
+            Assert.Contains("path", result.ElementAt(0).Path, StringComparison.InvariantCultureIgnoreCase);
+            Assert.Contains("path", result.ElementAt(1).Path, StringComparison.InvariantCultureIgnoreCase);
+            Assert.Contains("path", result.ElementAt(2).Path, StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        [Fact]
+        public async Task GetAttachmentsBy_MoreFiltersWithMatch_ReturnAttachments()
+        {
+            // Arrange
+            var attachments = new List<Attachment> {
+                new() { Path = "/path/example.png", TicketId = Guid.AllBitsSet },
+                new() { Path = "/path/trial.png" },
+                new() { Path = "/path/test.png", TicketId = Guid.AllBitsSet }
+            };
+
+            var mockContext = new Mock<ADAticketsDbContext>();
+            var mockSet = attachments.BuildMockDbSet();
+            mockContext.Setup(c => c.Attachments)
+                .Returns(mockSet.Object);
+
+            var service = new AttachmentService(mockContext.Object);
+
+            // Act
+            var result = await service.GetAttachmentsByAsync([
+                new KeyValuePair<string, string>("Path", "path"),
+                new KeyValuePair<string, string>("TicketId", Guid.AllBitsSet.ToString())
+                ]);
+
+            // Assert
+            Assert.Equal(2, result.Count());
+            Assert.Contains("path", result.ElementAt(0).Path, StringComparison.InvariantCultureIgnoreCase);
+            Assert.Contains("path", result.ElementAt(1).Path, StringComparison.InvariantCultureIgnoreCase);
+            Assert.Equal(Guid.AllBitsSet, result.ElementAt(0).TicketId);
+            Assert.Equal(Guid.AllBitsSet, result.ElementAt(1).TicketId);
+        }
+
+        [Fact]
+        public async Task GetAttachmentsBy_NoMatch_ReturnsNothing()
+        {
+            // Arrange
+            var attachments = new List<Attachment> {
+                new() { Path = "/path/example.png" },
+                new() { Path = "/path/trial.png" },
+                new() { Path = "/path/test.png" }
+            };
+
+            var mockContext = new Mock<ADAticketsDbContext>();
+            var mockSet = attachments.BuildMockDbSet();
+            mockContext.Setup(c => c.Attachments)
+                .Returns(mockSet.Object);
+
+            var service = new AttachmentService(mockContext.Object);
+
+            // Act
+            var result = await service.GetAttachmentsByAsync([new KeyValuePair<string, string>("Path", "image")]);
+
+            // Assert
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public async Task GetAttachmentsBy_InvalidFilter_ReturnsNothing()
+        {
+            // Arrange
+            var attachments = new List<Attachment> {
+                new() { Path = "/path/example.png" },
+                new() { Path = "/path/trial.png" },
+                new() { Path = "/path/test.png" }
+            };
+
+            var mockContext = new Mock<ADAticketsDbContext>();
+            var mockSet = attachments.BuildMockDbSet();
+            mockContext.Setup(c => c.Attachments)
+                .Returns(mockSet.Object);
+
+            var service = new AttachmentService(mockContext.Object);
+
+            // Act
+            var result = await service.GetAttachmentsByAsync([new KeyValuePair<string, string>("SomeName", "value")]);
+
+            // Assert
+            Assert.Empty(result);
+        }
+        #endregion
     }
 }

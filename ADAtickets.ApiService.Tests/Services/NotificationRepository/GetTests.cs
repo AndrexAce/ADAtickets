@@ -163,5 +163,113 @@ namespace ADAtickets.ApiService.Tests.Services.NotificationRepository
             Assert.Equal(guid3, result.ElementAt(2).Id);
         }
         #endregion
+
+        #region GetBy
+        [Fact]
+        public async Task GetNotificationsBy_OneFilterWithMatch_ReturnsNotifications()
+        {
+            // Arrange
+            var notifications = new List<Notification> {
+                new() { Message = "Example message." },
+                new() { Message = "Trial message."},
+                new() { Message = "Test message." }
+            };
+
+            var mockContext = new Mock<ADAticketsDbContext>();
+            var mockSet = notifications.BuildMockDbSet();
+            mockContext.Setup(c => c.Notifications)
+                .Returns(mockSet.Object);
+
+            var service = new NotificationService(mockContext.Object);
+
+            // Act
+            var result = await service.GetNotificationsByAsync([new KeyValuePair<string, string>("Message", "message")]);
+
+            // Assert
+            Assert.Equal(3, result.Count());
+            Assert.Contains("message", result.ElementAt(0).Message, StringComparison.InvariantCultureIgnoreCase);
+            Assert.Contains("message", result.ElementAt(1).Message, StringComparison.InvariantCultureIgnoreCase);
+            Assert.Contains("message", result.ElementAt(2).Message, StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        [Fact]
+        public async Task GetNotificationsBy_MoreFiltersWithMatch_ReturnNotifications()
+        {
+            // Arrange
+            var notifications = new List<Notification> {
+                new() { Message = "Example message.", SendDateTime = DateTimeOffset.UnixEpoch },
+                new() { Message = "Trial message." },
+                new() { Message = "Test message.", SendDateTime = DateTimeOffset.UnixEpoch }
+            };
+
+            var mockContext = new Mock<ADAticketsDbContext>();
+            var mockSet = notifications.BuildMockDbSet();
+            mockContext.Setup(c => c.Notifications)
+                .Returns(mockSet.Object);
+
+            var service = new NotificationService(mockContext.Object);
+
+            // Act
+            var result = await service.GetNotificationsByAsync([
+                new KeyValuePair<string, string>("Message", "message"),
+                new KeyValuePair<string, string>("SendDateTime", DateTimeOffset.UnixEpoch.ToString())
+                ]);
+
+            // Assert
+            Assert.Equal(2, result.Count());
+            Assert.Contains("message", result.ElementAt(0).Message, StringComparison.InvariantCultureIgnoreCase);
+            Assert.Contains("message", result.ElementAt(1).Message, StringComparison.InvariantCultureIgnoreCase);
+            Assert.True(DateTimeOffset.UnixEpoch <= result.ElementAt(0).SendDateTime);
+            Assert.True(DateTimeOffset.UnixEpoch <= result.ElementAt(1).SendDateTime);
+        }
+
+        [Fact]
+        public async Task GetNotificationsBy_NoMatch_ReturnsNothing()
+        {
+            // Arrange
+            var notifications = new List<Notification> {
+                new() { Message = "Example message." },
+                new() { Message = "Trial message."},
+                new() { Message = "Test message." }
+            };
+
+            var mockContext = new Mock<ADAticketsDbContext>();
+            var mockSet = notifications.BuildMockDbSet();
+            mockContext.Setup(c => c.Notifications)
+                .Returns(mockSet.Object);
+
+            var service = new NotificationService(mockContext.Object);
+
+            // Act
+            var result = await service.GetNotificationsByAsync([new KeyValuePair<string, string>("Message", "text")]);
+
+            // Assert
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public async Task GetAttachmentsBy_InvalidFilter_ReturnsNothing()
+        {
+            // Arrange
+            var notifications = new List<Notification> {
+                new() { Message = "Example description." },
+                new() { Message = "Trial description."},
+                new() { Message = "Test description." }
+            };
+
+            var mockContext = new Mock<ADAticketsDbContext>();
+            var mockSet = notifications.BuildMockDbSet();
+            mockContext.Setup(c => c.Notifications)
+                .Returns(mockSet.Object);
+
+            var service = new NotificationService(mockContext.Object);
+
+            // Act
+            var result = await service.GetNotificationsByAsync([new KeyValuePair<string, string>("SomeName", "value")]);
+
+            // Assert
+            Assert.Empty(result);
+        }
+        #endregion
     }
 }

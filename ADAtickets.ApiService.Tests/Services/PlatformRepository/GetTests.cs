@@ -163,5 +163,113 @@ namespace ADAtickets.ApiService.Tests.Services.PlatformRepository
             Assert.Equal(guid3, result.ElementAt(2).Id);
         }
         #endregion
+
+        #region GetBy
+        [Fact]
+        public async Task GetPlatformsBy_OneFilterWithMatch_ReturnsPlatforms()
+        {
+            // Arrange
+            var platforms = new List<Platform> {
+                new() { RepositoryUrl = "https://example.com" },
+                new() { RepositoryUrl = "https://trial.com"},
+                new() { RepositoryUrl = "https://test.com" }
+            };
+
+            var mockContext = new Mock<ADAticketsDbContext>();
+            var mockSet = platforms.BuildMockDbSet();
+            mockContext.Setup(c => c.Platforms)
+                .Returns(mockSet.Object);
+
+            var service = new PlatformService(mockContext.Object);
+
+            // Act
+            var result = await service.GetPlatformsByAsync([new KeyValuePair<string, string>("RepositoryUrl", "https")]);
+
+            // Assert
+            Assert.Equal(3, result.Count());
+            Assert.Contains("https", result.ElementAt(0).RepositoryUrl, StringComparison.InvariantCultureIgnoreCase);
+            Assert.Contains("https", result.ElementAt(1).RepositoryUrl, StringComparison.InvariantCultureIgnoreCase);
+            Assert.Contains("https", result.ElementAt(2).RepositoryUrl, StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        [Fact]
+        public async Task GetPlatformsBy_MoreFiltersWithMatch_ReturnPlatforms()
+        {
+            // Arrange
+            var platforms = new List<Platform> {
+                new() { Name = "Example repo", RepositoryUrl = "https://example.com" },
+                new() { Name = "Trial repo", RepositoryUrl = "https://trial.com"},
+                new() { Name = "Test repo", RepositoryUrl = "https://test.com" }
+            };
+
+            var mockContext = new Mock<ADAticketsDbContext>();
+            var mockSet = platforms.BuildMockDbSet();
+            mockContext.Setup(c => c.Platforms)
+                .Returns(mockSet.Object);
+
+            var service = new PlatformService(mockContext.Object);
+
+            // Act
+            var result = await service.GetPlatformsByAsync([
+                new KeyValuePair<string, string>("Name", "repo"),
+                new KeyValuePair<string, string>("RepositoryUrl", "https://t")
+                ]);
+
+            // Assert
+            Assert.Equal(2, result.Count());
+            Assert.Contains("repo", result.ElementAt(0).Name, StringComparison.InvariantCultureIgnoreCase);
+            Assert.Contains("repo", result.ElementAt(1).Name, StringComparison.InvariantCultureIgnoreCase);
+            Assert.Contains("https://t", result.ElementAt(0).RepositoryUrl, StringComparison.InvariantCultureIgnoreCase);
+            Assert.Contains("https://t", result.ElementAt(1).RepositoryUrl, StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        [Fact]
+        public async Task GetPlatformsBy_NoMatch_ReturnsNothing()
+        {
+            // Arrange
+            var platforms = new List<Platform> {
+                new() { RepositoryUrl = "https://example.com" },
+                new() { RepositoryUrl = "https://trial.com"},
+                new() { RepositoryUrl = "https://test.com" }
+            };
+
+            var mockContext = new Mock<ADAticketsDbContext>();
+            var mockSet = platforms.BuildMockDbSet();
+            mockContext.Setup(c => c.Platforms)
+                .Returns(mockSet.Object);
+
+            var service = new PlatformService(mockContext.Object);
+
+            // Act
+            var result = await service.GetPlatformsByAsync([new KeyValuePair<string, string>("RepositoryUrl", ".it")]);
+
+            // Assert
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public async Task GetAttachmentsBy_InvalidFilter_ReturnsNothing()
+        {
+            // Arrange
+            var platforms = new List<Platform> {
+                new() { RepositoryUrl = "https://example.com" },
+                new() { RepositoryUrl = "https://trial.com"},
+                new() { RepositoryUrl = "https://test.com" }
+            };
+
+            var mockContext = new Mock<ADAticketsDbContext>();
+            var mockSet = platforms.BuildMockDbSet();
+            mockContext.Setup(c => c.Platforms)
+                .Returns(mockSet.Object);
+
+            var service = new PlatformService(mockContext.Object);
+
+            // Act
+            var result = await service.GetPlatformsByAsync([new KeyValuePair<string, string>("SomeName", "value")]);
+
+            // Assert
+            Assert.Empty(result);
+        }
+        #endregion
     }
 }

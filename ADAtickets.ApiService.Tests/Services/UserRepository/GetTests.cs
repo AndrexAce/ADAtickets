@@ -163,5 +163,113 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
             Assert.Equal(guid3, result.ElementAt(2).Id);
         }
         #endregion
+
+        #region GetBy
+        [Fact]
+        public async Task GetUsersBy_OneFilterWithMatch_ReturnsUsers()
+        {
+            // Arrange
+            var users = new List<User> {
+                new() { Name = "Jonathan" },
+                new() { Name = "Jack" },
+                new() { Name = "James" }
+            };
+
+            var mockContext = new Mock<ADAticketsDbContext>();
+            var mockSet = users.BuildMockDbSet();
+            mockContext.Setup(c => c.AppUsers)
+                .Returns(mockSet.Object);
+
+            var service = new UserService(mockContext.Object);
+
+            // Act
+            var result = await service.GetUsersByAsync([new KeyValuePair<string, string>("Name", "j")]);
+
+            // Assert
+            Assert.Equal(3, result.Count());
+            Assert.Contains("j", result.ElementAt(0).Name, StringComparison.InvariantCultureIgnoreCase);
+            Assert.Contains("j", result.ElementAt(1).Name, StringComparison.InvariantCultureIgnoreCase);
+            Assert.Contains("j", result.ElementAt(2).Name, StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        [Fact]
+        public async Task GetUsersBy_MoreFiltersWithMatch_ReturnUsers()
+        {
+            // Arrange
+            var users = new List<User> {
+                new() { Name = "Jonathan", Type = UserType.Admin },
+                new() { Name = "Jack" },
+                new() { Name = "James", Type = UserType.Admin }
+            };
+
+            var mockContext = new Mock<ADAticketsDbContext>();
+            var mockSet = users.BuildMockDbSet();
+            mockContext.Setup(c => c.AppUsers)
+                .Returns(mockSet.Object);
+
+            var service = new UserService(mockContext.Object);
+
+            // Act
+            var result = await service.GetUsersByAsync([
+                new KeyValuePair<string, string>("Name", "j"),
+                new KeyValuePair<string, string>("Type", UserType.Admin.ToString())
+                ]);
+
+            // Assert
+            Assert.Equal(2, result.Count());
+            Assert.Contains("j", result.ElementAt(0).Name, StringComparison.InvariantCultureIgnoreCase);
+            Assert.Contains("j", result.ElementAt(1).Name, StringComparison.InvariantCultureIgnoreCase);
+            Assert.Equal(UserType.Admin, result.ElementAt(0).Type);
+            Assert.Equal(UserType.Admin, result.ElementAt(1).Type);
+        }
+
+        [Fact]
+        public async Task GetUsersBy_NoMatch_ReturnsNothing()
+        {
+            // Arrange
+            var users = new List<User> {
+                new() { Name = "Jonathan" },
+                new() { Name = "Jack" },
+                new() { Name = "James" }
+            };
+
+            var mockContext = new Mock<ADAticketsDbContext>();
+            var mockSet = users.BuildMockDbSet();
+            mockContext.Setup(c => c.AppUsers)
+                .Returns(mockSet.Object);
+
+            var service = new UserService(mockContext.Object);
+
+            // Act
+            var result = await service.GetUsersByAsync([new KeyValuePair<string, string>("Name", "i")]);
+
+            // Assert
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public async Task GetAttachmentsBy_InvalidFilter_ReturnsNothing()
+        {
+            // Arrange
+            var users = new List<User> {
+                new() { Name = "Jonathan" },
+                new() { Name = "Jack" },
+                new() { Name = "James" }
+            };
+
+            var mockContext = new Mock<ADAticketsDbContext>();
+            var mockSet = users.BuildMockDbSet();
+            mockContext.Setup(c => c.AppUsers)
+                .Returns(mockSet.Object);
+
+            var service = new UserService(mockContext.Object);
+
+            // Act
+            var result = await service.GetUsersByAsync([new KeyValuePair<string, string>("SomeName", "value")]);
+
+            // Assert
+            Assert.Empty(result);
+        }
+        #endregion
     }
 }
