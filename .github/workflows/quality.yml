@@ -92,7 +92,11 @@ jobs:
 
       - name: Run tests
         run: |
-          coverlet .\ADAtickets.ApiService.Tests\bin\Release\net9.0\ADAtickets.ApiService.Tests.dll --target "dotnet" --targetargs "test --no-build" -f=opencover -o="coverage.xml"
+          coverlet ./ADAtickets.ApiService.Tests/bin/Release/net9.0/ADAtickets.ApiService.Tests.dll \
+          --target "dotnet" \
+          --targetargs "test ./ADAtickets.ApiService.Tests/ADAtickets.ApiService.Tests.csproj --no-build --configuration Release" \
+          -f=opencover \
+          -o="coverage.xml"
 
       - name: End SonarCloud analysis
         env:
