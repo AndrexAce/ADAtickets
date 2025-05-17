@@ -21,11 +21,14 @@ jobs:
           git config user.name "Andrea Lucchese"
           git config user.email "andrylook14@gmail.com"
       
+      - name: Get version
+        run: echo "v$(cat VERSION)" >> $GITHUB_ENV
+
       - name: Push tag
         run: |
-          git tag "v$(cat VERSION)"
+          git tag ${{ env.VERSION }}
           git remote set-url origin https://x-access-token:${{ secrets.PAT }}@github.com/${{ github.repository }}.git
-          git push origin "v$(cat VERSION)"
+          git push origin ${{ env.VERSION }}
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
@@ -40,4 +43,4 @@ jobs:
           build-args: BUILD_CONFIGURATION=Release
           context: ./ADAtickets.ApiService
           push: true
-          tags: adatickets-api:latest,adatickets-api:v$(cat VERSION)
+          tags: adatickets-api:latest,adatickets-api:${{ env.VERSION }}
