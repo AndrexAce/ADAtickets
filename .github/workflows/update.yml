@@ -22,7 +22,7 @@ jobs:
           git config user.email "andrylook14@gmail.com"
       
       - name: Get version
-        run: echo "v$(cat VERSION)" >> $GITHUB_ENV
+        run: echo "VERSION=v$(cat VERSION)" >> $GITHUB_ENV
 
       - name: Push tag
         run: |
