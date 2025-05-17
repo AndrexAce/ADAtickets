@@ -61,11 +61,11 @@ namespace ADAtickets.ApiService.Tests.Services.ReplyRepository
             var mockTicketSet = tickets.BuildMockDbSet();
             var mockUserSet = users.BuildMockDbSet();
             mockReplySet.Setup(s => s.Add(It.IsAny<Reply>()))
-                .Callback<Reply>(a =>
+                .Callback<Reply>(r =>
                 {
-                    if (a.Message.Length <= 5000 && mockTicketSet.Object.Single().Id == a.TicketId && mockUserSet.Object.Single().Id == a.AuthorUserId)
+                    if (r.Message.Length <= 5000 && mockTicketSet.Object.Single().Id == r.TicketId && mockUserSet.Object.Single().Id == r.AuthorUserId)
                     {
-                        replies.Add(a);
+                        replies.Add(r);
                     }
                 });
             mockContext.Setup(c => c.Replies)
@@ -98,11 +98,11 @@ namespace ADAtickets.ApiService.Tests.Services.ReplyRepository
             var mockTicketSet = tickets.BuildMockDbSet();
             var mockUserSet = users.BuildMockDbSet();
             mockReplySet.Setup(s => s.Add(It.IsAny<Reply>()))
-                .Callback<Reply>(a =>
+                .Callback<Reply>(r =>
                 {
-                    if (a.Message.Length <= 5000 && mockTicketSet.Object.Single().Id == a.TicketId && mockUserSet.Object.Single().Id == a.AuthorUserId)
+                    if (r.Message.Length <= 5000 && mockTicketSet.Object.Single().Id == r.TicketId && mockUserSet.Object.Single().Id == r.AuthorUserId)
                     {
-                        replies.Add(a);
+                        replies.Add(r);
                     }
                 });
             mockContext.Setup(c => c.Replies)

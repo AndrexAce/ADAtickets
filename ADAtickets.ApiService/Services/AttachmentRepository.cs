@@ -144,6 +144,7 @@ namespace ADAtickets.ApiService.Services
         {
             try
             {
+#pragma warning disable SYSLIB1045 // Convert to 'GeneratedRegexAttribute'.
                 if (!Regex.IsMatch(attachmentPath, @"^(?!.*//)[a-zA-Z0-9_\-\\/\.]+$"))
                 {
                     return false;
@@ -152,6 +153,7 @@ namespace ADAtickets.ApiService.Services
                 {
                     File.Delete(attachmentPath);
                 }
+#pragma warning restore SYSLIB1045 // Convert to 'GeneratedRegexAttribute'.
 
                 return true;
             }

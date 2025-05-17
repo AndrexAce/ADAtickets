@@ -57,11 +57,11 @@ namespace ADAtickets.ApiService.Tests.Services.PlatformRepository
             var mockContext = new Mock<ADAticketsDbContext>();
             var mockPlatformSet = platforms.BuildMockDbSet();
             mockPlatformSet.Setup(s => s.Add(It.IsAny<Platform>()))
-                .Callback<Platform>(a =>
+                .Callback<Platform>(p =>
                 {
-                    if (a.Name.Length <= 254 && Regex.IsMatch(a.RepositoryUrl, @"^(https?:\/\/)?(www\.)?([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}\/?$"))
+                    if (p.Name.Length <= 254 && Regex.IsMatch(p.RepositoryUrl, @"^(https?:\/\/)?(www\.)?([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}\/?$"))
                     {
-                        platforms.Add(a);
+                        platforms.Add(p);
                     }
                 });
             mockContext.Setup(c => c.Platforms)
@@ -90,11 +90,11 @@ namespace ADAtickets.ApiService.Tests.Services.PlatformRepository
             var mockContext = new Mock<ADAticketsDbContext>();
             var mockPlatformSet = platforms.BuildMockDbSet();
             mockPlatformSet.Setup(s => s.Add(It.IsAny<Platform>()))
-                .Callback<Platform>(a =>
+                .Callback<Platform>(p =>
                 {
-                    if (a.Name.Length <= 254 && Regex.IsMatch(a.RepositoryUrl, @"^(https?:\/\/)?(www\.)?([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}\/?$"))
+                    if (p.Name.Length <= 254 && Regex.IsMatch(p.RepositoryUrl, @"^(https?:\/\/)?(www\.)?([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}\/?$"))
                     {
-                        platforms.Add(a);
+                        platforms.Add(p);
                     }
                 });
             mockContext.Setup(c => c.Platforms)

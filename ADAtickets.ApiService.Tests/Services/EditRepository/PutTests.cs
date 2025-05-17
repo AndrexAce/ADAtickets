@@ -61,9 +61,9 @@ namespace ADAtickets.ApiService.Tests.Services.EditRepository
             var mockTicketSet = tickets.BuildMockDbSet();
             var mockUserSet = users.BuildMockDbSet();
             mockEditSet.Setup(s => s.Update(It.IsAny<Edit>()))
-                .Callback<Edit>(a =>
+                .Callback<Edit>(e =>
                 {
-                    if (a.Description.Length <= 200 && mockTicketSet.Object.Single().Id == a.TicketId && mockUserSet.Object.Single().Id == a.UserId)
+                    if (e.Description.Length <= 200 && mockTicketSet.Object.Single().Id == e.TicketId && mockUserSet.Object.Single().Id == e.UserId)
                     {
                         edits[0].Description = inEdit.Description;
                     }
@@ -98,9 +98,9 @@ namespace ADAtickets.ApiService.Tests.Services.EditRepository
             var mockTicketSet = tickets.BuildMockDbSet();
             var mockUserSet = users.BuildMockDbSet();
             mockEditSet.Setup(s => s.Update(It.IsAny<Edit>()))
-                .Callback<Edit>(a =>
+                .Callback<Edit>(e =>
                 {
-                    if (a.Description.Length <= 200 && mockTicketSet.Object.Single().Id == a.TicketId && mockUserSet.Object.Single().Id == a.UserId)
+                    if (e.Description.Length <= 200 && mockTicketSet.Object.Single().Id == e.TicketId && mockUserSet.Object.Single().Id == e.UserId)
                     {
                         edits[0].Description = inEdit.Description;
                     }

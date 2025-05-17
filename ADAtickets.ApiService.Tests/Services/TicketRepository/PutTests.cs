@@ -68,12 +68,12 @@ namespace ADAtickets.ApiService.Tests.Services.TicketRepository
             var mockPlatformSet = platform.BuildMockDbSet();
             var mockUserSet = users.BuildMockDbSet();
             mockTicketSet.Setup(s => s.Update(It.IsAny<Ticket>()))
-                .Callback<Ticket>(a =>
+                .Callback<Ticket>(t =>
                 {
-                    if (a.Title.Length <= 50 && a.Description.Length <= 5000
-                    && mockPlatformSet.Object.Single().Id == a.PlatformId
-                    && mockUserSet.Object.ElementAt(0).Id == a.CreatorUserId
-                    && (a.OperatorUserId == null || mockUserSet.Object.ElementAt(1).Id == a.OperatorUserId))
+                    if (t.Title.Length <= 50 && t.Description.Length <= 5000
+                    && mockPlatformSet.Object.Single().Id == t.PlatformId
+                    && mockUserSet.Object.ElementAt(0).Id == t.CreatorUserId
+                    && (t.OperatorUserId == null || mockUserSet.Object.ElementAt(1).Id == t.OperatorUserId))
                     {
                         tickets[0].Title = inTicket.Title;
                         tickets[0].Description = inTicket.Description;
@@ -110,12 +110,12 @@ namespace ADAtickets.ApiService.Tests.Services.TicketRepository
             var mockPlatformSet = platform.BuildMockDbSet();
             var mockUserSet = users.BuildMockDbSet();
             mockTicketSet.Setup(s => s.Update(It.IsAny<Ticket>()))
-                .Callback<Ticket>(a =>
+                .Callback<Ticket>(t =>
                 {
-                    if (a.Title.Length <= 50 && a.Description.Length <= 5000
-                    && mockPlatformSet.Object.Single().Id == a.PlatformId
-                    && mockUserSet.Object.ElementAt(0).Id == a.CreatorUserId
-                    && (a.OperatorUserId == null || mockUserSet.Object.ElementAt(1).Id == a.OperatorUserId))
+                    if (t.Title.Length <= 50 && t.Description.Length <= 5000
+                    && mockPlatformSet.Object.Single().Id == t.PlatformId
+                    && mockUserSet.Object.ElementAt(0).Id == t.CreatorUserId
+                    && (t.OperatorUserId == null || mockUserSet.Object.ElementAt(1).Id == t.OperatorUserId))
                     {
                         tickets[0].Title = inTicket.Title;
                         tickets[0].Description = inTicket.Description;

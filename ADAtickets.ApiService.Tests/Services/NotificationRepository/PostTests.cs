@@ -61,11 +61,11 @@ namespace ADAtickets.ApiService.Tests.Services.NotificationRepository
             var mockTicketSet = tickets.BuildMockDbSet();
             var mockUserSet = users.BuildMockDbSet();
             mockNotificationSet.Setup(s => s.Add(It.IsAny<Notification>()))
-                .Callback<Notification>(a =>
+                .Callback<Notification>(n =>
                 {
-                    if (a.Message.Length <= 200 && mockTicketSet.Object.Single().Id == a.TicketId && mockUserSet.Object.Single().Id == a.UserId)
+                    if (n.Message.Length <= 200 && mockTicketSet.Object.Single().Id == n.TicketId && mockUserSet.Object.Single().Id == n.UserId)
                     {
-                        notifications.Add(a);
+                        notifications.Add(n);
                     }
                 });
             mockContext.Setup(c => c.Notifications)
@@ -98,11 +98,11 @@ namespace ADAtickets.ApiService.Tests.Services.NotificationRepository
             var mockTicketSet = tickets.BuildMockDbSet();
             var mockUserSet = users.BuildMockDbSet();
             mockNotificationSet.Setup(s => s.Add(It.IsAny<Notification>()))
-                .Callback<Notification>(a =>
+                .Callback<Notification>(n =>
                 {
-                    if (a.Message.Length <= 200 && mockTicketSet.Object.Single().Id == a.TicketId && mockUserSet.Object.Single().Id == a.UserId)
+                    if (n.Message.Length <= 200 && mockTicketSet.Object.Single().Id == n.TicketId && mockUserSet.Object.Single().Id == n.UserId)
                     {
-                        notifications.Add(a);
+                        notifications.Add(n);
                     }
                 });
             mockContext.Setup(c => c.Notifications)
