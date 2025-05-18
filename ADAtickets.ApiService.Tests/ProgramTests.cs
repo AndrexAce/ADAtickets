@@ -2,13 +2,18 @@ using ADAtickets.ApiService.Configs;
 using ADAtickets.ApiService.Repositories;
 using AutoMapper;
 using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Swagger;
-using Microsoft.AspNetCore.Builder;
 
 namespace ADAtickets.ApiService.Tests
 {
@@ -54,6 +59,26 @@ namespace ADAtickets.ApiService.Tests
 
             // Assert: API Explorer
             Assert.NotNull(services.GetService<IApiDescriptionGroupCollectionProvider>());
+
+            // Assert: Cookie authentication
+            Assert.NotNull(services.GetService<IAuthenticationSchemeProvider>());
+
+            // Assert: Identity authentication API
+            Assert.NotNull(services.GetService<IAuthenticationService>());
+        }
+
+        [Fact]
+        public async Task ConfigureApplication_RegistersMiddlewares()
+        {
+            // Arrange
+            var builder = WebApplication.CreateBuilder();
+            Program.ConfigureServices(builder);
+
+            // Act
+            var app = builder.Build();
+
+            // Assert
+            Assert.Null(await Record.ExceptionAsync(() => Program.ConfigureApplication(app)));
         }
     }
 }

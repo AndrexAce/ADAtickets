@@ -57,6 +57,9 @@ namespace ADAtickets.ApiService
 
             var app = builder.Build();
             await ConfigureApplication(app);
+
+            // Start the application.
+            await app.RunAsync();
         }
 
         /// <summary>
@@ -277,9 +280,6 @@ namespace ADAtickets.ApiService
 
             // Map the controllers endpoints.
             app.MapControllers();
-
-            // Start the application.
-            await app.RunAsync();
         }
     }
 }
