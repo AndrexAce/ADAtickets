@@ -21,12 +21,8 @@ using ADAtickets.ApiService.Configs;
 using ADAtickets.ApiService.Models;
 using ADAtickets.ApiService.Repositories;
 using ADAtickets.ApiService.Services;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Web;
 using Microsoft.OpenApi.Models;
 using Scalar.AspNetCore;
 using System.Net.Mime;
@@ -69,7 +65,6 @@ namespace ADAtickets.ApiService
         public static void ConfigureServices(WebApplicationBuilder builder)
         {
             // Add the DBContext to execute queries against the database.
-            // The context is pooled so that the application spends less time creating and destroying contexts.
             builder.Services.AddDbContextPool<ADAticketsDbContext>(options =>
             {
                 // Configure the DBContext to use PostgreSQL.
@@ -85,106 +80,38 @@ namespace ADAtickets.ApiService
                     .UseSnakeCaseNamingConvention();
             });
 
-            // Configure EntraID authentication for Microsoft work accounts.
-            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"), "AzureAd");
-
-            // Configure local authentication with Identity.
-            builder.Services.AddIdentityApiEndpoints<IdentityUser<Guid>>(options =>
-            {
-                options.Password.RequiredLength = 8;
-
-                options.SignIn.RequireConfirmedAccount = true;
-                options.SignIn.RequireConfirmedEmail = true;
-
-                options.User.RequireUniqueEmail = true;
-            })
-                .AddEntityFrameworkStores<ADAticketsDbContext>();
-
-            // Configure the authorization cookie.
-            builder.Services.ConfigureApplicationCookie(options =>
-            {
-                options.AccessDeniedPath = "/denied";
-                options.LoginPath = "/login";
-                options.LogoutPath = "/logout";
-                options.ExpireTimeSpan = TimeSpan.FromDays(30);
-                options.ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter;
-                options.SlidingExpiration = true;
-
-                options.Cookie.HttpOnly = true;
-                options.Cookie.IsEssential = true;
-                options.Cookie.Name = "ADAtickets";
-                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-                options.Cookie.SameSite = SameSiteMode.Strict;
-            });
-
-            // Configure the antiforgery token to prevent Cross-Site Request Forgery (CSRF) attacks.
-            builder.Services.AddAntiforgery(options =>
-            {
-                options.HeaderName = "X-XSRF-TOKEN";
-                options.FormFieldName = "__RequestVerificationToken";
-
-                options.Cookie.HttpOnly = true;
-                options.Cookie.IsEssential = true;
-                options.Cookie.Name = "ADAtickets-Xsrf";
-                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-                options.Cookie.SameSite = SameSiteMode.Strict;
-            });
-
-            const string identityScheme = "Identity.Application";
-            const string azureAdScheme = "AzureAd";
-
-            // Configure the authorization.
-            builder.Services.AddAuthorizationBuilder()
-                .AddPolicy("AuthenticatedUserOnly", policy =>
+            // Add JWTs decoding for both Entra ID and external Entra ID.
+            builder.Services.AddAuthentication()
+                .AddJwtBearer("Entra", jwtOptions =>
                 {
-                    policy.RequireRole(nameof(UserType.User))
-                    .RequireAuthenticatedUser()
-                    .AddAuthenticationSchemes(identityScheme, azureAdScheme);
+                    jwtOptions.Authority = builder.Configuration.GetSection("Entra:Authority").Value;
+                    jwtOptions.Audience = builder.Configuration.GetSection("Entra:Audience").Value;
                 })
-                .AddPolicy("AuthenticatedOperatorOnly", policy =>
+                .AddJwtBearer("ExternalEntra", jwtOptions =>
                 {
-                    policy.RequireRole(nameof(UserType.Operator))
-                    .RequireAuthenticatedUser()
-                    .AddAuthenticationSchemes(identityScheme, azureAdScheme);
-                })
-                .AddPolicy("AuthenticatedAdminOnly", policy =>
-                {
-                    policy.RequireRole(nameof(UserType.Admin))
-                    .RequireAuthenticatedUser()
-                    .AddAuthenticationSchemes(identityScheme, azureAdScheme);
-                })
-                .AddPolicy("AuthenticatedOperator", policy =>
-                {
-                    policy.RequireRole(nameof(UserType.Operator), nameof(UserType.Admin))
-                    .RequireAuthenticatedUser()
-                    .AddAuthenticationSchemes(identityScheme, azureAdScheme);
-                })
-                .AddPolicy("AuthenticatedEveryone", policy =>
-                {
-                    policy.RequireRole(nameof(UserType.User), nameof(UserType.Operator), nameof(UserType.Admin))
-                    .RequireAuthenticatedUser()
-                    .AddAuthenticationSchemes(identityScheme, azureAdScheme);
-                })
-                .AddDefaultPolicy("Unauthenticated", policy => policy.RequireAssertion(_ => true));
+                    jwtOptions.Authority = builder.Configuration.GetSection("ExternalEntra:Authority").Value;
+                    jwtOptions.Audience = builder.Configuration.GetSection("ExternalEntra:Audience").Value;
+                });
 
             // Add services commonly used with controllers APIs.
             builder.Services
-                .AddControllers(options =>// Require the APIs to respect the broswer request media type, and return a 406 Not Acceptable response if the media type is not supported.
+                .AddControllers(options =>
                 {
+                    // Require the APIs to respect the browser request media type
                     options.RespectBrowserAcceptHeader = true;
                     options.ReturnHttpNotAcceptable = true;
                 })
-                .ConfigureApiBehaviorOptions(options => // Configure the API behavior options to return either a JSON or XML 400 Bad Request response when the model state is invalid.
+                .ConfigureApiBehaviorOptions(options =>
                 {
+                    // Configure API behavior for invalid model state
                     options.InvalidModelStateResponseFactory = context =>
                         new BadRequestObjectResult(context.ModelState)
                         {
                             ContentTypes = { MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml }
                         };
                 })
-                .AddXmlSerializerFormatters() // Add XML serialization support for the APIs.
-                .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter())); // Configure enumerations serialization support.
+                .AddXmlSerializerFormatters()
+                .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
             // Add Swagger documentation for the APIs.
             builder.Services.AddEndpointsApiExplorer();
@@ -194,7 +121,7 @@ namespace ADAtickets.ApiService
                 {
                     Version = "v1",
                     Title = "ADAtickets API",
-                    Description = "Web MCV APIs to interact with the ADAtickets ticketing system.",
+                    Description = "Web API to interact with the ADAtickets ticketing system with authentication endpoints and JWT validation.",
                     Contact = new OpenApiContact
                     {
                         Name = "Andrea Lucchese",
@@ -214,7 +141,7 @@ namespace ADAtickets.ApiService
             // Add services used to return detailed error messages for failed requests.
             builder.Services.AddProblemDetails();
 
-            // Configure the scoped (one per request) classes available for dependency injection.
+            // Configure the scoped repositories for dependency injection.
             builder.Services.AddScoped<IEditRepository, EditRepository>();
             builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
             builder.Services.AddScoped<IPlatformRepository, PlatformRepository>();
@@ -234,51 +161,45 @@ namespace ADAtickets.ApiService
         {
             if (app.Environment.IsDevelopment())
             {
-                // Apply migrations on startup if the app is in development to ensure the database is up to date.
+                // Apply migrations on startup if the app is in development
                 var scope = app.Services.CreateScope();
                 var db = scope.ServiceProvider.GetRequiredService<ADAticketsDbContext>();
                 await db.Database.MigrateAsync();
 
-                // Map an endpoint to access the API documentation.
+                // Map endpoint to access the API documentation.
                 app.UseSwagger(options =>
                 {
                     options.RouteTemplate = "/openapi/{documentName}.json";
                 });
 
-                // Map an endpoint to access the API documentation via Scalar.
+                // Map endpoint to access the API documentation via Scalar.
                 app.MapScalarApiReference(options =>
                 {
                     options.Theme = ScalarTheme.BluePlanet;
                 });
 
-                // When exceptions happen dunring development, show a detailed screen.
+                // Show detailed exception screen during development.
                 app.UseDeveloperExceptionPage();
             }
             else
             {
-                // Add the redirection from HTTP to HTTPS.
+                // Add HTTPS redirection for production.
                 app.UseHttpsRedirection();
             }
 
-            // Create an exception handler to handle exceptions in APIs.
+            // Create an exception handler for APIs.
             app.UseExceptionHandler();
 
-            // Configure an interceptor for 4xx and 5xx errors to return a JSON response with the error details.
+            // Configure interceptor for 4xx and 5xx errors.
             app.UseStatusCodePages();
 
-            // Add the authentication middleware.
+            // Add authentication middleware (validates both Identity and Microsoft JWTs).
             app.UseAuthentication();
 
-            // Add the authentication middleware.
+            // Add authorization middleware.
             app.UseAuthorization();
 
-            // Add the antiforgery middleware.
-            app.UseAntiforgery();
-
-            // Map the authentication endpoints.
-            app.MapIdentityApi<IdentityUser<Guid>>();
-
-            // Map the controllers endpoints.
+            // Map the controllers endpoints for business logic APIs.
             app.MapControllers();
         }
     }
