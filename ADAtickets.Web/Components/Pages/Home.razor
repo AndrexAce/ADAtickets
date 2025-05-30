@@ -1,0 +1,67 @@
+﻿<!-- ADAtickets is a simple, lightweight, open source ticketing system
+interacting with your enterprise's repositories on Azure DevOps
+with a two-way synchronization.
+Copyright (C) 2025  Andrea Lucchese
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
+@page "/"
+@using System.Globalization
+@inject IStringLocalizer<Home> Loc
+@inject NavigationManager NavManager
+
+<PageTitle>ADAtickets - @Loc["Title"]</PageTitle>
+
+<FluentCard Width="fit-content" Height="fit-content" Style="display: flex; flex-direction: column; align-items: center; gap: 1em; padding: 2em; margin: auto; min-width: 420px;">
+    @if (CurrentTheme == DesignThemeModes.Dark)
+    {
+        <img src="LogoDark.svg" />
+    }
+    else
+    {
+        <img src="LogoLight.svg" />
+    }
+    <span style="text-align: center;">
+        <FluentLabel Weight="FontWeight.Bold">@Loc["Greeting1"]</FluentLabel>
+        <FluentLabel Weight="FontWeight.Bold">@Loc["Greeting2"]</FluentLabel>
+    </span>
+    <span style="display: flex; flex-direction: column; gap: 1em;">
+        <span style="display: flex; flex-direction: row; gap: 1em;">
+            <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Person())" Style="width: 100%; min-width: 240px;" OnClick="NavigateToUserSignin">@Loc["UserButton"]</FluentButton>
+            <FluentIcon Id="UserButton" Icon="Icons.Regular.Size20.Info"></FluentIcon>
+            <FluentTooltip Anchor="UserButton" Position="TooltipPosition.End">@Loc["UserButtonTooltip"]</FluentTooltip>
+        </span>
+        <span style="display: flex; flex-direction: row; gap: 1em;">
+            <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Wrench())" Style="width: 100%; min-width: 240px;" OnClick="NavigateToAdminSignin">@Loc["AdminButton"]</FluentButton>
+            <FluentIcon Id="AdminButton" Icon="Icons.Regular.Size20.Info"></FluentIcon>
+            <FluentTooltip Anchor="AdminButton" Position="TooltipPosition.End">@Loc["AdminButtonTooltip"]</FluentTooltip>
+        </span>
+    </span>
+</FluentCard>
+
+@code {
+    [CascadingParameter(Name = "ThemeMode")]
+    public DesignThemeModes CurrentTheme { get; set; }
+
+    private void NavigateToUserSignin()
+    {
+        // Navigate to the MSAL sign-in page using the ExternalEntra scheme (for regular users)
+        NavManager.NavigateTo("MicrosoftIdentity/Account/SignIn/ExternalEntra", forceLoad: true);
+    }
+
+    private void NavigateToAdminSignin()
+    {
+        // Navigate to the MSAL sign-in page using the Entra scheme (for administrators)
+        NavManager.NavigateTo("MicrosoftIdentity/Account/SignIn/Entra", forceLoad: true);
+    }
+}
