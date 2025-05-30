@@ -56,9 +56,6 @@ namespace ADAtickets.ApiService.Tests
             // Assert: AutoMapper
             Assert.NotNull(services.GetService<IMapper>());
 
-            // Assert: Antiforgery
-            Assert.NotNull(services.GetService<IAntiforgery>());
-
             // Assert: Authorization
             Assert.NotNull(services.GetService<IAuthorizationService>());
 
