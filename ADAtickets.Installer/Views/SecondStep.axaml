@@ -1,0 +1,51 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:assets="clr-namespace:ADAtickets.Installer.Assets"
+             xmlns:vm="clr-namespace:ADAtickets.Installer.ViewModels"
+             mc:Ignorable="d"
+             x:Class="ADAtickets.Installer.Views.SecondStep"
+             x:DataType="vm:MainViewModel"
+             Width="750">
+	<Design.DataContext>
+		<vm:MainViewModel />
+	</Design.DataContext>
+
+	<StackPanel Orientation="Vertical" Margin="20 20 20 20" Spacing="20">
+		<TextBlock Text="Inserisci le seguenti informazioni per completare il setup."
+                   FontFamily="Segoe UI"
+                   HorizontalAlignment="Center"/>
+		<StackPanel Orientation="Horizontal" Spacing="20">
+			<Image Source="/Assets/Docker.png" Width="100"/>
+			<UniformGrid Columns="3" HorizontalAlignment="Stretch" ColumnSpacing="20" RowSpacing="20">
+				<StackPanel Orientation="Vertical">
+					<TextBlock Text="Nome utente base di dati:" FontFamily="Segoe UI"/>
+					<TextBox Text="{Binding DbName}" Watermark="postgres" HorizontalAlignment="Stretch"/>
+				</StackPanel>
+				<StackPanel Orientation="Vertical">
+					<TextBlock Text="Password base di dati:" FontFamily="Segoe UI"/>
+					<TextBox Text="{Binding DbPassword}" PasswordChar="•" Watermark="postgres" HorizontalAlignment="Stretch"/>
+				</StackPanel>
+				<StackPanel Orientation="Vertical">
+					<TextBlock Text="Password certificato SSL:" FontFamily="Segoe UI"/>
+					<TextBox Text="{Binding SslPassword}" PasswordChar="•" HorizontalAlignment="Stretch"/>
+				</StackPanel>
+				<StackPanel Orientation="Vertical">
+					<TextBlock Text="Percorso certificato SSL:" FontFamily="Segoe UI"/>
+					<TextBox Text="{Binding SslPath}" Watermark="/https/aspnetapp.pfx" HorizontalAlignment="Stretch"/>
+				</StackPanel>
+				<StackPanel Orientation="Vertical">
+					<TextBlock Text="Percorso montaggio volume:" FontFamily="Segoe UI"/>
+					<TextBox Text="{Binding VolumePath}" Watermark="~/.aspnet/https" HorizontalAlignment="Stretch"/>
+				</StackPanel>
+				<StackPanel Orientation="Vertical">
+					<TextBlock Text="Versione applicazione:" FontFamily="Segoe UI"/>
+					<ComboBox SelectedValue="{Binding Version}" HorizontalAlignment="Stretch">
+						<ComboBoxItem Content="v1.0.0"/>
+					</ComboBox>
+				</StackPanel>
+			</UniformGrid>
+		</StackPanel>
+	</StackPanel>
+</UserControl>

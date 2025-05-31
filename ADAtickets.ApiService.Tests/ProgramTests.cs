@@ -20,7 +20,6 @@
 using ADAtickets.ApiService.Configs;
 using ADAtickets.ApiService.Repositories;
 using AutoMapper;
-using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;

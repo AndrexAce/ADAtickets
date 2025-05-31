@@ -1,0 +1,29 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:assets="clr-namespace:ADAtickets.Installer.Assets"
+             xmlns:vm="clr-namespace:ADAtickets.Installer.ViewModels"
+             mc:Ignorable="d"
+             x:Class="ADAtickets.Installer.Views.FirstStep"
+             x:DataType="vm:MainViewModel"
+			 Width="300">
+  <Design.DataContext>
+    <vm:MainViewModel />
+  </Design.DataContext>
+
+    <StackPanel Orientation="Vertical" Margin="10 20 10 20" Spacing="20" VerticalAlignment="Top">
+        <TextBlock Text="{x:Static assets:Resources.Greeting}" 
+                  TextAlignment="Center" 
+                  FontFamily="Segoe UI"/>
+        <TextBlock Text="{x:Static assets:Resources.Presentation}" 
+                  TextAlignment="Center" 
+                  TextWrapping="Wrap" 
+                  FontFamily="Segoe UI"/>
+		<Button Content="{x:Static assets:Resources.Start}"
+				HorizontalAlignment="Center"
+				FontFamily="Segoe UI"
+				Classes="accent"
+				Command="{Binding NextStep}"/>
+    </StackPanel>
+</UserControl>
