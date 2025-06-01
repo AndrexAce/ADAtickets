@@ -117,13 +117,49 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ApplicationVersionLabel" xml:space="preserve">
+    <value>Versione applicazione:</value>
+  </data>
+  <data name="DbPasswordLabel" xml:space="preserve">
+    <value>Password base di dati:</value>
+  </data>
+  <data name="DbUserNameLabel" xml:space="preserve">
+    <value>Nome utente base di dati:</value>
+  </data>
+  <data name="EntraAuthorityLabel" xml:space="preserve">
+    <value>Authority Entra ID:</value>
+  </data>
+  <data name="EntraAudienceLabel" xml:space="preserve">
+    <value>Audience Entra ID:</value>
+  </data>
+  <data name="FieldRequired" xml:space="preserve">
+    <value>Questo campo è obbligatorio.</value>
+  </data>
   <data name="Greeting" xml:space="preserve">
     <value>Ciao!</value>
+  </data>
+  <data name="InvalidPath" xml:space="preserve">
+    <value>Il percorso non è valido.</value>
   </data>
   <data name="Presentation" xml:space="preserve">
     <value>Prima di eseguire questo setup, leggi le istruzioni nel README.</value>
   </data>
-  <data name="Start" xml:space="preserve">
+  <data name="SslPasswordLabel" xml:space="preserve">
+    <value>Password certificato SSL:</value>
+  </data>
+  <data name="SslPathLabel" xml:space="preserve">
+    <value>Percorso certificato SSL:</value>
+  </data>
+  <data name="Next" xml:space="preserve">
     <value>Continua</value>
+  </data>
+  <data name="VolumePathLabel" xml:space="preserve">
+    <value>Percorso montaggio volume:</value>
+  </data>
+  <data name="EntraExternalAudienceLabel" xml:space="preserve">
+    <value>Audience Entra External ID:</value>
+  </data>
+  <data name="EntraExternalAuthorityLabel" xml:space="preserve">
+    <value>Authority Entra External ID:</value>
   </data>
 </root>

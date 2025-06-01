@@ -44,7 +44,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     private void ApplySelectedCulture()
     {
-        if (CultureInfo.CurrentCulture != selectedCulture)
+        if (CultureInfo.CurrentCulture != selectedCulture && selectedCulture != null)
         {
             var uri = new Uri(Navigation.Uri)
                 .GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped);

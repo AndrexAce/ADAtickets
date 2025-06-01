@@ -61,11 +61,101 @@ namespace ADAtickets.Installer.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Application version:.
+        /// </summary>
+        public static string ApplicationVersionLabel {
+            get {
+                return ResourceManager.GetString("ApplicationVersionLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Database password:.
+        /// </summary>
+        public static string DbPasswordLabel {
+            get {
+                return ResourceManager.GetString("DbPasswordLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Database username:.
+        /// </summary>
+        public static string DbUserNameLabel {
+            get {
+                return ResourceManager.GetString("DbUserNameLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Entra ID Audience:.
+        /// </summary>
+        public static string EntraAudienceLabel {
+            get {
+                return ResourceManager.GetString("EntraAudienceLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Entra ID Authority:.
+        /// </summary>
+        public static string EntraAuthorityLabel {
+            get {
+                return ResourceManager.GetString("EntraAuthorityLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Entra External ID Audience:.
+        /// </summary>
+        public static string EntraExternalAudienceLabel {
+            get {
+                return ResourceManager.GetString("EntraExternalAudienceLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Entra External ID Authority:.
+        /// </summary>
+        public static string EntraExternalAuthorityLabel {
+            get {
+                return ResourceManager.GetString("EntraExternalAuthorityLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This field is mandatory..
+        /// </summary>
+        public static string FieldRequired {
+            get {
+                return ResourceManager.GetString("FieldRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Hello!.
         /// </summary>
         public static string Greeting {
             get {
                 return ResourceManager.GetString("Greeting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The path is invalid..
+        /// </summary>
+        public static string InvalidPath {
+            get {
+                return ResourceManager.GetString("InvalidPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Next.
+        /// </summary>
+        public static string Next {
+            get {
+                return ResourceManager.GetString("Next", resourceCulture);
             }
         }
         
@@ -79,11 +169,29 @@ namespace ADAtickets.Installer.Assets {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Start.
+        ///   Looks up a localized string similar to SSL certificate password:.
         /// </summary>
-        public static string Start {
+        public static string SslPasswordLabel {
             get {
-                return ResourceManager.GetString("Start", resourceCulture);
+                return ResourceManager.GetString("SslPasswordLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SSL certificate path:.
+        /// </summary>
+        public static string SslPathLabel {
+            get {
+                return ResourceManager.GetString("SslPathLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Volume mount path:.
+        /// </summary>
+        public static string VolumePathLabel {
+            get {
+                return ResourceManager.GetString("VolumePathLabel", resourceCulture);
             }
         }
     }

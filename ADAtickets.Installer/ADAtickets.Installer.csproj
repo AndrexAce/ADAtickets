@@ -4,6 +4,7 @@
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+	<RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -47,6 +48,9 @@
        <DesignTime>True</DesignTime>
        <AutoGen>True</AutoGen>
        <DependentUpon>Resources.resx</DependentUpon>
+     </Compile>
+     <Compile Update="Views\ThirdStep.axaml.cs">
+       <DependentUpon>ThirdStep.axaml</DependentUpon>
      </Compile>
      <Compile Update="Views\SecondStep.axaml.cs">
        <DependentUpon>SecondStep.axaml</DependentUpon>

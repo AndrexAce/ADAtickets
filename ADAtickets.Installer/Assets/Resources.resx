@@ -117,13 +117,49 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ApplicationVersionLabel" xml:space="preserve">
+    <value>Application version:</value>
+  </data>
+  <data name="DbPasswordLabel" xml:space="preserve">
+    <value>Database password:</value>
+  </data>
+  <data name="DbUserNameLabel" xml:space="preserve">
+    <value>Database username:</value>
+  </data>
+  <data name="EntraAuthorityLabel" xml:space="preserve">
+    <value>Entra ID Authority:</value>
+  </data>
+  <data name="EntraAudienceLabel" xml:space="preserve">
+    <value>Entra ID Audience:</value>
+  </data>
+  <data name="FieldRequired" xml:space="preserve">
+    <value>This field is mandatory.</value>
+  </data>
   <data name="Greeting" xml:space="preserve">
     <value>Hello!</value>
+  </data>
+  <data name="InvalidPath" xml:space="preserve">
+    <value>The path is invalid.</value>
   </data>
   <data name="Presentation" xml:space="preserve">
     <value>Before running this setup, read the instructions in the README file.</value>
   </data>
-  <data name="Start" xml:space="preserve">
-    <value>Start</value>
+  <data name="SslPasswordLabel" xml:space="preserve">
+    <value>SSL certificate password:</value>
+  </data>
+  <data name="SslPathLabel" xml:space="preserve">
+    <value>SSL certificate path:</value>
+  </data>
+  <data name="Next" xml:space="preserve">
+    <value>Next</value>
+  </data>
+  <data name="VolumePathLabel" xml:space="preserve">
+    <value>Volume mount path:</value>
+  </data>
+  <data name="EntraExternalAudienceLabel" xml:space="preserve">
+    <value>Entra External ID Audience:</value>
+  </data>
+  <data name="EntraExternalAuthorityLabel" xml:space="preserve">
+    <value>Entra External ID Authority:</value>
   </data>
 </root>
