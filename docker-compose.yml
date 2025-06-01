@@ -2,8 +2,8 @@ services:
   adatickets.postgresql:
     container_name: Database
     environment:
-      - POSTGRES_USER=${POSTGRES_USER:?error}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?error}
+      - POSTGRES_USER=${POSTGRESUSER:?error}
+      - POSTGRES_PASSWORD=${POSTGRESPASSWORD:?error}
       - POSTGRES_DB=adatickets
     healthcheck:
       test: pg_isready -U postgres -d adatickets
@@ -27,8 +27,18 @@ services:
       - network
     ports:
       - "5194:8080"
-      - "7214:8081" 
-
+      - "7214:8081"
+  
+  adatickets.web:
+    container_name: Web
+    depends_on:
+      adatickets.apiservice:
+        condition: service_started
+    networks:
+      - network
+    ports:
+      - "44321:8081"
+    
 networks:
   network:
     driver: bridge

@@ -6,9 +6,9 @@ services:
     restart: always
     image: sosedoff/pgweb
     ports: 
-      - "8081:8081" 
+      - "8082:8081" 
     environment:
-      - PGWEB_DATABASE_URL=postgres://${POSTGRES_USER:?error}:${POSTGRES_PASSWORD:?error}@adatickets.postgresql:5432/adatickets?sslmode=disable
+      - PGWEB_DATABASE_URL=postgres://${POSTGRESUSER:?error}:${POSTGRESPASSWORD:?error}@adatickets.postgresql:5432/adatickets?sslmode=disable
     depends_on:
       adatickets.postgresql:
         condition: service_healthy
@@ -27,7 +27,40 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=https://+:8081;http://+:8080;
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=${CERT_PASSWORD:?error}
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=${CERT_PATH:-/https/aspnetapp.pfx}
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${CERTPASSWORD:?error}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${CERTPATH:-/https/aspnetapp.pfx}
+      - ENTRA__AUTHORITY=${ENTRA__AUTHORITY:?error}
+      - ENTRA__AUDIENCE=${ENTRA__AUDIENCE:?error}
+      - EXTERNALENTRA__AUTHORITY=${EXTERNALENTRA__AUTHORITY:?error}
+      - EXTERNALENTRA__AUDIENCE=${EXTERNALENTRA__AUDIENCE:?error}
+    volumes:
+      - ${VOLUME_PATH:-~/.aspnet/https}:/https:ro
+  
+  adatickets.web:
+    build:
+      context: .
+      args:
+       - BUILD_CONFIGURATION=Debug
+      dockerfile: ADAtickets.Web/Dockerfile
+      tags:
+        - andrexace/adatickets-web:dev
+    image: andrexace/adatickets-web:dev
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:8081;http://+:8080;
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${CERTPASSWORD:?error}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${CERTPATH:-/https/aspnetapp.pfx}
+      - ENTRA__CALLBACKPATH=/signin-oidc-entra
+      - EXTERNALENTRA__CALLBACKPATH=/signin-oidc-entra-external
+      - ENTRA__INSTANCE=https://login.microsoftonline.com
+      - ENTRA__RESPONSETYPE=code
+      - ENTRA__DOWNSTREAMAPI__BASEURL=https://localhost:7214
+      - ENTRA__CLIENTID=${ENTRA__CLIENTID:?error}
+      - ENTRA__DOMAIN=${ENTRA__DOMAIN:?error}
+      - ENTRA__TENANTID=${ENTRA__TENANTID:?error}
+      - ENTRA__CERTIFICATE__DISKPATH=${ENTRA__CERTIFICATE__DISKPATH:?error}
+      - ENTRA__CERTIFICATE__PASSWORD=${ENTRA__CERTIFICATE__PASSWORD:?error}
+      - ENTRA__DOWNSTREAMAPI__SCOPES__0=${ENTRA__DOWNSTREAMAPI__SCOPES__0:?error}
+      - ENTRA__DOWNSTREAMAPI__SCOPES__1=${ENTRA__DOWNSTREAMAPI__SCOPES__1:?error}
     volumes:
       - ${VOLUME_PATH:-~/.aspnet/https}:/https:ro
