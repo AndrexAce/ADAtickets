@@ -32,16 +32,16 @@ namespace ADAtickets.Installer.ViewModels;
 class MainViewModel : ReactiveObject
 {
     private UserControl _currentView;
-    private string? dbUserName;
-    private string? dbPassword;
-    private string? sslPassword;
-    private string? sslPath;
-    private string? volumePath;
-    private string? version;
-    private string? entraAuthority;
-    private string? entraAudience;
-    private string? entraExternalAuthority;
-    private string? entraExternalAudience;
+    private string? _dbUserName;
+    private string? _dbPassword;
+    private string? _sslPassword;
+    private string? _sslPath;
+    private string? _volumePath;
+    private string? _version;
+    private string? _tenantId;
+    private string? _tenantDomain;
+    private string? _externalTenantId;
+    private string? _externalTenantDomain;
 
     public UserControl CurrentView
     {
@@ -53,24 +53,24 @@ class MainViewModel : ReactiveObject
               ErrorMessageResourceName = "FieldRequired")]
     public string? DbUserName
     {
-        get => dbUserName;
-        set => this.RaiseAndSetIfChanged(ref dbUserName, value);
+        get => _dbUserName;
+        set => this.RaiseAndSetIfChanged(ref _dbUserName, value);
     }
 
     [Required(ErrorMessageResourceType = typeof(Assets.Resources),
               ErrorMessageResourceName = "FieldRequired")]
     public string? DbPassword
     {
-        get => dbPassword;
-        set => this.RaiseAndSetIfChanged(ref dbPassword, value);
+        get => _dbPassword;
+        set => this.RaiseAndSetIfChanged(ref _dbPassword, value);
     }
 
     [Required(ErrorMessageResourceType = typeof(Assets.Resources),
               ErrorMessageResourceName = "FieldRequired")]
     public string? SslPassword
     {
-        get => sslPassword;
-        set => this.RaiseAndSetIfChanged(ref sslPassword, value);
+        get => _sslPassword;
+        set => this.RaiseAndSetIfChanged(ref _sslPassword, value);
     }
 
     [Required(ErrorMessageResourceType = typeof(Assets.Resources),
@@ -80,8 +80,8 @@ class MainViewModel : ReactiveObject
                      ErrorMessageResourceName = "InvalidPath")]
     public string? SslPath
     {
-        get => sslPath;
-        set => this.RaiseAndSetIfChanged(ref sslPath, value);
+        get => _sslPath;
+        set => this.RaiseAndSetIfChanged(ref _sslPath, value);
     }
 
     [Required(ErrorMessageResourceType = typeof(Assets.Resources),
@@ -91,48 +91,60 @@ class MainViewModel : ReactiveObject
                      ErrorMessageResourceName = "InvalidPath")]
     public string? VolumePath
     {
-        get => volumePath;
-        set => this.RaiseAndSetIfChanged(ref volumePath, value);
+        get => _volumePath;
+        set => this.RaiseAndSetIfChanged(ref _volumePath, value);
     }
 
     [Required(ErrorMessageResourceType = typeof(Assets.Resources),
               ErrorMessageResourceName = "FieldRequired")]
     public string? Version
     {
-        get => version;
-        set => this.RaiseAndSetIfChanged(ref version, value);
+        get => _version;
+        set => this.RaiseAndSetIfChanged(ref _version, value);
     }
 
     [Required(ErrorMessageResourceType = typeof(Assets.Resources),
               ErrorMessageResourceName = "FieldRequired")]
-    public string? EntraAuthority
+    [RegularExpression(@"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+                     ErrorMessageResourceType = typeof(Assets.Resources),
+                     ErrorMessageResourceName = "InvalidGuid")]
+    public string? TenantId
     {
-        get => entraAuthority;
-        set => this.RaiseAndSetIfChanged(ref entraAuthority, value);
+        get => _tenantId;
+        set => this.RaiseAndSetIfChanged(ref _tenantId, value);
     }
 
     [Required(ErrorMessageResourceType = typeof(Assets.Resources),
               ErrorMessageResourceName = "FieldRequired")]
-    public string? EntraAudience
+    [RegularExpression(@"^[a-zA-Z0-9\-\.]+\.onmicrosoft\.com$",
+                     ErrorMessageResourceType = typeof(Assets.Resources),
+                     ErrorMessageResourceName = "InvalidDomain")]
+    public string? TenantDomain
     {
-        get => entraAudience;
-        set => this.RaiseAndSetIfChanged(ref entraAudience, value);
+        get => _tenantDomain;
+        set => this.RaiseAndSetIfChanged(ref _tenantDomain, value);
     }
 
     [Required(ErrorMessageResourceType = typeof(Assets.Resources),
               ErrorMessageResourceName = "FieldRequired")]
-    public string? EntraExternalAuthority
+    [RegularExpression(@"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+                     ErrorMessageResourceType = typeof(Assets.Resources),
+                     ErrorMessageResourceName = "InvalidGuid")]
+    public string? ExternalTenantId
     {
-        get => entraExternalAuthority;
-        set => this.RaiseAndSetIfChanged(ref entraExternalAuthority, value);
+        get => _externalTenantId;
+        set => this.RaiseAndSetIfChanged(ref _externalTenantId, value);
     }
 
     [Required(ErrorMessageResourceType = typeof(Assets.Resources),
               ErrorMessageResourceName = "FieldRequired")]
-    public string? EntraExternalAudience
+    [RegularExpression(@"^[a-zA-Z0-9\-\.]+\.onmicrosoft\.com$",
+                     ErrorMessageResourceType = typeof(Assets.Resources),
+                     ErrorMessageResourceName = "InvalidDomain")]
+    public string? ExternalTenantDomain
     {
-        get => entraExternalAudience;
-        set => this.RaiseAndSetIfChanged(ref entraExternalAudience, value);
+        get => _externalTenantDomain;
+        set => this.RaiseAndSetIfChanged(ref _externalTenantDomain, value);
     }
 
     public static ICommand ExitAppCommand => ReactiveCommand.Create(ExitApp);

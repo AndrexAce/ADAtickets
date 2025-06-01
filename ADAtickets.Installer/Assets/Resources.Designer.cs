@@ -88,38 +88,29 @@ namespace ADAtickets.Installer.Assets {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Entra ID Audience:.
+        ///   Looks up a localized string similar to Tenant domain:.
         /// </summary>
-        public static string EntraAudienceLabel {
+        public static string DomainLabel {
             get {
-                return ResourceManager.GetString("EntraAudienceLabel", resourceCulture);
+                return ResourceManager.GetString("DomainLabel", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Entra ID Authority:.
+        ///   Looks up a localized string similar to External tenant domain:.
         /// </summary>
-        public static string EntraAuthorityLabel {
+        public static string ExternalDomainLabel {
             get {
-                return ResourceManager.GetString("EntraAuthorityLabel", resourceCulture);
+                return ResourceManager.GetString("ExternalDomainLabel", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Entra External ID Audience:.
+        ///   Looks up a localized string similar to External tenant ID:.
         /// </summary>
-        public static string EntraExternalAudienceLabel {
+        public static string ExternalTenantIdLabel {
             get {
-                return ResourceManager.GetString("EntraExternalAudienceLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Entra External ID Authority:.
-        /// </summary>
-        public static string EntraExternalAuthorityLabel {
-            get {
-                return ResourceManager.GetString("EntraExternalAuthorityLabel", resourceCulture);
+                return ResourceManager.GetString("ExternalTenantIdLabel", resourceCulture);
             }
         }
         
@@ -138,6 +129,24 @@ namespace ADAtickets.Installer.Assets {
         public static string Greeting {
             get {
                 return ResourceManager.GetString("Greeting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The domain is invalid..
+        /// </summary>
+        public static string InvalidDomain {
+            get {
+                return ResourceManager.GetString("InvalidDomain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The GUID is invalid..
+        /// </summary>
+        public static string InvalidGuid {
+            get {
+                return ResourceManager.GetString("InvalidGuid", resourceCulture);
             }
         }
         
@@ -183,6 +192,15 @@ namespace ADAtickets.Installer.Assets {
         public static string SslPathLabel {
             get {
                 return ResourceManager.GetString("SslPathLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tenant ID:.
+        /// </summary>
+        public static string TenantIdLabel {
+            get {
+                return ResourceManager.GetString("TenantIdLabel", resourceCulture);
             }
         }
         

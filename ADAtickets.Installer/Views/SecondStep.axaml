@@ -68,20 +68,20 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 			<Image Source="/Assets/Azure.png" Width="100"/>
 			<UniformGrid Columns="2" HorizontalAlignment="Stretch" ColumnSpacing="20" RowSpacing="20" Width="760">
 				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-					<TextBlock Text="{x:Static assets:Resources.EntraAuthorityLabel}" FontFamily="Segoe UI"/>
-					<TextBox Text="{Binding EntraAuthority}" Watermark="https://login.microsoftonline.com/{idTenant}/v2.0" HorizontalAlignment="Stretch" Width="NaN"/>
+					<TextBlock Text="{x:Static assets:Resources.TenantIdLabel}" FontFamily="Segoe UI"/>
+					<TextBox Text="{Binding TenantId}" Watermark="00000000-0000-0000-0000-000000000000" HorizontalAlignment="Stretch" Width="NaN"/>
 				</StackPanel>
 				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-					<TextBlock Text="{x:Static assets:Resources.EntraAudienceLabel}" FontFamily="Segoe UI"/>
-					<TextBox Text="{Binding EntraAudience}" Watermark="api://{idApp}" HorizontalAlignment="Stretch" Width="NaN"/>
+					<TextBlock Text="{x:Static assets:Resources.DomainLabel}" FontFamily="Segoe UI"/>
+					<TextBox Text="{Binding TenantDomain}" Watermark="tenantName.onmicrosoft.com" HorizontalAlignment="Stretch" Width="NaN"/>
 				</StackPanel>
 				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-					<TextBlock Text="{x:Static assets:Resources.EntraExternalAuthorityLabel}" FontFamily="Segoe UI"/>
-					<TextBox Text="{Binding EntraExternalAuthority}" Watermark="https://{tenantDomain}/{idTenant}/v2.0/" HorizontalAlignment="Stretch" Width="NaN"/>
+					<TextBlock Text="{x:Static assets:Resources.ExternalTenantIdLabel}" FontFamily="Segoe UI"/>
+					<TextBox Text="{Binding ExternalTenantId}" Watermark="00000000-0000-0000-0000-000000000000" HorizontalAlignment="Stretch" Width="NaN"/>
 				</StackPanel>
 				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-					<TextBlock Text="{x:Static assets:Resources.EntraExternalAudienceLabel}" FontFamily="Segoe UI"/>
-					<TextBox Text="{Binding EntraExternalAudience}" Watermark="api://{idApp}" HorizontalAlignment="Stretch" Width="NaN"/>
+					<TextBlock Text="{x:Static assets:Resources.ExternalDomainLabel}" FontFamily="Segoe UI"/>
+					<TextBox Text="{Binding ExternalTenantDomain}" Watermark="tenantName.onmicrosoft.com" HorizontalAlignment="Stretch" Width="NaN"/>
 				</StackPanel>
 			</UniformGrid>
 		</StackPanel>

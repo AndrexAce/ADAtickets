@@ -126,11 +126,11 @@
   <data name="DbUserNameLabel" xml:space="preserve">
     <value>Database username:</value>
   </data>
-  <data name="EntraAuthorityLabel" xml:space="preserve">
-    <value>Entra ID Authority:</value>
+  <data name="TenantIdLabel" xml:space="preserve">
+    <value>Tenant ID:</value>
   </data>
-  <data name="EntraAudienceLabel" xml:space="preserve">
-    <value>Entra ID Audience:</value>
+  <data name="DomainLabel" xml:space="preserve">
+    <value>Tenant domain:</value>
   </data>
   <data name="FieldRequired" xml:space="preserve">
     <value>This field is mandatory.</value>
@@ -156,10 +156,16 @@
   <data name="VolumePathLabel" xml:space="preserve">
     <value>Volume mount path:</value>
   </data>
-  <data name="EntraExternalAudienceLabel" xml:space="preserve">
-    <value>Entra External ID Audience:</value>
+  <data name="ExternalDomainLabel" xml:space="preserve">
+    <value>External tenant domain:</value>
   </data>
-  <data name="EntraExternalAuthorityLabel" xml:space="preserve">
-    <value>Entra External ID Authority:</value>
+  <data name="ExternalTenantIdLabel" xml:space="preserve">
+    <value>External tenant ID:</value>
+  </data>
+  <data name="InvalidDomain" xml:space="preserve">
+    <value>The domain is invalid.</value>
+  </data>
+  <data name="InvalidGuid" xml:space="preserve">
+    <value>The GUID is invalid.</value>
   </data>
 </root>

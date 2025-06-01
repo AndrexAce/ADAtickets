@@ -126,11 +126,11 @@
   <data name="DbUserNameLabel" xml:space="preserve">
     <value>Nome utente base di dati:</value>
   </data>
-  <data name="EntraAuthorityLabel" xml:space="preserve">
-    <value>Authority Entra ID:</value>
+  <data name="TenantIdLabel" xml:space="preserve">
+    <value>ID tenant:</value>
   </data>
-  <data name="EntraAudienceLabel" xml:space="preserve">
-    <value>Audience Entra ID:</value>
+  <data name="DomainLabel" xml:space="preserve">
+    <value>Dominio tenant:</value>
   </data>
   <data name="FieldRequired" xml:space="preserve">
     <value>Questo campo è obbligatorio.</value>
@@ -156,10 +156,16 @@
   <data name="VolumePathLabel" xml:space="preserve">
     <value>Percorso montaggio volume:</value>
   </data>
-  <data name="EntraExternalAudienceLabel" xml:space="preserve">
-    <value>Audience Entra External ID:</value>
+  <data name="ExternalDomainLabel" xml:space="preserve">
+    <value>Dominio tenant esterno:</value>
   </data>
-  <data name="EntraExternalAuthorityLabel" xml:space="preserve">
-    <value>Authority Entra External ID:</value>
+  <data name="ExternalTenantIdLabel" xml:space="preserve">
+    <value>ID tenant esterno:</value>
+  </data>
+  <data name="InvalidDomain" xml:space="preserve">
+    <value>Il dominio non è valido.</value>
+  </data>
+  <data name="InvalidGuid" xml:space="preserve">
+    <value>Il GUID non è valido.</value>
   </data>
 </root>
