@@ -117,8 +117,8 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ApplicationVersionLabel" xml:space="preserve">
-    <value>Application version:</value>
+  <data name="ApiVersionLabel" xml:space="preserve">
+    <value>API version:</value>
   </data>
   <data name="DbPasswordLabel" xml:space="preserve">
     <value>Database password:</value>
@@ -167,5 +167,20 @@
   </data>
   <data name="InvalidGuid" xml:space="preserve">
     <value>The GUID is invalid.</value>
+  </data>
+  <data name="ClientIdLabel" xml:space="preserve">
+    <value>Client app ID:</value>
+  </data>
+  <data name="ExternalClientIdLabel" xml:space="preserve">
+    <value>External client app ID:</value>
+  </data>
+  <data name="ApiIdLabel" xml:space="preserve">
+    <value>API app ID:</value>
+  </data>
+  <data name="ExternalApiIdLabel" xml:space="preserve">
+    <value>External API app ID:</value>
+  </data>
+  <data name="WebVersionLabel" xml:space="preserve">
+    <value>App version:</value>
   </data>
 </root>

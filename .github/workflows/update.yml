@@ -21,14 +21,18 @@ jobs:
           git config user.name "Andrea Lucchese"
           git config user.email "andrylook14@gmail.com"
       
-      - name: Get version
-        run: echo "VERSION=v$(cat VERSION)" >> $GITHUB_ENV
+      - name: Get Installer version
+        run: echo "VERSION=v$(cat ADAtickets.Installer/VERSION)" >> $GITHUB_ENV
 
-      - name: Push tag
+      - name: Push tag if it doesn't already exist
         run: |
-          git tag ${{ env.VERSION }}
-          git remote set-url origin https://x-access-token:${{ secrets.PAT }}@github.com/${{ github.repository }}.git
-          git push origin ${{ env.VERSION }}
+          if ! git ls-remote --tags origin | grep -q "refs/tags/${{ env.VERSION }}$"; then
+            git tag ${{ env.VERSION }}
+            git remote set-url origin https://x-access-token:${{ secrets.PAT }}@github.com/${{ github.repository }}.git
+            git push origin ${{ env.VERSION }}
+          else
+            echo "Tag ${{ env.VERSION }} already exists. Skipping tag creation."
+          fi
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
@@ -36,11 +40,25 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.PAT }}
+      
+      - name: Get API version
+        run: echo "API_VERSION=v$(cat ADAtickets.ApiService/VERSION)" >> $GITHUB_ENV
 
-      - name: Build and push
+      - name: Build and push API
         uses: docker/build-push-action@v6
         with:
           build-args: BUILD_CONFIGURATION=Release
           context: ./ADAtickets.ApiService
           push: true
-          tags: adatickets-api:latest,adatickets-api:${{ env.VERSION }}
+          tags: adatickets-api:latest,adatickets-api:${{ env.API_VERSION }}
+
+      - name: Get Web version
+        run: echo "WEB_VERSION=v$(cat ADAtickets.Web/VERSION)" >> $GITHUB_ENV
+
+      - name: Build and push web app
+        uses: docker/build-push-action@v6
+        with:
+          build-args: BUILD_CONFIGURATION=Release
+          context: ./ADAtickets.Web
+          push: true
+          tags: adatickets-web:latest,adatickets-web:${{ env.WEB_VERSION }}

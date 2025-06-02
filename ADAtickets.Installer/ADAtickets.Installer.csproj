@@ -49,6 +49,9 @@
        <AutoGen>True</AutoGen>
        <DependentUpon>Resources.resx</DependentUpon>
      </Compile>
+     <Compile Update="Views\LastStep.axaml.cs">
+       <DependentUpon>LastStep.axaml</DependentUpon>
+     </Compile>
      <Compile Update="Views\ThirdStep.axaml.cs">
        <DependentUpon>ThirdStep.axaml</DependentUpon>
      </Compile>

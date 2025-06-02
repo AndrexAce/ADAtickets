@@ -61,11 +61,29 @@ namespace ADAtickets.Installer.Assets {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Application version:.
+        ///   Looks up a localized string similar to API app ID:.
         /// </summary>
-        public static string ApplicationVersionLabel {
+        public static string ApiIdLabel {
             get {
-                return ResourceManager.GetString("ApplicationVersionLabel", resourceCulture);
+                return ResourceManager.GetString("ApiIdLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to API version:.
+        /// </summary>
+        public static string ApiVersionLabel {
+            get {
+                return ResourceManager.GetString("ApiVersionLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Client app ID:.
+        /// </summary>
+        public static string ClientIdLabel {
+            get {
+                return ResourceManager.GetString("ClientIdLabel", resourceCulture);
             }
         }
         
@@ -93,6 +111,24 @@ namespace ADAtickets.Installer.Assets {
         public static string DomainLabel {
             get {
                 return ResourceManager.GetString("DomainLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to External API app ID:.
+        /// </summary>
+        public static string ExternalApiIdLabel {
+            get {
+                return ResourceManager.GetString("ExternalApiIdLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to External client app ID:.
+        /// </summary>
+        public static string ExternalClientIdLabel {
+            get {
+                return ResourceManager.GetString("ExternalClientIdLabel", resourceCulture);
             }
         }
         
@@ -210,6 +246,15 @@ namespace ADAtickets.Installer.Assets {
         public static string VolumePathLabel {
             get {
                 return ResourceManager.GetString("VolumePathLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to App version:.
+        /// </summary>
+        public static string WebVersionLabel {
+            get {
+                return ResourceManager.GetString("WebVersionLabel", resourceCulture);
             }
         }
     }

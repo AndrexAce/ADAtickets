@@ -17,7 +17,7 @@ services:
       - "5432:5432"
     volumes:
       - database-data:/var/lib/postgresql/data
-    
+
   adatickets.apiservice:
     container_name: Api
     depends_on:
@@ -28,7 +28,7 @@ services:
     ports:
       - "5194:8080"
       - "7214:8081"
-  
+
   adatickets.web:
     container_name: Web
     depends_on:
@@ -38,7 +38,7 @@ services:
       - network
     ports:
       - "44321:8081"
-    
+
 networks:
   network:
     driver: bridge

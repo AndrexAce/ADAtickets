@@ -5,8 +5,8 @@ services:
     container_name: Pgweb
     restart: always
     image: sosedoff/pgweb
-    ports: 
-      - "8082:8081" 
+    ports:
+      - "8082:8081"
     environment:
       - PGWEB_DATABASE_URL=postgres://${POSTGRESUSER:?error}:${POSTGRESPASSWORD:?error}@adatickets.postgresql:5432/adatickets?sslmode=disable
     depends_on:
@@ -19,7 +19,7 @@ services:
     build:
       context: .
       args:
-       - BUILD_CONFIGURATION=Debug
+        - BUILD_CONFIGURATION=Debug
       dockerfile: ADAtickets.ApiService/Dockerfile
       tags:
         - andrexace/adatickets-api:dev
@@ -35,16 +35,16 @@ services:
       # Entra configuration variables
       - Entra__Authority=https://login.microsoftonline.com/${TENANTID:?error}/v2.0/
       - Entra__Audience=api://${APIAPPID:?error}
-      - ExternalEntra__Authority=https://${EXTERNALTENANTNAME:?error}.ciamlogin.com/${EXTERNALTENANTID?:error}/v2.0/ 
+      - ExternalEntra__Authority=https://${EXTERNALTENANTNAME:?error}.ciamlogin.com/${EXTERNALTENANTID:?error}/v2.0/
       - ExternalEntra__Audience=api://${EXTERNALAPIAPPID:?error}
     volumes:
       - ${VOLUMEPATH:-~/.aspnet/https}:/https:ro
-  
+
   adatickets.web:
     build:
       context: .
       args:
-       - BUILD_CONFIGURATION=Debug
+        - BUILD_CONFIGURATION=Debug
       dockerfile: ADAtickets.Web/Dockerfile
       tags:
         - andrexace/adatickets-web:dev
@@ -69,10 +69,10 @@ services:
       - Entra__DownstreamApi__BaseUrl=https://localhost:7214
       - Entra__DownstreamApi__Scopes__0=api://${APIAPPID:?error}/Read
       - Entra__DownstreamApi__Scopes__1=api://${APIAPPID:?error}/ReadWrite
-      - ExternalEntra__Authority=https://${EXTERNALTENANTNAME?:error}.ciamlogin.com/${EXTERNALTENANTID?:error}/v2.0/ 
+      - ExternalEntra__Authority=https://${EXTERNALTENANTNAME:?error}.ciamlogin.com/${EXTERNALTENANTID:?error}/v2.0/
       - ExternalEntra__Audience=api://${EXTERNALAPIAPPID:?error}
       - ExternalEntra__CallbackPath=/signin-oidc-entra-external
-      - ExternalEntra__Instance=https://${EXTERNALTENANTNAME?:error}.ciamlogin.com
+      - ExternalEntra__Instance=https://${EXTERNALTENANTNAME:?error}.ciamlogin.com
       - ExternalEntra__ClientId=${EXTERNALCLIENTAPPID}
       - ExternalEntra__Domain=${EXTERNALTENANTNAME:?error}.onmicrosoft.com
       - ExternalEntra__TenantId=${EXTERNALTENANTID:?error}

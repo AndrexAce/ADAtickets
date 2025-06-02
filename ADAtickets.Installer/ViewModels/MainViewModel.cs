@@ -37,11 +37,16 @@ class MainViewModel : ReactiveObject
     private string? _sslPassword;
     private string? _sslPath;
     private string? _volumePath;
-    private string? _version;
+    private string? _apiVersion;
+    private string? _webVersion;
     private string? _tenantId;
     private string? _tenantDomain;
     private string? _externalTenantId;
     private string? _externalTenantDomain;
+    private string? _clientId;
+    private string? _apiId;
+    private string? _externalClientId;
+    private string? _externalApiId;
 
     public UserControl CurrentView
     {
@@ -97,10 +102,18 @@ class MainViewModel : ReactiveObject
 
     [Required(ErrorMessageResourceType = typeof(Assets.Resources),
               ErrorMessageResourceName = "FieldRequired")]
-    public string? Version
+    public string? ApiVersion
     {
-        get => _version;
-        set => this.RaiseAndSetIfChanged(ref _version, value);
+        get => _apiVersion;
+        set => this.RaiseAndSetIfChanged(ref _apiVersion, value);
+    }
+
+    [Required(ErrorMessageResourceType = typeof(Assets.Resources),
+              ErrorMessageResourceName = "FieldRequired")]
+    public string? WebVersion
+    {
+        get => _webVersion;
+        set => this.RaiseAndSetIfChanged(ref _webVersion, value);
     }
 
     [Required(ErrorMessageResourceType = typeof(Assets.Resources),
@@ -147,10 +160,55 @@ class MainViewModel : ReactiveObject
         set => this.RaiseAndSetIfChanged(ref _externalTenantDomain, value);
     }
 
+    [Required(ErrorMessageResourceType = typeof(Assets.Resources),
+              ErrorMessageResourceName = "FieldRequired")]
+    [RegularExpression(@"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+                     ErrorMessageResourceType = typeof(Assets.Resources),
+                     ErrorMessageResourceName = "InvalidGuid")]
+    public string? ClientId
+    {
+        get => _clientId;
+        set => this.RaiseAndSetIfChanged(ref _clientId, value);
+    }
+
+    [Required(ErrorMessageResourceType = typeof(Assets.Resources),
+              ErrorMessageResourceName = "FieldRequired")]
+    [RegularExpression(@"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+                     ErrorMessageResourceType = typeof(Assets.Resources),
+                     ErrorMessageResourceName = "InvalidGuid")]
+    public string? ApiId
+    {
+        get => _apiId;
+        set => this.RaiseAndSetIfChanged(ref _apiId, value);
+    }
+
+    [Required(ErrorMessageResourceType = typeof(Assets.Resources),
+              ErrorMessageResourceName = "FieldRequired")]
+    [RegularExpression(@"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+                     ErrorMessageResourceType = typeof(Assets.Resources),
+                     ErrorMessageResourceName = "InvalidGuid")]
+    public string? ExternalClientId
+    {
+        get => _externalClientId;
+        set => this.RaiseAndSetIfChanged(ref _externalClientId, value);
+    }
+
+    [Required(ErrorMessageResourceType = typeof(Assets.Resources),
+              ErrorMessageResourceName = "FieldRequired")]
+    [RegularExpression(@"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+                     ErrorMessageResourceType = typeof(Assets.Resources),
+                     ErrorMessageResourceName = "InvalidGuid")]
+    public string? ExternalApiId
+    {
+        get => _externalApiId;
+        set => this.RaiseAndSetIfChanged(ref _externalApiId, value);
+    }
+
     public static ICommand ExitAppCommand => ReactiveCommand.Create(ExitApp);
     public static ICommand ChangeThemeCommand => ReactiveCommand.Create(ChangeTheme);
     public ICommand GoToSecondStepCommand => ReactiveCommand.Create(GoToSecondStep);
     public ICommand GoToThirdStepCommand => ReactiveCommand.Create(GoToThirdStep);
+    public ICommand GoToLastStepCommand => ReactiveCommand.Create(GoToFinalStep);
 
     public MainViewModel()
     {
@@ -182,9 +240,22 @@ class MainViewModel : ReactiveObject
 
     private void GoToThirdStep()
     {
-        CurrentView = new ThirdStep { DataContext = this };
+        if (ValidateSecondStepDocker() && ValidateSecondStepAzure())
+        {
+            CurrentView = new ThirdStep { DataContext = this };
 
-        RepositionWindow();
+            RepositionWindow();
+        }
+    }
+
+    private void GoToFinalStep()
+    {
+        if (ValidateThirdStep())
+        {
+            CurrentView = new LastStep { DataContext = this };
+
+            RepositionWindow();
+        }
     }
 
     private static void RepositionWindow()
@@ -206,5 +277,77 @@ class MainViewModel : ReactiveObject
                 });
             }
         }
+    }
+
+    private bool ValidateSecondStepDocker()
+    {
+        var isValid = true;
+        var context = new ValidationContext(this)
+        {
+            MemberName = nameof(DbUserName)
+        };
+        isValid &= Validator.TryValidateProperty(DbUserName, context, []);
+
+        context.MemberName = nameof(DbPassword);
+        isValid &= Validator.TryValidateProperty(DbPassword, context, []);
+
+        context.MemberName = nameof(SslPassword);
+        isValid &= Validator.TryValidateProperty(SslPassword, context, []);
+
+        context.MemberName = nameof(SslPath);
+        isValid &= Validator.TryValidateProperty(SslPath, context, []);
+
+        context.MemberName = nameof(VolumePath);
+        isValid &= Validator.TryValidateProperty(VolumePath, context, []);
+
+        context.MemberName = nameof(ApiVersion);
+        isValid &= Validator.TryValidateProperty(ApiVersion, context, []);
+
+        context.MemberName = nameof(WebVersion);
+        isValid &= Validator.TryValidateProperty(WebVersion, context, []);
+
+        return isValid;
+    }
+
+    private bool ValidateSecondStepAzure()
+    {
+        var isValid = true;
+        var context = new ValidationContext(this)
+        {
+            MemberName = nameof(TenantId)
+        };
+        isValid &= Validator.TryValidateProperty(TenantId, context, []);
+
+        context.MemberName = nameof(TenantDomain);
+        isValid &= Validator.TryValidateProperty(TenantDomain, context, []);
+
+        context.MemberName = nameof(ExternalTenantId);
+        isValid &= Validator.TryValidateProperty(ExternalTenantId, context, []);
+
+        context.MemberName = nameof(ExternalTenantDomain);
+        isValid &= Validator.TryValidateProperty(ExternalTenantDomain, context, []);
+
+        return isValid;
+    }
+
+    private bool ValidateThirdStep()
+    {
+        var isValid = true;
+        var context = new ValidationContext(this)
+        {
+            MemberName = nameof(ClientId)
+        };
+        isValid &= Validator.TryValidateProperty(ClientId, context, []);
+
+        context.MemberName = nameof(ApiId);
+        isValid &= Validator.TryValidateProperty(ApiId, context, []);
+
+        context.MemberName = nameof(ExternalClientId);
+        isValid &= Validator.TryValidateProperty(ExternalClientId, context, []);
+
+        context.MemberName = nameof(ExternalApiId);
+        isValid &= Validator.TryValidateProperty(ExternalApiId, context, []);
+
+        return isValid;
     }
 }
