@@ -11,15 +11,19 @@ services:
         - andrexace/adatickets-api:${APITAG:-latest}
     image: andrexace/adatickets-api:${APITAG:-latest}
     environment:
+      # ASP.NET configuration variables
       - DOTNET_GENERATE_ASPNET_CERTIFICATE=false
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=https://+:8081;http://+:8080;
       - ASPNETCORE_Kestrel__Certificates__Default__Password=${CERTPASSWORD:?error}
       - ASPNETCORE_Kestrel__Certificates__Default__Path=${CERTPATH:?error}
-      - ENTRA__AUTHORITY=${ENTRA__AUTHORITY:?error}
-      - ENTRA__AUDIENCE=${ENTRA__AUDIENCE:?error}
-      - EXTERNALENTRA__AUTHORITY=${EXTERNALENTRA__AUTHORITY:?error}
-      - EXTERNALENTRA__AUDIENCE=${EXTERNALENTRA__AUDIENCE:?error}
+      # Database connection string
+      - ConnectionStrings__PostgreSQL=Host=localhost;Port=5432;Database=adatickets;Username=${POSTGRESUSER:?error};Password=${POSTGRESPASSWORD:?error}
+      # Entra configuration variables
+      - Entra__Authority=https://login.microsoftonline.com/${TENANTID:?error}/v2.0/
+      - Entra__Audience=api://${APIAPPID:?error}
+      - ExternalEntra__Authority=https://${EXTERNALTENANTNAME:?error}.ciamlogin.com/${EXTERNALTENANTID?:error}/v2.0/ 
+      - ExternalEntra__Audience=api://${EXTERNALAPIAPPID:?error}
     volumes:
       - ${VOLUMEPATH:?error}:/https:ro
 
@@ -27,27 +31,40 @@ services:
     build:
       context: .
       args:
-       - BUILD_CONFIGURATION=Debug
+       - BUILD_CONFIGURATION=Release
       dockerfile: ADAtickets.Web/Dockerfile
       tags:
         - andrexace/adatickets-web:${APITAG:-latest}
     image: andrexace/adatickets-web:${APITAG:-latest}
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      # ASP.NET configuration variables
+      - DOTNET_GENERATE_ASPNET_CERTIFICATE=false
+      - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=https://+:8081;http://+:8080;
       - ASPNETCORE_Kestrel__Certificates__Default__Password=${CERTPASSWORD:?error}
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=${CERTPATH:-/https/aspnetapp.pfx}
-      - ENTRA__CALLBACKPATH=/signin-oidc-entra
-      - EXTERNALENTRA__CALLBACKPATH=/signin-oidc-entra-external
-      - ENTRA__INSTANCE=https://login.microsoftonline.com
-      - ENTRA__RESPONSETYPE=code
-      - ENTRA__DOWNSTREAMAPI__BASEURL=https://localhost:7214
-      - ENTRA__CLIENTID=${ENTRA__CLIENTID:?error}
-      - ENTRA__DOMAIN=${ENTRA__DOMAIN:?error}
-      - ENTRA__TENANTID=${ENTRA__TENANTID:?error}
-      - ENTRA__CERTIFICATE__DISKPATH=${ENTRA__CERTIFICATE__DISKPATH:?error}
-      - ENTRA__CERTIFICATE__PASSWORD=${ENTRA__CERTIFICATE__PASSWORD:?error}
-      - ENTRA__DOWNSTREAMAPI__SCOPES__0=${ENTRA__DOWNSTREAMAPI__SCOPES__0:?error}
-      - ENTRA__DOWNSTREAMAPI__SCOPES__1=${ENTRA__DOWNSTREAMAPI__SCOPES__1:?error}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${CERTPATH:?error}
+      # Entra configuration variables
+      - Entra__Authority=https://login.microsoftonline.com/${TENANTID:?error}/v2.0/
+      - Entra__Audience=api://${APIAPPID:?error}
+      - Entra__CallbackPath=/signin-oidc-entra
+      - Entra__Instance=https://login.microsoftonline.com
+      - Entra__ResponseType=code
+      - Entra__ClientId=${CLIENTAPPID:?error}
+      - Entra__Domain=${TENANTNAME:?error}.onmicrosoft.com
+      - Entra__TenantId=${TENANTID:?error}
+      - Entra__Certificate__DiskPath=${CERTIFICATEDISKPATH:?error}
+      - Entra__Certificate__Password=${CERTIFICATEPASSWORD:?error}
+      - Entra__DownstreamApi__BaseUrl=https://localhost:7214
+      - Entra__DownstreamApi__Scopes__0=api://${APIAPPID:?error}/Read
+      - Entra__DownstreamApi__Scopes__1=api://${APIAPPID:?error}/ReadWrite
+      - ExternalEntra__Authority=https://${EXTERNALTENANTNAME?:error}.ciamlogin.com/${EXTERNALTENANTID?:error}/v2.0/ 
+      - ExternalEntra__Audience=api://${EXTERNALAPIAPPID:?error}
+      - ExternalEntra__CallbackPath=/signin-oidc-entra-external
+      - ExternalEntra__Instance=https://${EXTERNALTENANTNAME?:error}.ciamlogin.com
+      - ExternalEntra__ClientId=${EXTERNALCLIENTAPPID}
+      - ExternalEntra__Domain=${EXTERNALTENANTNAME:?error}.onmicrosoft.com
+      - ExternalEntra__TenantId=${EXTERNALTENANTID:?error}
+      - ExternalEntra__DownstreamApi__Scopes__0=api://${EXTERNALAPIAPPID:?error}/Read
+      - ExternalEntra__DownstreamApi__Scopes__1=api://${EXTERNALAPIAPPID:?error}/ReadWrite
     volumes:
-      - ${VOLUME_PATH:-~/.aspnet/https}:/https:ro
+      - ${VOLUMEPATH:-~/.aspnet/https}:/https:ro
