@@ -49,6 +49,7 @@ jobs:
         with:
           build-args: BUILD_CONFIGURATION=Release
           context: .
+          file: ADAtickets.ApiService/Dockerfile
           push: true
           tags: adatickets-api:latest,adatickets-api:${{ env.API_VERSION }}
 
@@ -60,5 +61,6 @@ jobs:
         with:
           build-args: BUILD_CONFIGURATION=Release
           context: .
+          file: ADAtickets.Web/Dockerfile
           push: true
           tags: adatickets-web:latest,adatickets-web:${{ env.WEB_VERSION }}
