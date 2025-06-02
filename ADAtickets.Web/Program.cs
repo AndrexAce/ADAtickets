@@ -67,7 +67,7 @@ namespace ADAtickets.Web
                         new CertificateDescription
                         {
                             SourceType = CertificateSource.Path,
-                            CertificateDiskPath = builder.Configuration.GetSection("Entra:Certificate:DiskPath").Value,
+                            CertificateDiskPath = builder.Configuration.GetSection("Entra:Certificate:Path").Value,
                             CertificatePassword = builder.Configuration.GetSection("Entra:CertificatePassword").Value
                         }
                     ];
@@ -94,7 +94,7 @@ namespace ADAtickets.Web
                         new CertificateDescription
                         {
                             SourceType = CertificateSource.Path,
-                            CertificateDiskPath = builder.Configuration.GetSection("Entra:Certificate:DiskPath").Value,
+                            CertificateDiskPath = builder.Configuration.GetSection("Entra:Certificate:Path").Value,
                             CertificatePassword = builder.Configuration.GetSection("Entra:Certificate:Password").Value
                         }
                     ];

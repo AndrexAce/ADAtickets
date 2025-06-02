@@ -29,7 +29,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 	</Design.DataContext>
 
 	<StackPanel Orientation="Vertical" Margin="20 20 20 20" Spacing="20" HorizontalAlignment="Stretch">
-		<TextBlock Text="Inserisci le seguenti informazioni per completare il setup."
+		<TextBlock Text="{x:Static assets:Resources.PleaseInsert}"
                    FontFamily="Segoe UI"
                    HorizontalAlignment="Center"/>
 		<StackPanel Orientation="Horizontal" Spacing="20" HorizontalAlignment="Stretch">
@@ -42,18 +42,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
 					<TextBlock Text="{x:Static assets:Resources.DbPasswordLabel}" FontFamily="Segoe UI"/>
 					<TextBox Text="{Binding DbPassword}" PasswordChar="•" Watermark="postgres" HorizontalAlignment="Stretch" Width="NaN"/>
-				</StackPanel>
-				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-					<TextBlock Text="{x:Static assets:Resources.SslPasswordLabel}" FontFamily="Segoe UI"/>
-					<TextBox Text="{Binding SslPassword}" PasswordChar="•" HorizontalAlignment="Stretch" Width="NaN"/>
-				</StackPanel>
-				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-					<TextBlock Text="{x:Static assets:Resources.SslPathLabel}" FontFamily="Segoe UI"/>
-					<TextBox Text="{Binding SslPath}" Watermark="/https/aspnetapp.pfx" HorizontalAlignment="Stretch" Width="NaN"/>
-				</StackPanel>
-				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-					<TextBlock Text="{x:Static assets:Resources.VolumePathLabel}" FontFamily="Segoe UI"/>
-					<TextBox Text="{Binding VolumePath}" Watermark="~/.aspnet/https" HorizontalAlignment="Stretch" Width="NaN"/>
 				</StackPanel>
 				<Grid ColumnDefinitions="*,*" HorizontalAlignment="Stretch" ColumnSpacing="20">
 					<StackPanel Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Stretch">
@@ -69,6 +57,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 						</ComboBox>
 					</StackPanel>
 				</Grid>
+				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+					<TextBlock Text="{x:Static assets:Resources.SslCertificatePathLabel}" FontFamily="Segoe UI"/>
+					<TextBox Text="{Binding SslCertificatePath}" Watermark="/path/to/certificate.pfx" HorizontalAlignment="Stretch" Width="NaN"/>
+				</StackPanel>
+				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+					<TextBlock Text="{x:Static assets:Resources.SslCertificatePasswordLabel}" FontFamily="Segoe UI"/>
+					<TextBox Text="{Binding SslCertificatePassword}" PasswordChar="•" HorizontalAlignment="Stretch" Width="NaN"/>
+				</StackPanel>
 			</UniformGrid>
 		</StackPanel>
 		<Separator/>

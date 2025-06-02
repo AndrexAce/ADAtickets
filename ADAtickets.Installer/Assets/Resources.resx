@@ -144,17 +144,17 @@
   <data name="Presentation" xml:space="preserve">
     <value>Before running this setup, read the instructions in the README file.</value>
   </data>
-  <data name="SslPasswordLabel" xml:space="preserve">
+  <data name="SslCertificatePasswordLabel" xml:space="preserve">
     <value>SSL certificate password:</value>
   </data>
-  <data name="SslPathLabel" xml:space="preserve">
-    <value>SSL certificate path:</value>
+  <data name="SslCertificatePathLabel" xml:space="preserve">
+    <value>SSL certificate path (local):</value>
   </data>
   <data name="Next" xml:space="preserve">
     <value>Next</value>
   </data>
   <data name="VolumePathLabel" xml:space="preserve">
-    <value>Volume mount path:</value>
+    <value>Volume mount path (local):</value>
   </data>
   <data name="ExternalDomainLabel" xml:space="preserve">
     <value>External tenant domain:</value>
@@ -182,5 +182,32 @@
   </data>
   <data name="WebVersionLabel" xml:space="preserve">
     <value>App version:</value>
+  </data>
+  <data name="AuthCertificatePathLabel" xml:space="preserve">
+    <value>Authentication certificate path (local):</value>
+  </data>
+  <data name="AuthCertificatePasswordLabel" xml:space="preserve">
+    <value>Authentication certificate password:</value>
+  </data>
+  <data name="PleaseInsert" xml:space="preserve">
+    <value>Insert the following information to continue with the setup.</value>
+  </data>
+  <data name="Installing" xml:space="preserve">
+    <value>Installing ADAtickets...</value>
+  </data>
+  <data name="EnvFileWriting" xml:space="preserve">
+    <value>Writing the environment file...</value>
+  </data>
+  <data name="ApiContainerPull" xml:space="preserve">
+    <value>Pulling API container...</value>
+  </data>
+  <data name="WebContainerPull" xml:space="preserve">
+    <value>Pulling web container...</value>
+  </data>
+  <data name="ComposeStartup" xml:space="preserve">
+    <value>Starting up containers with Compose...</value>
+  </data>
+  <data name="DbContainerPull" xml:space="preserve">
+    <value>Pulling database container...</value>
   </data>
 </root>

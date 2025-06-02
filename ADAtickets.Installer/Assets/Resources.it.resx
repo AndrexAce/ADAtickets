@@ -144,17 +144,17 @@
   <data name="Presentation" xml:space="preserve">
     <value>Prima di eseguire questo setup, leggi le istruzioni nel README.</value>
   </data>
-  <data name="SslPasswordLabel" xml:space="preserve">
+  <data name="SslCertificatePasswordLabel" xml:space="preserve">
     <value>Password certificato SSL:</value>
   </data>
-  <data name="SslPathLabel" xml:space="preserve">
-    <value>Percorso certificato SSL:</value>
+  <data name="SslCertificatePathLabel" xml:space="preserve">
+    <value>Percorso certificato SSL (locale):</value>
   </data>
   <data name="Next" xml:space="preserve">
     <value>Continua</value>
   </data>
   <data name="VolumePathLabel" xml:space="preserve">
-    <value>Percorso montaggio volume:</value>
+    <value>Percorso montaggio volume (locale):</value>
   </data>
   <data name="ExternalDomainLabel" xml:space="preserve">
     <value>Dominio tenant esterno:</value>
@@ -182,5 +182,32 @@
   </data>
   <data name="WebVersionLabel" xml:space="preserve">
     <value>Versione app:</value>
+  </data>
+  <data name="AuthCertificatePathLabel" xml:space="preserve">
+    <value>Percorso certificato autenticazione (locale):</value>
+  </data>
+  <data name="AuthCertificatePasswordLabel" xml:space="preserve">
+    <value>Password certificato autenticazione:</value>
+  </data>
+  <data name="PleaseInsert" xml:space="preserve">
+    <value>Inserisci le seguenti informazioni per completare il setup.</value>
+  </data>
+  <data name="Installing" xml:space="preserve">
+    <value>Installazione ADAtickets...</value>
+  </data>
+  <data name="EnvFileWriting" xml:space="preserve">
+    <value>Scrivendo il file di ambiente...</value>
+  </data>
+  <data name="ApiContainerPull" xml:space="preserve">
+    <value>Scaricando il container API...</value>
+  </data>
+  <data name="WebContainerPull" xml:space="preserve">
+    <value>Scaricando il container web...</value>
+  </data>
+  <data name="ComposeStartup" xml:space="preserve">
+    <value>Avviando i contenitori con Compose...</value>
+  </data>
+  <data name="DbContainerPull" xml:space="preserve">
+    <value>Scaricando il contenitore della base di dati...</value>
   </data>
 </root>

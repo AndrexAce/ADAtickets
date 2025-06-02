@@ -8,8 +8,8 @@ services:
       - DOTNET_GENERATE_ASPNET_CERTIFICATE=false
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=https://+:8081;http://+:8080;
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=${CERTPASSWORD:?error}
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=${CERTPATH:?error}
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${SSLCERTIFICATEPASSWORD:?error}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/${SSLCERTIFICATENAME:?error}
       # Database connection string
       - ConnectionStrings__PostgreSQL=Host=localhost;Port=5432;Database=adatickets;Username=${POSTGRESUSER:?error};Password=${POSTGRESPASSWORD:?error}
       # Entra configuration variables
@@ -18,7 +18,8 @@ services:
       - ExternalEntra__Authority=https://${EXTERNALTENANTNAME:?error}.ciamlogin.com/${EXTERNALTENANTID:?error}/v2.0/
       - ExternalEntra__Audience=api://${EXTERNALAPIAPPID:?error}
     volumes:
-      - ${VOLUMEPATH:?error}:/https:ro
+      - ${SSLCERTIFICATEDISKPATH:?error}:/https:ro
+      - ${AUTHCERTIFICATEDISKPATH:?error}:/certs:ro
 
   adatickets.web:
     image: ghcr.io/andrexace/adatickets-web:${CLIENTTAG:-latest}
@@ -27,8 +28,8 @@ services:
       - DOTNET_GENERATE_ASPNET_CERTIFICATE=false
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=https://+:8081;http://+:8080;
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=${CERTPASSWORD:?error}
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=${CERTPATH:?error}
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${SSLCERTIFICATEPASSWORD:?error}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/${SSLCERTIFICATENAME:?error}
       # Entra configuration variables
       - Entra__Authority=https://login.microsoftonline.com/${TENANTID:?error}/v2.0/
       - Entra__Audience=api://${APIAPPID:?error}
@@ -38,8 +39,8 @@ services:
       - Entra__ClientId=${CLIENTAPPID:?error}
       - Entra__Domain=${TENANTNAME:?error}.onmicrosoft.com
       - Entra__TenantId=${TENANTID:?error}
-      - Entra__Certificate__DiskPath=${CERTIFICATEDISKPATH:?error}
-      - Entra__Certificate__Password=${CERTIFICATEPASSWORD:?error}
+      - Entra__Certificate__Path=/certs/${AUTHCERTIFICATENAME:?error}
+      - Entra__Certificate__Password=${AUTHCERTIFICATEPASSWORD:?error}
       - Entra__DownstreamApi__BaseUrl=https://localhost:7214
       - Entra__DownstreamApi__Scopes__0=api://${APIAPPID:?error}/Read
       - Entra__DownstreamApi__Scopes__1=api://${APIAPPID:?error}/ReadWrite
@@ -53,4 +54,5 @@ services:
       - ExternalEntra__DownstreamApi__Scopes__0=api://${EXTERNALAPIAPPID:?error}/Read
       - ExternalEntra__DownstreamApi__Scopes__1=api://${EXTERNALAPIAPPID:?error}/ReadWrite
     volumes:
-      - ${VOLUMEPATH:-~/.aspnet/https}:/https:ro
+      - ${SSLCERTIFICATEDISKPATH:?error}:/https:ro
+      - ${AUTHCERTIFICATEDISKPATH:?error}:/certs:ro

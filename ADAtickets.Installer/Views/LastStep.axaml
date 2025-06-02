@@ -28,4 +28,33 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 		<vm:MainViewModel />
 	</Design.DataContext>
 
+	<Grid RowDefinitions="Auto,*,Auto" Margin="20">
+		<TextBlock Grid.Row="0"
+                   Text="{x:Static assets:Resources.Installing}"
+                   FontFamily="Segoe UI"
+                   HorizontalAlignment="Center"
+                   Margin="0,0,0,30"/>
+
+		<Panel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+			<Ellipse Width="100" Height="100" Stroke="{DynamicResource SystemAccentColor}" StrokeDashArray="1" StrokeThickness="5">
+				<Ellipse.Styles>
+					<Style Selector="Ellipse">
+						<Style.Animations>
+							<Animation Duration="0:0:10" IterationCount="Infinite">
+								<KeyFrame Cue="100%">
+									<Setter Property="RotateTransform.Angle" Value="360" />
+								</KeyFrame>
+							</Animation>
+						</Style.Animations>
+					</Style>
+				</Ellipse.Styles>
+			</Ellipse>
+		</Panel>
+
+		<TextBlock Grid.Row="2"
+                   Text="{Binding PhaseText}"
+				   FontFamily="Segoe UI"
+                   HorizontalAlignment="Center"
+                   Margin="0,30,0,0"/>
+	</Grid>
 </UserControl>

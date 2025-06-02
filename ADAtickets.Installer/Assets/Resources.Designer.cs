@@ -61,6 +61,15 @@ namespace ADAtickets.Installer.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Pulling API container....
+        /// </summary>
+        public static string ApiContainerPull {
+            get {
+                return ResourceManager.GetString("ApiContainerPull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to API app ID:.
         /// </summary>
         public static string ApiIdLabel {
@@ -79,11 +88,47 @@ namespace ADAtickets.Installer.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Authentication certificate password:.
+        /// </summary>
+        public static string AuthCertificatePasswordLabel {
+            get {
+                return ResourceManager.GetString("AuthCertificatePasswordLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Authentication certificate path (local):.
+        /// </summary>
+        public static string AuthCertificatePathLabel {
+            get {
+                return ResourceManager.GetString("AuthCertificatePathLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Client app ID:.
         /// </summary>
         public static string ClientIdLabel {
             get {
                 return ResourceManager.GetString("ClientIdLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Starting up containers with Compose....
+        /// </summary>
+        public static string ComposeStartup {
+            get {
+                return ResourceManager.GetString("ComposeStartup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pulling database container....
+        /// </summary>
+        public static string DbContainerPull {
+            get {
+                return ResourceManager.GetString("DbContainerPull", resourceCulture);
             }
         }
         
@@ -111,6 +156,15 @@ namespace ADAtickets.Installer.Assets {
         public static string DomainLabel {
             get {
                 return ResourceManager.GetString("DomainLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Writing the environment file....
+        /// </summary>
+        public static string EnvFileWriting {
+            get {
+                return ResourceManager.GetString("EnvFileWriting", resourceCulture);
             }
         }
         
@@ -169,6 +223,15 @@ namespace ADAtickets.Installer.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Installing ADAtickets....
+        /// </summary>
+        public static string Installing {
+            get {
+                return ResourceManager.GetString("Installing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The domain is invalid..
         /// </summary>
         public static string InvalidDomain {
@@ -205,6 +268,15 @@ namespace ADAtickets.Installer.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Insert the following information to continue with the setup..
+        /// </summary>
+        public static string PleaseInsert {
+            get {
+                return ResourceManager.GetString("PleaseInsert", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Before running this setup, read the instructions in the README file..
         /// </summary>
         public static string Presentation {
@@ -216,18 +288,18 @@ namespace ADAtickets.Installer.Assets {
         /// <summary>
         ///   Looks up a localized string similar to SSL certificate password:.
         /// </summary>
-        public static string SslPasswordLabel {
+        public static string SslCertificatePasswordLabel {
             get {
-                return ResourceManager.GetString("SslPasswordLabel", resourceCulture);
+                return ResourceManager.GetString("SslCertificatePasswordLabel", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SSL certificate path:.
+        ///   Looks up a localized string similar to SSL certificate path (local):.
         /// </summary>
-        public static string SslPathLabel {
+        public static string SslCertificatePathLabel {
             get {
-                return ResourceManager.GetString("SslPathLabel", resourceCulture);
+                return ResourceManager.GetString("SslCertificatePathLabel", resourceCulture);
             }
         }
         
@@ -241,11 +313,20 @@ namespace ADAtickets.Installer.Assets {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Volume mount path:.
+        ///   Looks up a localized string similar to Volume mount path (local):.
         /// </summary>
         public static string VolumePathLabel {
             get {
                 return ResourceManager.GetString("VolumePathLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pulling web container....
+        /// </summary>
+        public static string WebContainerPull {
+            get {
+                return ResourceManager.GetString("WebContainerPull", resourceCulture);
             }
         }
         

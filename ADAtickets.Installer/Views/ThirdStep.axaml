@@ -29,7 +29,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 	</Design.DataContext>
 
 	<StackPanel Orientation="Vertical" Margin="20 20 20 20" Spacing="20" HorizontalAlignment="Stretch">
-		<TextBlock Text="Inserisci le seguenti informazioni per completare il setup."
+		<TextBlock Text="{x:Static assets:Resources.PleaseInsert}"
                    FontFamily="Segoe UI"
                    HorizontalAlignment="Center"/>
 		<StackPanel Orientation="Horizontal" Spacing="20">
@@ -50,6 +50,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
 					<TextBlock Text="{x:Static assets:Resources.ExternalApiIdLabel}" FontFamily="Segoe UI"/>
 					<TextBox Text="{Binding ExternalApiId}" Watermark="00000000-0000-0000-0000-000000000000" HorizontalAlignment="Stretch" Width="NaN"/>
+				</StackPanel>
+				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+					<TextBlock Text="{x:Static assets:Resources.AuthCertificatePathLabel}" FontFamily="Segoe UI"/>
+					<TextBox Text="{Binding AuthCertificatePath}" Watermark="/path/to/certificate.pfx" HorizontalAlignment="Stretch" Width="NaN"/>
+				</StackPanel>
+				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+					<TextBlock Text="{x:Static assets:Resources.AuthCertificatePasswordLabel}" FontFamily="Segoe UI"/>
+					<TextBox Text="{Binding AuthCertificatePassword}" PasswordChar="•" HorizontalAlignment="Stretch" Width="NaN"/>
 				</StackPanel>
 			</UniformGrid>
 		</StackPanel>

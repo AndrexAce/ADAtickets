@@ -25,6 +25,7 @@ using Avalonia.Styling;
 using Avalonia.Threading;
 using ReactiveUI;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Windows.Input;
 
 namespace ADAtickets.Installer.ViewModels;
@@ -34,9 +35,8 @@ class MainViewModel : ReactiveObject
     private UserControl _currentView;
     private string? _dbUserName;
     private string? _dbPassword;
-    private string? _sslPassword;
-    private string? _sslPath;
-    private string? _volumePath;
+    private string? _sslCertificatePath;
+    private string? _sslCertificatePassword;
     private string? _apiVersion;
     private string? _webVersion;
     private string? _tenantId;
@@ -47,6 +47,9 @@ class MainViewModel : ReactiveObject
     private string? _apiId;
     private string? _externalClientId;
     private string? _externalApiId;
+    private string? _authCertificatePath;
+    private string? _authCertificatePassword;
+    private string _phaseText = "";
 
     public UserControl CurrentView
     {
@@ -72,32 +75,21 @@ class MainViewModel : ReactiveObject
 
     [Required(ErrorMessageResourceType = typeof(Assets.Resources),
               ErrorMessageResourceName = "FieldRequired")]
-    public string? SslPassword
+    [RegularExpression(@"^[a-zA-Z0-9\/\\_.~:-]+$",
+                     ErrorMessageResourceType = typeof(Assets.Resources),
+                     ErrorMessageResourceName = "InvalidPath")]
+    public string? SslCertificatePath
     {
-        get => _sslPassword;
-        set => this.RaiseAndSetIfChanged(ref _sslPassword, value);
+        get => _sslCertificatePath;
+        set => this.RaiseAndSetIfChanged(ref _sslCertificatePath, value);
     }
 
     [Required(ErrorMessageResourceType = typeof(Assets.Resources),
               ErrorMessageResourceName = "FieldRequired")]
-    [RegularExpression(@"^[a-zA-Z0-9\/\\_.~:-]+$",
-                     ErrorMessageResourceType = typeof(Assets.Resources),
-                     ErrorMessageResourceName = "InvalidPath")]
-    public string? SslPath
+    public string? SslCertificatePassword
     {
-        get => _sslPath;
-        set => this.RaiseAndSetIfChanged(ref _sslPath, value);
-    }
-
-    [Required(ErrorMessageResourceType = typeof(Assets.Resources),
-              ErrorMessageResourceName = "FieldRequired")]
-    [RegularExpression(@"^[a-zA-Z0-9\/\\_.~:-]+$",
-                     ErrorMessageResourceType = typeof(Assets.Resources),
-                     ErrorMessageResourceName = "InvalidPath")]
-    public string? VolumePath
-    {
-        get => _volumePath;
-        set => this.RaiseAndSetIfChanged(ref _volumePath, value);
+        get => _sslCertificatePassword;
+        set => this.RaiseAndSetIfChanged(ref _sslCertificatePassword, value);
     }
 
     [Required(ErrorMessageResourceType = typeof(Assets.Resources),
@@ -204,6 +196,31 @@ class MainViewModel : ReactiveObject
         set => this.RaiseAndSetIfChanged(ref _externalApiId, value);
     }
 
+    [Required(ErrorMessageResourceType = typeof(Assets.Resources),
+              ErrorMessageResourceName = "FieldRequired")]
+    [RegularExpression(@"^[a-zA-Z0-9\/\\_.~:-]+$",
+                     ErrorMessageResourceType = typeof(Assets.Resources),
+                     ErrorMessageResourceName = "InvalidPath")]
+    public string? AuthCertificatePath
+    {
+        get => _authCertificatePath;
+        set => this.RaiseAndSetIfChanged(ref _authCertificatePath, value);
+    }
+
+    [Required(ErrorMessageResourceType = typeof(Assets.Resources),
+              ErrorMessageResourceName = "FieldRequired")]
+    public string? AuthCertificatePassword
+    {
+        get => _authCertificatePassword;
+        set => this.RaiseAndSetIfChanged(ref _authCertificatePassword, value);
+    }
+
+    public string PhaseText
+    {
+        get => _phaseText;
+        set => this.RaiseAndSetIfChanged(ref _phaseText, value);
+    }
+
     public static ICommand ExitAppCommand => ReactiveCommand.Create(ExitApp);
     public static ICommand ChangeThemeCommand => ReactiveCommand.Create(ChangeTheme);
     public ICommand GoToSecondStepCommand => ReactiveCommand.Create(GoToSecondStep);
@@ -291,14 +308,12 @@ class MainViewModel : ReactiveObject
         context.MemberName = nameof(DbPassword);
         isValid &= Validator.TryValidateProperty(DbPassword, context, []);
 
-        context.MemberName = nameof(SslPassword);
-        isValid &= Validator.TryValidateProperty(SslPassword, context, []);
+        context.MemberName = nameof(SslCertificatePath);
+        isValid &= Validator.TryValidateProperty(SslCertificatePath, context, []);
+        isValid &= File.Exists(SslCertificatePath);
 
-        context.MemberName = nameof(SslPath);
-        isValid &= Validator.TryValidateProperty(SslPath, context, []);
-
-        context.MemberName = nameof(VolumePath);
-        isValid &= Validator.TryValidateProperty(VolumePath, context, []);
+        context.MemberName = nameof(SslCertificatePassword);
+        isValid &= Validator.TryValidateProperty(SslCertificatePassword, context, []);
 
         context.MemberName = nameof(ApiVersion);
         isValid &= Validator.TryValidateProperty(ApiVersion, context, []);
@@ -347,6 +362,13 @@ class MainViewModel : ReactiveObject
 
         context.MemberName = nameof(ExternalApiId);
         isValid &= Validator.TryValidateProperty(ExternalApiId, context, []);
+
+        context.MemberName = nameof(AuthCertificatePath);
+        isValid &= Validator.TryValidateProperty(AuthCertificatePassword, context, []);
+        isValid &= File.Exists(AuthCertificatePath);
+
+        context.MemberName = nameof(AuthCertificatePassword);
+        isValid &= Validator.TryValidateProperty(AuthCertificatePassword, context, []);
 
         return isValid;
     }
