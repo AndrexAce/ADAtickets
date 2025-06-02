@@ -87,7 +87,7 @@ namespace ADAtickets.Web
                     msIdentityOptions.ClientId = builder.Configuration.GetSection("ExternalEntra:ClientId").Value;
                     msIdentityOptions.Domain = builder.Configuration.GetSection("ExternalEntra:Domain").Value;
                     msIdentityOptions.Instance = builder.Configuration.GetSection("ExternalEntra:Instance").Value!;
-                    msIdentityOptions.ResponseType = builder.Configuration.GetSection("ExternalEntra:ResponseType").Value!;
+                    msIdentityOptions.ResponseType = builder.Configuration.GetSection("Entra:ResponseType").Value!;
                     msIdentityOptions.TenantId = builder.Configuration.GetSection("ExternalEntra:TenantId").Value;
                     msIdentityOptions.ClientCertificates =
                     [
@@ -102,7 +102,7 @@ namespace ADAtickets.Web
                 .EnableTokenAcquisitionToCallDownstreamApi()
                 .AddDownstreamApi("APIExternalEntra", configOptions =>
                 {
-                    configOptions.BaseUrl = builder.Configuration.GetSection("ExternalEntra:DownstreamApi:BaseUrl").Value;
+                    configOptions.BaseUrl = builder.Configuration.GetSection("Entra:DownstreamApi:BaseUrl").Value;
                     configOptions.Scopes = builder.Configuration.GetSection("ExternalEntra:DownstreamApi:Scopes").Get<string[]>()!;
                 })
                 .AddInMemoryTokenCaches();
