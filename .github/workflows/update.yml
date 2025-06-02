@@ -52,8 +52,8 @@ jobs:
           file: ADAtickets.ApiService/Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/adatickets-api:latest
-            ghcr.io/${{ github.repository_owner }}/adatickets-api:${{ env.API_VERSION }}
+            ghcr.io/andrexace/adatickets-api:latest
+            ghcr.io/andrexace/adatickets-api:${{ env.API_VERSION }}
 
       - name: Get Web version
         run: echo "WEB_VERSION=v$(cat ADAtickets.Web/VERSION)" >> $GITHUB_ENV
@@ -66,5 +66,5 @@ jobs:
           file: ADAtickets.Web/Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/adatickets-web:latest
-            ghcr.io/${{ github.repository_owner }}/adatickets-web:${{ env.WEB_VERSION }}
+            ghcr.io/andrexace/adatickets-web:latest
+            ghcr.io/andrexace/adatickets-web:${{ env.WEB_VERSION }}
