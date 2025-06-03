@@ -210,4 +210,13 @@
   <data name="DbContainerPull" xml:space="preserve">
     <value>Scaricando il contenitore della base di dati...</value>
   </data>
+  <data name="WaitingDocker" xml:space="preserve">
+    <value>Aspettando l'avvio di Docker...</value>
+  </data>
+  <data name="StillWaitingDocker" xml:space="preserve">
+    <value>Ancora aspettando l'avvio di Docker. L'hai avviato?</value>
+  </data>
+  <data name="CleaningTemp" xml:space="preserve">
+    <value>Ripulendo i file temporanei...</value>
+  </data>
 </root>

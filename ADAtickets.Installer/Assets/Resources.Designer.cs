@@ -106,6 +106,15 @@ namespace ADAtickets.Installer.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cleaning temporary files....
+        /// </summary>
+        public static string CleaningTemp {
+            get {
+                return ResourceManager.GetString("CleaningTemp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Client app ID:.
         /// </summary>
         public static string ClientIdLabel {
@@ -304,6 +313,15 @@ namespace ADAtickets.Installer.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Still waiting for Docker startup. Did you launch it?.
+        /// </summary>
+        public static string StillWaitingDocker {
+            get {
+                return ResourceManager.GetString("StillWaitingDocker", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Tenant ID:.
         /// </summary>
         public static string TenantIdLabel {
@@ -318,6 +336,15 @@ namespace ADAtickets.Installer.Assets {
         public static string VolumePathLabel {
             get {
                 return ResourceManager.GetString("VolumePathLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Waiting for Docker startup....
+        /// </summary>
+        public static string WaitingDocker {
+            get {
+                return ResourceManager.GetString("WaitingDocker", resourceCulture);
             }
         }
         

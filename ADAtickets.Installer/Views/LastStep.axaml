@@ -51,7 +51,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 			</Ellipse>
 		</Panel>
 
-		<TextBlock Grid.Row="2"
+		<ProgressBar Grid.Row="2" Minimum="0" Maximum="100" Foreground="{DynamicResource SystemAccentColor}" Value="{Binding ProgressBarValue}"/>
+		<TextBlock Grid.Row="3"
                    Text="{Binding PhaseText}"
 				   FontFamily="Segoe UI"
                    HorizontalAlignment="Center"

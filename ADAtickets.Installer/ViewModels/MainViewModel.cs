@@ -50,6 +50,7 @@ class MainViewModel : ReactiveObject
     private string? _authCertificatePath;
     private string? _authCertificatePassword;
     private string _phaseText = "";
+    private int progressBarValue = 0;
 
     public UserControl CurrentView
     {
@@ -219,6 +220,12 @@ class MainViewModel : ReactiveObject
     {
         get => _phaseText;
         set => this.RaiseAndSetIfChanged(ref _phaseText, value);
+    }
+
+    public int ProgressBarValue
+    {
+        get => progressBarValue;
+        set => this.RaiseAndSetIfChanged(ref progressBarValue, value);
     }
 
     public static ICommand ExitAppCommand => ReactiveCommand.Create(ExitApp);

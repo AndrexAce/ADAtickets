@@ -46,14 +46,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 				<Grid ColumnDefinitions="*,*" HorizontalAlignment="Stretch" ColumnSpacing="20">
 					<StackPanel Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Stretch">
 						<TextBlock Text="{x:Static assets:Resources.ApiVersionLabel}" FontFamily="Segoe UI"/>
-						<ComboBox SelectedIndex="0" SelectedValue="{Binding ApiVersion}" HorizontalAlignment="Stretch" Width="NaN">
-							<ComboBoxItem Content="v1.0.0"/>
+						<ComboBox SelectedItem="{Binding ApiVersion}" HorizontalAlignment="Stretch" Width="NaN">
+							<ComboBoxItem>v1.0.0</ComboBoxItem>
 						</ComboBox>
 					</StackPanel>
 					<StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Stretch">
 						<TextBlock Text="{x:Static assets:Resources.WebVersionLabel}" FontFamily="Segoe UI"/>
-						<ComboBox SelectedIndex="0" SelectedValue="{Binding WebVersion}" HorizontalAlignment="Stretch" Width="NaN">
-							<ComboBoxItem Content="v1.0.0"/>
+						<ComboBox SelectedItem="{Binding WebVersion}" HorizontalAlignment="Stretch" Width="NaN">
+							<ComboBoxItem>v1.0.0</ComboBoxItem>
 						</ComboBox>
 					</StackPanel>
 				</Grid>
