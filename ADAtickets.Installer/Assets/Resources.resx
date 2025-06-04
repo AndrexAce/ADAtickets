@@ -219,4 +219,10 @@
   <data name="CleaningTemp" xml:space="preserve">
     <value>Cleaning temporary files...</value>
   </data>
+  <data name="ErrorOccurred" xml:space="preserve">
+    <value>An error occurred while setting up:</value>
+  </data>
+  <data name="SetupCompleted" xml:space="preserve">
+    <value>Setup completed successfully.</value>
+  </data>
 </root>

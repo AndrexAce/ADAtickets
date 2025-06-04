@@ -28,6 +28,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ADAtickets.Installer.Views;
@@ -46,109 +47,140 @@ partial class LastStep : UserControl
         _ = ExecuteSetup();
     }
 
-    static private bool IsWindows() => Environment.OSVersion.Platform == PlatformID.Win32NT;
-
     private const string WINDOWS_DOCKERSERVER = "npipe://./pipe/docker_engine";
     private const string LINUX_DOCKERSERVER = "unix:///var/run/docker.sock";
+    private const string WINDOWS_DOCKEREXE = @"C:\Program Files\Docker\Docker\resources\bin\docker.exe";
+    private const string LINUX_DOCKEREXE = "/usr/bin/docker";
 
     private async Task ExecuteSetup()
     {
         // Get the ViewModel from DataContext
         if (DataContext is MainViewModel viewModel)
         {
-            viewModel.PhaseText = Assets.Resources.EnvFileWriting;
+            try
+            {
+                viewModel.PhaseText = Assets.Resources.EnvFileWriting;
 
-            var tempEnvPath = await Task.Run(() => WriteToEnvFileAsync(viewModel));
-            await Task.Delay(3000);
+                var tempPath = CreateRandomTempFolder();
 
-            viewModel.ProgressBarValue = 10;
+                await Task.Run(() => WriteToEnvFileAsync(viewModel, tempPath));
+                await Task.Delay(3000);
 
-            // Create a Docker client from the correct URI based on the OS
-            using DockerClient client = new DockerClientConfiguration(
-            IsWindows() ?
-                new Uri(WINDOWS_DOCKERSERVER) :
-                new Uri(LINUX_DOCKERSERVER)
-            ).CreateClient();
+                viewModel.ProgressBarValue = 10;
 
-            await Task.Run(() => PullDbContainerAsync(viewModel, client));
-            await Task.Delay(3000);
+                // Create a Docker client from the correct URI based on the OS
+                using DockerClient client = new DockerClientConfiguration(
+                OperatingSystem.IsWindows() ?
+                    new Uri(WINDOWS_DOCKERSERVER) :
+                    new Uri(LINUX_DOCKERSERVER)
+                ).CreateClient();
 
-            viewModel.ProgressBarValue = 30;
+                await Task.Run(() => PullDbContainerAsync(viewModel, client));
+                await Task.Delay(3000);
 
-            await Task.Run(() => PullAPIAsync(viewModel, client));
-            await Task.Delay(3000);
+                viewModel.ProgressBarValue = 30;
 
-            viewModel.ProgressBarValue = 50;
+                await Task.Run(() => PullAPIAsync(viewModel, client));
+                await Task.Delay(3000);
 
-            await Task.Run(() => PullWebAppAsync(viewModel, client));
-            await Task.Delay(3000);
+                viewModel.ProgressBarValue = 50;
 
-            viewModel.ProgressBarValue = 70;
+                await Task.Run(() => PullWebAppAsync(viewModel, client));
+                await Task.Delay(3000);
 
-            var tempComposePaths = await Task.Run(() => RunComposeAsync(viewModel, client));
-            await Task.Delay(3000);
+                viewModel.ProgressBarValue = 70;
 
-            viewModel.ProgressBarValue = 90;
+                await Task.Run(() => RunComposeAsync(viewModel, client, tempPath));
+                await Task.Delay(3000);
 
-            CleanTempFiles(viewModel, tempEnvPath, tempComposePaths);
-            await Task.Delay(3000);
+                viewModel.ProgressBarValue = 90;
 
-            viewModel.ProgressBarValue = 100;
+                CleanTempFiles(viewModel, tempPath);
+                await Task.Delay(3000);
+
+                viewModel.ProgressBarValue = 100;
+
+                viewModel.IsLoadingVisible = false;
+                viewModel.PhaseText = Assets.Resources.SetupCompleted;
+            }
+            catch (Exception e)
+            {
+                // Other unexpected errors
+                viewModel.IsLoadingVisible = false;
+                viewModel.PhaseText = Assets.Resources.ErrorOccurred + " " + e.GetType().ToString();
+            }
         }
     }
 
-    private static async Task<string> WriteToEnvFileAsync(MainViewModel viewModel)
+    private static string CreateRandomTempFolder()
+    {
+        // Create a temporary folder with a random name
+        string tempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+
+        if (OperatingSystem.IsWindows())
+        {
+            Directory.CreateDirectory(tempPath);
+        }
+        else
+        {
+            Directory.CreateDirectory(tempPath, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
+        }
+
+        return tempPath;
+    }
+
+    private static async Task WriteToEnvFileAsync(MainViewModel viewModel, string path)
     {
         // Get assembly containing the embedded resource
         var assembly = Assembly.GetExecutingAssembly();
-        string resourcePath = "ADAtickets.Installer.Assets.example.env";
+        string resourceAssemblyPath = "ADAtickets.Installer.Assets.example.env";
 
         // Read the template
-        using Stream? stream = assembly.GetManifestResourceStream(resourcePath) ??
-            throw new IOException($"Could not find embedded resource: {resourcePath}");
+        using Stream? stream = assembly.GetManifestResourceStream(resourceAssemblyPath) ??
+            throw new IOException($"Could not find embedded resource: {resourceAssemblyPath}");
         using StreamReader reader = new(stream);
         string templateContent = await reader.ReadToEndAsync();
 
         // Replace variables with ViewModel data
         // Database configuration
-        string fileContent = Regex.Replace(templateContent, "^POSTGRESUSER=.*$", $"POSTGRESUSER={viewModel.DbUserName}");
-        fileContent = Regex.Replace(fileContent, "^POSTGRESPASSWORD=.*$", $"POSTGRESPASSWORD={viewModel.DbPassword}");
+        string fileContent = Regex.Replace(templateContent, "^POSTGRESUSER=.*$", $"POSTGRESUSER={viewModel.DbUserName}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
+        fileContent = Regex.Replace(fileContent, "^POSTGRESPASSWORD=.*$", $"POSTGRESPASSWORD={viewModel.DbPassword}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
 
         // SSL certificate configuration
-        fileContent = Regex.Replace(fileContent, "^SSLCERTIFICATEDISKPATH=.*$", $"SSLCERTIFICATEDISKPATH={viewModel.SslCertificatePath}");
-        fileContent = Regex.Replace(fileContent, "^SSLCERTIFICATENAME=.*$", $"SSLCERTIFICATENAME={Path.GetFileName(viewModel.SslCertificatePath)}");
-        fileContent = Regex.Replace(fileContent, "^SSLCERTIFICATEPASSWORD=.*$", $"SSLCERTIFICATEPASSWORD={viewModel.SslCertificatePassword}");
+        fileContent = Regex.Replace(fileContent, "^SSLCERTIFICATEDISKPATH=.*$", $"SSLCERTIFICATEDISKPATH={Path.GetDirectoryName(viewModel.SslCertificatePath)}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
+        fileContent = Regex.Replace(fileContent, "^SSLCERTIFICATENAME=.*$", $"SSLCERTIFICATENAME={Path.GetFileName(viewModel.SslCertificatePath)}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
+        fileContent = Regex.Replace(fileContent, "^SSLCERTIFICATEPASSWORD=.*$", $"SSLCERTIFICATEPASSWORD={viewModel.SslCertificatePassword}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
 
         // App tag
-        fileContent = Regex.Replace(fileContent, "^APITAG=.*$", $"APITAG={viewModel.ApiVersion}");
-        fileContent = Regex.Replace(fileContent, "^CLIENTTAG=.*$", $"CLIENTTAG={viewModel.WebVersion}");
+        string? apiTag = await Dispatcher.UIThread.InvokeAsync(() => viewModel.ApiVersion?.Content?.ToString());
+        fileContent = Regex.Replace(fileContent, "^APITAG=.*$", $"APITAG={apiTag}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
+        string? webTag = await Dispatcher.UIThread.InvokeAsync(() => viewModel.WebVersion?.Content?.ToString());
+        fileContent = Regex.Replace(fileContent, "^CLIENTTAG=.*$", $"CLIENTTAG={webTag}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
 
         // Entra ID configuration (API)
-        fileContent = Regex.Replace(fileContent, "^TENANTID=.*$", $"TENANTID={viewModel.TenantId}");
-        fileContent = Regex.Replace(fileContent, "^APIAPPID=.*$", $"APIAPPID={viewModel.ApiId}");
+        fileContent = Regex.Replace(fileContent, "^TENANTID=.*$", $"TENANTID={viewModel.TenantId}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
+        fileContent = Regex.Replace(fileContent, "^APIAPPID=.*$", $"APIAPPID={viewModel.ApiId}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
 
         // External Entra ID configuration (API)
-        fileContent = Regex.Replace(fileContent, "^EXTERNALTENANTID=.*$", $"EXTERNALTENANTID={viewModel.ExternalTenantId}");
-        fileContent = Regex.Replace(fileContent, "^EXTERNALAPIAPPID=.*$", $"EXTERNALAPIAPPID={viewModel.ExternalApiId}");
+        fileContent = Regex.Replace(fileContent, "^EXTERNALTENANTID=.*$", $"EXTERNALTENANTID={viewModel.ExternalTenantId}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
+        fileContent = Regex.Replace(fileContent, "^EXTERNALAPIAPPID=.*$", $"EXTERNALAPIAPPID={viewModel.ExternalApiId}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
 
         // Entra ID configuration (web app)
-        fileContent = Regex.Replace(fileContent, "^CLIENTAPPID=.*$", $"CLIENTAPPID={viewModel.ClientId}");
-        fileContent = Regex.Replace(fileContent, "^TENANTNAME=.*$", $"TENANTNAME={viewModel.TenantDomain![..viewModel.TenantDomain!.IndexOf('.')]}");
+        fileContent = Regex.Replace(fileContent, "^CLIENTAPPID=.*$", $"CLIENTAPPID={viewModel.ClientId}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
+        fileContent = Regex.Replace(fileContent, "^TENANTNAME=.*$", $"TENANTNAME={viewModel.TenantDomain?[..viewModel.TenantDomain.IndexOf('.')]}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
 
         // External Entra ID configuration (web app)
-        fileContent = Regex.Replace(fileContent, "^EXTERNALCLIENTAPPID=.*$", $"EXTERNALCLIENTAPPID={viewModel.ExternalClientId}");
-        fileContent = Regex.Replace(fileContent, "^EXTERNALTENANTNAME=.*$", $"EXTERNALTENANTNAME={viewModel.ExternalTenantDomain![..viewModel.ExternalTenantDomain!.IndexOf('.')]}");
+        fileContent = Regex.Replace(fileContent, "^EXTERNALCLIENTAPPID=.*$", $"EXTERNALCLIENTAPPID={viewModel.ExternalClientId}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
+        fileContent = Regex.Replace(fileContent, "^EXTERNALTENANTNAME=.*$", $"EXTERNALTENANTNAME={viewModel.ExternalTenantDomain?[..viewModel.ExternalTenantDomain.IndexOf('.')]}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
 
         // Entra global configuration (web app)
-        fileContent = Regex.Replace(fileContent, "^AUTHCERTIFICATEDISKPATH=.*$", $"AUTHCERTIFICATEDISKPATH={viewModel.AuthCertificatePath}");
-        fileContent = Regex.Replace(fileContent, "^AUTHCERTIFICATENAME=.*$", $"AUTHCERTIFICATENAME={Path.GetFileName(viewModel.AuthCertificatePath)}");
-        fileContent = Regex.Replace(fileContent, "^AUTHCERTIFICATEPASSWORD=.*$", $"AUTHCERTIFICATEPASSWORD={viewModel.AuthCertificatePassword}");
+        fileContent = Regex.Replace(fileContent, "^AUTHCERTIFICATEDISKPATH=.*$", $"AUTHCERTIFICATEDISKPATH={Path.GetDirectoryName(viewModel.AuthCertificatePath)}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
+        fileContent = Regex.Replace(fileContent, "^AUTHCERTIFICATENAME=.*$", $"AUTHCERTIFICATENAME={Path.GetFileName(viewModel.AuthCertificatePath)}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
+        fileContent = Regex.Replace(fileContent, "^AUTHCERTIFICATEPASSWORD=.*$", $"AUTHCERTIFICATEPASSWORD={viewModel.AuthCertificatePassword}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
 
         // Write to temporary location
-        string tempEnvPath = Path.Combine(Path.GetTempPath(), ".env");
+        string tempEnvPath = Path.Combine(path, ".env");
         await File.WriteAllTextAsync(tempEnvPath, fileContent);
-
-        return tempEnvPath;
     }
 
     private static async Task PullDbContainerAsync(MainViewModel viewModel, DockerClient client)
@@ -167,7 +199,8 @@ partial class LastStep : UserControl
                         Tag = "latest"
                     },
                     null,
-                    new Progress<JSONMessage>()
+                    new Progress<JSONMessage>(),
+                    new CancellationTokenSource(TimeSpan.FromMinutes(3)).Token
                 );
 
                 return;
@@ -195,10 +228,11 @@ partial class LastStep : UserControl
                     new ImagesCreateParameters
                     {
                         FromImage = "ghcr.io/andrexace/adatickets-api",
-                        Tag = viewModel.ApiVersion
+                        Tag = await Dispatcher.UIThread.InvokeAsync(() => viewModel.ApiVersion?.Content?.ToString())
                     },
                     null,
-                    new Progress<JSONMessage>()
+                    new Progress<JSONMessage>(),
+                    new CancellationTokenSource(TimeSpan.FromMinutes(3)).Token
                 );
 
                 return;
@@ -226,10 +260,11 @@ partial class LastStep : UserControl
                     new ImagesCreateParameters
                     {
                         FromImage = "ghcr.io/andrexace/adatickets-web",
-                        Tag = viewModel.WebVersion
+                        Tag = await Dispatcher.UIThread.InvokeAsync(() => viewModel.WebVersion?.Content?.ToString())
                     },
                     null,
-                    new Progress<JSONMessage>()
+                    new Progress<JSONMessage>(),
+                    new CancellationTokenSource(TimeSpan.FromMinutes(3)).Token
                 );
 
                 return;
@@ -244,7 +279,7 @@ partial class LastStep : UserControl
         }
     }
 
-    private static async Task<(string, string)> RunComposeAsync(MainViewModel viewModel, DockerClient client)
+    private static async Task RunComposeAsync(MainViewModel viewModel, DockerClient client, string path)
     {
         while (true)
         {
@@ -254,45 +289,54 @@ partial class LastStep : UserControl
 
                 // Get assembly containing the embedded resource
                 var assembly = Assembly.GetExecutingAssembly();
-                string composePath = "ADAtickets.Installer.Assets.docker-compose.yml";
-                string overridePath = "ADAtickets.Installer.Assets.docker-compose.override-prod.yml";
+                string composeAssemblyPath = "ADAtickets.Installer.Assets.docker-compose.yml";
+                string overrideAssemblyPath = "ADAtickets.Installer.Assets.docker-compose.override-prod.yml";
 
                 // Read the template
-                using Stream? composeStream = assembly.GetManifestResourceStream(composePath) ??
-                    throw new IOException($"Could not find embedded resource: {composePath}");
+                using Stream? composeStream = assembly.GetManifestResourceStream(composeAssemblyPath) ??
+                    throw new IOException($"Could not find embedded resource: {composeAssemblyPath}");
                 using StreamReader composeReader = new(composeStream);
                 string composeContent = await composeReader.ReadToEndAsync();
 
-                using Stream? overrideStream = assembly.GetManifestResourceStream(overridePath) ??
-                    throw new IOException($"Could not find embedded resource: {overridePath}");
+                using Stream? overrideStream = assembly.GetManifestResourceStream(overrideAssemblyPath) ??
+                    throw new IOException($"Could not find embedded resource: {overrideAssemblyPath}");
                 using StreamReader reader = new(overrideStream);
                 string overrideContent = await reader.ReadToEndAsync();
 
                 // Write to temporary location
-                string tempComposePath = Path.Combine(Path.GetTempPath(), "docker-compose.yml");
+                string tempComposePath = Path.Combine(path, "docker-compose.yml");
                 await File.WriteAllTextAsync(tempComposePath, composeContent);
 
-                string tempOverridePath = Path.Combine(Path.GetTempPath(), "docker-compose.override-prod.yml");
+                string tempOverridePath = Path.Combine(path, "docker-compose.override-prod.yml");
                 await File.WriteAllTextAsync(tempOverridePath, overrideContent);
+
+                // Find the Docker executable in the known paths
+                var dockerExePath = OperatingSystem.IsWindows() ? WINDOWS_DOCKEREXE : LINUX_DOCKEREXE;
 
                 // Run the docker-compose command
                 var process = new Process
                 {
                     StartInfo = new ProcessStartInfo
                     {
-                        FileName = "docker",
+                        FileName = dockerExePath,
                         Arguments = "compose -f docker-compose.yml -f docker-compose.override-prod.yml up -d",
                         RedirectStandardOutput = true,
                         RedirectStandardError = true,
                         UseShellExecute = false,
-                        CreateNoWindow = false,
-                        WorkingDirectory = Path.GetTempPath()
+                        CreateNoWindow = true,
+                        WorkingDirectory = path
                     }
                 };
                 process.Start();
+
                 await process.WaitForExitAsync();
 
-                return (tempComposePath, tempOverridePath);
+                if (process.ExitCode != 0)
+                {
+                    throw new InvalidOperationException(await process.StandardError.ReadToEndAsync());
+                }
+
+                return;
             }
             catch (TimeoutException)
             {
@@ -325,24 +369,13 @@ partial class LastStep : UserControl
         }
     }
 
-    private static void CleanTempFiles(MainViewModel viewModel, string tempEnvPath, (string, string) tempComposePaths)
+    private static void CleanTempFiles(MainViewModel viewModel, string tempPath)
     {
         viewModel.PhaseText = $"{Assets.Resources.CleaningTemp}";
 
-        // Delete the temporary .env file
-        if (File.Exists(tempEnvPath))
+        if (Directory.Exists(tempPath))
         {
-            File.Delete(tempEnvPath);
-        }
-
-        // Delete the temporary docker-compose files
-        if (File.Exists(tempComposePaths.Item1))
-        {
-            File.Delete(tempComposePaths.Item1);
-        }
-        if (File.Exists(tempComposePaths.Item2))
-        {
-            File.Delete(tempComposePaths.Item2);
+            Directory.Delete(tempPath, true);
         }
     }
 }

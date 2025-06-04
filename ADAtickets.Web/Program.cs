@@ -67,8 +67,8 @@ namespace ADAtickets.Web
                         new CertificateDescription
                         {
                             SourceType = CertificateSource.Path,
-                            CertificateDiskPath = builder.Configuration.GetSection("Entra:Certificate:Path").Value,
-                            CertificatePassword = builder.Configuration.GetSection("Entra:CertificatePassword").Value
+                            CertificateDiskPath = builder.Configuration.GetSection("Entra:Certificate:DiskPath").Value,
+                            CertificatePassword = builder.Configuration.GetSection("Entra:Certificate:Password").Value
                         }
                     ];
                 }, openIdConnectScheme: "Entra", cookieScheme: "EntraCookies")
@@ -94,7 +94,7 @@ namespace ADAtickets.Web
                         new CertificateDescription
                         {
                             SourceType = CertificateSource.Path,
-                            CertificateDiskPath = builder.Configuration.GetSection("Entra:Certificate:Path").Value,
+                            CertificateDiskPath = builder.Configuration.GetSection("Entra:Certificate:DiskPath").Value,
                             CertificatePassword = builder.Configuration.GetSection("Entra:Certificate:Password").Value
                         }
                     ];

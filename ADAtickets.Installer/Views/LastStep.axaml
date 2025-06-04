@@ -36,7 +36,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                    Margin="0,0,0,30"/>
 
 		<Panel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
-			<Ellipse Width="100" Height="100" Stroke="{DynamicResource SystemAccentColor}" StrokeDashArray="1" StrokeThickness="5">
+			<Ellipse Width="100" Height="100" Stroke="{DynamicResource SystemAccentColor}" StrokeDashArray="1" StrokeThickness="5" IsVisible="{Binding IsLoadingVisible}">
 				<Ellipse.Styles>
 					<Style Selector="Ellipse">
 						<Style.Animations>

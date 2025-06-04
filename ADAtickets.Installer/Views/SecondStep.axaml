@@ -47,13 +47,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 					<StackPanel Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Stretch">
 						<TextBlock Text="{x:Static assets:Resources.ApiVersionLabel}" FontFamily="Segoe UI"/>
 						<ComboBox SelectedItem="{Binding ApiVersion}" HorizontalAlignment="Stretch" Width="NaN">
-							<ComboBoxItem>v1.0.0</ComboBoxItem>
+							<ComboBoxItem Content="v1.0.0"/>
 						</ComboBox>
 					</StackPanel>
 					<StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Stretch">
 						<TextBlock Text="{x:Static assets:Resources.WebVersionLabel}" FontFamily="Segoe UI"/>
 						<ComboBox SelectedItem="{Binding WebVersion}" HorizontalAlignment="Stretch" Width="NaN">
-							<ComboBoxItem>v1.0.0</ComboBoxItem>
+							<ComboBoxItem Content="v1.0.0"/>
 						</ComboBox>
 					</StackPanel>
 				</Grid>

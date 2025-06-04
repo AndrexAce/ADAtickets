@@ -219,4 +219,10 @@
   <data name="CleaningTemp" xml:space="preserve">
     <value>Ripulendo i file temporanei...</value>
   </data>
+  <data name="ErrorOccurred" xml:space="preserve">
+    <value>Si è verificato un errore durante il setup:</value>
+  </data>
+  <data name="SetupCompleted" xml:space="preserve">
+    <value>Setup completato con successo.</value>
+  </data>
 </root>

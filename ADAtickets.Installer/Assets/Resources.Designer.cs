@@ -178,6 +178,15 @@ namespace ADAtickets.Installer.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An error occurred while setting up:.
+        /// </summary>
+        public static string ErrorOccurred {
+            get {
+                return ResourceManager.GetString("ErrorOccurred", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to External API app ID:.
         /// </summary>
         public static string ExternalApiIdLabel {
@@ -291,6 +300,15 @@ namespace ADAtickets.Installer.Assets {
         public static string Presentation {
             get {
                 return ResourceManager.GetString("Presentation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Setup completed successfully..
+        /// </summary>
+        public static string SetupCompleted {
+            get {
+                return ResourceManager.GetString("SetupCompleted", resourceCulture);
             }
         }
         

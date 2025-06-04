@@ -37,8 +37,8 @@ class MainViewModel : ReactiveObject
     private string? _dbPassword;
     private string? _sslCertificatePath;
     private string? _sslCertificatePassword;
-    private string? _apiVersion;
-    private string? _webVersion;
+    private ComboBoxItem? _apiVersion;
+    private ComboBoxItem? _webVersion;
     private string? _tenantId;
     private string? _tenantDomain;
     private string? _externalTenantId;
@@ -50,7 +50,8 @@ class MainViewModel : ReactiveObject
     private string? _authCertificatePath;
     private string? _authCertificatePassword;
     private string _phaseText = "";
-    private int progressBarValue = 0;
+    private int _progressBarValue = 0;
+    private bool _isLoadingVisible = true;
 
     public UserControl CurrentView
     {
@@ -95,7 +96,7 @@ class MainViewModel : ReactiveObject
 
     [Required(ErrorMessageResourceType = typeof(Assets.Resources),
               ErrorMessageResourceName = "FieldRequired")]
-    public string? ApiVersion
+    public ComboBoxItem? ApiVersion
     {
         get => _apiVersion;
         set => this.RaiseAndSetIfChanged(ref _apiVersion, value);
@@ -103,7 +104,7 @@ class MainViewModel : ReactiveObject
 
     [Required(ErrorMessageResourceType = typeof(Assets.Resources),
               ErrorMessageResourceName = "FieldRequired")]
-    public string? WebVersion
+    public ComboBoxItem? WebVersion
     {
         get => _webVersion;
         set => this.RaiseAndSetIfChanged(ref _webVersion, value);
@@ -224,8 +225,14 @@ class MainViewModel : ReactiveObject
 
     public int ProgressBarValue
     {
-        get => progressBarValue;
-        set => this.RaiseAndSetIfChanged(ref progressBarValue, value);
+        get => _progressBarValue;
+        set => this.RaiseAndSetIfChanged(ref _progressBarValue, value);
+    }
+
+    public bool IsLoadingVisible
+    {
+        get => _isLoadingVisible;
+        set => this.RaiseAndSetIfChanged(ref _isLoadingVisible, value);
     }
 
     public static ICommand ExitAppCommand => ReactiveCommand.Create(ExitApp);
