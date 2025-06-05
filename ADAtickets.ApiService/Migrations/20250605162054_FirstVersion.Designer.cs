@@ -13,15 +13,15 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ADAtickets.ApiService.Migrations
 {
     [DbContext(typeof(ADAticketsDbContext))]
-    [Migration("20250427161211_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250605162054_FirstVersion")]
+    partial class FirstVersion
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.4")
+                .HasAnnotation("ProductVersion", "9.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "priority", new[] { "high", "low", "medium" });
@@ -32,7 +32,13 @@ namespace ADAtickets.ApiService.Migrations
 
             modelBuilder.Entity("ADAtickets.ApiService.Models.Attachment", b =>
                 {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
                     b.Property<string>("Path")
+                        .IsRequired()
                         .HasMaxLength(4000)
                         .HasColumnType("character varying(4000)")
                         .HasColumnName("path");
@@ -41,11 +47,21 @@ namespace ADAtickets.ApiService.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("ticket_id");
 
-                    b.HasKey("Path", "TicketId")
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id")
                         .HasName("pk_attachments");
 
                     b.HasIndex("TicketId")
                         .HasDatabaseName("ix_attachments_ticket_id");
+
+                    b.HasIndex("Path", "TicketId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_attachments_path_ticket_id");
 
                     b.ToTable("attachments", (string)null);
                 });
@@ -79,11 +95,15 @@ namespace ADAtickets.ApiService.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("ticket_id");
 
-                    b.Property<string>("UserEmail")
-                        .IsRequired()
-                        .HasMaxLength(254)
-                        .HasColumnType("character varying(254)")
-                        .HasColumnName("user_email");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
                     b.HasKey("Id")
                         .HasName("pk_edits");
@@ -91,8 +111,8 @@ namespace ADAtickets.ApiService.Migrations
                     b.HasIndex("TicketId")
                         .HasDatabaseName("ix_edits_ticket_id");
 
-                    b.HasIndex("UserEmail")
-                        .HasDatabaseName("ix_edits_user_email");
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_edits_user_id");
 
                     b.ToTable("edits", (string)null);
                 });
@@ -114,15 +134,23 @@ namespace ADAtickets.ApiService.Migrations
                         .HasColumnType("character varying(200)")
                         .HasColumnName("message");
 
+                    b.Property<DateTimeOffset>("SendDateTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("send_date_time");
+
                     b.Property<Guid>("TicketId")
                         .HasColumnType("uuid")
                         .HasColumnName("ticket_id");
 
-                    b.Property<string>("UserEmail")
-                        .IsRequired()
-                        .HasMaxLength(254)
-                        .HasColumnType("character varying(254)")
-                        .HasColumnName("user_email");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
                     b.HasKey("Id")
                         .HasName("pk_notifications");
@@ -130,15 +158,21 @@ namespace ADAtickets.ApiService.Migrations
                     b.HasIndex("TicketId")
                         .HasDatabaseName("ix_notifications_ticket_id");
 
-                    b.HasIndex("UserEmail")
-                        .HasDatabaseName("ix_notifications_user_email");
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_notifications_user_id");
 
                     b.ToTable("notifications", (string)null);
                 });
 
             modelBuilder.Entity("ADAtickets.ApiService.Models.Platform", b =>
                 {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasMaxLength(254)
                         .HasColumnType("character varying(254)")
                         .HasColumnName("name");
@@ -149,8 +183,18 @@ namespace ADAtickets.ApiService.Migrations
                         .HasColumnType("character varying(4000)")
                         .HasColumnName("repository_url");
 
-                    b.HasKey("Name")
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id")
                         .HasName("pk_platforms");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("ix_platforms_name");
 
                     b.HasIndex("RepositoryUrl")
                         .IsUnique()
@@ -166,11 +210,9 @@ namespace ADAtickets.ApiService.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<string>("AuthorUserEmail")
-                        .IsRequired()
-                        .HasMaxLength(254)
-                        .HasColumnType("character varying(254)")
-                        .HasColumnName("author_user_email");
+                    b.Property<Guid>("AuthorUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("author_user_id");
 
                     b.Property<string>("Message")
                         .IsRequired()
@@ -186,11 +228,17 @@ namespace ADAtickets.ApiService.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("ticket_id");
 
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.HasKey("Id")
                         .HasName("pk_replies");
 
-                    b.HasIndex("AuthorUserEmail")
-                        .HasDatabaseName("ix_replies_author_user_email");
+                    b.HasIndex("AuthorUserId")
+                        .HasDatabaseName("ix_replies_author_user_id");
 
                     b.HasIndex("TicketId")
                         .HasDatabaseName("ix_replies_ticket_id");
@@ -205,11 +253,13 @@ namespace ADAtickets.ApiService.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<string>("CreatorUserEmail")
-                        .IsRequired()
-                        .HasMaxLength(254)
-                        .HasColumnType("character varying(254)")
-                        .HasColumnName("creator_user_email");
+                    b.Property<DateTimeOffset>("CreationDateTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("creation_date_time");
+
+                    b.Property<Guid>("CreatorUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("creator_user_id");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -217,16 +267,13 @@ namespace ADAtickets.ApiService.Migrations
                         .HasColumnType("character varying(5000)")
                         .HasColumnName("description");
 
-                    b.Property<string>("OperatorUserEmail")
-                        .HasMaxLength(254)
-                        .HasColumnType("character varying(254)")
-                        .HasColumnName("operator_user_email");
+                    b.Property<Guid?>("OperatorUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("operator_user_id");
 
-                    b.Property<string>("PlatformName")
-                        .IsRequired()
-                        .HasMaxLength(4000)
-                        .HasColumnType("character varying(4000)")
-                        .HasColumnName("platform_name");
+                    b.Property<Guid>("PlatformId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("platform_id");
 
                     b.Property<Priority>("Priority")
                         .HasColumnType("priority")
@@ -246,6 +293,12 @@ namespace ADAtickets.ApiService.Migrations
                         .HasColumnType("ticket_type")
                         .HasColumnName("type");
 
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.Property<int>("WorkItemId")
                         .HasColumnType("integer")
                         .HasColumnName("work_item_id");
@@ -253,24 +306,24 @@ namespace ADAtickets.ApiService.Migrations
                     b.HasKey("Id")
                         .HasName("pk_tickets");
 
-                    b.HasIndex("CreatorUserEmail")
-                        .HasDatabaseName("ix_tickets_creator_user_email");
+                    b.HasIndex("CreatorUserId")
+                        .HasDatabaseName("ix_tickets_creator_user_id");
 
-                    b.HasIndex("OperatorUserEmail")
-                        .HasDatabaseName("ix_tickets_operator_user_email");
+                    b.HasIndex("OperatorUserId")
+                        .HasDatabaseName("ix_tickets_operator_user_id");
 
-                    b.HasIndex("PlatformName")
-                        .HasDatabaseName("ix_tickets_platform_name");
+                    b.HasIndex("PlatformId")
+                        .HasDatabaseName("ix_tickets_platform_id");
 
                     b.ToTable("tickets", (string)null);
                 });
 
             modelBuilder.Entity("ADAtickets.ApiService.Models.User", b =>
                 {
-                    b.Property<string>("Email")
-                        .HasMaxLength(254)
-                        .HasColumnType("character varying(254)")
-                        .HasColumnName("email");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<bool>("AreEmailNotificationsEnabled")
                         .HasColumnType("boolean")
@@ -279,14 +332,6 @@ namespace ADAtickets.ApiService.Migrations
                     b.Property<bool>("ArePhoneNotificationsEnabled")
                         .HasColumnType("boolean")
                         .HasColumnName("are_phone_notifications_enabled");
-
-                    b.Property<bool>("IsEmail2FAEnabled")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_email2fa_enabled");
-
-                    b.Property<bool>("IsPhone2FAEnabled")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_phone2fa_enabled");
 
                     b.Property<string>("MicrosoftAccountId")
                         .HasMaxLength(20)
@@ -299,17 +344,6 @@ namespace ADAtickets.ApiService.Migrations
                         .HasColumnType("character varying(50)")
                         .HasColumnName("name");
 
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
-                        .HasColumnName("password");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("phone_number");
-
                     b.Property<string>("Surname")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -320,7 +354,13 @@ namespace ADAtickets.ApiService.Migrations
                         .HasColumnType("user_type")
                         .HasColumnName("type");
 
-                    b.HasKey("Email")
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id")
                         .HasName("pk_users");
 
                     b.ToTable("users", (string)null);
@@ -328,16 +368,21 @@ namespace ADAtickets.ApiService.Migrations
 
             modelBuilder.Entity("ADAtickets.ApiService.Models.UserNotification", b =>
                 {
-                    b.Property<string>("ReceiverUserEmail")
-                        .HasMaxLength(254)
-                        .HasColumnType("character varying(254)")
-                        .HasColumnName("receiver_user_email");
+                    b.Property<Guid>("ReceiverUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("receiver_user_id");
 
                     b.Property<Guid>("NotificationId")
                         .HasColumnType("uuid")
                         .HasColumnName("notification_id");
 
-                    b.HasKey("ReceiverUserEmail", "NotificationId")
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("ReceiverUserId", "NotificationId")
                         .HasName("pk_user_notifications");
 
                     b.HasIndex("NotificationId")
@@ -348,23 +393,60 @@ namespace ADAtickets.ApiService.Migrations
 
             modelBuilder.Entity("ADAtickets.ApiService.Models.UserPlatform", b =>
                 {
-                    b.Property<string>("UserEmail")
-                        .HasMaxLength(254)
-                        .HasColumnType("character varying(254)")
-                        .HasColumnName("user_email");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
 
-                    b.Property<string>("PlatformName")
+                    b.Property<Guid>("PlatformId")
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("platform_name");
+                        .HasColumnType("uuid")
+                        .HasColumnName("platform_id");
 
-                    b.HasKey("UserEmail", "PlatformName")
+                    b.HasKey("UserId", "PlatformId")
                         .HasName("pk_user_platforms");
 
-                    b.HasIndex("PlatformName")
-                        .HasDatabaseName("ix_user_platforms_platform_name");
+                    b.HasIndex("PlatformId")
+                        .HasDatabaseName("ix_user_platforms_platform_id");
 
                     b.ToTable("user_platforms", (string)null);
+                });
+
+            modelBuilder.Entity("NotificationUser", b =>
+                {
+                    b.Property<Guid>("ReceivedNotificationsId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("received_notifications_id");
+
+                    b.Property<Guid>("RecipientsId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("recipients_id");
+
+                    b.HasKey("ReceivedNotificationsId", "RecipientsId")
+                        .HasName("pk_notification_user");
+
+                    b.HasIndex("RecipientsId")
+                        .HasDatabaseName("ix_notification_user_recipients_id");
+
+                    b.ToTable("notification_user", (string)null);
+                });
+
+            modelBuilder.Entity("PlatformUser", b =>
+                {
+                    b.Property<Guid>("PreferredPlatformsId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("preferred_platforms_id");
+
+                    b.Property<Guid>("UsersPreferredId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("users_preferred_id");
+
+                    b.HasKey("PreferredPlatformsId", "UsersPreferredId")
+                        .HasName("pk_platform_user");
+
+                    b.HasIndex("UsersPreferredId")
+                        .HasDatabaseName("ix_platform_user_users_preferred_id");
+
+                    b.ToTable("platform_user", (string)null);
                 });
 
             modelBuilder.Entity("ADAtickets.ApiService.Models.Attachment", b =>
@@ -390,10 +472,10 @@ namespace ADAtickets.ApiService.Migrations
 
                     b.HasOne("ADAtickets.ApiService.Models.User", "User")
                         .WithMany("Edits")
-                        .HasForeignKey("UserEmail")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_edits_users_user_email");
+                        .HasConstraintName("fk_edits_users_user_id");
 
                     b.Navigation("Ticket");
 
@@ -411,10 +493,10 @@ namespace ADAtickets.ApiService.Migrations
 
                     b.HasOne("ADAtickets.ApiService.Models.User", "User")
                         .WithMany("SentNotifications")
-                        .HasForeignKey("UserEmail")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_notifications_users_user_email");
+                        .HasConstraintName("fk_notifications_users_user_id");
 
                     b.Navigation("Ticket");
 
@@ -425,10 +507,10 @@ namespace ADAtickets.ApiService.Migrations
                 {
                     b.HasOne("ADAtickets.ApiService.Models.User", "AuthorUser")
                         .WithMany("Replies")
-                        .HasForeignKey("AuthorUserEmail")
+                        .HasForeignKey("AuthorUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_replies_users_author_user_email");
+                        .HasConstraintName("fk_replies_users_author_user_id");
 
                     b.HasOne("ADAtickets.ApiService.Models.Ticket", "Ticket")
                         .WithMany("Replies")
@@ -446,22 +528,22 @@ namespace ADAtickets.ApiService.Migrations
                 {
                     b.HasOne("ADAtickets.ApiService.Models.User", "CreatorUser")
                         .WithMany("CreatedTickets")
-                        .HasForeignKey("CreatorUserEmail")
+                        .HasForeignKey("CreatorUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_tickets_users_creator_user_email");
+                        .HasConstraintName("fk_tickets_users_creator_user_id");
 
                     b.HasOne("ADAtickets.ApiService.Models.User", "OperatorUser")
                         .WithMany("AssignedTickets")
-                        .HasForeignKey("OperatorUserEmail")
-                        .HasConstraintName("fk_tickets_users_operator_user_email");
+                        .HasForeignKey("OperatorUserId")
+                        .HasConstraintName("fk_tickets_users_operator_user_id");
 
                     b.HasOne("ADAtickets.ApiService.Models.Platform", "Platform")
                         .WithMany("Tickets")
-                        .HasForeignKey("PlatformName")
+                        .HasForeignKey("PlatformId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_tickets_platforms_platform_name");
+                        .HasConstraintName("fk_tickets_platforms_platform_id");
 
                     b.Navigation("CreatorUser");
 
@@ -473,18 +555,18 @@ namespace ADAtickets.ApiService.Migrations
             modelBuilder.Entity("ADAtickets.ApiService.Models.UserNotification", b =>
                 {
                     b.HasOne("ADAtickets.ApiService.Models.Notification", "Notification")
-                        .WithMany("SentNotifications")
+                        .WithMany("UserNotifications")
                         .HasForeignKey("NotificationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_user_notifications_notifications_notification_id");
 
                     b.HasOne("ADAtickets.ApiService.Models.User", "ReceiverUser")
-                        .WithMany("ReceivedNotifications")
-                        .HasForeignKey("ReceiverUserEmail")
+                        .WithMany("UserNotifications")
+                        .HasForeignKey("ReceiverUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_user_notifications_users_receiver_user_email");
+                        .HasConstraintName("fk_user_notifications_users_receiver_user_id");
 
                     b.Navigation("Notification");
 
@@ -494,34 +576,68 @@ namespace ADAtickets.ApiService.Migrations
             modelBuilder.Entity("ADAtickets.ApiService.Models.UserPlatform", b =>
                 {
                     b.HasOne("ADAtickets.ApiService.Models.Platform", "Platform")
-                        .WithMany("UsersPreferred")
-                        .HasForeignKey("PlatformName")
+                        .WithMany("UserPlatforms")
+                        .HasForeignKey("PlatformId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_user_platforms_platforms_platform_name");
+                        .HasConstraintName("fk_user_platforms_platforms_platform_id");
 
                     b.HasOne("ADAtickets.ApiService.Models.User", "User")
-                        .WithMany("PreferredPlatforms")
-                        .HasForeignKey("UserEmail")
+                        .WithMany("UserPlatforms")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_user_platforms_users_user_email");
+                        .HasConstraintName("fk_user_platforms_users_user_id");
 
                     b.Navigation("Platform");
 
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("NotificationUser", b =>
+                {
+                    b.HasOne("ADAtickets.ApiService.Models.Notification", null)
+                        .WithMany()
+                        .HasForeignKey("ReceivedNotificationsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_notification_user_notifications_received_notifications_id");
+
+                    b.HasOne("ADAtickets.ApiService.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("RecipientsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_notification_user_users_recipients_id");
+                });
+
+            modelBuilder.Entity("PlatformUser", b =>
+                {
+                    b.HasOne("ADAtickets.ApiService.Models.Platform", null)
+                        .WithMany()
+                        .HasForeignKey("PreferredPlatformsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_platform_user_platforms_preferred_platforms_id");
+
+                    b.HasOne("ADAtickets.ApiService.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UsersPreferredId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_platform_user_users_users_preferred_id");
+                });
+
             modelBuilder.Entity("ADAtickets.ApiService.Models.Notification", b =>
                 {
-                    b.Navigation("SentNotifications");
+                    b.Navigation("UserNotifications");
                 });
 
             modelBuilder.Entity("ADAtickets.ApiService.Models.Platform", b =>
                 {
                     b.Navigation("Tickets");
 
-                    b.Navigation("UsersPreferred");
+                    b.Navigation("UserPlatforms");
                 });
 
             modelBuilder.Entity("ADAtickets.ApiService.Models.Ticket", b =>
@@ -543,13 +659,13 @@ namespace ADAtickets.ApiService.Migrations
 
                     b.Navigation("Edits");
 
-                    b.Navigation("PreferredPlatforms");
-
-                    b.Navigation("ReceivedNotifications");
-
                     b.Navigation("Replies");
 
                     b.Navigation("SentNotifications");
+
+                    b.Navigation("UserNotifications");
+
+                    b.Navigation("UserPlatforms");
                 });
 #pragma warning restore 612, 618
         }

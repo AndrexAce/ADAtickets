@@ -18,8 +18,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using ADAtickets.ApiService.Models;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace ADAtickets.ApiService.Configs
@@ -28,7 +26,7 @@ namespace ADAtickets.ApiService.Configs
     /// <para>Represents the Entity Framework Core database context for the ADAtickets application.</para>
     /// <para>This context is used to interact with the database and manage the application's entities.</para>
     /// </summary>
-    public class ADAticketsDbContext : IdentityDbContext<IdentityUser<Guid>, IdentityRole<Guid>, Guid>
+    public class ADAticketsDbContext : DbContext
     {
         /// <summary>
         /// Paramteless constructor for testing purposes.
@@ -77,7 +75,7 @@ namespace ADAtickets.ApiService.Configs
         /// <summary>
         /// Gets or sets the DbSet for managing <see cref="User"/> entities.
         /// </summary>
-        public virtual DbSet<User> AppUsers { get; set; }
+        public virtual DbSet<User> Users { get; set; }
 
         /// <summary>
         /// Gets or sets the DbSet for managing <see cref="UserNotification"/> entities.

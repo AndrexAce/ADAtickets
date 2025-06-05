@@ -18,7 +18,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using AutoMapper.Configuration.Annotations;
-using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
@@ -52,18 +51,6 @@ namespace ADAtickets.ApiService.Models
         public string Surname { get; set; } = string.Empty;
 
         /// <summary>
-        /// Whether the user enabled the two-factor authentication via email.
-        /// </summary>
-        [Required]
-        public bool IsEmail2FAEnabled { get; set; } = false;
-
-        /// <summary>
-        /// Whether the user enabled the two-factor authentication via SMS.
-        /// </summary>
-        [Required]
-        public bool IsPhone2FAEnabled { get; set; } = false;
-
-        /// <summary>
         /// Whether the user enabled the reception of external notifications via email.
         /// </summary>
         [Required]
@@ -86,21 +73,6 @@ namespace ADAtickets.ApiService.Models
         /// </summary>
         [MaxLength(20)]
         public string? MicrosoftAccountId { get; set; } = null;
-
-        /// <summary>
-        /// The unique identifier of the user's ASP.NET Identity User.
-        /// </summary>
-        [Required]
-        [ForeignKey(nameof(IdentityUser))]
-        public Guid IdentityUserId { get; set; } = Guid.Empty;
-
-        /// <summary>
-        /// The ASP.NET Identity User associated with this user.
-        /// </summary>
-        [Required]
-        [Ignore]
-        [JsonIgnore]
-        public IdentityUser<Guid> IdentityUser { get; set; } = new IdentityUser<Guid>();
 
         /// <summary>
         /// The collection of tickets created by the user (if they are a user, otherwise it must be empty).

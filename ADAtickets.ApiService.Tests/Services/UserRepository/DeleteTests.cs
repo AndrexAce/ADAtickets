@@ -45,7 +45,7 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
             var mockSet = users.BuildMockDbSet();
             mockSet.Setup(s => s.Remove(It.IsAny<User>()))
                 .Callback<User>(user => users.RemoveAll(u => u.Id == user.Id));
-            mockContext.Setup(c => c.AppUsers)
+            mockContext.Setup(c => c.Users)
                 .Returns(mockSet.Object);
 
             var service = new UserService(mockContext.Object);
@@ -54,7 +54,7 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
 
             // Act
             await service.DeleteUserAsync(user);
-            var deletedUser = await mockContext.Object.AppUsers.SingleOrDefaultAsync(cancellationToken);
+            var deletedUser = await mockContext.Object.Users.SingleOrDefaultAsync(cancellationToken);
 
             // Assert
             Assert.Null(deletedUser);

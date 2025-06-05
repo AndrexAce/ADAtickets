@@ -41,18 +41,6 @@ namespace ADAtickets.ApiService.Dtos.Requests
         public string Surname { get; set; } = string.Empty;
 
         /// <summary>
-        /// Whether the user enabled the two-factor authentication via email.
-        /// </summary>
-        [Required]
-        public bool IsEmail2FAEnabled { get; set; } = false;
-
-        /// <summary>
-        /// Whether the user enabled the two-factor authentication via SMS.
-        /// </summary>
-        [Required]
-        public bool IsPhone2FAEnabled { get; set; } = false;
-
-        /// <summary>
         /// Whether the user enabled the reception of external notifications via email.
         /// </summary>
         [Required]
@@ -74,11 +62,5 @@ namespace ADAtickets.ApiService.Dtos.Requests
         /// The unique identifier of the user's Microsoft account.
         /// </summary>
         public string? MicrosoftAccountId { get; set; } = null;
-
-        /// <summary>
-        /// The unique identifier of the user's ASP.NET Identity User.
-        /// </summary>
-        [Required]
-        public Guid IdentityUserId { get; set; } = Guid.Empty;
     }
 }

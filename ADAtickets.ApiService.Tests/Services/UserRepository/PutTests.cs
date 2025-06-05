@@ -19,7 +19,6 @@
  */
 using ADAtickets.ApiService.Configs;
 using ADAtickets.ApiService.Models;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MockQueryable.Moq;
 using Moq;
@@ -38,19 +37,17 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
     {
         public static TheoryData<User> InvalidUserData =>
         [
-            Utilities.CreateUser(name: new string('a', 51), surname: "Lucchese", microsoftAccountId: "someId", identityUserId: Guid.AllBitsSet),
-            Utilities.CreateUser(name: new string('a', 51), surname: "Lucchese", microsoftAccountId: null, identityUserId: Guid.AllBitsSet),
-            Utilities.CreateUser(name: "Andrea", surname: new string('a', 51), microsoftAccountId: "someId", identityUserId: Guid.AllBitsSet),
-            Utilities.CreateUser(name: "Andrea", surname: new string('a', 51), microsoftAccountId: null, identityUserId: Guid.AllBitsSet),
-            Utilities.CreateUser(name: "Andrea", surname: "Lucchese", microsoftAccountId: new string('a', 21), identityUserId: Guid.AllBitsSet),
-            Utilities.CreateUser(name: "Andrea", surname: "Lucchese", microsoftAccountId: "someId", identityUserId: Guid.Empty),
-            Utilities.CreateUser(name: "Andrea", surname: "Lucchese", microsoftAccountId: null, identityUserId: Guid.Empty),
+            Utilities.CreateUser(name: new string('a', 51), surname: "Lucchese", microsoftAccountId: "someId"),
+            Utilities.CreateUser(name: new string('a', 51), surname: "Lucchese", microsoftAccountId: null),
+            Utilities.CreateUser(name: "Andrea", surname: new string('a', 51), microsoftAccountId: "someId"),
+            Utilities.CreateUser(name: "Andrea", surname: new string('a', 51), microsoftAccountId: null),
+            Utilities.CreateUser(name: "Andrea", surname: "Lucchese", microsoftAccountId: new string('a', 21))
         ];
 
         public static TheoryData<User> ValidUserData =>
         [
-            Utilities.CreateUser(name: "Andrea", surname: "Lucchese", microsoftAccountId: "someId", identityUserId: Guid.AllBitsSet),
-            Utilities.CreateUser(name: "Andrea", surname: "Lucchese", microsoftAccountId: null, identityUserId: Guid.AllBitsSet)
+            Utilities.CreateUser(name: "Andrea", surname: "Lucchese", microsoftAccountId: "someId"),
+            Utilities.CreateUser(name: "Andrea", surname: "Lucchese", microsoftAccountId: null)
         ];
 
         [Theory]
@@ -58,24 +55,21 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
         public async Task UpdateUser_ValidEntity_ReturnsNew(User inUser)
         {
             // Arrange
-            var users = new List<User> { new() { Id = inUser.Id, Name = "Andrew", Surname = "Turchese", IdentityUserId = Guid.AllBitsSet } };
-            var identityUsers = new List<IdentityUser<Guid>> { new() { Id = Guid.AllBitsSet } };
+            var users = new List<User> { new() { Id = inUser.Id, Name = "Andrew", Surname = "Turchese" } };
 
             var mockContext = new Mock<ADAticketsDbContext>();
             var mockUserSet = users.BuildMockDbSet();
-            var mockIdentityUserSet = identityUsers.BuildMockDbSet();
             mockUserSet.Setup(s => s.Update(It.IsAny<User>()))
                 .Callback<User>(u =>
                 {
                     if (u.Name.Length <= 50 && u.Surname.Length <= 50
-                    && (u.MicrosoftAccountId == null || u.MicrosoftAccountId.Length <= 20)
-                    && mockIdentityUserSet.Object.Single().Id == u.IdentityUserId)
+                    && (u.MicrosoftAccountId == null || u.MicrosoftAccountId.Length <= 20))
                     {
                         users[0].Name = inUser.Name;
                         users[0].Surname = inUser.Surname;
                     }
                 });
-            mockContext.Setup(c => c.AppUsers)
+            mockContext.Setup(c => c.Users)
                 .Returns(mockUserSet.Object);
 
             var service = new UserService(mockContext.Object);
@@ -84,7 +78,7 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
 
             // Act
             await service.UpdateUserAsync(inUser);
-            var updatedUser = await mockContext.Object.AppUsers.SingleOrDefaultAsync(cancellationToken);
+            var updatedUser = await mockContext.Object.Users.SingleOrDefaultAsync(cancellationToken);
 
             // Assert
             Assert.NotNull(updatedUser);
@@ -97,24 +91,21 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
         public async Task UpdateUser_InvalidEntity_ReturnsOld(User inUser)
         {
             // Arrange
-            var users = new List<User> { new() { Id = inUser.Id, Name = "Andrew", Surname = "Turchese", IdentityUserId = Guid.AllBitsSet } };
-            var identityUsers = new List<IdentityUser<Guid>> { new() { Id = Guid.AllBitsSet } };
+            var users = new List<User> { new() { Id = inUser.Id, Name = "Andrew", Surname = "Turchese" } };
 
             var mockContext = new Mock<ADAticketsDbContext>();
             var mockUserSet = users.BuildMockDbSet();
-            var mockIdentityUserSet = identityUsers.BuildMockDbSet();
             mockUserSet.Setup(s => s.Update(It.IsAny<User>()))
                 .Callback<User>(u =>
                 {
                     if (u.Name.Length <= 50 && u.Surname.Length <= 50
-                    && (u.MicrosoftAccountId == null || u.MicrosoftAccountId.Length <= 20)
-                    && mockIdentityUserSet.Object.Single().Id == u.IdentityUserId)
+                    && (u.MicrosoftAccountId == null || u.MicrosoftAccountId.Length <= 20))
                     {
                         users[0].Name = inUser.Name;
                         users[0].Surname = inUser.Surname;
                     }
                 });
-            mockContext.Setup(c => c.AppUsers)
+            mockContext.Setup(c => c.Users)
                 .Returns(mockUserSet.Object);
 
             var service = new UserService(mockContext.Object);
@@ -123,7 +114,7 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
 
             // Act
             await service.UpdateUserAsync(inUser);
-            var updatedUser = await mockContext.Object.AppUsers.SingleOrDefaultAsync(cancellationToken);
+            var updatedUser = await mockContext.Object.Users.SingleOrDefaultAsync(cancellationToken);
 
             // Assert
             Assert.NotNull(updatedUser);

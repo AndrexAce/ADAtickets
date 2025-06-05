@@ -53,7 +53,7 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
             var mockSet = users.BuildMockDbSet();
             mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
                 .ReturnsAsync((object[] arguments) => users.Find(u => u.Id == (Guid)arguments[0]));
-            mockContext.Setup(c => c.AppUsers)
+            mockContext.Setup(c => c.Users)
                 .Returns(mockSet.Object);
 
             var service = new UserService(mockContext.Object);
@@ -76,7 +76,7 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
             var mockSet = users.BuildMockDbSet();
             mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
                 .ReturnsAsync((object[] arguments) => users.Find(u => u.Id == (Guid)arguments[0]));
-            mockContext.Setup(c => c.AppUsers)
+            mockContext.Setup(c => c.Users)
                 .Returns(mockSet.Object);
 
             var service = new UserService(mockContext.Object);
@@ -98,7 +98,7 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
             var mockSet = users.BuildMockDbSet();
             mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
                 .ReturnsAsync((object[] arguments) => users.Find(u => u.Id == (Guid)arguments[0]));
-            mockContext.Setup(c => c.AppUsers)
+            mockContext.Setup(c => c.Users)
                 .Returns(mockSet.Object);
 
             var service = new UserService(mockContext.Object);
@@ -120,7 +120,7 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
 
             var mockContext = new Mock<ADAticketsDbContext>();
             var mockSet = users.BuildMockDbSet();
-            mockContext.Setup(c => c.AppUsers)
+            mockContext.Setup(c => c.Users)
                 .Returns(mockSet.Object);
 
             var service = new UserService(mockContext.Object);
@@ -148,7 +148,7 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
 
             var mockContext = new Mock<ADAticketsDbContext>();
             var mockSet = users.BuildMockDbSet();
-            mockContext.Setup(c => c.AppUsers)
+            mockContext.Setup(c => c.Users)
                 .Returns(mockSet.Object);
 
             var service = new UserService(mockContext.Object);
@@ -177,7 +177,7 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
 
             var mockContext = new Mock<ADAticketsDbContext>();
             var mockSet = users.BuildMockDbSet();
-            mockContext.Setup(c => c.AppUsers)
+            mockContext.Setup(c => c.Users)
                 .Returns(mockSet.Object);
 
             var service = new UserService(mockContext.Object);
@@ -204,7 +204,7 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
 
             var mockContext = new Mock<ADAticketsDbContext>();
             var mockSet = users.BuildMockDbSet();
-            mockContext.Setup(c => c.AppUsers)
+            mockContext.Setup(c => c.Users)
                 .Returns(mockSet.Object);
 
             var service = new UserService(mockContext.Object);
@@ -235,7 +235,7 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
 
             var mockContext = new Mock<ADAticketsDbContext>();
             var mockSet = users.BuildMockDbSet();
-            mockContext.Setup(c => c.AppUsers)
+            mockContext.Setup(c => c.Users)
                 .Returns(mockSet.Object);
 
             var service = new UserService(mockContext.Object);
@@ -259,7 +259,7 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
 
             var mockContext = new Mock<ADAticketsDbContext>();
             var mockSet = users.BuildMockDbSet();
-            mockContext.Setup(c => c.AppUsers)
+            mockContext.Setup(c => c.Users)
                 .Returns(mockSet.Object);
 
             var service = new UserService(mockContext.Object);

@@ -35,19 +35,19 @@ namespace ADAtickets.ApiService.Services
         /// <inheritdoc cref="IUserRepository.GetUserByIdAsync"/>
         public async Task<User?> GetUserByIdAsync(Guid id)
         {
-            return await _context.AppUsers.FindAsync(id);
+            return await _context.Users.FindAsync(id);
         }
 
         /// <inheritdoc cref="IUserRepository.GetUsersAsync"/>
         public async Task<IEnumerable<User>> GetUsersAsync()
         {
-            return await _context.AppUsers.ToListAsync();
+            return await _context.Users.ToListAsync();
         }
 
         /// <inheritdoc cref="IUserRepository.GetUsersByAsync"/>
         public async Task<IEnumerable<User>> GetUsersByAsync(IEnumerable<KeyValuePair<string, string>> filters)
         {
-            IQueryable<User> query = _context.AppUsers;
+            IQueryable<User> query = _context.Users;
 
             foreach (var filter in filters)
             {
@@ -63,14 +63,6 @@ namespace ADAtickets.ApiService.Services
 
                     case nameof(User.Surname):
                         query = query.Where(u => u.Surname.Contains(filter.Value, StringComparison.InvariantCultureIgnoreCase));
-                        break;
-
-                    case nameof(User.IsEmail2FAEnabled) when bool.TryParse(filter.Value, out bool outBool):
-                        query = query.Where(u => u.IsEmail2FAEnabled == outBool);
-                        break;
-
-                    case nameof(User.IsPhone2FAEnabled) when bool.TryParse(filter.Value, out bool outBool):
-                        query = query.Where(u => u.IsPhone2FAEnabled == outBool);
                         break;
 
                     case nameof(User.AreEmailNotificationsEnabled) when bool.TryParse(filter.Value, out bool outBool):
@@ -89,10 +81,6 @@ namespace ADAtickets.ApiService.Services
                         query = query.Where(u => u.MicrosoftAccountId != null && u.MicrosoftAccountId.Contains(filter.Value, StringComparison.InvariantCultureIgnoreCase));
                         break;
 
-                    case nameof(User.IdentityUserId) when Guid.TryParse(filter.Value, out Guid outGuid):
-                        query = query.Where(u => u.IdentityUserId == outGuid);
-                        break;
-
                     default:
                         return [];
                 }
@@ -104,21 +92,21 @@ namespace ADAtickets.ApiService.Services
         /// <inheritdoc cref="IUserRepository.AddUserAsync"/>
         public async Task AddUserAsync(User user)
         {
-            _context.AppUsers.Add(user);
+            _context.Users.Add(user);
             await _context.SaveChangesAsync();
         }
 
         /// <inheritdoc cref="IUserRepository.UpdateUserAsync"/>
         public async Task UpdateUserAsync(User user)
         {
-            _context.AppUsers.Update(user);
+            _context.Users.Update(user);
             await _context.SaveChangesAsync();
         }
 
         /// <inheritdoc cref="IUserRepository.DeleteUserAsync"/>
         public async Task DeleteUserAsync(User user)
         {
-            _context.AppUsers.Remove(user);
+            _context.Users.Remove(user);
             await _context.SaveChangesAsync();
         }
     }
