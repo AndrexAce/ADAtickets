@@ -240,6 +240,7 @@ class MainViewModel : ReactiveObject
     public ICommand GoToSecondStepCommand => ReactiveCommand.Create(GoToSecondStep);
     public ICommand GoToThirdStepCommand => ReactiveCommand.Create(GoToThirdStep);
     public ICommand GoToLastStepCommand => ReactiveCommand.Create(GoToFinalStep);
+    public ICommand GoToPreviousStepCommand => ReactiveCommand.Create(GoToSecondStep);
 
     public MainViewModel()
     {

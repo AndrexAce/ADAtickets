@@ -225,4 +225,7 @@
   <data name="SetupCompleted" xml:space="preserve">
     <value>Setup completed successfully.</value>
   </data>
+  <data name="Previous" xml:space="preserve">
+    <value>Previous</value>
+  </data>
 </root>

@@ -29,9 +29,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 	</Design.DataContext>
 
 	<StackPanel Orientation="Vertical" Margin="20 20 20 20" Spacing="20" HorizontalAlignment="Stretch">
-		<TextBlock Text="{x:Static assets:Resources.PleaseInsert}"
+		<Grid ColumnDefinitions="Auto,*" >
+			<Button Grid.Column="1" Content="{x:Static assets:Resources.Previous}"
+				HorizontalAlignment="Left"
+				FontFamily="Segoe UI"
+				Classes="accent"
+				Command="{Binding GoToPreviousStepCommand}"/>
+			<TextBlock Grid.Column="2" Text="{x:Static assets:Resources.PleaseInsert}"
                    FontFamily="Segoe UI"
                    HorizontalAlignment="Center"/>
+		</Grid>
 		<StackPanel Orientation="Horizontal" Spacing="20">
 			<Image Source="/Assets/Azure.png" Width="100"/>
 			<UniformGrid Columns="2" HorizontalAlignment="Stretch" ColumnSpacing="20" RowSpacing="20" Width="760">
