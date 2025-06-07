@@ -60,15 +60,15 @@ namespace ADAtickets.Web
                     msIdentityOptions.ClientId = builder.Configuration.GetSection("Entra:ClientId").Value;
                     msIdentityOptions.Domain = builder.Configuration.GetSection("Entra:Domain").Value;
                     msIdentityOptions.Instance = builder.Configuration.GetSection("Entra:Instance").Value!;
-                    msIdentityOptions.ResponseType = builder.Configuration.GetSection("Entra:ResponseType").Value!;
+                    msIdentityOptions.SignedOutCallbackPath = builder.Configuration.GetSection("Entra:SignedOutCallbackPath").Value;
                     msIdentityOptions.TenantId = builder.Configuration.GetSection("Entra:TenantId").Value;
                     msIdentityOptions.ClientCertificates =
                     [
                         new CertificateDescription
                         {
                             SourceType = CertificateSource.Path,
-                            CertificateDiskPath = builder.Configuration.GetSection("Entra:Certificate:DiskPath").Value,
-                            CertificatePassword = builder.Configuration.GetSection("Entra:Certificate:Password").Value
+                            CertificateDiskPath = builder.Configuration.GetSection("Entra:ClientCertificate:DiskPath").Value,
+                            CertificatePassword = builder.Configuration.GetSection("Entra:ClientCertificate:Password").Value
                         }
                     ];
                 }, openIdConnectScheme: "Entra", cookieScheme: "EntraCookies")
@@ -78,7 +78,7 @@ namespace ADAtickets.Web
                     configOptions.BaseUrl = builder.Configuration.GetSection("Entra:DownstreamApi:BaseUrl").Value;
                     configOptions.Scopes = builder.Configuration.GetSection("Entra:DownstreamApi:Scopes").Get<string[]>()!;
                 })
-                .AddInMemoryTokenCaches();
+                .AddDistributedTokenCaches();
 
             builder.Services.AddAuthentication()
                 .AddMicrosoftIdentityWebApp(msIdentityOptions =>
@@ -87,25 +87,25 @@ namespace ADAtickets.Web
                     msIdentityOptions.ClientId = builder.Configuration.GetSection("ExternalEntra:ClientId").Value;
                     msIdentityOptions.Domain = builder.Configuration.GetSection("ExternalEntra:Domain").Value;
                     msIdentityOptions.Instance = builder.Configuration.GetSection("ExternalEntra:Instance").Value!;
-                    msIdentityOptions.ResponseType = builder.Configuration.GetSection("Entra:ResponseType").Value!;
+                    msIdentityOptions.SignedOutCallbackPath = builder.Configuration.GetSection("Entra:SignedOutCallbackPath").Value;
                     msIdentityOptions.TenantId = builder.Configuration.GetSection("ExternalEntra:TenantId").Value;
                     msIdentityOptions.ClientCertificates =
                     [
                         new CertificateDescription
                         {
                             SourceType = CertificateSource.Path,
-                            CertificateDiskPath = builder.Configuration.GetSection("Entra:Certificate:DiskPath").Value,
-                            CertificatePassword = builder.Configuration.GetSection("Entra:Certificate:Password").Value
+                            CertificateDiskPath = builder.Configuration.GetSection("Entra:ClientCertificate:DiskPath").Value,
+                            CertificatePassword = builder.Configuration.GetSection("Entra:ClientCertificate:Password").Value
                         }
                     ];
                 }, openIdConnectScheme: "ExternalEntra", cookieScheme: "ExternalEntraCookies")
                 .EnableTokenAcquisitionToCallDownstreamApi()
                 .AddDownstreamApi("APIExternalEntra", configOptions =>
                 {
-                    configOptions.BaseUrl = builder.Configuration.GetSection("Entra:DownstreamApi:BaseUrl").Value;
+                    configOptions.BaseUrl = builder.Configuration.GetSection("ExternalEntra:DownstreamApi:BaseUrl").Value;
                     configOptions.Scopes = builder.Configuration.GetSection("ExternalEntra:DownstreamApi:Scopes").Get<string[]>()!;
                 })
-                .AddInMemoryTokenCaches();
+                .AddDistributedTokenCaches();
 
             builder.Services.AddAuthorization();
 

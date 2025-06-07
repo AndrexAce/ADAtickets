@@ -19,7 +19,7 @@ services:
       - ExternalEntra__Audience=api://${EXTERNALAPIAPPID:?error}
     volumes:
       - ${SSLCERTIFICATEDISKPATH:?error}:/https:ro
-      - ${AUTHCERTIFICATEDISKPATH:?error}:/certs:ro
+      - ${APIAUTHCERTIFICATEDISKPATH:?error}:/certs:ro
 
   adatickets.web:
     image: ghcr.io/andrexace/adatickets-web:${CLIENTTAG:-latest}
@@ -35,12 +35,12 @@ services:
       - Entra__Audience=api://${APIAPPID:?error}
       - Entra__CallbackPath=/signin-oidc-entra
       - Entra__Instance=https://login.microsoftonline.com
-      - Entra__ResponseType=code
+      - Entra__SignOutCallbackPath=/signout-oidc-entra
       - Entra__ClientId=${CLIENTAPPID:?error}
       - Entra__Domain=${TENANTNAME:?error}.onmicrosoft.com
       - Entra__TenantId=${TENANTID:?error}
-      - Entra__Certificate__Path=/certs/${AUTHCERTIFICATENAME:?error}
-      - Entra__Certificate__Password=${AUTHCERTIFICATEPASSWORD:?error}
+      - Entra__ClientCertificate__Path=/certs/${WEBAPPAUTHCERTIFICATENAME:?error}
+      - Entra__ClientCertificate__Password=${WEBAPPAUTHCERTIFICATEPASSWORD:?error}
       - Entra__DownstreamApi__BaseUrl=https://localhost:7214
       - Entra__DownstreamApi__Scopes__0=api://${APIAPPID:?error}/Read
       - Entra__DownstreamApi__Scopes__1=api://${APIAPPID:?error}/ReadWrite
@@ -48,6 +48,7 @@ services:
       - ExternalEntra__Audience=api://${EXTERNALAPIAPPID:?error}
       - ExternalEntra__CallbackPath=/signin-oidc-entra-external
       - ExternalEntra__Instance=https://${EXTERNALTENANTNAME:?error}.ciamlogin.com
+      - ExternalEntra__SignOutCallbackPath=/signout-oidc-entra-external 
       - ExternalEntra__ClientId=${EXTERNALCLIENTAPPID}
       - ExternalEntra__Domain=${EXTERNALTENANTNAME:?error}.onmicrosoft.com
       - ExternalEntra__TenantId=${EXTERNALTENANTID:?error}
@@ -55,4 +56,4 @@ services:
       - ExternalEntra__DownstreamApi__Scopes__1=api://${EXTERNALAPIAPPID:?error}/ReadWrite
     volumes:
       - ${SSLCERTIFICATEDISKPATH:?error}:/https:ro
-      - ${AUTHCERTIFICATEDISKPATH:?error}:/certs:ro
+      - ${WEBAPPAUTHCERTIFICATEDISKPATH:?error}:/certs:ro

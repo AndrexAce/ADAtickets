@@ -173,10 +173,18 @@ partial class LastStep : UserControl
         fileContent = Regex.Replace(fileContent, "^EXTERNALCLIENTAPPID=.*$", $"EXTERNALCLIENTAPPID={viewModel.ExternalClientId}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
         fileContent = Regex.Replace(fileContent, "^EXTERNALTENANTNAME=.*$", $"EXTERNALTENANTNAME={viewModel.ExternalTenantDomain?[..viewModel.ExternalTenantDomain.IndexOf('.')]}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
 
-        // Entra global configuration (web app)
-        fileContent = Regex.Replace(fileContent, "^AUTHCERTIFICATEDISKPATH=.*$", $"AUTHCERTIFICATEDISKPATH={Path.GetDirectoryName(viewModel.AuthCertificatePath)}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
-        fileContent = Regex.Replace(fileContent, "^AUTHCERTIFICATENAME=.*$", $"AUTHCERTIFICATENAME={Path.GetFileName(viewModel.AuthCertificatePath)}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
-        fileContent = Regex.Replace(fileContent, "^AUTHCERTIFICATEPASSWORD=.*$", $"AUTHCERTIFICATEPASSWORD={viewModel.AuthCertificatePassword}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
+        // Authentication configuration (API)
+        fileContent = Regex.Replace(fileContent, "^APIAUTHCERTIFICATEDISKPATH=.*$", $"APIAUTHCERTIFICATEDISKPATH={Path.GetDirectoryName(viewModel.ApiAuthCertificatePath)}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
+        fileContent = Regex.Replace(fileContent, "^APIAUTHCERTIFICATENAME=.*$", $"APIAUTHCERTIFICATENAME={Path.GetFileName(viewModel.ApiAuthCertificatePath)}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
+        fileContent = Regex.Replace(fileContent, "^APIAUTHCERTIFICATEPASSWORD=.*$", $"APIAUTHCERTIFICATEPASSWORD={viewModel.ApiAuthCertificatePassword}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
+
+        // Authentication configuration (web app)
+        fileContent = Regex.Replace(fileContent, "^WEBAPPAUTHCERTIFICATEDISKPATH=.*$", $"WEBAPPAUTHCERTIFICATEDISKPATH={Path.GetDirectoryName(viewModel.WebAppAuthCertificatePath)}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
+        fileContent = Regex.Replace(fileContent, "^WEBAPPAUTHCERTIFICATENAME=.*$", $"WEBAPPAUTHCERTIFICATENAME={Path.GetFileName(viewModel.WebAppAuthCertificatePath)}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
+        fileContent = Regex.Replace(fileContent, "^WEBAPPAUTHCERTIFICATEPASSWORD=.*$", $"WEBAPPAUTHCERTIFICATEPASSWORD={viewModel.WebAppAuthCertificatePassword}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
+
+        // Azure DevOps configuration
+        fileContent = Regex.Replace(fileContent, "^DEVOPSORGANIZATION=.*$", $"DEVOPSORGANIZATION={viewModel.DevOpsOrganizationName}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
 
         // Write to temporary location
         string tempEnvPath = Path.Combine(path, ".env");
@@ -196,7 +204,7 @@ partial class LastStep : UserControl
                     new ImagesCreateParameters
                     {
                         FromImage = "postgres",
-                        Tag = "latest"
+                        Tag = "17.5"
                     },
                     null,
                     new Progress<JSONMessage>(),

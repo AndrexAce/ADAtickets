@@ -61,6 +61,24 @@ namespace ADAtickets.Installer.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to API authentication certificate password:.
+        /// </summary>
+        public static string ApiAuthCertificatePasswordLabel {
+            get {
+                return ResourceManager.GetString("ApiAuthCertificatePasswordLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to API authentication certificate path:.
+        /// </summary>
+        public static string ApiAuthCertificatePathLabel {
+            get {
+                return ResourceManager.GetString("ApiAuthCertificatePathLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Pulling API container....
         /// </summary>
         public static string ApiContainerPull {
@@ -84,24 +102,6 @@ namespace ADAtickets.Installer.Assets {
         public static string ApiVersionLabel {
             get {
                 return ResourceManager.GetString("ApiVersionLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Authentication certificate password:.
-        /// </summary>
-        public static string AuthCertificatePasswordLabel {
-            get {
-                return ResourceManager.GetString("AuthCertificatePasswordLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Authentication certificate path (local):.
-        /// </summary>
-        public static string AuthCertificatePathLabel {
-            get {
-                return ResourceManager.GetString("AuthCertificatePathLabel", resourceCulture);
             }
         }
         
@@ -156,6 +156,15 @@ namespace ADAtickets.Installer.Assets {
         public static string DbUserNameLabel {
             get {
                 return ResourceManager.GetString("DbUserNameLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DevOps organization name:.
+        /// </summary>
+        public static string DevOpsOrganizationNameLabel {
+            get {
+                return ResourceManager.GetString("DevOpsOrganizationNameLabel", resourceCulture);
             }
         }
         
@@ -268,6 +277,15 @@ namespace ADAtickets.Installer.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The organization name is invalid..
+        /// </summary>
+        public static string InvalidOrganizationName {
+            get {
+                return ResourceManager.GetString("InvalidOrganizationName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The path is invalid..
         /// </summary>
         public static string InvalidPath {
@@ -372,6 +390,24 @@ namespace ADAtickets.Installer.Assets {
         public static string WaitingDocker {
             get {
                 return ResourceManager.GetString("WaitingDocker", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Web app authentication certificate password:.
+        /// </summary>
+        public static string WebAppAuthCertificatePasswordLabel {
+            get {
+                return ResourceManager.GetString("WebAppAuthCertificatePasswordLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Web app authentication certificate path (local):.
+        /// </summary>
+        public static string WebAppAuthCertificatePathLabel {
+            get {
+                return ResourceManager.GetString("WebAppAuthCertificatePathLabel", resourceCulture);
             }
         }
         

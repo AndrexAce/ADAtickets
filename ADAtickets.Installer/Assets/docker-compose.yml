@@ -10,7 +10,7 @@ services:
       interval: 10s
       timeout: 3s
       retries: 3
-    image: postgres:latest
+    image: postgres:17.5
     networks:
       - network
     ports:

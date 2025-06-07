@@ -183,11 +183,8 @@
   <data name="WebVersionLabel" xml:space="preserve">
     <value>Versione app:</value>
   </data>
-  <data name="AuthCertificatePathLabel" xml:space="preserve">
-    <value>Percorso certificato autenticazione (locale):</value>
-  </data>
-  <data name="AuthCertificatePasswordLabel" xml:space="preserve">
-    <value>Password certificato autenticazione:</value>
+  <data name="WebAppAuthCertificatePasswordLabel" xml:space="preserve">
+    <value>Password certificato autenticazione web app:</value>
   </data>
   <data name="PleaseInsert" xml:space="preserve">
     <value>Inserisci le seguenti informazioni per completare il setup.</value>
@@ -227,5 +224,20 @@
   </data>
   <data name="Previous" xml:space="preserve">
     <value>Indietro</value>
+  </data>
+  <data name="ApiAuthCertificatePathLabel" xml:space="preserve">
+    <value>Percorso certificato autenticazione API:</value>
+  </data>
+  <data name="ApiAuthCertificatePasswordLabel" xml:space="preserve">
+    <value>Password certificato autenticazione API:</value>
+  </data>
+  <data name="WebAppAuthCertificatePathLabel" xml:space="preserve">
+    <value>Percorso certificato autenticazione (locale) web app:</value>
+  </data>
+  <data name="DevOpsOrganizationNameLabel" xml:space="preserve">
+    <value>Nome organizzazione DevOps:</value>
+  </data>
+  <data name="InvalidOrganizationName" xml:space="preserve">
+    <value>Il nome dell'organizzazione non è valido,</value>
   </data>
 </root>

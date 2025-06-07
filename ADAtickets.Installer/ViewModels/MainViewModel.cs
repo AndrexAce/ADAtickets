@@ -47,8 +47,11 @@ class MainViewModel : ReactiveObject
     private string? _apiId;
     private string? _externalClientId;
     private string? _externalApiId;
-    private string? _authCertificatePath;
-    private string? _authCertificatePassword;
+    private string? _apiAuthCertificatePath;
+    private string? _apiAuthCertificatePassword;
+    private string? _webAppAuthCertificatePath;
+    private string? _webAppAuthCertificatePassword;
+    private string? _devOpsOrganizationName;
     private string _phaseText = "";
     private int _progressBarValue = 0;
     private bool _isLoadingVisible = true;
@@ -203,18 +206,48 @@ class MainViewModel : ReactiveObject
     [RegularExpression(@"^[a-zA-Z0-9\/\\_.~:-]+$",
                      ErrorMessageResourceType = typeof(Assets.Resources),
                      ErrorMessageResourceName = "InvalidPath")]
-    public string? AuthCertificatePath
+    public string? WebAppAuthCertificatePath
     {
-        get => _authCertificatePath;
-        set => this.RaiseAndSetIfChanged(ref _authCertificatePath, value);
+        get => _webAppAuthCertificatePath;
+        set => this.RaiseAndSetIfChanged(ref _webAppAuthCertificatePath, value);
     }
 
     [Required(ErrorMessageResourceType = typeof(Assets.Resources),
               ErrorMessageResourceName = "FieldRequired")]
-    public string? AuthCertificatePassword
+    public string? WebAppAuthCertificatePassword
     {
-        get => _authCertificatePassword;
-        set => this.RaiseAndSetIfChanged(ref _authCertificatePassword, value);
+        get => _webAppAuthCertificatePassword;
+        set => this.RaiseAndSetIfChanged(ref _webAppAuthCertificatePassword, value);
+    }
+
+    [Required(ErrorMessageResourceType = typeof(Assets.Resources),
+              ErrorMessageResourceName = "FieldRequired")]
+    [RegularExpression(@"^[a-zA-Z0-9\/\\_.~:-]+$",
+                     ErrorMessageResourceType = typeof(Assets.Resources),
+                     ErrorMessageResourceName = "InvalidPath")]
+    public string? ApiAuthCertificatePath
+    {
+        get => _apiAuthCertificatePath;
+        set => this.RaiseAndSetIfChanged(ref _apiAuthCertificatePath, value);
+    }
+
+    [Required(ErrorMessageResourceType = typeof(Assets.Resources),
+              ErrorMessageResourceName = "FieldRequired")]
+    public string? ApiAuthCertificatePassword
+    {
+        get => _apiAuthCertificatePassword;
+        set => this.RaiseAndSetIfChanged(ref _apiAuthCertificatePassword, value);
+    }
+
+    [Required(ErrorMessageResourceType = typeof(Assets.Resources),
+          ErrorMessageResourceName = "FieldRequired")]
+    [RegularExpression(@"^[a-zA-Z0-9]+$",
+                     ErrorMessageResourceType = typeof(Assets.Resources),
+                     ErrorMessageResourceName = "InvalidOrganizationName")]
+    public string? DevOpsOrganizationName
+    {
+        get => _devOpsOrganizationName;
+        set => this.RaiseAndSetIfChanged(ref _devOpsOrganizationName, value);
     }
 
     public string PhaseText
@@ -378,12 +411,12 @@ class MainViewModel : ReactiveObject
         context.MemberName = nameof(ExternalApiId);
         isValid &= Validator.TryValidateProperty(ExternalApiId, context, []);
 
-        context.MemberName = nameof(AuthCertificatePath);
-        isValid &= Validator.TryValidateProperty(AuthCertificatePassword, context, []);
-        isValid &= File.Exists(AuthCertificatePath);
+        context.MemberName = nameof(WebAppAuthCertificatePath);
+        isValid &= Validator.TryValidateProperty(WebAppAuthCertificatePassword, context, []);
+        isValid &= File.Exists(WebAppAuthCertificatePath);
 
-        context.MemberName = nameof(AuthCertificatePassword);
-        isValid &= Validator.TryValidateProperty(AuthCertificatePassword, context, []);
+        context.MemberName = nameof(WebAppAuthCertificatePassword);
+        isValid &= Validator.TryValidateProperty(WebAppAuthCertificatePassword, context, []);
 
         return isValid;
     }

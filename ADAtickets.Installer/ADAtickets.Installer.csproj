@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Assets\docker-compose.override-prod.yml" />
-    <EmbeddedResource Include="Assets\docker-compose.override.yml" />
     <EmbeddedResource Include="Assets\docker-compose.yml" />
     <EmbeddedResource Include="Assets\example.env" />
   </ItemGroup>
