@@ -55,16 +55,6 @@
           "Microsoft.FluentUI.AspNetCore.Components": "4.11.9"
         }
       },
-      "Microsoft.Identity.Client": {
-        "type": "Direct",
-        "requested": "[4.72.1, )",
-        "resolved": "4.72.1",
-        "contentHash": "U3FbgYeKbU34zP17vi4xO70U5WiVO4GcqHbGwfqzAGJMQQfzkdEK5Ue69mI1tWj7Ft2lbJJ9Wsho9/6Jn5OKqQ==",
-        "dependencies": {
-          "Microsoft.IdentityModel.Abstractions": "6.35.0",
-          "System.Diagnostics.DiagnosticSource": "6.0.1"
-        }
-      },
       "Microsoft.Identity.Web.DownstreamApi": {
         "type": "Direct",
         "requested": "[3.9.3, )",
@@ -413,6 +403,15 @@
         "type": "Transitive",
         "resolved": "9.1.0",
         "contentHash": "6xXC5DLWASaI/eyS7vq4Hs2MtC6wDBpQiMmSvg+KeQUpfOwbwaE/HRvaEB+Ic2DLdHizClPV5yg/HbtwbeGhNQ=="
+      },
+      "Microsoft.Identity.Client": {
+        "type": "Transitive",
+        "resolved": "4.72.1",
+        "contentHash": "U3FbgYeKbU34zP17vi4xO70U5WiVO4GcqHbGwfqzAGJMQQfzkdEK5Ue69mI1tWj7Ft2lbJJ9Wsho9/6Jn5OKqQ==",
+        "dependencies": {
+          "Microsoft.IdentityModel.Abstractions": "6.35.0",
+          "System.Diagnostics.DiagnosticSource": "6.0.1"
+        }
       },
       "Microsoft.Identity.Client.Extensions.Msal": {
         "type": "Transitive",

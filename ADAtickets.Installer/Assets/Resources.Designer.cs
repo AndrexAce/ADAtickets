@@ -61,6 +61,15 @@ namespace ADAtickets.Installer.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to API app ID:.
+        /// </summary>
+        public static string ApiAppIdLabel {
+            get {
+                return ResourceManager.GetString("ApiAppIdLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to API authentication certificate password:.
         /// </summary>
         public static string ApiAuthCertificatePasswordLabel {
@@ -70,7 +79,7 @@ namespace ADAtickets.Installer.Assets {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to API authentication certificate path:.
+        ///   Looks up a localized string similar to API authentication certificate path (local):.
         /// </summary>
         public static string ApiAuthCertificatePathLabel {
             get {
@@ -84,15 +93,6 @@ namespace ADAtickets.Installer.Assets {
         public static string ApiContainerPull {
             get {
                 return ResourceManager.GetString("ApiContainerPull", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to API app ID:.
-        /// </summary>
-        public static string ApiIdLabel {
-            get {
-                return ResourceManager.GetString("ApiIdLabel", resourceCulture);
             }
         }
         
@@ -111,15 +111,6 @@ namespace ADAtickets.Installer.Assets {
         public static string CleaningTemp {
             get {
                 return ResourceManager.GetString("CleaningTemp", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Client app ID:.
-        /// </summary>
-        public static string ClientIdLabel {
-            get {
-                return ResourceManager.GetString("ClientIdLabel", resourceCulture);
             }
         }
         
@@ -160,24 +151,6 @@ namespace ADAtickets.Installer.Assets {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to DevOps organization name:.
-        /// </summary>
-        public static string DevOpsOrganizationNameLabel {
-            get {
-                return ResourceManager.GetString("DevOpsOrganizationNameLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Tenant domain:.
-        /// </summary>
-        public static string DomainLabel {
-            get {
-                return ResourceManager.GetString("DomainLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Writing the environment file....
         /// </summary>
         public static string EnvFileWriting {
@@ -198,27 +171,9 @@ namespace ADAtickets.Installer.Assets {
         /// <summary>
         ///   Looks up a localized string similar to External API app ID:.
         /// </summary>
-        public static string ExternalApiIdLabel {
+        public static string ExternalApiAppIdLabel {
             get {
-                return ResourceManager.GetString("ExternalApiIdLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to External client app ID:.
-        /// </summary>
-        public static string ExternalClientIdLabel {
-            get {
-                return ResourceManager.GetString("ExternalClientIdLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to External tenant domain:.
-        /// </summary>
-        public static string ExternalDomainLabel {
-            get {
-                return ResourceManager.GetString("ExternalDomainLabel", resourceCulture);
+                return ResourceManager.GetString("ExternalApiAppIdLabel", resourceCulture);
             }
         }
         
@@ -228,6 +183,15 @@ namespace ADAtickets.Installer.Assets {
         public static string ExternalTenantIdLabel {
             get {
                 return ResourceManager.GetString("ExternalTenantIdLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to External web app ID:.
+        /// </summary>
+        public static string ExternalWebAppIdLabel {
+            get {
+                return ResourceManager.GetString("ExternalWebAppIdLabel", resourceCulture);
             }
         }
         
@@ -273,15 +237,6 @@ namespace ADAtickets.Installer.Assets {
         public static string InvalidGuid {
             get {
                 return ResourceManager.GetString("InvalidGuid", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The organization name is invalid..
-        /// </summary>
-        public static string InvalidOrganizationName {
-            get {
-                return ResourceManager.GetString("InvalidOrganizationName", resourceCulture);
             }
         }
         
@@ -394,20 +349,29 @@ namespace ADAtickets.Installer.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Web app ID:.
+        /// </summary>
+        public static string WebAppIdLabel {
+            get {
+                return ResourceManager.GetString("WebAppIdLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Web app authentication certificate password:.
         /// </summary>
-        public static string WebAppAuthCertificatePasswordLabel {
+        public static string WebAuthCertificatePasswordLabel {
             get {
-                return ResourceManager.GetString("WebAppAuthCertificatePasswordLabel", resourceCulture);
+                return ResourceManager.GetString("WebAuthCertificatePasswordLabel", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Web app authentication certificate path (local):.
         /// </summary>
-        public static string WebAppAuthCertificatePathLabel {
+        public static string WebAuthCertificatePathLabel {
             get {
-                return ResourceManager.GetString("WebAppAuthCertificatePathLabel", resourceCulture);
+                return ResourceManager.GetString("WebAuthCertificatePathLabel", resourceCulture);
             }
         }
         

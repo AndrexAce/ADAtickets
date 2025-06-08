@@ -76,16 +76,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 					<TextBox Text="{Binding TenantId}" Watermark="00000000-0000-0000-0000-000000000000" HorizontalAlignment="Stretch" Width="NaN"/>
 				</StackPanel>
 				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-					<TextBlock Text="{x:Static assets:Resources.DomainLabel}" FontFamily="Segoe UI"/>
-					<TextBox Text="{Binding TenantDomain}" Watermark="tenantName.onmicrosoft.com" HorizontalAlignment="Stretch" Width="NaN"/>
-				</StackPanel>
-				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
 					<TextBlock Text="{x:Static assets:Resources.ExternalTenantIdLabel}" FontFamily="Segoe UI"/>
 					<TextBox Text="{Binding ExternalTenantId}" Watermark="00000000-0000-0000-0000-000000000000" HorizontalAlignment="Stretch" Width="NaN"/>
-				</StackPanel>
-				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-					<TextBlock Text="{x:Static assets:Resources.ExternalDomainLabel}" FontFamily="Segoe UI"/>
-					<TextBox Text="{Binding ExternalTenantDomain}" Watermark="tenantName.onmicrosoft.com" HorizontalAlignment="Stretch" Width="NaN"/>
 				</StackPanel>
 			</UniformGrid>
 		</StackPanel>

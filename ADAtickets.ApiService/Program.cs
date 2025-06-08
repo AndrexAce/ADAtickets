@@ -21,8 +21,10 @@ using ADAtickets.ApiService.Configs;
 using ADAtickets.ApiService.Models;
 using ADAtickets.ApiService.Repositories;
 using ADAtickets.ApiService.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Web;
 using Microsoft.OpenApi.Models;
 using Scalar.AspNetCore;
 using System.Net.Mime;
@@ -80,18 +82,15 @@ namespace ADAtickets.ApiService
                     .UseSnakeCaseNamingConvention();
             });
 
-            // Add JWTs decoding for both Entra ID and external Entra ID.
+            // Add JWTs decoding for both Entra ID and Entra External ID.
             builder.Services.AddAuthentication()
-                .AddJwtBearer("Entra", jwtOptions =>
-                {
-                    jwtOptions.Authority = builder.Configuration.GetSection("Entra:Authority").Value;
-                    jwtOptions.Audience = builder.Configuration.GetSection("Entra:Audience").Value;
-                })
-                .AddJwtBearer("ExternalEntra", jwtOptions =>
-                {
-                    jwtOptions.Authority = builder.Configuration.GetSection("ExternalEntra:Authority").Value;
-                    jwtOptions.Audience = builder.Configuration.GetSection("ExternalEntra:Audience").Value;
-                });
+                .AddMicrosoftIdentityWebApi(builder.Configuration, nameof(Scheme.Entra), nameof(Scheme.Entra));
+
+            builder.Services.AddAuthentication()
+                .AddMicrosoftIdentityWebApi(builder.Configuration, nameof(Scheme.ExternalEntra), nameof(Scheme.ExternalEntra));
+
+            // Add authorization policies.
+            CreatePolicies(builder.Services.AddAuthorizationBuilder());
 
             // Add services commonly used with controllers APIs.
             builder.Services
@@ -193,7 +192,7 @@ namespace ADAtickets.ApiService
             // Configure interceptor for 4xx and 5xx errors.
             app.UseStatusCodePages();
 
-            // Add authentication middleware (validates both Identity and Microsoft JWTs).
+            // Add authentication middleware.
             app.UseAuthentication();
 
             // Add authorization middleware.
@@ -201,6 +200,31 @@ namespace ADAtickets.ApiService
 
             // Map the controllers endpoints for business logic APIs.
             app.MapControllers();
+        }
+
+        private static void CreatePolicies(AuthorizationBuilder builder)
+        {
+            builder.AddPolicy(nameof(Policy.AdminOnly), policy =>
+            {
+                policy.RequireAuthenticatedUser()
+                .RequireRole("Azure DevOps Administrator")
+                .AddAuthenticationSchemes(nameof(Scheme.Entra));
+
+            })
+            .AddPolicy(nameof(Policy.OperatorOrAdmin), policy =>
+            {
+                policy.RequireAuthenticatedUser()
+                .AddAuthenticationSchemes(nameof(Scheme.Entra));
+            })
+            .AddPolicy(nameof(Policy.Everyone), policy =>
+            {
+                policy.RequireAuthenticatedUser()
+                .AddAuthenticationSchemes(nameof(Scheme.Entra), nameof(Scheme.ExternalEntra));
+            })
+            .AddDefaultPolicy(nameof(Policy.Unauthenticated), policy =>
+            {
+                policy.RequireAssertion(_ => true);
+            });
         }
     }
 }

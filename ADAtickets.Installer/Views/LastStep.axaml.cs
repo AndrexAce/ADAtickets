@@ -155,23 +155,23 @@ partial class LastStep : UserControl
         string? apiTag = await Dispatcher.UIThread.InvokeAsync(() => viewModel.ApiVersion?.Content?.ToString());
         fileContent = Regex.Replace(fileContent, "^APITAG=.*$", $"APITAG={apiTag}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
         string? webTag = await Dispatcher.UIThread.InvokeAsync(() => viewModel.WebVersion?.Content?.ToString());
-        fileContent = Regex.Replace(fileContent, "^CLIENTTAG=.*$", $"CLIENTTAG={webTag}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
+        fileContent = Regex.Replace(fileContent, "^WEBTAG=.*$", $"WEBTAG={webTag}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
+
+        // Tenant configuration
+        fileContent = Regex.Replace(fileContent, "^TENANTID=.*$", $"TENANTID={viewModel.TenantId}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
+        fileContent = Regex.Replace(fileContent, "^EXTERNALTENANTID=.*$", $"EXTERNALTENANTID={viewModel.ExternalTenantId}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
 
         // Entra ID configuration (API)
-        fileContent = Regex.Replace(fileContent, "^TENANTID=.*$", $"TENANTID={viewModel.TenantId}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
-        fileContent = Regex.Replace(fileContent, "^APIAPPID=.*$", $"APIAPPID={viewModel.ApiId}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
+        fileContent = Regex.Replace(fileContent, "^APIAPPID=.*$", $"APIAPPID={viewModel.ApiAppId}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
 
         // External Entra ID configuration (API)
-        fileContent = Regex.Replace(fileContent, "^EXTERNALTENANTID=.*$", $"EXTERNALTENANTID={viewModel.ExternalTenantId}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
-        fileContent = Regex.Replace(fileContent, "^EXTERNALAPIAPPID=.*$", $"EXTERNALAPIAPPID={viewModel.ExternalApiId}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
+        fileContent = Regex.Replace(fileContent, "^EXTERNALAPIAPPID=.*$", $"EXTERNALAPIAPPID={viewModel.ExternalApiAppId}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
 
         // Entra ID configuration (web app)
-        fileContent = Regex.Replace(fileContent, "^CLIENTAPPID=.*$", $"CLIENTAPPID={viewModel.ClientId}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
-        fileContent = Regex.Replace(fileContent, "^TENANTNAME=.*$", $"TENANTNAME={viewModel.TenantDomain?[..viewModel.TenantDomain.IndexOf('.')]}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
+        fileContent = Regex.Replace(fileContent, "^WEBAPPID=.*$", $"WEBAPPID={viewModel.WebAppId}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
 
         // External Entra ID configuration (web app)
-        fileContent = Regex.Replace(fileContent, "^EXTERNALCLIENTAPPID=.*$", $"EXTERNALCLIENTAPPID={viewModel.ExternalClientId}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
-        fileContent = Regex.Replace(fileContent, "^EXTERNALTENANTNAME=.*$", $"EXTERNALTENANTNAME={viewModel.ExternalTenantDomain?[..viewModel.ExternalTenantDomain.IndexOf('.')]}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
+        fileContent = Regex.Replace(fileContent, "^EXTERNALWEBAPPID=.*$", $"EXTERNALWEBAPPID={viewModel.ExternalWebAppId}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
 
         // Authentication configuration (API)
         fileContent = Regex.Replace(fileContent, "^APIAUTHCERTIFICATEDISKPATH=.*$", $"APIAUTHCERTIFICATEDISKPATH={Path.GetDirectoryName(viewModel.ApiAuthCertificatePath)}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
@@ -179,12 +179,9 @@ partial class LastStep : UserControl
         fileContent = Regex.Replace(fileContent, "^APIAUTHCERTIFICATEPASSWORD=.*$", $"APIAUTHCERTIFICATEPASSWORD={viewModel.ApiAuthCertificatePassword}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
 
         // Authentication configuration (web app)
-        fileContent = Regex.Replace(fileContent, "^WEBAPPAUTHCERTIFICATEDISKPATH=.*$", $"WEBAPPAUTHCERTIFICATEDISKPATH={Path.GetDirectoryName(viewModel.WebAppAuthCertificatePath)}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
-        fileContent = Regex.Replace(fileContent, "^WEBAPPAUTHCERTIFICATENAME=.*$", $"WEBAPPAUTHCERTIFICATENAME={Path.GetFileName(viewModel.WebAppAuthCertificatePath)}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
-        fileContent = Regex.Replace(fileContent, "^WEBAPPAUTHCERTIFICATEPASSWORD=.*$", $"WEBAPPAUTHCERTIFICATEPASSWORD={viewModel.WebAppAuthCertificatePassword}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
-
-        // Azure DevOps configuration
-        fileContent = Regex.Replace(fileContent, "^DEVOPSORGANIZATION=.*$", $"DEVOPSORGANIZATION={viewModel.DevOpsOrganizationName}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
+        fileContent = Regex.Replace(fileContent, "^WEBAUTHCERTIFICATEDISKPATH=.*$", $"WEBAUTHCERTIFICATEDISKPATH={Path.GetDirectoryName(viewModel.WebAuthCertificatePath)}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
+        fileContent = Regex.Replace(fileContent, "^WEBAUTHCERTIFICATENAME=.*$", $"WEBAUTHCERTIFICATENAME={Path.GetFileName(viewModel.WebAuthCertificatePath)}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
+        fileContent = Regex.Replace(fileContent, "^WEBAUTHCERTIFICATEPASSWORD=.*$", $"WEBAUTHCERTIFICATEPASSWORD={viewModel.WebAuthCertificatePassword}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
 
         // Write to temporary location
         string tempEnvPath = Path.Combine(path, ".env");

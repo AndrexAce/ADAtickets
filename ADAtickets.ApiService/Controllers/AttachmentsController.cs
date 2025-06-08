@@ -42,6 +42,7 @@ namespace ADAtickets.ApiService.Controllers
     [FormatFilter]
     [ApiConventionType(typeof(ADAticketsApiConventions))]
     [AutoValidateAntiforgeryToken]
+    [Authorize(Policy = nameof(Policy.AdminOnly))]
     public sealed class AttachmentsController(IAttachmentRepository attachmentRepository, IMapper mapper) : ControllerBase
     {
         private readonly IAttachmentRepository _attachmentRepository = attachmentRepository;
@@ -63,7 +64,6 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="403">The client was authenticated but had not enough privileges.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpGet]
-        [Authorize(Policy = "AdminOnly")]
         public async Task<ActionResult<IEnumerable<AttachmentResponseDto>>> GetAttachments([FromQuery] IEnumerable<KeyValuePair<string, string>>? filters)
         {
             var attachments = await (filters != null ? _attachmentRepository.GetAttachmentsByAsync(filters) : _attachmentRepository.GetAttachmentsAsync());
@@ -83,7 +83,6 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="404">The entity with the given id didn't exist.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpGet("{id}")]
-        [Authorize(Policy = "AdminOnly")]
         public async Task<ActionResult<AttachmentResponseDto>> GetAttachment(Guid id)
         {
             // Check if the requested entity exists.
@@ -129,7 +128,6 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="406">The client asked for an unsupported response format.</response>
         /// <response code="409">The entity was updated by another request at the same time.</response>
         [HttpPut("{id}")]
-        [Authorize(Policy = "AdminOnly")]
         public async Task<ActionResult<AttachmentResponseDto>> PutAttachment(Guid id, AttachmentRequestDto attachmentDto)
         {
             // If the requested entity does not exist, create a new one.
@@ -187,7 +185,6 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="403">The client was authenticated but had not enough privileges.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpPost]
-        [Authorize(Policy = "AdminOnly")]
         public async Task<ActionResult<AttachmentResponseDto>> PostAttachment(AttachmentRequestDto attachmentDto)
         {
             var attachment = _mapper.Map(attachmentDto, new Attachment());
@@ -211,7 +208,6 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="404">The entity with the given id didn't exist.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpDelete("{id}")]
-        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> DeleteAttachment(Guid id)
         {
             // Check if the requested entity exists.

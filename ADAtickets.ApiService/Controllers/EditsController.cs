@@ -63,7 +63,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="403">The client was authenticated but had not enough privileges.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpGet]
-        [Authorize(Policy = "AuthenticatedEveryone")]
+        [Authorize(Policy = nameof(Policy.Everyone))]
         public async Task<ActionResult<IEnumerable<EditResponseDto>>> GetEdits([FromQuery] IEnumerable<KeyValuePair<string, string>>? filters)
         {
             var edits = await (filters != null ? _editRepository.GetEditsByAsync(filters) : _editRepository.GetEditsAsync());
@@ -83,7 +83,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="404">The entity with the given id didn't exist.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpGet("{id}")]
-        [Authorize(Policy = "AdminOnly")]
+        [Authorize(Policy = nameof(Policy.AdminOnly))]
         public async Task<ActionResult<EditResponseDto>> GetEdit(Guid id)
         {
             // Check if the requested entity exists.
@@ -135,7 +135,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="406">The client asked for an unsupported response format.</response>
         /// <response code="409">The entity was updated by another request at the same time.</response>
         [HttpPut("{id}")]
-        [Authorize(Policy = "AdminOnly")]
+        [Authorize(Policy = nameof(Policy.AdminOnly))]
         public async Task<ActionResult<EditResponseDto>> PutEdit(Guid id, EditRequestDto editDto)
         {
             // If the requested entity does not exist, create a new one.
@@ -199,7 +199,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="403">The client was authenticated but had not enough privileges.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpPost]
-        [Authorize(Policy = "AdminOnly")]
+        [Authorize(Policy = nameof(Policy.AdminOnly))]
         public async Task<ActionResult<EditResponseDto>> PostEdit(EditRequestDto editDto)
         {
             var edit = _mapper.Map(editDto, new Edit());
@@ -223,7 +223,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="404">The entity with the given id didn't exist.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpDelete("{id}")]
-        [Authorize(Policy = "AdminOnly")]
+        [Authorize(Policy = nameof(Policy.AdminOnly))]
         public async Task<IActionResult> DeleteEdit(Guid id)
         {
             // Check if the requested entity exists.

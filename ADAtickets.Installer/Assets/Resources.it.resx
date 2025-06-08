@@ -129,9 +129,6 @@
   <data name="TenantIdLabel" xml:space="preserve">
     <value>ID tenant:</value>
   </data>
-  <data name="DomainLabel" xml:space="preserve">
-    <value>Dominio tenant:</value>
-  </data>
   <data name="FieldRequired" xml:space="preserve">
     <value>Questo campo è obbligatorio.</value>
   </data>
@@ -156,9 +153,6 @@
   <data name="VolumePathLabel" xml:space="preserve">
     <value>Percorso montaggio volume (locale):</value>
   </data>
-  <data name="ExternalDomainLabel" xml:space="preserve">
-    <value>Dominio tenant esterno:</value>
-  </data>
   <data name="ExternalTenantIdLabel" xml:space="preserve">
     <value>ID tenant esterno:</value>
   </data>
@@ -168,22 +162,22 @@
   <data name="InvalidGuid" xml:space="preserve">
     <value>Il GUID non è valido.</value>
   </data>
-  <data name="ClientIdLabel" xml:space="preserve">
-    <value>ID app client:</value>
+  <data name="WebAppIdLabel" xml:space="preserve">
+    <value>ID app web:</value>
   </data>
-  <data name="ExternalClientIdLabel" xml:space="preserve">
-    <value>ID app client esterna:</value>
+  <data name="ExternalWebAppIdLabel" xml:space="preserve">
+    <value>ID app web esterna:</value>
   </data>
-  <data name="ApiIdLabel" xml:space="preserve">
+  <data name="ApiAppIdLabel" xml:space="preserve">
     <value>ID app API:</value>
   </data>
-  <data name="ExternalApiIdLabel" xml:space="preserve">
+  <data name="ExternalApiAppIdLabel" xml:space="preserve">
     <value>ID app API esterna:</value>
   </data>
   <data name="WebVersionLabel" xml:space="preserve">
     <value>Versione app:</value>
   </data>
-  <data name="WebAppAuthCertificatePasswordLabel" xml:space="preserve">
+  <data name="WebAuthCertificatePasswordLabel" xml:space="preserve">
     <value>Password certificato autenticazione web app:</value>
   </data>
   <data name="PleaseInsert" xml:space="preserve">
@@ -226,18 +220,12 @@
     <value>Indietro</value>
   </data>
   <data name="ApiAuthCertificatePathLabel" xml:space="preserve">
-    <value>Percorso certificato autenticazione API:</value>
+    <value>Percorso certificato autenticazione (locale) API:</value>
   </data>
   <data name="ApiAuthCertificatePasswordLabel" xml:space="preserve">
     <value>Password certificato autenticazione API:</value>
   </data>
-  <data name="WebAppAuthCertificatePathLabel" xml:space="preserve">
+  <data name="WebAuthCertificatePathLabel" xml:space="preserve">
     <value>Percorso certificato autenticazione (locale) web app:</value>
-  </data>
-  <data name="DevOpsOrganizationNameLabel" xml:space="preserve">
-    <value>Nome organizzazione DevOps:</value>
-  </data>
-  <data name="InvalidOrganizationName" xml:space="preserve">
-    <value>Il nome dell'organizzazione non è valido,</value>
   </data>
 </root>

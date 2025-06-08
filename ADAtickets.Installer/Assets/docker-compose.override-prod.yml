@@ -13,16 +13,22 @@ services:
       # Database connection string
       - ConnectionStrings__PostgreSQL=Host=localhost;Port=5432;Database=adatickets;Username=${POSTGRESUSER:?error};Password=${POSTGRESPASSWORD:?error}
       # Entra configuration variables
-      - Entra__Authority=https://login.microsoftonline.com/${TENANTID:?error}/v2.0/
-      - Entra__Audience=api://${APIAPPID:?error}
-      - ExternalEntra__Authority=https://${EXTERNALTENANTNAME:?error}.ciamlogin.com/${EXTERNALTENANTID:?error}/v2.0/
-      - ExternalEntra__Audience=api://${EXTERNALAPIAPPID:?error}
+      - Entra__Instance=https://login.microsoftonline.com
+      - Entra__TenantId=${TENANTID:?error}
+      - Entra__ClientId=${APIAPPID:?error}
+      # External Entra configuration variables
+      - ExternalEntra__Instance=https://login.microsoftonline.com
+      - ExternalEntra__TenantId=${EXTERNALTENANTID:?error}
+      - ExternalEntra__ClientId=${EXTERNALAPIAPPID:?error}
+      # API scopes
+      - Authorization__Scopes__Read="Read ReadWrite"
+      - Authorization__Scopes__Write="ReadWrite"
     volumes:
       - ${SSLCERTIFICATEDISKPATH:?error}:/https:ro
       - ${APIAUTHCERTIFICATEDISKPATH:?error}:/certs:ro
 
   adatickets.web:
-    image: ghcr.io/andrexace/adatickets-web:${CLIENTTAG:-latest}
+    image: ghcr.io/andrexace/adatickets-web:${WEBTAG:-latest}
     environment:
       # ASP.NET configuration variables
       - DOTNET_GENERATE_ASPNET_CERTIFICATE=false
@@ -31,29 +37,29 @@ services:
       - ASPNETCORE_Kestrel__Certificates__Default__Password=${SSLCERTIFICATEPASSWORD:?error}
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/${SSLCERTIFICATENAME:?error}
       # Entra configuration variables
-      - Entra__Authority=https://login.microsoftonline.com/${TENANTID:?error}/v2.0/
-      - Entra__Audience=api://${APIAPPID:?error}
-      - Entra__CallbackPath=/signin-oidc-entra
       - Entra__Instance=https://login.microsoftonline.com
-      - Entra__SignOutCallbackPath=/signout-oidc-entra
-      - Entra__ClientId=${CLIENTAPPID:?error}
-      - Entra__Domain=${TENANTNAME:?error}.onmicrosoft.com
       - Entra__TenantId=${TENANTID:?error}
-      - Entra__ClientCertificate__Path=/certs/${WEBAPPAUTHCERTIFICATENAME:?error}
-      - Entra__ClientCertificate__Password=${WEBAPPAUTHCERTIFICATEPASSWORD:?error}
-      - Entra__DownstreamApi__BaseUrl=https://localhost:7214
-      - Entra__DownstreamApi__Scopes__0=api://${APIAPPID:?error}/Read
-      - Entra__DownstreamApi__Scopes__1=api://${APIAPPID:?error}/ReadWrite
-      - ExternalEntra__Authority=https://${EXTERNALTENANTNAME:?error}.ciamlogin.com/${EXTERNALTENANTID:?error}/v2.0/
-      - ExternalEntra__Audience=api://${EXTERNALAPIAPPID:?error}
-      - ExternalEntra__CallbackPath=/signin-oidc-entra-external
-      - ExternalEntra__Instance=https://${EXTERNALTENANTNAME:?error}.ciamlogin.com
-      - ExternalEntra__SignOutCallbackPath=/signout-oidc-entra-external 
-      - ExternalEntra__ClientId=${EXTERNALCLIENTAPPID}
-      - ExternalEntra__Domain=${EXTERNALTENANTNAME:?error}.onmicrosoft.com
+      - Entra__ClientId=${WEBAPPID:?error}
+      - Entra__CallbackPath=/signin-oidc-entra
+      - Entra__SignedOutCallbackPath=/signout-oidc-entra
+      - Entra__ClientCertificates__0__SourceType=Path
+      - Entra__ClientCertificates__0__CertificateDiskPath=/certs/${WEBAUTHCERTIFICATENAME:?error}
+      - Entra__ClientCertificates__0__CertificatePassword=${WEBAUTHCERTIFICATEPASSWORD:?error}
+      - Entra__ADAticketsAPI__BaseUrl=https://localhost:7214
+      - Entra__ADAticketsAPI__Scopes__0="Read"
+      - Entra__ADAticketsAPI__Scopes__1="ReadWrite"
+      # External Entra configuration variables
+      - ExternalEntra__Instance=https://login.microsoftonline.com
       - ExternalEntra__TenantId=${EXTERNALTENANTID:?error}
-      - ExternalEntra__DownstreamApi__Scopes__0=api://${EXTERNALAPIAPPID:?error}/Read
-      - ExternalEntra__DownstreamApi__Scopes__1=api://${EXTERNALAPIAPPID:?error}/ReadWrite
+      - ExternalEntra__ClientId=${EXTERNALWEBAPPID:?error}
+      - ExternalEntra__CallbackPath=/signin-oidc-external-entra
+      - ExternalEntra__SignedOutCallbackPath=/signout-oidc-external-entra
+      - ExternalEntra__ClientCertificates__0__SourceType=Path
+      - ExternalEntra__ClientCertificates__0__CertificateDiskPath=/certs/${WEBAUTHCERTIFICATENAME:?error}
+      - ExternalEntra__ClientCertificates__0__CertificatePassword=${WEBAUTHCERTIFICATEPASSWORD:?error}
+      - ExternalEntra__ADAticketsAPI__BaseUrl=https://localhost:7214
+      - ExternalEntra__ADAticketsAPI__Scopes__0="Read"
+      - ExternalEntra__ADAticketsAPI__Scopes__1="ReadWrite"
     volumes:
       - ${SSLCERTIFICATEDISKPATH:?error}:/https:ro
-      - ${WEBAPPAUTHCERTIFICATEDISKPATH:?error}:/certs:ro
+      - ${WEBAUTHCERTIFICATEDISKPATH:?error}:/certs:ro

@@ -2,17 +2,6 @@
   "version": 1,
   "dependencies": {
     "net9.0": {
-      "Avalonia": {
-        "type": "Direct",
-        "requested": "[11.3.1, )",
-        "resolved": "11.3.1",
-        "contentHash": "XHZAj64Ywp3su68NBckeccY1N4Cig8J/iTzMEszWDnAWQbH8xgHftcr+DhS7PrANM/uXyFGP9n4+4v3vhJDeWA==",
-        "dependencies": {
-          "Avalonia.BuildServices": "0.0.31",
-          "Avalonia.Remote.Protocol": "11.3.1",
-          "MicroCom.Runtime": "0.11.0"
-        }
-      },
       "Avalonia.Diagnostics": {
         "type": "Direct",
         "requested": "[11.3.1, )",
@@ -62,6 +51,16 @@
           "Newtonsoft.Json": "13.0.1",
           "System.Buffers": "4.5.1",
           "System.Threading.Tasks.Extensions": "4.5.4"
+        }
+      },
+      "Avalonia": {
+        "type": "Transitive",
+        "resolved": "11.3.1",
+        "contentHash": "XHZAj64Ywp3su68NBckeccY1N4Cig8J/iTzMEszWDnAWQbH8xgHftcr+DhS7PrANM/uXyFGP9n4+4v3vhJDeWA==",
+        "dependencies": {
+          "Avalonia.BuildServices": "0.0.31",
+          "Avalonia.Remote.Protocol": "11.3.1",
+          "MicroCom.Runtime": "0.11.0"
         }
       },
       "Avalonia.BuildServices": {

@@ -43,28 +43,28 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 			<Image Source="/Assets/Azure.png" Width="100"/>
 			<UniformGrid Columns="2" HorizontalAlignment="Stretch" ColumnSpacing="20" RowSpacing="20" Width="760">
 				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-					<TextBlock Text="{x:Static assets:Resources.ClientIdLabel}" FontFamily="Segoe UI"/>
-					<TextBox Text="{Binding ClientId}" Watermark="00000000-0000-0000-0000-000000000000" HorizontalAlignment="Stretch" Width="NaN"/>
+					<TextBlock Text="{x:Static assets:Resources.WebAppIdLabel}" FontFamily="Segoe UI"/>
+					<TextBox Text="{Binding WebAppId}" Watermark="00000000-0000-0000-0000-000000000000" HorizontalAlignment="Stretch" Width="NaN"/>
 				</StackPanel>
 				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-					<TextBlock Text="{x:Static assets:Resources.ApiIdLabel}" FontFamily="Segoe UI"/>
-					<TextBox Text="{Binding ApiId}" Watermark="00000000-0000-0000-0000-000000000000" HorizontalAlignment="Stretch" Width="NaN"/>
+					<TextBlock Text="{x:Static assets:Resources.ExternalWebAppIdLabel}" FontFamily="Segoe UI"/>
+					<TextBox Text="{Binding ExternalWebAppId}" Watermark="00000000-0000-0000-0000-000000000000" HorizontalAlignment="Stretch" Width="NaN"/>
 				</StackPanel>
 				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-					<TextBlock Text="{x:Static assets:Resources.ExternalClientIdLabel}" FontFamily="Segoe UI"/>
-					<TextBox Text="{Binding ExternalClientId}" Watermark="00000000-0000-0000-0000-000000000000" HorizontalAlignment="Stretch" Width="NaN"/>
+					<TextBlock Text="{x:Static assets:Resources.ApiAppIdLabel}" FontFamily="Segoe UI"/>
+					<TextBox Text="{Binding ApiAppId}" Watermark="00000000-0000-0000-0000-000000000000" HorizontalAlignment="Stretch" Width="NaN"/>
 				</StackPanel>
 				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-					<TextBlock Text="{x:Static assets:Resources.ExternalApiIdLabel}" FontFamily="Segoe UI"/>
-					<TextBox Text="{Binding ExternalApiId}" Watermark="00000000-0000-0000-0000-000000000000" HorizontalAlignment="Stretch" Width="NaN"/>
+					<TextBlock Text="{x:Static assets:Resources.ExternalApiAppIdLabel}" FontFamily="Segoe UI"/>
+					<TextBox Text="{Binding ExternalApiAppId}" Watermark="00000000-0000-0000-0000-000000000000" HorizontalAlignment="Stretch" Width="NaN"/>
 				</StackPanel>
 				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-					<TextBlock Text="{x:Static assets:Resources.WebAppAuthCertificatePathLabel}" FontFamily="Segoe UI"/>
-					<TextBox Text="{Binding WebAppAuthCertificatePath}" Watermark="/path/to/certificate.pfx" HorizontalAlignment="Stretch" Width="NaN"/>
+					<TextBlock Text="{x:Static assets:Resources.WebAuthCertificatePathLabel}" FontFamily="Segoe UI"/>
+					<TextBox Text="{Binding WebAuthCertificatePath}" Watermark="/path/to/certificate.pfx" HorizontalAlignment="Stretch" Width="NaN"/>
 				</StackPanel>
 				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-					<TextBlock Text="{x:Static assets:Resources.WebAppAuthCertificatePasswordLabel}" FontFamily="Segoe UI"/>
-					<TextBox Text="{Binding WebAppAuthCertificatePassword}" PasswordChar="•" HorizontalAlignment="Stretch" Width="NaN"/>
+					<TextBlock Text="{x:Static assets:Resources.WebAuthCertificatePasswordLabel}" FontFamily="Segoe UI"/>
+					<TextBox Text="{Binding WebAuthCertificatePassword}" PasswordChar="•" HorizontalAlignment="Stretch" Width="NaN"/>
 				</StackPanel>
 				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
 					<TextBlock Text="{x:Static assets:Resources.ApiAuthCertificatePathLabel}" FontFamily="Segoe UI"/>
@@ -73,15 +73,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
 					<TextBlock Text="{x:Static assets:Resources.ApiAuthCertificatePasswordLabel}" FontFamily="Segoe UI"/>
 					<TextBox Text="{Binding ApiAuthCertificatePassword}" PasswordChar="•" HorizontalAlignment="Stretch" Width="NaN"/>
-				</StackPanel>
-			</UniformGrid>
-		</StackPanel>
-		<StackPanel Orientation="Horizontal" Spacing="20">
-			<Image Source="/Assets/AzureDevOps.png" Width="100"/>
-			<UniformGrid Columns="2" HorizontalAlignment="Stretch" ColumnSpacing="20" RowSpacing="20" Width="760">
-				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-					<TextBlock Text="{x:Static assets:Resources.DevOpsOrganizationNameLabel}" FontFamily="Segoe UI"/>
-					<TextBox Text="{Binding DevOpsOrganizationName}" Watermark="ExampleName" HorizontalAlignment="Stretch" Width="NaN"/>
 				</StackPanel>
 			</UniformGrid>
 		</StackPanel>

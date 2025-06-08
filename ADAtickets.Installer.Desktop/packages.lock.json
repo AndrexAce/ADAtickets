@@ -283,7 +283,6 @@
       "adatickets.installer": {
         "type": "Project",
         "dependencies": {
-          "Avalonia": "[11.3.1, )",
           "Avalonia.Diagnostics": "[11.3.1, )",
           "Avalonia.Fonts.Inter": "[11.3.1, )",
           "Avalonia.ReactiveUI": "[11.3.1, )",

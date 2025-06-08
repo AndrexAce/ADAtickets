@@ -40,18 +40,15 @@ class MainViewModel : ReactiveObject
     private ComboBoxItem? _apiVersion;
     private ComboBoxItem? _webVersion;
     private string? _tenantId;
-    private string? _tenantDomain;
     private string? _externalTenantId;
-    private string? _externalTenantDomain;
-    private string? _clientId;
-    private string? _apiId;
-    private string? _externalClientId;
-    private string? _externalApiId;
+    private string? _apiAppId;
+    private string? _externalApiAppId;
+    private string? _webAppId;
+    private string? _externalWebAppId;
     private string? _apiAuthCertificatePath;
     private string? _apiAuthCertificatePassword;
-    private string? _webAppAuthCertificatePath;
-    private string? _webAppAuthCertificatePassword;
-    private string? _devOpsOrganizationName;
+    private string? _webAuthCertificatePath;
+    private string? _webAuthCertificatePassword;
     private string _phaseText = "";
     private int _progressBarValue = 0;
     private bool _isLoadingVisible = true;
@@ -126,17 +123,6 @@ class MainViewModel : ReactiveObject
 
     [Required(ErrorMessageResourceType = typeof(Assets.Resources),
               ErrorMessageResourceName = "FieldRequired")]
-    [RegularExpression(@"^[a-zA-Z0-9\-\.]+\.onmicrosoft\.com$",
-                     ErrorMessageResourceType = typeof(Assets.Resources),
-                     ErrorMessageResourceName = "InvalidDomain")]
-    public string? TenantDomain
-    {
-        get => _tenantDomain;
-        set => this.RaiseAndSetIfChanged(ref _tenantDomain, value);
-    }
-
-    [Required(ErrorMessageResourceType = typeof(Assets.Resources),
-              ErrorMessageResourceName = "FieldRequired")]
     [RegularExpression(@"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
                      ErrorMessageResourceType = typeof(Assets.Resources),
                      ErrorMessageResourceName = "InvalidGuid")]
@@ -148,13 +134,13 @@ class MainViewModel : ReactiveObject
 
     [Required(ErrorMessageResourceType = typeof(Assets.Resources),
               ErrorMessageResourceName = "FieldRequired")]
-    [RegularExpression(@"^[a-zA-Z0-9\-\.]+\.onmicrosoft\.com$",
+    [RegularExpression(@"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
                      ErrorMessageResourceType = typeof(Assets.Resources),
-                     ErrorMessageResourceName = "InvalidDomain")]
-    public string? ExternalTenantDomain
+                     ErrorMessageResourceName = "InvalidGuid")]
+    public string? ApiAppId
     {
-        get => _externalTenantDomain;
-        set => this.RaiseAndSetIfChanged(ref _externalTenantDomain, value);
+        get => _apiAppId;
+        set => this.RaiseAndSetIfChanged(ref _apiAppId, value);
     }
 
     [Required(ErrorMessageResourceType = typeof(Assets.Resources),
@@ -162,69 +148,39 @@ class MainViewModel : ReactiveObject
     [RegularExpression(@"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
                      ErrorMessageResourceType = typeof(Assets.Resources),
                      ErrorMessageResourceName = "InvalidGuid")]
-    public string? ClientId
+    public string? ExternalApiAppId
     {
-        get => _clientId;
-        set => this.RaiseAndSetIfChanged(ref _clientId, value);
+        get => _externalApiAppId;
+        set => this.RaiseAndSetIfChanged(ref _externalApiAppId, value);
     }
 
     [Required(ErrorMessageResourceType = typeof(Assets.Resources),
-              ErrorMessageResourceName = "FieldRequired")]
+          ErrorMessageResourceName = "FieldRequired")]
     [RegularExpression(@"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
-                     ErrorMessageResourceType = typeof(Assets.Resources),
-                     ErrorMessageResourceName = "InvalidGuid")]
-    public string? ApiId
+                 ErrorMessageResourceType = typeof(Assets.Resources),
+                 ErrorMessageResourceName = "InvalidGuid")]
+    public string? WebAppId
     {
-        get => _apiId;
-        set => this.RaiseAndSetIfChanged(ref _apiId, value);
+        get => _webAppId;
+        set => this.RaiseAndSetIfChanged(ref _webAppId, value);
     }
 
     [Required(ErrorMessageResourceType = typeof(Assets.Resources),
-              ErrorMessageResourceName = "FieldRequired")]
+          ErrorMessageResourceName = "FieldRequired")]
     [RegularExpression(@"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
-                     ErrorMessageResourceType = typeof(Assets.Resources),
-                     ErrorMessageResourceName = "InvalidGuid")]
-    public string? ExternalClientId
+                 ErrorMessageResourceType = typeof(Assets.Resources),
+                 ErrorMessageResourceName = "InvalidGuid")]
+    public string? ExternalWebAppId
     {
-        get => _externalClientId;
-        set => this.RaiseAndSetIfChanged(ref _externalClientId, value);
+        get => _externalWebAppId;
+        set => this.RaiseAndSetIfChanged(ref _externalWebAppId, value);
     }
 
     [Required(ErrorMessageResourceType = typeof(Assets.Resources),
-              ErrorMessageResourceName = "FieldRequired")]
-    [RegularExpression(@"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
-                     ErrorMessageResourceType = typeof(Assets.Resources),
-                     ErrorMessageResourceName = "InvalidGuid")]
-    public string? ExternalApiId
-    {
-        get => _externalApiId;
-        set => this.RaiseAndSetIfChanged(ref _externalApiId, value);
-    }
-
-    [Required(ErrorMessageResourceType = typeof(Assets.Resources),
-              ErrorMessageResourceName = "FieldRequired")]
+          ErrorMessageResourceName = "FieldRequired")]
     [RegularExpression(@"^[a-zA-Z0-9\/\\_.~:-]+$",
-                     ErrorMessageResourceType = typeof(Assets.Resources),
-                     ErrorMessageResourceName = "InvalidPath")]
-    public string? WebAppAuthCertificatePath
-    {
-        get => _webAppAuthCertificatePath;
-        set => this.RaiseAndSetIfChanged(ref _webAppAuthCertificatePath, value);
-    }
-
-    [Required(ErrorMessageResourceType = typeof(Assets.Resources),
-              ErrorMessageResourceName = "FieldRequired")]
-    public string? WebAppAuthCertificatePassword
-    {
-        get => _webAppAuthCertificatePassword;
-        set => this.RaiseAndSetIfChanged(ref _webAppAuthCertificatePassword, value);
-    }
-
-    [Required(ErrorMessageResourceType = typeof(Assets.Resources),
-              ErrorMessageResourceName = "FieldRequired")]
-    [RegularExpression(@"^[a-zA-Z0-9\/\\_.~:-]+$",
-                     ErrorMessageResourceType = typeof(Assets.Resources),
-                     ErrorMessageResourceName = "InvalidPath")]
+                 ErrorMessageResourceType = typeof(Assets.Resources),
+                 ErrorMessageResourceName = "InvalidPath")]
     public string? ApiAuthCertificatePath
     {
         get => _apiAuthCertificatePath;
@@ -240,14 +196,22 @@ class MainViewModel : ReactiveObject
     }
 
     [Required(ErrorMessageResourceType = typeof(Assets.Resources),
-          ErrorMessageResourceName = "FieldRequired")]
-    [RegularExpression(@"^[a-zA-Z0-9]+$",
+              ErrorMessageResourceName = "FieldRequired")]
+    [RegularExpression(@"^[a-zA-Z0-9\/\\_.~:-]+$",
                      ErrorMessageResourceType = typeof(Assets.Resources),
-                     ErrorMessageResourceName = "InvalidOrganizationName")]
-    public string? DevOpsOrganizationName
+                     ErrorMessageResourceName = "InvalidPath")]
+    public string? WebAuthCertificatePath
     {
-        get => _devOpsOrganizationName;
-        set => this.RaiseAndSetIfChanged(ref _devOpsOrganizationName, value);
+        get => _webAuthCertificatePath;
+        set => this.RaiseAndSetIfChanged(ref _webAuthCertificatePath, value);
+    }
+
+    [Required(ErrorMessageResourceType = typeof(Assets.Resources),
+              ErrorMessageResourceName = "FieldRequired")]
+    public string? WebAuthCertificatePassword
+    {
+        get => _webAuthCertificatePassword;
+        set => this.RaiseAndSetIfChanged(ref _webAuthCertificatePassword, value);
     }
 
     public string PhaseText
@@ -381,14 +345,8 @@ class MainViewModel : ReactiveObject
         };
         isValid &= Validator.TryValidateProperty(TenantId, context, []);
 
-        context.MemberName = nameof(TenantDomain);
-        isValid &= Validator.TryValidateProperty(TenantDomain, context, []);
-
         context.MemberName = nameof(ExternalTenantId);
         isValid &= Validator.TryValidateProperty(ExternalTenantId, context, []);
-
-        context.MemberName = nameof(ExternalTenantDomain);
-        isValid &= Validator.TryValidateProperty(ExternalTenantDomain, context, []);
 
         return isValid;
     }
@@ -398,25 +356,32 @@ class MainViewModel : ReactiveObject
         var isValid = true;
         var context = new ValidationContext(this)
         {
-            MemberName = nameof(ClientId)
+            MemberName = nameof(WebAppId)
         };
-        isValid &= Validator.TryValidateProperty(ClientId, context, []);
+        isValid &= Validator.TryValidateProperty(WebAppId, context, []);
 
-        context.MemberName = nameof(ApiId);
-        isValid &= Validator.TryValidateProperty(ApiId, context, []);
+        context.MemberName = nameof(ApiAppId);
+        isValid &= Validator.TryValidateProperty(ApiAppId, context, []);
 
-        context.MemberName = nameof(ExternalClientId);
-        isValid &= Validator.TryValidateProperty(ExternalClientId, context, []);
+        context.MemberName = nameof(ExternalWebAppId);
+        isValid &= Validator.TryValidateProperty(ExternalWebAppId, context, []);
 
-        context.MemberName = nameof(ExternalApiId);
-        isValid &= Validator.TryValidateProperty(ExternalApiId, context, []);
+        context.MemberName = nameof(ExternalApiAppId);
+        isValid &= Validator.TryValidateProperty(ExternalApiAppId, context, []);
 
-        context.MemberName = nameof(WebAppAuthCertificatePath);
-        isValid &= Validator.TryValidateProperty(WebAppAuthCertificatePassword, context, []);
-        isValid &= File.Exists(WebAppAuthCertificatePath);
+        context.MemberName = nameof(WebAuthCertificatePath);
+        isValid &= Validator.TryValidateProperty(WebAuthCertificatePassword, context, []);
+        isValid &= File.Exists(WebAuthCertificatePath);
 
-        context.MemberName = nameof(WebAppAuthCertificatePassword);
-        isValid &= Validator.TryValidateProperty(WebAppAuthCertificatePassword, context, []);
+        context.MemberName = nameof(WebAuthCertificatePassword);
+        isValid &= Validator.TryValidateProperty(WebAuthCertificatePassword, context, []);
+
+        context.MemberName = nameof(ApiAuthCertificatePath);
+        isValid &= Validator.TryValidateProperty(ApiAuthCertificatePassword, context, []);
+        isValid &= File.Exists(ApiAuthCertificatePath);
+
+        context.MemberName = nameof(ApiAuthCertificatePassword);
+        isValid &= Validator.TryValidateProperty(ApiAuthCertificatePassword, context, []);
 
         return isValid;
     }

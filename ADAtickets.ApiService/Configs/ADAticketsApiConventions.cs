@@ -19,6 +19,7 @@
  */
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.Identity.Web.Resource;
 
 namespace ADAtickets.ApiService.Configs
 {
@@ -39,6 +40,7 @@ namespace ADAtickets.ApiService.Configs
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
         [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
+        [RequiredScope(RequiredScopesConfigurationKey = "AuthorizationScopes:Read")]
         public static void Get(
             [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Suffix)]
             [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.Any)]
@@ -58,6 +60,7 @@ namespace ADAtickets.ApiService.Configs
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
         [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
+        [RequiredScope(RequiredScopesConfigurationKey = "AuthorizationScopes:Read")]
         public static void Get(
             [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Suffix)]
             [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.Any)]
@@ -77,6 +80,7 @@ namespace ADAtickets.ApiService.Configs
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
         [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
+        [RequiredScope(RequiredScopesConfigurationKey = "AuthorizationScopes:Write")]
         public static void Post(
             [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Any)]
             [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.Any)]
@@ -99,6 +103,7 @@ namespace ADAtickets.ApiService.Configs
         [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
+        [RequiredScope(RequiredScopesConfigurationKey = "AuthorizationScopes:Write")]
         public static void Put(
             [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Suffix)]
             [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.Any)]
@@ -122,6 +127,7 @@ namespace ADAtickets.ApiService.Configs
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
         [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
+        [RequiredScope(RequiredScopesConfigurationKey = "AuthorizationScopes:Write")]
         public static void Delete(
             [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Suffix)]
             [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.Any)]

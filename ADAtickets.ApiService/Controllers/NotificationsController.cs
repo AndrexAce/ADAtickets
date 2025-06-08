@@ -63,7 +63,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="403">The client was authenticated but had not enough privileges.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpGet]
-        [Authorize(Policy = "AuthenticatedEveryone")]
+        [Authorize(Policy = nameof(Policy.Everyone))]
         public async Task<ActionResult<IEnumerable<NotificationResponseDto>>> GetNotifications([FromQuery] IEnumerable<KeyValuePair<string, string>>? filters)
         {
             var notifications = await (filters != null ? _notificationRepository.GetNotificationsByAsync(filters) : _notificationRepository.GetNotificationsAsync());
@@ -83,7 +83,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="404">The entity with the given id didn't exist.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpGet("{id}")]
-        [Authorize(Policy = "AdminOnly")]
+        [Authorize(Policy = nameof(Policy.AdminOnly))]
         public async Task<ActionResult<NotificationResponseDto>> GetNotification(Guid id)
         {
             // Check if the requested entity exists.
@@ -133,7 +133,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="406">The client asked for an unsupported response format.</response>
         /// <response code="409">The entity was updated by another request at the same time.</response>
         [HttpPut("{id}")]
-        [Authorize(Policy = "AdminOnly")]
+        [Authorize(Policy = nameof(Policy.AdminOnly))]
         public async Task<ActionResult<NotificationResponseDto>> PutNotification(Guid id, NotificationRequestDto notificationDto)
         {
             // If the requested entity does not exist, create a new one.
@@ -195,7 +195,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="403">The client was authenticated but had not enough privileges.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpPost]
-        [Authorize(Policy = "AdminOnly")]
+        [Authorize(Policy = nameof(Policy.AdminOnly))]
         public async Task<ActionResult<NotificationResponseDto>> PostNotification(NotificationRequestDto notificationDto)
         {
             var notification = _mapper.Map(notificationDto, new Notification());
@@ -219,7 +219,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="404">The entity with the given id didn't exist.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpDelete("{id}")]
-        [Authorize(Policy = "AdminOnly")]
+        [Authorize(Policy = nameof(Policy.AdminOnly))]
         public async Task<IActionResult> DeleteNotification(Guid id)
         {
             // Check if the requested entity exists.

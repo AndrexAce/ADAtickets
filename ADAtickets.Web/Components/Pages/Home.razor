@@ -41,12 +41,22 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     </span>
     <span style="display: flex; flex-direction: column; gap: 1em;">
         <span style="display: flex; flex-direction: row; gap: 1em;">
-            <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Person())" Style="width: 100%; min-width: 240px;" OnClick="NavigateToUserSignin">@Loc["UserButton"]</FluentButton>
+            <FluentButton Appearance="Appearance.Accent" 
+                          IconStart="@(new Icons.Regular.Size20.Person())" 
+                          Style="width: 100%; min-width: 240px;" 
+                          OnClick="@(() => NavManager.NavigateTo("MicrosoftIdentity/Account/SignIn/ExternalEntra", true))">
+                @Loc["UserButton"]
+            </FluentButton>
             <FluentIcon Id="UserButton" Icon="Icons.Regular.Size20.Info"></FluentIcon>
             <FluentTooltip Anchor="UserButton" Position="TooltipPosition.End">@Loc["UserButtonTooltip"]</FluentTooltip>
         </span>
         <span style="display: flex; flex-direction: row; gap: 1em;">
-            <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Wrench())" Style="width: 100%; min-width: 240px;" OnClick="NavigateToAdminSignin">@Loc["AdminButton"]</FluentButton>
+            <FluentButton Appearance="Appearance.Accent" 
+                          IconStart="@(new Icons.Regular.Size20.Wrench())" 
+                          Style="width: 100%; min-width: 240px;" 
+                          OnClick="@(() => NavManager.NavigateTo("MicrosoftIdentity/Account/SignIn/Entra", true))">
+                @Loc["AdminButton"]
+            </FluentButton>
             <FluentIcon Id="AdminButton" Icon="Icons.Regular.Size20.Info"></FluentIcon>
             <FluentTooltip Anchor="AdminButton" Position="TooltipPosition.End">@Loc["AdminButtonTooltip"]</FluentTooltip>
         </span>
@@ -56,16 +66,4 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @code {
     [CascadingParameter(Name = "ThemeMode")]
     public DesignThemeModes CurrentTheme { get; set; }
-
-    private void NavigateToUserSignin()
-    {
-        // Navigate to the MSAL sign-in page using the ExternalEntra scheme (for regular users)
-        NavManager.NavigateTo("MicrosoftIdentity/Account/SignIn/ExternalEntra", forceLoad: true);
-    }
-
-    private void NavigateToAdminSignin()
-    {
-        // Navigate to the MSAL sign-in page using the Entra scheme (for administrators)
-        NavManager.NavigateTo("MicrosoftIdentity/Account/SignIn/Entra", forceLoad: true);
-    }
 }

@@ -54,57 +54,15 @@ namespace ADAtickets.Web
         {
             // Authentication and Authorization
             builder.Services.AddAuthentication()
-                .AddMicrosoftIdentityWebApp(msIdentityOptions =>
-                {
-                    msIdentityOptions.CallbackPath = builder.Configuration.GetSection("Entra:CallbackPath").Value;
-                    msIdentityOptions.ClientId = builder.Configuration.GetSection("Entra:ClientId").Value;
-                    msIdentityOptions.Domain = builder.Configuration.GetSection("Entra:Domain").Value;
-                    msIdentityOptions.Instance = builder.Configuration.GetSection("Entra:Instance").Value!;
-                    msIdentityOptions.SignedOutCallbackPath = builder.Configuration.GetSection("Entra:SignedOutCallbackPath").Value;
-                    msIdentityOptions.TenantId = builder.Configuration.GetSection("Entra:TenantId").Value;
-                    msIdentityOptions.ClientCertificates =
-                    [
-                        new CertificateDescription
-                        {
-                            SourceType = CertificateSource.Path,
-                            CertificateDiskPath = builder.Configuration.GetSection("Entra:ClientCertificate:DiskPath").Value,
-                            CertificatePassword = builder.Configuration.GetSection("Entra:ClientCertificate:Password").Value
-                        }
-                    ];
-                }, openIdConnectScheme: "Entra", cookieScheme: "EntraCookies")
+                .AddMicrosoftIdentityWebApp(builder.Configuration, "Entra", "Entra", "EntraCookie")
                 .EnableTokenAcquisitionToCallDownstreamApi()
-                .AddDownstreamApi("APIEntra", configOptions =>
-                {
-                    configOptions.BaseUrl = builder.Configuration.GetSection("Entra:DownstreamApi:BaseUrl").Value;
-                    configOptions.Scopes = builder.Configuration.GetSection("Entra:DownstreamApi:Scopes").Get<string[]>()!;
-                })
+                .AddDownstreamApi("ADAticketsAPI", builder.Configuration)
                 .AddDistributedTokenCaches();
 
             builder.Services.AddAuthentication()
-                .AddMicrosoftIdentityWebApp(msIdentityOptions =>
-                {
-                    msIdentityOptions.CallbackPath = builder.Configuration.GetSection("ExternalEntra:CallbackPath").Value;
-                    msIdentityOptions.ClientId = builder.Configuration.GetSection("ExternalEntra:ClientId").Value;
-                    msIdentityOptions.Domain = builder.Configuration.GetSection("ExternalEntra:Domain").Value;
-                    msIdentityOptions.Instance = builder.Configuration.GetSection("ExternalEntra:Instance").Value!;
-                    msIdentityOptions.SignedOutCallbackPath = builder.Configuration.GetSection("Entra:SignedOutCallbackPath").Value;
-                    msIdentityOptions.TenantId = builder.Configuration.GetSection("ExternalEntra:TenantId").Value;
-                    msIdentityOptions.ClientCertificates =
-                    [
-                        new CertificateDescription
-                        {
-                            SourceType = CertificateSource.Path,
-                            CertificateDiskPath = builder.Configuration.GetSection("Entra:ClientCertificate:DiskPath").Value,
-                            CertificatePassword = builder.Configuration.GetSection("Entra:ClientCertificate:Password").Value
-                        }
-                    ];
-                }, openIdConnectScheme: "ExternalEntra", cookieScheme: "ExternalEntraCookies")
+                .AddMicrosoftIdentityWebApp(builder.Configuration, "ExternalEntra", "ExternalEntra", "ExternalEntraCookie")
                 .EnableTokenAcquisitionToCallDownstreamApi()
-                .AddDownstreamApi("APIExternalEntra", configOptions =>
-                {
-                    configOptions.BaseUrl = builder.Configuration.GetSection("ExternalEntra:DownstreamApi:BaseUrl").Value;
-                    configOptions.Scopes = builder.Configuration.GetSection("ExternalEntra:DownstreamApi:Scopes").Get<string[]>()!;
-                })
+                .AddDownstreamApi("ADAticketsAPI", builder.Configuration)
                 .AddDistributedTokenCaches();
 
             builder.Services.AddAuthorization();
@@ -122,8 +80,8 @@ namespace ADAtickets.Web
             builder.Services.AddFluentUIComponents();
             builder.Services.AddDataGridEntityFrameworkAdapter();
 
-            // MVC and Blazor setup
-            builder.Services.AddControllersWithViews()
+            // Razor services
+            builder.Services.AddRazorPages()
                 .AddMicrosoftIdentityUI();
 
             builder.Services.AddRazorComponents()
@@ -157,15 +115,16 @@ namespace ADAtickets.Web
             app.UseHttpsRedirection();
             app.UseAntiforgery();
 
+            // Authentication and authorization
+            app.UseAuthentication();
+            app.UseAuthorization();
+
             // Configure routing
             app.MapStaticAssets();
             app.MapControllers();
+            app.MapRazorPages();
             app.MapRazorComponents<App>()
                 .AddInteractiveServerRenderMode();
-
-            // Authentication and authorization middleware must be added in this order
-            app.UseAuthentication();
-            app.UseAuthorization();
 
             app.Run();
         }
