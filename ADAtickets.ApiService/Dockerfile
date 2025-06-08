@@ -10,7 +10,6 @@ LABEL org.opencontainers.image.source=https://github.com/andrexace/adatickets
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Directory.Build.props", "."]
 COPY ["ADAtickets.ApiService/ADAtickets.ApiService.csproj", "ADAtickets.ApiService/"]
 RUN dotnet restore "./ADAtickets.ApiService/ADAtickets.ApiService.csproj"
 COPY . .
