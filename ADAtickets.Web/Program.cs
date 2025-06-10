@@ -29,6 +29,8 @@ namespace ADAtickets.Web
     /// </summary>
     static class Program
     {
+        private const string APIServiceName = "ADAticketsAPI";
+
         /// <summary>
         /// Entrypoint of the application.
         /// </summary>
@@ -56,11 +58,11 @@ namespace ADAtickets.Web
             var authBuilder = builder.Services.AddAuthentication();
             authBuilder.AddMicrosoftIdentityWebApp(builder.Configuration, "Entra", "Entra", "EntraCookie")
                 .EnableTokenAcquisitionToCallDownstreamApi()
-                .AddDownstreamApi("ADAticketsAPI", builder.Configuration.GetSection("ADAticketsAPI"))
+                .AddDownstreamApi(APIServiceName, builder.Configuration.GetSection(APIServiceName))
                 .AddDistributedTokenCaches();
             authBuilder.AddMicrosoftIdentityWebApp(builder.Configuration, "ExternalEntra", "ExternalEntra", "ExternalEntraCookie")
                 .EnableTokenAcquisitionToCallDownstreamApi()
-                .AddDownstreamApi("ADAticketsAPI", builder.Configuration.GetSection("ADAticketsAPI"))
+                .AddDownstreamApi(APIServiceName, builder.Configuration.GetSection(APIServiceName))
                 .AddDistributedTokenCaches();
 
             builder.Services.AddAuthorization();
