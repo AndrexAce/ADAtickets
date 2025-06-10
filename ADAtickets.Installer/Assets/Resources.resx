@@ -228,4 +228,13 @@
   <data name="WebAuthCertificatePathLabel" xml:space="preserve">
     <value>Web app authentication certificate path (local):</value>
   </data>
+  <data name="DevOpsOrganizationNameLabel" xml:space="preserve">
+    <value>DevOps organization name:</value>
+  </data>
+  <data name="ExampleNameWatermark" xml:space="preserve">
+    <value>Example Name</value>
+  </data>
+  <data name="InvalidOrganizationName" xml:space="preserve">
+    <value>Invalid organization name.</value>
+  </data>
 </root>

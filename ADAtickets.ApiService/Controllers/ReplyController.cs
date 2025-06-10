@@ -26,6 +26,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Web.Resource;
 using System.Net.Mime;
 
 namespace ADAtickets.ApiService.Controllers
@@ -41,7 +42,6 @@ namespace ADAtickets.ApiService.Controllers
     [Produces(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
     [FormatFilter]
     [ApiConventionType(typeof(ADAticketsApiConventions))]
-    [AutoValidateAntiforgeryToken]
     public sealed class RepliesController(IReplyRepository replyRepository, IMapper mapper) : ControllerBase
     {
         private readonly IReplyRepository _replyRepository = replyRepository;
@@ -64,6 +64,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpGet]
         [Authorize(Policy = nameof(Policy.Everyone))]
+        [RequiredScope(RequiredScopesConfigurationKey = "AuthorizationScopes:Read")]
         public async Task<ActionResult<IEnumerable<ReplyResponseDto>>> GetReplies([FromQuery] IEnumerable<KeyValuePair<string, string>>? filters)
         {
             var replies = await (filters != null ? _replyRepository.GetRepliesByAsync(filters) : _replyRepository.GetRepliesAsync());
@@ -84,6 +85,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpGet("{id}")]
         [Authorize(Policy = nameof(Policy.AdminOnly))]
+        [RequiredScope(RequiredScopesConfigurationKey = "AuthorizationScopes:Read")]
         public async Task<ActionResult<ReplyResponseDto>> GetReply(Guid id)
         {
             // Check if the requested entity exists.
@@ -132,6 +134,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="409">The entity was updated by another request at the same time.</response>
         [HttpPut("{id}")]
         [Authorize(Policy = nameof(Policy.AdminOnly))]
+        [RequiredScope(RequiredScopesConfigurationKey = "AuthorizationScopes:Write")]
         public async Task<ActionResult<ReplyResponseDto>> PutReply(Guid id, ReplyRequestDto replyDto)
         {
             // If the requested entity does not exist, create a new one.
@@ -192,6 +195,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpPost]
         [Authorize(Policy = nameof(Policy.Everyone))]
+        [RequiredScope(RequiredScopesConfigurationKey = "AuthorizationScopes:Write")]
         public async Task<ActionResult<ReplyResponseDto>> PostReply(ReplyRequestDto replyDto)
         {
             var reply = _mapper.Map(replyDto, new Reply());
@@ -216,6 +220,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpDelete("{id}")]
         [Authorize(Policy = nameof(Policy.AdminOnly))]
+        [RequiredScope(RequiredScopesConfigurationKey = "AuthorizationScopes:Write")]
         public async Task<IActionResult> DeleteReply(Guid id)
         {
             // Check if the requested entity exists.

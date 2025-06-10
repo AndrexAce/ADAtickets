@@ -69,6 +69,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 		</StackPanel>
 		<Separator/>
 		<StackPanel Orientation="Horizontal" Spacing="20">
+			<Image Source="/Assets/AzureDevOps.png" Width="100"/>
+			<UniformGrid Columns="2" HorizontalAlignment="Stretch" ColumnSpacing="20" RowSpacing="20" Width="760">
+				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+					<TextBlock Text="{x:Static assets:Resources.DevOpsOrganizationNameLabel}" FontFamily="Segoe UI"/>
+					<TextBox Text="{Binding DevOpsOrganizationName}" Watermark="{x:Static assets:Resources.ExampleNameWatermark}" HorizontalAlignment="Stretch" Width="NaN"/>
+				</StackPanel>
+			</UniformGrid>
+		</StackPanel>
+		<Separator/>
+		<StackPanel Orientation="Horizontal" Spacing="20">
 			<Image Source="/Assets/Azure.png" Width="100"/>
 			<UniformGrid Columns="2" HorizontalAlignment="Stretch" ColumnSpacing="20" RowSpacing="20" Width="760">
 				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">

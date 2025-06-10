@@ -151,6 +151,15 @@ namespace ADAtickets.Installer.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to DevOps organization name:.
+        /// </summary>
+        public static string DevOpsOrganizationNameLabel {
+            get {
+                return ResourceManager.GetString("DevOpsOrganizationNameLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Writing the environment file....
         /// </summary>
         public static string EnvFileWriting {
@@ -165,6 +174,15 @@ namespace ADAtickets.Installer.Assets {
         public static string ErrorOccurred {
             get {
                 return ResourceManager.GetString("ErrorOccurred", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Example Name.
+        /// </summary>
+        public static string ExampleNameWatermark {
+            get {
+                return ResourceManager.GetString("ExampleNameWatermark", resourceCulture);
             }
         }
         
@@ -237,6 +255,15 @@ namespace ADAtickets.Installer.Assets {
         public static string InvalidGuid {
             get {
                 return ResourceManager.GetString("InvalidGuid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid organization name..
+        /// </summary>
+        public static string InvalidOrganizationName {
+            get {
+                return ResourceManager.GetString("InvalidOrganizationName", resourceCulture);
             }
         }
         

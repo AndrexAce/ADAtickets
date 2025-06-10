@@ -31,6 +31,10 @@ namespace ADAtickets.ApiService.Configs
         /// <summary>
         /// Scheme employed by the logged in user or opertor in the external tenant.
         /// </summary>
-        ExternalEntra
+        ExternalEntra,
+        /// <summary>
+        /// Scheme employed by the service principal in the organizational tenant.
+        /// </summary>
+        DevOps
     }
 }

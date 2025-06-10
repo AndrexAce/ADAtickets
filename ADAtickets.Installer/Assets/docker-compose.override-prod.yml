@@ -20,6 +20,15 @@ services:
       - ExternalEntra__Instance=https://login.microsoftonline.com
       - ExternalEntra__TenantId=${EXTERNALTENANTID:?error}
       - ExternalEntra__ClientId=${EXTERNALAPIAPPID:?error}
+      # DevOps configuration variables
+      - DevOps__Instance=https://login.microsoftonline.com
+      - DevOps__TenantId=${TENANTID:?error}
+      - DevOps__ClientId=${APIAPPID:?error}
+      - DevOps__ClientCertificates__0__SourceType=Path
+      - DevOps__ClientCertificates__0__CertificateDiskPath=/certs/${APIAUTHCERTIFICATENAME:?error}
+      - DevOps__ClientCertificates__0__CertificatePassword=${APIAUTHCERTIFICATEPASSWORD:?error}
+      - DevOps__DevOpsAPI__BaseUrl=https://dev.azure.com/${DEVOPSORGANIZATIONNAME:?error}/_apis
+      - DevOps__DevOpsAPI__Scopes__0="499b84ac-1321-427f-aa17-267ca6975798/.default"
       # API scopes
       - Authorization__Scopes__Read="Read ReadWrite"
       - Authorization__Scopes__Write="ReadWrite"

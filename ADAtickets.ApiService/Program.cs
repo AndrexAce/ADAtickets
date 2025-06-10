@@ -21,6 +21,7 @@ using ADAtickets.ApiService.Configs;
 using ADAtickets.ApiService.Models;
 using ADAtickets.ApiService.Repositories;
 using ADAtickets.ApiService.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -83,11 +84,17 @@ namespace ADAtickets.ApiService
             });
 
             // Add JWTs decoding for both Entra ID and Entra External ID.
-            builder.Services.AddAuthentication()
-                .AddMicrosoftIdentityWebApi(builder.Configuration, nameof(Scheme.Entra), nameof(Scheme.Entra));
+            var authBuilder = builder.Services.AddAuthentication();
+            authBuilder.AddMicrosoftIdentityWebApi(builder.Configuration, nameof(Scheme.Entra), nameof(Scheme.Entra));
+            authBuilder.AddMicrosoftIdentityWebApi(builder.Configuration, nameof(Scheme.ExternalEntra), nameof(Scheme.ExternalEntra));
 
-            builder.Services.AddAuthentication()
-                .AddMicrosoftIdentityWebApi(builder.Configuration, nameof(Scheme.ExternalEntra), nameof(Scheme.ExternalEntra));
+            // Add authentication for the DevOps service principal.
+            authBuilder.AddMicrosoftIdentityWebApi(builder.Configuration, nameof(Scheme.DevOps), JwtBearerDefaults.AuthenticationScheme)
+                .EnableTokenAcquisitionToCallDownstreamApi()
+                .AddDownstreamApi("DevOpsAPI", builder.Configuration.GetSection("DevOpsAPI"))
+                .AddDistributedTokenCaches();
+
+            builder.Services.AddDistributedMemoryCache();
 
             // Add authorization policies.
             CreatePolicies(builder.Services.AddAuthorizationBuilder());

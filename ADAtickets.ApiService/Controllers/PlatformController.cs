@@ -26,6 +26,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Web.Resource;
 using System.Net.Mime;
 
 namespace ADAtickets.ApiService.Controllers
@@ -41,7 +42,6 @@ namespace ADAtickets.ApiService.Controllers
     [Produces(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
     [FormatFilter]
     [ApiConventionType(typeof(ADAticketsApiConventions))]
-    [AutoValidateAntiforgeryToken]
     [Authorize(Policy = nameof(Policy.AdminOnly))]
     public sealed class PlatformsController(IPlatformRepository platformRepository, IMapper mapper) : ControllerBase
     {
@@ -64,6 +64,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="403">The client was authenticated but had not enough privileges.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpGet]
+        [RequiredScope(RequiredScopesConfigurationKey = "AuthorizationScopes:Read")]
         public async Task<ActionResult<IEnumerable<PlatformResponseDto>>> GetPlatforms([FromQuery] IEnumerable<KeyValuePair<string, string>>? filters)
         {
             var platforms = await (filters != null ? _platformRepository.GetPlatformsByAsync(filters) : _platformRepository.GetPlatformsAsync());
@@ -83,6 +84,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="404">The entity with the given id didn't exist.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpGet("{id}")]
+        [RequiredScope(RequiredScopesConfigurationKey = "AuthorizationScopes:Read")]
         public async Task<ActionResult<PlatformResponseDto>> GetPlatform(Guid id)
         {
             // Check if the requested entity exists.
@@ -126,6 +128,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="406">The client asked for an unsupported response format.</response>
         /// <response code="409">The entity was updated by another request at the same time.</response>
         [HttpPut("{id}")]
+        [RequiredScope(RequiredScopesConfigurationKey = "AuthorizationScopes:Write")]
         public async Task<ActionResult<PlatformResponseDto>> PutPlatform(Guid id, PlatformRequestDto platformDto)
         {
             // If the requested entity does not exist, create a new one.
@@ -181,6 +184,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="403">The client was authenticated but had not enough privileges.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpPost]
+        [RequiredScope(RequiredScopesConfigurationKey = "AuthorizationScopes:Write")]
         public async Task<ActionResult<PlatformResponseDto>> PostPlatform(PlatformRequestDto platformDto)
         {
             var platform = _mapper.Map(platformDto, new Platform());
@@ -204,6 +208,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="404">The entity with the given id didn't exist.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpDelete("{id}")]
+        [RequiredScope(RequiredScopesConfigurationKey = "AuthorizationScopes:Write")]
         public async Task<IActionResult> DeletePlatform(Guid id)
         {
             // Check if the requested entity exists.

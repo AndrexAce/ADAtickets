@@ -157,6 +157,9 @@ partial class LastStep : UserControl
         string? webTag = await Dispatcher.UIThread.InvokeAsync(() => viewModel.WebVersion?.Content?.ToString());
         fileContent = Regex.Replace(fileContent, "^WEBTAG=.*$", $"WEBTAG={webTag}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
 
+        // DevOps configuration
+        fileContent = Regex.Replace(fileContent, "^DEVOPSORGANIZATIONNAME=.*$", $"DEVOPSORGANIZATIONNAME={viewModel.DevOpsOrganizationName}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
+
         // Tenant configuration
         fileContent = Regex.Replace(fileContent, "^TENANTID=.*$", $"TENANTID={viewModel.TenantId}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
         fileContent = Regex.Replace(fileContent, "^EXTERNALTENANTID=.*$", $"EXTERNALTENANTID={viewModel.ExternalTenantId}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));

@@ -39,6 +39,7 @@ class MainViewModel : ReactiveObject
     private string? _sslCertificatePassword;
     private ComboBoxItem? _apiVersion;
     private ComboBoxItem? _webVersion;
+    private string? _devOpsOrganizationName;
     private string? _tenantId;
     private string? _externalTenantId;
     private string? _apiAppId;
@@ -108,6 +109,17 @@ class MainViewModel : ReactiveObject
     {
         get => _webVersion;
         set => this.RaiseAndSetIfChanged(ref _webVersion, value);
+    }
+
+    [Required(ErrorMessageResourceType = typeof(Assets.Resources),
+              ErrorMessageResourceName = "FieldRequired")]
+    [RegularExpression(@"^[a-zA-Z0-9][a-zA-Z0-9\-]{0,48}[a-zA-Z0-9]$",
+                     ErrorMessageResourceType = typeof(Assets.Resources),
+                     ErrorMessageResourceName = "InvalidOrganizationName")]
+    public string? DevOpsOrganizationName
+    {
+        get => _devOpsOrganizationName;
+        set => this.RaiseAndSetIfChanged(ref _devOpsOrganizationName, value);
     }
 
     [Required(ErrorMessageResourceType = typeof(Assets.Resources),

@@ -53,16 +53,14 @@ namespace ADAtickets.Web
         public static void ConfigureServices(WebApplicationBuilder builder)
         {
             // Authentication and Authorization
-            builder.Services.AddAuthentication()
-                .AddMicrosoftIdentityWebApp(builder.Configuration, "Entra", "Entra", "EntraCookie")
+            var authBuilder = builder.Services.AddAuthentication();
+            authBuilder.AddMicrosoftIdentityWebApp(builder.Configuration, "Entra", "Entra", "EntraCookie")
                 .EnableTokenAcquisitionToCallDownstreamApi()
-                .AddDownstreamApi("ADAticketsAPI", builder.Configuration)
+                .AddDownstreamApi("ADAticketsAPI", builder.Configuration.GetSection("ADAticketsAPI"))
                 .AddDistributedTokenCaches();
-
-            builder.Services.AddAuthentication()
-                .AddMicrosoftIdentityWebApp(builder.Configuration, "ExternalEntra", "ExternalEntra", "ExternalEntraCookie")
+            authBuilder.AddMicrosoftIdentityWebApp(builder.Configuration, "ExternalEntra", "ExternalEntra", "ExternalEntraCookie")
                 .EnableTokenAcquisitionToCallDownstreamApi()
-                .AddDownstreamApi("ADAticketsAPI", builder.Configuration)
+                .AddDownstreamApi("ADAticketsAPI", builder.Configuration.GetSection("ADAticketsAPI"))
                 .AddDistributedTokenCaches();
 
             builder.Services.AddAuthorization();

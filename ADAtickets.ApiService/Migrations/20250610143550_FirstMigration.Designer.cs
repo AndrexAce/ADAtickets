@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ADAtickets.ApiService.Migrations
 {
     [DbContext(typeof(ADAticketsDbContext))]
-    [Migration("20250605162054_FirstVersion")]
-    partial class FirstVersion
+    [Migration("20250610143550_FirstMigration")]
+    partial class FirstMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
