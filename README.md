@@ -24,6 +24,7 @@ Check the related [wiki page](https://github.com/AndrexAce/ADAtickets/wiki/Setup
 ## Roadmap 🗺️
 
 - Automatic deployment of needed resources during setup with Azure SDK.
+- View branches and commits linked to tickets.
 
 ## License 📃
 This project is licensed under the GPL v3 License — see the [LICENSE](https://github.com/AndrexAce/ADAtickets/blob/master/LICENSE.txt) file for details.

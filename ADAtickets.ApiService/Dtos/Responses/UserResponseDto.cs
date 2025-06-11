@@ -33,6 +33,11 @@ namespace ADAtickets.ApiService.Dtos.Responses
         public Guid Id { get; set; } = Guid.NewGuid();
 
         /// <summary>
+        /// The email address of the user.
+        /// </summary>
+        public string Email { get; set; } = string.Empty;
+
+        /// <summary>
         /// The name of the user.
         /// </summary>
         public string Name { get; set; } = string.Empty;
@@ -41,6 +46,11 @@ namespace ADAtickets.ApiService.Dtos.Responses
         /// The surname of the user.
         /// </summary>
         public string Surname { get; set; } = string.Empty;
+
+        /// <summary>
+        /// The phone number of the user.
+        /// </summary>
+        public string PhoneNumber { get; set; } = string.Empty;
 
         /// <summary>
         /// Whether the user enabled the reception of external notifications via email.

@@ -18,7 +18,7 @@ namespace ADAtickets.ApiService.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.5")
+                .HasAnnotation("ProductVersion", "9.0.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "priority", new[] { "high", "low", "medium" });
@@ -189,10 +189,6 @@ namespace ADAtickets.ApiService.Migrations
                     b.HasKey("Id")
                         .HasName("pk_platforms");
 
-                    b.HasIndex("Name")
-                        .IsUnique()
-                        .HasDatabaseName("ix_platforms_name");
-
                     b.HasIndex("RepositoryUrl")
                         .IsUnique()
                         .HasDatabaseName("ix_platforms_repository_url");
@@ -330,6 +326,11 @@ namespace ADAtickets.ApiService.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("are_phone_notifications_enabled");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("email");
+
                     b.Property<string>("MicrosoftAccountId")
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)")
@@ -340,6 +341,11 @@ namespace ADAtickets.ApiService.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
                         .HasColumnName("name");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("phone_number");
 
                     b.Property<string>("Surname")
                         .IsRequired()
@@ -359,6 +365,18 @@ namespace ADAtickets.ApiService.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_users");
+
+                    b.HasIndex("Email")
+                        .IsUnique()
+                        .HasDatabaseName("ix_users_email");
+
+                    b.HasIndex("MicrosoftAccountId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_users_microsoft_account_id");
+
+                    b.HasIndex("PhoneNumber")
+                        .IsUnique()
+                        .HasDatabaseName("ix_users_phone_number");
 
                     b.ToTable("users", (string)null);
                 });

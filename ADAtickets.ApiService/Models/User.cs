@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using AutoMapper.Configuration.Annotations;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
@@ -27,6 +28,9 @@ namespace ADAtickets.ApiService.Models
     /// <summary>
     /// Represents a user of the system.
     /// </summary>
+    [Index(nameof(Email), IsUnique = true)]
+    [Index(nameof(PhoneNumber), IsUnique = true)]
+    [Index(nameof(MicrosoftAccountId), IsUnique = true)]
     public sealed class User : EntityBase
     {
         /// <summary>
@@ -35,6 +39,13 @@ namespace ADAtickets.ApiService.Models
         [Key]
         [Required]
         public Guid Id { get; set; } = Guid.NewGuid();
+
+        /// <summary>
+        /// The email address of the user.
+        /// </summary>
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = string.Empty;
 
         /// <summary>
         /// The name of the user.
@@ -49,6 +60,13 @@ namespace ADAtickets.ApiService.Models
         [Required]
         [MaxLength(50)]
         public string Surname { get; set; } = string.Empty;
+
+        /// <summary>
+        /// The phone number of the user.
+        /// </summary>
+        [Required]
+        [Phone]
+        public string PhoneNumber { get; set; } = string.Empty;
 
         /// <summary>
         /// Whether the user enabled the reception of external notifications via email.

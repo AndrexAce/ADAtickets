@@ -57,12 +57,20 @@ namespace ADAtickets.ApiService.Services
                         query = query.Where(u => u.Id == outGuid);
                         break;
 
+                    case nameof(User.Email):
+                        query = query.Where(u => u.Email.Contains(filter.Value, StringComparison.InvariantCultureIgnoreCase));
+                        break;
+
                     case nameof(User.Name):
                         query = query.Where(u => u.Name.Contains(filter.Value, StringComparison.InvariantCultureIgnoreCase));
                         break;
 
                     case nameof(User.Surname):
                         query = query.Where(u => u.Surname.Contains(filter.Value, StringComparison.InvariantCultureIgnoreCase));
+                        break;
+
+                    case nameof(User.PhoneNumber):
+                        query = query.Where(u => u.PhoneNumber.Contains(filter.Value, StringComparison.InvariantCultureIgnoreCase));
                         break;
 
                     case nameof(User.AreEmailNotificationsEnabled) when bool.TryParse(filter.Value, out bool outBool):

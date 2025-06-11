@@ -1,4 +1,5 @@
-﻿using ADAtickets.ApiService.Models;
+﻿using System;
+using ADAtickets.ApiService.Models;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -36,8 +37,10 @@ namespace ADAtickets.ApiService.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
+                    email = table.Column<string>(type: "text", nullable: false),
                     name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     surname = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    phone_number = table.Column<string>(type: "text", nullable: false),
                     are_email_notifications_enabled = table.Column<bool>(type: "boolean", nullable: false),
                     are_phone_notifications_enabled = table.Column<bool>(type: "boolean", nullable: false),
                     type = table.Column<UserType>(type: "user_type", nullable: false),
@@ -334,12 +337,6 @@ namespace ADAtickets.ApiService.Migrations
                 column: "users_preferred_id");
 
             migrationBuilder.CreateIndex(
-                name: "ix_platforms_name",
-                table: "platforms",
-                column: "name",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "ix_platforms_repository_url",
                 table: "platforms",
                 column: "repository_url",
@@ -379,6 +376,24 @@ namespace ADAtickets.ApiService.Migrations
                 name: "ix_user_platforms_platform_id",
                 table: "user_platforms",
                 column: "platform_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_users_email",
+                table: "users",
+                column: "email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_users_microsoft_account_id",
+                table: "users",
+                column: "microsoft_account_id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_users_phone_number",
+                table: "users",
+                column: "phone_number",
+                unique: true);
         }
 
         /// <inheritdoc />

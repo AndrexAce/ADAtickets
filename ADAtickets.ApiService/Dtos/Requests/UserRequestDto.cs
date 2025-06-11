@@ -29,6 +29,12 @@ namespace ADAtickets.ApiService.Dtos.Requests
     public sealed class UserRequestDto
     {
         /// <summary>
+        /// The email address of the user.
+        /// </summary>
+        [Required]
+        public string Email { get; set; } = string.Empty;
+
+        /// <summary>
         /// The name of the user.
         /// </summary>
         [Required]
@@ -39,6 +45,12 @@ namespace ADAtickets.ApiService.Dtos.Requests
         /// </summary>
         [Required]
         public string Surname { get; set; } = string.Empty;
+
+        /// <summary>
+        /// The phone number of the user.
+        /// </summary>
+        [Required]
+        public string PhoneNumber { get; set; } = string.Empty;
 
         /// <summary>
         /// Whether the user enabled the reception of external notifications via email.
