@@ -237,4 +237,7 @@
   <data name="InvalidOrganizationName" xml:space="preserve">
     <value>Invalid organization name.</value>
   </data>
+  <data name="CacheContainerPull" xml:space="preserve">
+    <value>Pulling cache container...</value>
+  </data>
 </root>

@@ -66,7 +66,7 @@ partial class LastStep : UserControl
                 await Task.Run(() => WriteToEnvFileAsync(viewModel, tempPath));
                 await Task.Delay(3000);
 
-                viewModel.ProgressBarValue = 10;
+                viewModel.ProgressBarValue = 5;
 
                 // Create a Docker client from the correct URI based on the OS
                 using DockerClient client = new DockerClientConfiguration(
@@ -78,22 +78,27 @@ partial class LastStep : UserControl
                 await Task.Run(() => PullDbContainerAsync(viewModel, client));
                 await Task.Delay(3000);
 
-                viewModel.ProgressBarValue = 30;
+                viewModel.ProgressBarValue = 25;
+
+                await Task.Run(() => PullCacheContainerAsync(viewModel, client));
+                await Task.Delay(3000);
+
+                viewModel.ProgressBarValue = 45;
 
                 await Task.Run(() => PullAPIAsync(viewModel, client));
                 await Task.Delay(3000);
 
-                viewModel.ProgressBarValue = 50;
+                viewModel.ProgressBarValue = 65;
 
                 await Task.Run(() => PullWebAppAsync(viewModel, client));
                 await Task.Delay(3000);
 
-                viewModel.ProgressBarValue = 70;
+                viewModel.ProgressBarValue = 85;
 
                 await Task.Run(() => RunComposeAsync(viewModel, client, tempPath));
                 await Task.Delay(3000);
 
-                viewModel.ProgressBarValue = 90;
+                viewModel.ProgressBarValue = 95;
 
                 CleanTempFiles(viewModel, tempPath);
                 await Task.Delay(3000);
@@ -189,6 +194,38 @@ partial class LastStep : UserControl
         // Write to temporary location
         string tempEnvPath = Path.Combine(path, ".env");
         await File.WriteAllTextAsync(tempEnvPath, fileContent);
+    }
+
+    private static async Task PullCacheContainerAsync(MainViewModel viewModel, DockerClient client)
+    {
+        while (true)
+        {
+            try
+            {
+                Dispatcher.UIThread.Post(() => viewModel.PhaseText = $"{Assets.Resources.CacheContainerPull}");
+
+                // Pull the Redis image
+                await client.Images.CreateImageAsync(
+                    new ImagesCreateParameters
+                    {
+                        FromImage = "redis",
+                        Tag = "8.0.2"
+                    },
+                    null,
+                    new Progress<JSONMessage>(),
+                    new CancellationTokenSource(TimeSpan.FromMinutes(3)).Token
+                );
+
+                return;
+            }
+            catch (TimeoutException)
+            {
+                // If Docker was closed, wait for it to be reopened
+                Dispatcher.UIThread.Post(() => viewModel.PhaseText = $"{Assets.Resources.WaitingDocker}");
+
+                await WaitForDockerAsync(viewModel, client);
+            }
+        }
     }
 
     private static async Task PullDbContainerAsync(MainViewModel viewModel, DockerClient client)

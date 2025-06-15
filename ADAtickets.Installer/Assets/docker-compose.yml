@@ -13,11 +13,18 @@ services:
     image: postgres:17.5
     networks:
       - network
-    ports:
-      - "5432:5432"
     volumes:
       - database-data:/var/lib/postgresql/data
 
+  adatickets.redis:
+    container_name: Cache
+    command: redis-server --appendonly yes
+    image: redis:8.0.2
+    networks:
+      - network
+    volumes:
+      - redis-data:/data
+ 
   adatickets.apiservice:
     container_name: Api
     depends_on:
@@ -33,6 +40,8 @@ services:
     depends_on:
       adatickets.apiservice:
         condition: service_started
+      adatickets.redis:
+        condition: service_started
     networks:
       - network
     ports:
@@ -44,3 +53,4 @@ networks:
 
 volumes:
   database-data:
+  redis-data:

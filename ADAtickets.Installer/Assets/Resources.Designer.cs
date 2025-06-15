@@ -106,6 +106,15 @@ namespace ADAtickets.Installer.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Pulling cache container....
+        /// </summary>
+        public static string CacheContainerPull {
+            get {
+                return ResourceManager.GetString("CacheContainerPull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cleaning temporary files....
         /// </summary>
         public static string CleaningTemp {

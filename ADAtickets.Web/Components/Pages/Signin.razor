@@ -20,13 +20,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.Identity.Abstractions
 @using Microsoft.Identity.Web
-@inject IStringLocalizer<Signin> Loc
 @inject NavigationManager navManager
 @inject AuthenticationStateProvider authStateProvider
 @inject IConfiguration configuration
 @inject IDownstreamApi downstreamApi
 
-<PageTitle>ADAtickets - @Loc["Title"]</PageTitle>
+<PageTitle>ADAtickets</PageTitle>
 <style>
     body {
         background: var(--neutral-layer-2);
@@ -34,6 +33,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 </style>
 
 @code {
+    [AuthorizeForScopes(ScopeKeySection = "DownstreamApi:Scopes")]
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         var authState = await authStateProvider.GetAuthenticationStateAsync();
@@ -45,10 +45,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             var primaryTenantId = configuration.GetSection("Entra:TenantId").Value;
 
             if (tenantId == primaryTenantId)
-            {
-                // TODO: check DevOps access
-
-                navManager.NavigateTo("/home", true);
+            {        
+                await downstreamApi.GetForUserAsync<string>("ADAticketsAPI", options =>
+                {
+                    options.RelativePath = "api/Users";
+                    options.AcquireTokenOptions.AuthenticationOptionsName = "Entra";
+                }, user);
             }
             else
             {

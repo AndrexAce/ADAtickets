@@ -237,4 +237,7 @@
   <data name="InvalidOrganizationName" xml:space="preserve">
     <value>Il nome dell'organizzazione non è valido.</value>
   </data>
+  <data name="CacheContainerPull" xml:space="preserve">
+    <value>Scaricando il contenitore della cache...</value>
+  </data>
 </root>

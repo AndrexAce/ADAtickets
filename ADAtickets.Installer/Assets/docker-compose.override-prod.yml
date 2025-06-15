@@ -11,7 +11,7 @@ services:
       - ASPNETCORE_Kestrel__Certificates__Default__Password=${SSLCERTIFICATEPASSWORD:?error}
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/${SSLCERTIFICATENAME:?error}
       # Database connection string
-      - ConnectionStrings__PostgreSQL=Host=localhost;Port=5432;Database=adatickets;Username=${POSTGRESUSER:?error};Password=${POSTGRESPASSWORD:?error}
+      - ConnectionStrings__PostgreSQL=Host=adatickets.postgresql;Port=5432;Database=adatickets;Username=${POSTGRESUSER:?error};Password=${POSTGRESPASSWORD:?error}
       # Entra configuration variables
       - Entra__Instance=https://login.microsoftonline.com
       - Entra__TenantId=${TENANTID:?error}
@@ -27,11 +27,12 @@ services:
       - DevOps__ClientCertificates__0__SourceType=Path
       - DevOps__ClientCertificates__0__CertificateDiskPath=/certs/${APIAUTHCERTIFICATENAME:?error}
       - DevOps__ClientCertificates__0__CertificatePassword=${APIAUTHCERTIFICATEPASSWORD:?error}
-      - DevOps__DevOpsAPI__BaseUrl=https://dev.azure.com/${DEVOPSORGANIZATIONNAME:?error}/_apis
-      - DevOps__DevOpsAPI__Scopes__0="499b84ac-1321-427f-aa17-267ca6975798/.default"
+      # DevOps API configuration variables
+      - DevOpsAPI__BaseUrl=https://dev.azure.com/${DEVOPSORGANIZATIONNAME:?error}/_apis
+      - DevOpsAPI__Scopes__0=499b84ac-1321-427f-aa17-267ca6975798/.default
       # API scopes
-      - Authorization__Scopes__Read="Read ReadWrite"
-      - Authorization__Scopes__Write="ReadWrite"
+      - AuthorizationScopes__Read=Read ReadWrite
+      - AuthorizationScopes__Write=ReadWrite
     volumes:
       - ${SSLCERTIFICATEDISKPATH:?error}:/https:ro
       - ${APIAUTHCERTIFICATEDISKPATH:?error}:/certs:ro
@@ -45,6 +46,8 @@ services:
       - ASPNETCORE_URLS=https://+:8081;http://+:8080;
       - ASPNETCORE_Kestrel__Certificates__Default__Password=${SSLCERTIFICATEPASSWORD:?error}
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/${SSLCERTIFICATENAME:?error}
+      # Redis connection string
+      - ConnectionStrings__Redis=adatickets.redis:6379
       # Entra configuration variables
       - Entra__Instance=https://login.microsoftonline.com
       - Entra__TenantId=${TENANTID:?error}
@@ -55,9 +58,6 @@ services:
       - Entra__ClientCertificates__0__SourceType=Path
       - Entra__ClientCertificates__0__CertificateDiskPath=/certs/${WEBAUTHCERTIFICATENAME:?error}
       - Entra__ClientCertificates__0__CertificatePassword=${WEBAUTHCERTIFICATEPASSWORD:?error}
-      - Entra__ADAticketsAPI__BaseUrl=https://localhost:7214
-      - Entra__ADAticketsAPI__Scopes__0="Read"
-      - Entra__ADAticketsAPI__Scopes__1="ReadWrite"
       # External Entra configuration variables
       - ExternalEntra__Instance=https://login.microsoftonline.com
       - ExternalEntra__TenantId=${EXTERNALTENANTID:?error}
@@ -68,9 +68,14 @@ services:
       - ExternalEntra__ClientCertificates__0__SourceType=Path
       - ExternalEntra__ClientCertificates__0__CertificateDiskPath=/certs/${WEBAUTHCERTIFICATENAME:?error}
       - ExternalEntra__ClientCertificates__0__CertificatePassword=${WEBAUTHCERTIFICATEPASSWORD:?error}
-      - ExternalEntra__ADAticketsAPI__BaseUrl=https://localhost:7214
-      - ExternalEntra__ADAticketsAPI__Scopes__0="Read"
-      - ExternalEntra__ADAticketsAPI__Scopes__1="ReadWrite"
+      # ADAtickets API configuration variables
+      - ADAticketsAPI__BaseUrl=http://adatickets.apiservice:8080
+      - ADAticketsAPI__Scopes__0=api://${APIAPPID:?error}/Read
+      - ADAticketsAPI__Scopes__1=api://${APIAPPID:?error}/ReadWrite
+      # External ADAtickets API configuration variables
+      - ExternalADAticketsAPI__BaseUrl=http://adatickets.apiservice:8080
+      - ExternalADAticketsAPI__Scopes__0=api://${EXTERNALAPIAPPID:?error}/Read
+      - ExternalADAticketsAPI__Scopes__1=api://${EXTERNALAPIAPPID:?error}/ReadWrite
     volumes:
       - ${SSLCERTIFICATEDISKPATH:?error}:/https:ro
       - ${WEBAUTHCERTIFICATEDISKPATH:?error}:/certs:ro

@@ -30,10 +30,6 @@ namespace ADAtickets.Web
     /// </summary>
     static class Program
     {
-        private const string APIServiceName = "ADAticketsAPI";
-        private const string EntraScheme = "Entra";
-        private const string ExternalEntraScheme = "ExternalEntra";
-
         /// <summary>
         /// Entrypoint of the application.
         /// </summary>
@@ -63,13 +59,13 @@ namespace ADAtickets.Web
                 options.DefaultScheme = "EntraScheme";
                 options.DefaultChallengeScheme = "EntraScheme";
             });
-            authBuilder.AddMicrosoftIdentityWebApp(builder.Configuration, EntraScheme, EntraScheme, "EntraCookie")
+            authBuilder.AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("Entra"), "Entra", "EntraCookies")
                 .EnableTokenAcquisitionToCallDownstreamApi()
-                .AddDownstreamApi(APIServiceName, builder.Configuration.GetSection(APIServiceName))
+                .AddDownstreamApi("ADAticketsAPI", builder.Configuration.GetSection("ADAticketsAPI"))
                 .AddDistributedTokenCaches();
-            authBuilder.AddMicrosoftIdentityWebApp(builder.Configuration, ExternalEntraScheme, ExternalEntraScheme, "ExternalEntraCookie")
+            authBuilder.AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("ExternalEntra"), "ExternalEntra", "ExternalEntraCookies")
                 .EnableTokenAcquisitionToCallDownstreamApi()
-                .AddDownstreamApi(APIServiceName, builder.Configuration.GetSection(APIServiceName))
+                .AddDownstreamApi("ExternalADAticketsAPI", builder.Configuration.GetSection("ExternalADAticketsAPI"))
                 .AddDistributedTokenCaches();
             authBuilder.AddPolicyScheme("EntraScheme", null, options =>
             {
@@ -78,9 +74,9 @@ namespace ADAtickets.Web
                     string? authorization = context.Request.Headers[HeaderNames.Cookie];
 
                     if (authorization is not null)
-                        return authorization.Contains(ExternalEntraScheme) ? ExternalEntraScheme : EntraScheme;
+                        return authorization.Contains("ExternalEntra") ? "ExternalEntra" : "Entra";
                     else
-                        return ExternalEntraScheme;
+                        return "ExternalEntra";
                 };
             });
 
@@ -90,7 +86,10 @@ namespace ADAtickets.Web
 
             // Basic services
             builder.Services.AddHttpContextAccessor();
-            builder.Services.AddDistributedMemoryCache();
+            builder.Services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = builder.Configuration.GetConnectionString("Redis");
+            });
 
             // Localization
             builder.Services.AddLocalization();
