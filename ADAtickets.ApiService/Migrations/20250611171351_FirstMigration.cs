@@ -1,5 +1,4 @@
-﻿using System;
-using ADAtickets.ApiService.Models;
+﻿using ADAtickets.ApiService.Models;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable

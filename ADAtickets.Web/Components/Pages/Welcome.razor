@@ -15,12 +15,12 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
-@page "/"
+@page "/welcome"
 @using System.Globalization
-@inject IStringLocalizer<Home> Loc
-@inject NavigationManager NavManager
+@inject IStringLocalizer<Welcome> loc
+@inject NavigationManager navManager
 
-<PageTitle>ADAtickets - @Loc["Title"]</PageTitle>
+<PageTitle>ADAtickets - @loc["Title"]</PageTitle>
 <style>
     body {
         background: var(--neutral-layer-2);
@@ -36,29 +36,29 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         <img src="LogoLight.svg" />
     }
     <span style="text-align: center;">
-        <FluentLabel Weight="FontWeight.Bold">@Loc["Greeting1"]</FluentLabel>
-        <FluentLabel Weight="FontWeight.Bold">@Loc["Greeting2"]</FluentLabel>
+        <FluentLabel Weight="FontWeight.Bold">@loc["Greeting1"]</FluentLabel>
+        <FluentLabel Weight="FontWeight.Bold">@loc["Greeting2"]</FluentLabel>
     </span>
     <span style="display: flex; flex-direction: column; gap: 1em;">
         <span style="display: flex; flex-direction: row; gap: 1em;">
             <FluentButton Appearance="Appearance.Accent" 
                           IconStart="@(new Icons.Regular.Size20.Person())" 
                           Style="width: 100%; min-width: 240px;" 
-                          OnClick="@(() => NavManager.NavigateTo("MicrosoftIdentity/Account/SignIn/ExternalEntra", true))">
-                @Loc["UserButton"]
+                          OnClick="@(() => navManager.NavigateTo("MicrosoftIdentity/Account/SignIn/ExternalEntra?redirectUri=/signin-oidc-external-entra", true))">
+                @loc["UserButton"]
             </FluentButton>
             <FluentIcon Id="UserButton" Icon="Icons.Regular.Size20.Info"></FluentIcon>
-            <FluentTooltip Anchor="UserButton" Position="TooltipPosition.End">@Loc["UserButtonTooltip"]</FluentTooltip>
+            <FluentTooltip Anchor="UserButton" Position="TooltipPosition.End">@loc["UserButtonTooltip"]</FluentTooltip>
         </span>
         <span style="display: flex; flex-direction: row; gap: 1em;">
             <FluentButton Appearance="Appearance.Accent" 
                           IconStart="@(new Icons.Regular.Size20.Wrench())" 
                           Style="width: 100%; min-width: 240px;" 
-                          OnClick="@(() => NavManager.NavigateTo("MicrosoftIdentity/Account/SignIn/Entra", true))">
-                @Loc["AdminButton"]
+                          OnClick="@(() => navManager.NavigateTo("MicrosoftIdentity/Account/SignIn/Entra?redirectUri=/signin-oidc-entra", true))">
+                @loc["AdminButton"]
             </FluentButton>
             <FluentIcon Id="AdminButton" Icon="Icons.Regular.Size20.Info"></FluentIcon>
-            <FluentTooltip Anchor="AdminButton" Position="TooltipPosition.End">@Loc["AdminButtonTooltip"]</FluentTooltip>
+            <FluentTooltip Anchor="AdminButton" Position="TooltipPosition.End">@loc["AdminButtonTooltip"]</FluentTooltip>
         </span>
     </span>
 </FluentCard>

@@ -40,8 +40,8 @@
     <PackageReference Include="Microsoft.VisualStudio.Services.InteractiveClient" Version="19.225.1" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
-    <PackageReference Include="Scalar.AspNetCore" Version="2.4.13" />
-    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="8.1.4" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.4.16" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="9.0.1" />
   </ItemGroup>
 
   <ItemGroup>

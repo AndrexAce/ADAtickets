@@ -21,6 +21,7 @@ using ADAtickets.Web.Components;
 using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
+using Microsoft.Net.Http.Headers;
 
 namespace ADAtickets.Web
 {
@@ -30,6 +31,8 @@ namespace ADAtickets.Web
     static class Program
     {
         private const string APIServiceName = "ADAticketsAPI";
+        private const string EntraScheme = "Entra";
+        private const string ExternalEntraScheme = "ExternalEntra";
 
         /// <summary>
         /// Entrypoint of the application.
@@ -55,15 +58,31 @@ namespace ADAtickets.Web
         public static void ConfigureServices(WebApplicationBuilder builder)
         {
             // Authentication and Authorization
-            var authBuilder = builder.Services.AddAuthentication();
-            authBuilder.AddMicrosoftIdentityWebApp(builder.Configuration, "Entra", "Entra", "EntraCookie")
+            var authBuilder = builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = "EntraScheme";
+                options.DefaultChallengeScheme = "EntraScheme";
+            });
+            authBuilder.AddMicrosoftIdentityWebApp(builder.Configuration, EntraScheme, EntraScheme, "EntraCookie")
                 .EnableTokenAcquisitionToCallDownstreamApi()
                 .AddDownstreamApi(APIServiceName, builder.Configuration.GetSection(APIServiceName))
                 .AddDistributedTokenCaches();
-            authBuilder.AddMicrosoftIdentityWebApp(builder.Configuration, "ExternalEntra", "ExternalEntra", "ExternalEntraCookie")
+            authBuilder.AddMicrosoftIdentityWebApp(builder.Configuration, ExternalEntraScheme, ExternalEntraScheme, "ExternalEntraCookie")
                 .EnableTokenAcquisitionToCallDownstreamApi()
                 .AddDownstreamApi(APIServiceName, builder.Configuration.GetSection(APIServiceName))
                 .AddDistributedTokenCaches();
+            authBuilder.AddPolicyScheme("EntraScheme", null, options =>
+            {
+                options.ForwardDefaultSelector = context =>
+                {
+                    string? authorization = context.Request.Headers[HeaderNames.Cookie];
+
+                    if (authorization is not null)
+                        return authorization.Contains(ExternalEntraScheme) ? ExternalEntraScheme : EntraScheme;
+                    else
+                        return ExternalEntraScheme;
+                };
+            });
 
             builder.Services.AddAuthorization();
 
@@ -111,13 +130,14 @@ namespace ADAtickets.Web
                 app.UseHsts();
             }
 
-            // Configure middleware pipeline
             app.UseHttpsRedirection();
-            app.UseAntiforgery();
 
             // Authentication and authorization
             app.UseAuthentication();
             app.UseAuthorization();
+
+            // Configure other middleware pipelines
+            app.UseAntiforgery();
 
             // Configure routing
             app.MapStaticAssets();
