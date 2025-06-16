@@ -209,26 +209,22 @@ namespace ADAtickets.ApiService
 
         private static void CreatePolicies(AuthorizationBuilder builder)
         {
-            builder.AddPolicy(nameof(Policy.AdminOnly), policy =>
+            builder.AddDefaultPolicy(Policy.AdminOnly, policy =>
             {
                 policy.RequireAuthenticatedUser()
                 .RequireRole("Azure DevOps Administrator")
                 .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault);
 
             })
-            .AddPolicy(nameof(Policy.OperatorOrAdmin), policy =>
+            .AddPolicy(Policy.OperatorOrAdmin, policy =>
             {
                 policy.RequireAuthenticatedUser()
                 .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault);
             })
-            .AddPolicy(nameof(Policy.Everyone), policy =>
+            .AddPolicy(Policy.Everyone, policy =>
             {
                 policy.RequireAuthenticatedUser()
                 .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault, Scheme.ExternalOpenIdConnectDefault);
-            })
-            .AddDefaultPolicy(nameof(Policy.Unauthenticated), policy =>
-            {
-                policy.RequireAssertion(_ => true);
             });
         }
     }

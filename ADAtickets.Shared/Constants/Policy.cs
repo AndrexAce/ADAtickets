@@ -36,9 +36,5 @@ namespace ADAtickets.Shared.Constants
         /// The name of the policy that requires the user to be authenticated with any role (User, Operator, or Admin).
         /// </summary>
         public const string Everyone = "UserOperatorAdmin";
-        /// <summary>
-        /// The name of the policy that allows access without authentication (anonymous access).
-        /// </summary>
-        public const string Unauthenticated = "Anonymous";
     }
 }
