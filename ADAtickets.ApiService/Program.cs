@@ -18,10 +18,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using ADAtickets.ApiService.Configs;
-using ADAtickets.ApiService.Models;
 using ADAtickets.ApiService.Repositories;
 using ADAtickets.ApiService.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using ADAtickets.Shared.Constants;
+using ADAtickets.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -37,13 +37,8 @@ namespace ADAtickets.ApiService
     /// <summary>
     /// Bootstrap class for the application.
     /// </summary>
-    public class Program
+    static class Program
     {
-        /// <summary>
-        /// Creates a new instance of the Program class.
-        /// </summary>
-        protected Program() { }
-
         /// <summary>
         /// Entrypoint of the application.
         /// </summary>
@@ -71,7 +66,7 @@ namespace ADAtickets.ApiService
             builder.Services.AddDbContextPool<ADAticketsDbContext>(options =>
             {
                 // Configure the DBContext to use PostgreSQL.
-                options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSQL"), options =>
+                options.UseNpgsql(builder.Configuration.GetConnectionString(Service.Database), options =>
                 {
                     // Create the enumerations in the connected database.
                     options.MapEnum<Priority>("priority")
@@ -85,16 +80,19 @@ namespace ADAtickets.ApiService
 
             // Add JWTs decoding for both Entra ID and Entra External ID.
             var authBuilder = builder.Services.AddAuthentication();
-            authBuilder.AddMicrosoftIdentityWebApi(builder.Configuration, nameof(Scheme.Entra), nameof(Scheme.Entra));
-            authBuilder.AddMicrosoftIdentityWebApi(builder.Configuration, nameof(Scheme.ExternalEntra), nameof(Scheme.ExternalEntra));
+            authBuilder.AddMicrosoftIdentityWebApi(builder.Configuration.GetSection(Scheme.OpenIdConnectDefault), Scheme.OpenIdConnectDefault);
+            authBuilder.AddMicrosoftIdentityWebApi(builder.Configuration.GetSection(Scheme.ExternalOpenIdConnectDefault), Scheme.ExternalOpenIdConnectDefault);
 
             // Add authentication for the DevOps service principal.
-            authBuilder.AddMicrosoftIdentityWebApi(builder.Configuration, nameof(Scheme.DevOps), JwtBearerDefaults.AuthenticationScheme)
+            authBuilder.AddMicrosoftIdentityWebApi(builder.Configuration.GetSection(Scheme.AzureDevOpsOpenIdConnectDefault), Scheme.AzureDevOpsOpenIdConnectDefault)
                 .EnableTokenAcquisitionToCallDownstreamApi()
-                .AddDownstreamApi("DevOpsAPI", builder.Configuration.GetSection("DevOpsAPI"))
+                .AddDownstreamApi(Service.AzureDevOpsAPI, builder.Configuration.GetSection(Service.AzureDevOpsAPI))
                 .AddDistributedTokenCaches();
 
-            builder.Services.AddDistributedMemoryCache();
+            builder.Services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = builder.Configuration.GetConnectionString(Service.Cache);
+            });
 
             // Add authorization policies.
             CreatePolicies(builder.Services.AddAuthorizationBuilder());
@@ -215,18 +213,18 @@ namespace ADAtickets.ApiService
             {
                 policy.RequireAuthenticatedUser()
                 .RequireRole("Azure DevOps Administrator")
-                .AddAuthenticationSchemes(nameof(Scheme.Entra));
+                .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault);
 
             })
             .AddPolicy(nameof(Policy.OperatorOrAdmin), policy =>
             {
                 policy.RequireAuthenticatedUser()
-                .AddAuthenticationSchemes(nameof(Scheme.Entra));
+                .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault);
             })
             .AddPolicy(nameof(Policy.Everyone), policy =>
             {
                 policy.RequireAuthenticatedUser()
-                .AddAuthenticationSchemes(nameof(Scheme.Entra), nameof(Scheme.ExternalEntra));
+                .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault, Scheme.ExternalOpenIdConnectDefault);
             })
             .AddDefaultPolicy(nameof(Policy.Unauthenticated), policy =>
             {

@@ -30,7 +30,7 @@ using System.Windows.Input;
 
 namespace ADAtickets.Installer.ViewModels;
 
-class MainViewModel : ReactiveObject
+sealed class MainViewModel : ReactiveObject
 {
     private UserControl _currentView;
     private string? _dbUserName;
@@ -359,6 +359,9 @@ class MainViewModel : ReactiveObject
 
         context.MemberName = nameof(ExternalTenantId);
         isValid &= Validator.TryValidateProperty(ExternalTenantId, context, []);
+
+        context.MemberName = nameof(DevOpsOrganizationName);
+        isValid &= Validator.TryValidateProperty(DevOpsOrganizationName, context, []);
 
         return isValid;
     }

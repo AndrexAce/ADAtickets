@@ -17,6 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using ADAtickets.Shared.Constants;
 using ADAtickets.Web.Components;
 using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.Identity.Web;
@@ -56,27 +57,27 @@ namespace ADAtickets.Web
             // Authentication and Authorization
             var authBuilder = builder.Services.AddAuthentication(options =>
             {
-                options.DefaultScheme = "EntraScheme";
-                options.DefaultChallengeScheme = "EntraScheme";
+                options.DefaultScheme = Scheme.PolicySchemeDefault;
+                options.DefaultChallengeScheme = Scheme.PolicySchemeDefault;
             });
-            authBuilder.AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("Entra"), "Entra", "EntraCookies")
+            authBuilder.AddMicrosoftIdentityWebApp(builder.Configuration.GetSection(Scheme.OpenIdConnectDefault), Scheme.OpenIdConnectDefault, Scheme.CookieDefault)
                 .EnableTokenAcquisitionToCallDownstreamApi()
-                .AddDownstreamApi("ADAticketsAPI", builder.Configuration.GetSection("ADAticketsAPI"))
+                .AddDownstreamApi(Service.API, builder.Configuration.GetSection("ADAticketsAPI"))
                 .AddDistributedTokenCaches();
-            authBuilder.AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("ExternalEntra"), "ExternalEntra", "ExternalEntraCookies")
+            authBuilder.AddMicrosoftIdentityWebApp(builder.Configuration.GetSection(Scheme.ExternalOpenIdConnectDefault), Scheme.ExternalOpenIdConnectDefault, Scheme.ExternalCookieDefault)
                 .EnableTokenAcquisitionToCallDownstreamApi()
-                .AddDownstreamApi("ExternalADAticketsAPI", builder.Configuration.GetSection("ExternalADAticketsAPI"))
+                .AddDownstreamApi(Service.ExternalAPI, builder.Configuration.GetSection("ExternalADAticketsAPI"))
                 .AddDistributedTokenCaches();
-            authBuilder.AddPolicyScheme("EntraScheme", null, options =>
+            authBuilder.AddPolicyScheme(Scheme.PolicySchemeDefault, null, options =>
             {
                 options.ForwardDefaultSelector = context =>
                 {
                     string? authorization = context.Request.Headers[HeaderNames.Cookie];
 
                     if (authorization is not null)
-                        return authorization.Contains("ExternalEntra") ? "ExternalEntra" : "Entra";
+                        return authorization.Contains(Scheme.ExternalCookieDefault) ? Scheme.ExternalOpenIdConnectDefault : Scheme.OpenIdConnectDefault;
                     else
-                        return "ExternalEntra";
+                        return Scheme.ExternalCookieDefault;
                 };
             });
 
@@ -88,7 +89,7 @@ namespace ADAtickets.Web
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddStackExchangeRedisCache(options =>
             {
-                options.Configuration = builder.Configuration.GetConnectionString("Redis");
+                options.Configuration = builder.Configuration.GetConnectionString(Service.Cache);
             });
 
             // Localization
@@ -96,7 +97,6 @@ namespace ADAtickets.Web
 
             // UI Components
             builder.Services.AddFluentUIComponents();
-            builder.Services.AddDataGridEntityFrameworkAdapter();
 
             // Razor services
             builder.Services.AddRazorPages()

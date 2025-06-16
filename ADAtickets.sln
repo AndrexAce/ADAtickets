@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ADAtickets.Installer", "ADA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ADAtickets.Installer.Desktop", "ADAtickets.Installer.Desktop\ADAtickets.Installer.Desktop.csproj", "{0608649A-1108-E4C5-9B73-A0CA0D3C3B46}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ADAtickets.Shared", "ADAtickets.Shared\ADAtickets.Shared.csproj", "{415D86C4-298A-49F1-BB01-BAE1A13CAC61}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{0608649A-1108-E4C5-9B73-A0CA0D3C3B46}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0608649A-1108-E4C5-9B73-A0CA0D3C3B46}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0608649A-1108-E4C5-9B73-A0CA0D3C3B46}.Release|Any CPU.Build.0 = Release|Any CPU
+		{415D86C4-298A-49F1-BB01-BAE1A13CAC61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{415D86C4-298A-49F1-BB01-BAE1A13CAC61}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{415D86C4-298A-49F1-BB01-BAE1A13CAC61}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{415D86C4-298A-49F1-BB01-BAE1A13CAC61}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

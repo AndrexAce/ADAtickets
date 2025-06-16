@@ -1,4 +1,4 @@
-﻿using ADAtickets.ApiService.Models;
+﻿using ADAtickets.Shared.Models;
 
 namespace ADAtickets.ApiService.Tests.Services.NotificationRepository
 {

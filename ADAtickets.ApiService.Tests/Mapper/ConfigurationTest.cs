@@ -22,7 +22,7 @@ using AutoMapper;
 
 namespace ADAtickets.ApiService.Tests.Mapper
 {
-    public class ConfigurationTest
+    sealed public class ConfigurationTest
     {
         [Fact]
         public void ValidConfiguration_DoesNotThrow()

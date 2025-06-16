@@ -18,7 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using ADAtickets.ApiService.Configs;
-using ADAtickets.ApiService.Models;
+using ADAtickets.Shared.Models;
 using MockQueryable.Moq;
 using Moq;
 using ReplyService = ADAtickets.ApiService.Services.ReplyRepository;

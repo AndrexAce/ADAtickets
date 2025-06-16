@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-using ADAtickets.ApiService.Models;
+using ADAtickets.Shared.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace ADAtickets.ApiService.Configs
@@ -26,7 +26,7 @@ namespace ADAtickets.ApiService.Configs
     /// <para>Represents the Entity Framework Core database context for the ADAtickets application.</para>
     /// <para>This context is used to interact with the database and manage the application's entities.</para>
     /// </summary>
-    public class ADAticketsDbContext : DbContext
+    class ADAticketsDbContext : DbContext
     {
         /// <summary>
         /// Paramteless constructor for testing purposes.

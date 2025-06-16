@@ -68,4 +68,8 @@
        <DependentUpon>FirstStep.axaml</DependentUpon>
      </Compile>
    </ItemGroup>
+
+	<ItemGroup>
+		<InternalsVisibleTo Include="ADAtickets.Installer.Desktop" />
+	</ItemGroup>
 </Project>

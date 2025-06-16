@@ -18,10 +18,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using ADAtickets.ApiService.Configs;
-using ADAtickets.ApiService.Dtos.Requests;
-using ADAtickets.ApiService.Dtos.Responses;
-using ADAtickets.ApiService.Models;
 using ADAtickets.ApiService.Repositories;
+using ADAtickets.Shared.Constants;
+using ADAtickets.Shared.Dtos.Requests;
+using ADAtickets.Shared.Dtos.Responses;
+using ADAtickets.Shared.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -36,13 +37,13 @@ namespace ADAtickets.ApiService.Controllers
     /// </summary>
     /// <param name="platformRepository">Object defining the operations allowed on the entity type.</param>
     /// <param name="mapper">Object definining the mappings of fields between the <see cref="Platform"/> entity and its <see cref="PlatformRequestDto"/> or <see cref="PlatformResponseDto"/> correspondant.</param>
-    [Route("api/Platforms")]
+    [Route("v1/Platforms")]
     [ApiController]
     [Consumes(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
     [Produces(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
     [FormatFilter]
     [ApiConventionType(typeof(ADAticketsApiConventions))]
-    [Authorize(Policy = nameof(Policy.AdminOnly))]
+    [Authorize(Policy = Policy.AdminOnly)]
     public sealed class PlatformsController(IPlatformRepository platformRepository, IMapper mapper) : ControllerBase
     {
         private readonly IPlatformRepository _platformRepository = platformRepository;
@@ -64,7 +65,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="403">The client was authenticated but had not enough privileges.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpGet]
-        [RequiredScope(RequiredScopesConfigurationKey = "AuthorizationScopes:Read")]
+        [RequiredScope(Scope.Read)]
         public async Task<ActionResult<IEnumerable<PlatformResponseDto>>> GetPlatforms([FromQuery] IEnumerable<KeyValuePair<string, string>>? filters)
         {
             var platforms = await (filters != null ? _platformRepository.GetPlatformsByAsync(filters) : _platformRepository.GetPlatformsAsync());
@@ -84,7 +85,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="404">The entity with the given id didn't exist.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpGet("{id}")]
-        [RequiredScope(RequiredScopesConfigurationKey = "AuthorizationScopes:Read")]
+        [RequiredScope(Scope.Read)]
         public async Task<ActionResult<PlatformResponseDto>> GetPlatform(Guid id)
         {
             // Check if the requested entity exists.
@@ -128,7 +129,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="406">The client asked for an unsupported response format.</response>
         /// <response code="409">The entity was updated by another request at the same time.</response>
         [HttpPut("{id}")]
-        [RequiredScope(RequiredScopesConfigurationKey = "AuthorizationScopes:Write")]
+        [RequiredScope(Scope.Read, Scope.Write)]
         public async Task<ActionResult<PlatformResponseDto>> PutPlatform(Guid id, PlatformRequestDto platformDto)
         {
             // If the requested entity does not exist, create a new one.
@@ -184,7 +185,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="403">The client was authenticated but had not enough privileges.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpPost]
-        [RequiredScope(RequiredScopesConfigurationKey = "AuthorizationScopes:Write")]
+        [RequiredScope(Scope.Read, Scope.Write)]
         public async Task<ActionResult<PlatformResponseDto>> PostPlatform(PlatformRequestDto platformDto)
         {
             var platform = _mapper.Map(platformDto, new Platform());
@@ -208,7 +209,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="404">The entity with the given id didn't exist.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpDelete("{id}")]
-        [RequiredScope(RequiredScopesConfigurationKey = "AuthorizationScopes:Write")]
+        [RequiredScope(Scope.Read, Scope.Write)]
         public async Task<IActionResult> DeletePlatform(Guid id)
         {
             // Check if the requested entity exists.

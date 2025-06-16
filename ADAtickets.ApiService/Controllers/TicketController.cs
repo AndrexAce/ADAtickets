@@ -18,10 +18,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using ADAtickets.ApiService.Configs;
-using ADAtickets.ApiService.Dtos.Requests;
-using ADAtickets.ApiService.Dtos.Responses;
-using ADAtickets.ApiService.Models;
 using ADAtickets.ApiService.Repositories;
+using ADAtickets.Shared.Constants;
+using ADAtickets.Shared.Dtos.Requests;
+using ADAtickets.Shared.Dtos.Responses;
+using ADAtickets.Shared.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -36,7 +37,7 @@ namespace ADAtickets.ApiService.Controllers
     /// </summary>
     /// <param name="ticketRepository">Object defining the operations allowed on the entity type.</param>
     /// <param name="mapper">Object definining the mappings of fields between the <see cref="Ticket"/> entity and its <see cref="TicketRequestDto"/> or <see cref="TicketResponseDto"/> correspondant.</param>
-    [Route("api/Tickets")]
+    [Route("v1/Tickets")]
     [ApiController]
     [Consumes(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
     [Produces(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
@@ -64,8 +65,8 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="403">The client was authenticated but had not enough privileges.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpGet]
-        [Authorize(Policy = nameof(Policy.Everyone))]
-        [RequiredScope(RequiredScopesConfigurationKey = "AuthorizationScopes:Read")]
+        [Authorize(Policy = Policy.Everyone)]
+        [RequiredScope(Scope.Read)]
         public async Task<ActionResult<IEnumerable<TicketResponseDto>>> GetTickets([FromQuery] IEnumerable<KeyValuePair<string, string>>? filters)
         {
             var tickets = await (filters != null ? _ticketRepository.GetTicketsByAsync(filters) : _ticketRepository.GetTicketsAsync());
@@ -85,8 +86,8 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="404">The entity with the given id didn't exist.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpGet("{id}")]
-        [Authorize(Policy = nameof(Policy.Everyone))]
-        [RequiredScope(RequiredScopesConfigurationKey = "AuthorizationScopes:Read")]
+        [Authorize(Policy = Policy.Everyone)]
+        [RequiredScope(Scope.Read)]
         public async Task<ActionResult<TicketResponseDto>> GetTicket(Guid id)
         {
             // Check if the requested entity exists.
@@ -145,8 +146,8 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="406">The client asked for an unsupported response format.</response>
         /// <response code="409">The entity was updated by another request at the same time.</response>
         [HttpPut("{id}")]
-        [Authorize(Policy = nameof(Policy.Everyone))]
-        [RequiredScope(RequiredScopesConfigurationKey = "AuthorizationScopes:Write")]
+        [Authorize(Policy = Policy.Everyone)]
+        [RequiredScope(Scope.Read, Scope.Write)]
         public async Task<ActionResult<TicketResponseDto>> PutTicket(Guid id, TicketRequestDto ticketDto)
         {
             // If the requested entity does not exist, create a new one.
@@ -218,7 +219,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpPost]
         [Authorize(Policy = nameof(Policy.Everyone))]
-        [RequiredScope(RequiredScopesConfigurationKey = "AuthorizationScopes:Write")]
+        [RequiredScope(Scope.Read, Scope.Write)]
         public async Task<ActionResult<TicketResponseDto>> PostTicket(TicketRequestDto ticketDto)
         {
             var ticket = _mapper.Map(ticketDto, new Ticket());
@@ -242,8 +243,8 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="404">The entity with the given id didn't exist.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpDelete("{id}")]
-        [Authorize(Policy = nameof(Policy.OperatorOrAdmin))]
-        [RequiredScope(RequiredScopesConfigurationKey = "AuthorizationScopes:Write")]
+        [Authorize(Policy = Policy.OperatorOrAdmin)]
+        [RequiredScope(Scope.Read, Scope.Write)]
         public async Task<IActionResult> DeleteTicket(Guid id)
         {
             // Check if the requested entity exists.

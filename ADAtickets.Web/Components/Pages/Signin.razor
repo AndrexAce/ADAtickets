@@ -18,12 +18,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @page "/signin-oidc-entra"
 @page "/signin-oidc-external-entra"
 @using Microsoft.AspNetCore.Components.Authorization
-@using Microsoft.Identity.Abstractions
-@using Microsoft.Identity.Web
 @inject NavigationManager navManager
 @inject AuthenticationStateProvider authStateProvider
 @inject IConfiguration configuration
-@inject IDownstreamApi downstreamApi
 
 <PageTitle>ADAtickets</PageTitle>
 <style>
@@ -33,7 +30,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 </style>
 
 @code {
-    [AuthorizeForScopes(ScopeKeySection = "DownstreamApi:Scopes")]
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         var authState = await authStateProvider.GetAuthenticationStateAsync();
@@ -46,11 +42,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
             if (tenantId == primaryTenantId)
             {        
-                await downstreamApi.GetForUserAsync<string>("ADAticketsAPI", options =>
-                {
-                    options.RelativePath = "api/Users";
-                    options.AcquireTokenOptions.AuthenticationOptionsName = "Entra";
-                }, user);
+                // TODO: check Azure DevOps access
             }
             else
             {
