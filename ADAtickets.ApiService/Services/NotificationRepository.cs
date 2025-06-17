@@ -46,6 +46,7 @@ namespace ADAtickets.ApiService.Services
         }
 
         /// <inheritdoc cref="INotificationRepository.GetNotificationsByAsync"/>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1862:Use the 'StringComparison' method overloads to perform case-insensitive string comparisons", Justification = "The comparison with the StringComparison overload is not translatable by Entity Framework and the EF.Function.ILike method is not standard SQL but PostgreSQL dialect.")]
         public async Task<IEnumerable<Notification>> GetNotificationsByAsync(IEnumerable<KeyValuePair<string, string>> filters)
         {
             IQueryable<Notification> query = _context.Notifications;
@@ -75,7 +76,7 @@ namespace ADAtickets.ApiService.Services
                         break;
 
                     case nameof(Notification.Message):
-                        query = query.Where(notification => notification.Message.Contains(filter.Value, StringComparison.InvariantCultureIgnoreCase));
+                        query = query.Where(notification => notification.Message.ToLower().Contains(filter.Value.ToLower()));
                         break;
 
                     default:

@@ -30,7 +30,6 @@ namespace ADAtickets.Shared.Models
     /// </summary>
     [Index(nameof(Email), IsUnique = true)]
     [Index(nameof(PhoneNumber), IsUnique = true)]
-    [Index(nameof(MicrosoftAccountId), IsUnique = true)]
     public sealed class User : EntityBase
     {
         /// <summary>
@@ -86,11 +85,6 @@ namespace ADAtickets.Shared.Models
         [Required]
         public UserType Type { get; set; } = UserType.User;
 
-        /// <summary>
-        /// The unique identifier of the user's Microsoft account.
-        /// </summary>
-        [MaxLength(20)]
-        public string? MicrosoftAccountId { get; set; } = null;
 
         /// <summary>
         /// The collection of tickets created by the user (if they are a user, otherwise it must be empty).

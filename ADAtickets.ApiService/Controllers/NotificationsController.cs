@@ -37,7 +37,7 @@ namespace ADAtickets.ApiService.Controllers
     /// </summary>
     /// <param name="notificationRepository">Object defining the operations allowed on the entity type.</param>
     /// <param name="mapper">Object definining the mappings of fields between the <see cref="Notification"/> entity and its <see cref="NotificationRequestDto"/> or <see cref="NotificationResponseDto"/> correspondant.</param>
-    [Route("v1/Notifications")]
+    [Route($"v{Service.APIVersion}/Notifications")]
     [ApiController]
     [Consumes(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
     [Produces(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]

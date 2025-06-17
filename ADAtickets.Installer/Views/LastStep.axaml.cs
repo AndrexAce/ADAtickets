@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using ADAtickets.Installer.ViewModels;
+using ADAtickets.Shared.Constants;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
@@ -209,7 +210,7 @@ partial class LastStep : UserControl
                     new ImagesCreateParameters
                     {
                         FromImage = "redis",
-                        Tag = "8.0.2"
+                        Tag = Service.CacheVersion
                     },
                     null,
                     new Progress<JSONMessage>(),
@@ -241,7 +242,7 @@ partial class LastStep : UserControl
                     new ImagesCreateParameters
                     {
                         FromImage = "postgres",
-                        Tag = "17.5"
+                        Tag = Service.DatabaseVersion
                     },
                     null,
                     new Progress<JSONMessage>(),

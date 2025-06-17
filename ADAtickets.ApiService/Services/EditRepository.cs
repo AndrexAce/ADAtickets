@@ -46,6 +46,7 @@ namespace ADAtickets.ApiService.Services
         }
 
         /// <inheritdoc cref="IEditRepository.GetEditsByAsync"/>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1862:Use the 'StringComparison' method overloads to perform case-insensitive string comparisons", Justification = "The comparison with the StringComparison overload is not translatable by Entity Framework and the EF.Function.ILike method is not standard SQL but PostgreSQL dialect.")]
         public async Task<IEnumerable<Edit>> GetEditsByAsync(IEnumerable<KeyValuePair<string, string>> filters)
         {
             IQueryable<Edit> query = _context.Edits;
@@ -79,7 +80,7 @@ namespace ADAtickets.ApiService.Services
                         break;
 
                     case nameof(Edit.Description):
-                        query = query.Where(edit => edit.Description.Contains(filter.Value, StringComparison.InvariantCultureIgnoreCase));
+                        query = query.Where(edit => edit.Description.ToLower().Contains(filter.Value.ToLower()));
                         break;
 
                     default:

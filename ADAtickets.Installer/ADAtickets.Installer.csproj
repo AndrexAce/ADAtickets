@@ -72,4 +72,8 @@
 	<ItemGroup>
 		<InternalsVisibleTo Include="ADAtickets.Installer.Desktop" />
 	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\ADAtickets.Shared\ADAtickets.Shared.csproj" />
+	</ItemGroup>
 </Project>

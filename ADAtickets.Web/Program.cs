@@ -62,11 +62,11 @@ namespace ADAtickets.Web
             });
             authBuilder.AddMicrosoftIdentityWebApp(builder.Configuration.GetSection(Scheme.OpenIdConnectDefault), Scheme.OpenIdConnectDefault, Scheme.CookieDefault)
                 .EnableTokenAcquisitionToCallDownstreamApi()
-                .AddDownstreamApi(Service.API, builder.Configuration.GetSection("ADAticketsAPI"))
+                .AddDownstreamApi(Service.API, builder.Configuration.GetSection(Service.API))
                 .AddDistributedTokenCaches();
             authBuilder.AddMicrosoftIdentityWebApp(builder.Configuration.GetSection(Scheme.ExternalOpenIdConnectDefault), Scheme.ExternalOpenIdConnectDefault, Scheme.ExternalCookieDefault)
                 .EnableTokenAcquisitionToCallDownstreamApi()
-                .AddDownstreamApi(Service.ExternalAPI, builder.Configuration.GetSection("ExternalADAticketsAPI"))
+                .AddDownstreamApi(Service.ExternalAPI, builder.Configuration.GetSection(Service.ExternalAPI))
                 .AddDistributedTokenCaches();
             authBuilder.AddPolicyScheme(Scheme.PolicySchemeDefault, null, options =>
             {
@@ -77,7 +77,7 @@ namespace ADAtickets.Web
                     if (authorization is not null)
                         return authorization.Contains(Scheme.ExternalCookieDefault) ? Scheme.ExternalOpenIdConnectDefault : Scheme.OpenIdConnectDefault;
                     else
-                        return Scheme.ExternalCookieDefault;
+                        return Scheme.ExternalOpenIdConnectDefault;
                 };
             });
 

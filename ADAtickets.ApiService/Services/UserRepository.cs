@@ -45,6 +45,7 @@ namespace ADAtickets.ApiService.Services
         }
 
         /// <inheritdoc cref="IUserRepository.GetUsersByAsync"/>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1862:Use the 'StringComparison' method overloads to perform case-insensitive string comparisons", Justification = "The comparison with the StringComparison overload is not translatable by Entity Framework and the EF.Function.ILike method is not standard SQL but PostgreSQL dialect.")]
         public async Task<IEnumerable<User>> GetUsersByAsync(IEnumerable<KeyValuePair<string, string>> filters)
         {
             IQueryable<User> query = _context.Users;
@@ -58,19 +59,19 @@ namespace ADAtickets.ApiService.Services
                         break;
 
                     case nameof(User.Email):
-                        query = query.Where(u => u.Email.Contains(filter.Value, StringComparison.InvariantCultureIgnoreCase));
+                        query = query.Where(u => u.Email.ToLower().Contains(filter.Value.ToLower()));
                         break;
 
                     case nameof(User.Name):
-                        query = query.Where(u => u.Name.Contains(filter.Value, StringComparison.InvariantCultureIgnoreCase));
+                        query = query.Where(u => u.Name.ToLower().Contains(filter.Value.ToLower()));
                         break;
 
                     case nameof(User.Surname):
-                        query = query.Where(u => u.Surname.Contains(filter.Value, StringComparison.InvariantCultureIgnoreCase));
+                        query = query.Where(u => u.Surname.ToLower().Contains(filter.Value.ToLower()));
                         break;
 
                     case nameof(User.PhoneNumber):
-                        query = query.Where(u => u.PhoneNumber.Contains(filter.Value, StringComparison.InvariantCultureIgnoreCase));
+                        query = query.Where(u => u.PhoneNumber.Contains(filter.Value));
                         break;
 
                     case nameof(User.AreEmailNotificationsEnabled) when bool.TryParse(filter.Value, out bool outBool):
@@ -83,10 +84,6 @@ namespace ADAtickets.ApiService.Services
 
                     case nameof(User.Type) when Enum.TryParse(filter.Value, true, out UserType outUserType):
                         query = query.Where(u => u.Type == outUserType);
-                        break;
-
-                    case nameof(User.MicrosoftAccountId):
-                        query = query.Where(u => u.MicrosoftAccountId != null && u.MicrosoftAccountId.Contains(filter.Value, StringComparison.InvariantCultureIgnoreCase));
                         break;
 
                     default:

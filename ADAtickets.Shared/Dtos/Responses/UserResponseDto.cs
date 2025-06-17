@@ -88,11 +88,6 @@ namespace ADAtickets.Shared.Dtos.Responses
         public UserType Type { get; set; } = UserType.User;
 
         /// <summary>
-        /// The unique identifier of the user's Microsoft account.
-        /// </summary>
-        public string? MicrosoftAccountId { get; set; } = null;
-
-        /// <summary>
         /// The collection of ids of tickets created by the user (if they are a user, otherwise it must be empty).
         /// </summary>
         public ICollection<Guid> CreatedTickets { get; } = [];

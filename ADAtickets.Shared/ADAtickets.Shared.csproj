@@ -10,6 +10,7 @@
 	<ItemGroup>
 		<InternalsVisibleTo Include="ADAtickets.ApiService" />
 		<InternalsVisibleTo Include="ADAtickets.Web" />
+		<InternalsVisibleTo Include="ADAtickets.Installer" />
 	</ItemGroup>
 
 	<ItemGroup>

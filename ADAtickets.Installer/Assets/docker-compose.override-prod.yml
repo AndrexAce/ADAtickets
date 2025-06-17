@@ -30,7 +30,7 @@ services:
       - AzureDevOps__ClientCertificates__0__CertificateDiskPath=/certs/${APIAUTHCERTIFICATENAME:?error}
       - AzureDevOps__ClientCertificates__0__CertificatePassword=${APIAUTHCERTIFICATEPASSWORD:?error}
       # DevOps API configuration variables
-      - AzureDevOpsAPI__BaseUrl=https://dev.azure.com/${DEVOPSORGANIZATIONNAME:?error}/_apis
+      - AzureDevOpsAPI__BaseUrl=https://vssps.dev.azure.com/${DEVOPSORGANIZATIONNAME:?error}/_apis
       - AzureDevOpsAPI__Scopes__0=499b84ac-1321-427f-aa17-267ca6975798/.default
     volumes:
       - ${SSLCERTIFICATEDISKPATH:?error}:/https:ro

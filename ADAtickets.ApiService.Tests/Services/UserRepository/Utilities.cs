@@ -6,14 +6,12 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
     {
         public static User CreateUser(
                string name = "",
-               string surname = "",
-               string? microsoftAccountId = "")
+               string surname = "")
         {
             return new User
             {
                 Name = name,
-                Surname = surname,
-                MicrosoftAccountId = microsoftAccountId
+                Surname = surname
             };
         }
     }

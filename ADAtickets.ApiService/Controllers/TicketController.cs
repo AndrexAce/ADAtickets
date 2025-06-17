@@ -37,7 +37,7 @@ namespace ADAtickets.ApiService.Controllers
     /// </summary>
     /// <param name="ticketRepository">Object defining the operations allowed on the entity type.</param>
     /// <param name="mapper">Object definining the mappings of fields between the <see cref="Ticket"/> entity and its <see cref="TicketRequestDto"/> or <see cref="TicketResponseDto"/> correspondant.</param>
-    [Route("v1/Tickets")]
+    [Route($"v{Service.APIVersion}/Tickets")]
     [ApiController]
     [Consumes(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
     [Produces(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]

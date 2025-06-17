@@ -37,7 +37,7 @@ namespace ADAtickets.ApiService.Controllers
     /// </summary>
     /// <param name="attachmentRepository">Object defining the operations allowed on the entity type.</param>
     /// <param name="mapper">Object definining the mappings of fields between the <see cref="Attachment"/> entity and its <see cref="AttachmentRequestDto"/> or <see cref="AttachmentResponseDto"/> correspondant.</param>
-    [Route("v1/Attachments")]
+    [Route($"v{Service.APIVersion}/Attachments")]
     [ApiController]
     [Consumes(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
     [Produces(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]

@@ -37,7 +37,7 @@ namespace ADAtickets.ApiService.Controllers
     /// </summary>
     /// <param name="userRepository">Object defining the operations allowed on the entity type.</param>
     /// <param name="mapper">Object definining the mappings of fields between the <see cref="User"/> entity and its <see cref="UserRequestDto"/> or <see cref="UserResponseDto"/> correspondant.</param>
-    [Route("v1/Users")]
+    [Route($"v{Service.APIVersion}/Users")]
     [ApiController]
     [Consumes(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
     [Produces(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]

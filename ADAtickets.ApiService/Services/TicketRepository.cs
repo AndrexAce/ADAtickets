@@ -46,6 +46,7 @@ namespace ADAtickets.ApiService.Services
         }
 
         /// <inheritdoc cref="ITicketRepository.GetTicketsByAsync"/>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1862:Use the 'StringComparison' method overloads to perform case-insensitive string comparisons", Justification = "The comparison with the StringComparison overload is not translatable by Entity Framework and the EF.Function.ILike method is not standard SQL but PostgreSQL dialect.")]
         public async Task<IEnumerable<Ticket>> GetTicketsByAsync(IEnumerable<KeyValuePair<string, string>> filters)
         {
             IQueryable<Ticket> query = _context.Tickets;
@@ -67,11 +68,11 @@ namespace ADAtickets.ApiService.Services
                         break;
 
                     case nameof(Ticket.Title):
-                        query = query.Where(ticket => ticket.Title.Contains(filter.Value, StringComparison.InvariantCultureIgnoreCase));
+                        query = query.Where(ticket => ticket.Title.ToLower().Contains(filter.Value.ToLower()));
                         break;
 
                     case nameof(Ticket.Description):
-                        query = query.Where(ticket => ticket.Description.Contains(filter.Value, StringComparison.InvariantCultureIgnoreCase));
+                        query = query.Where(ticket => ticket.Description.ToLower().Contains(filter.Value.ToLower()));
                         break;
 
                     case nameof(Ticket.Priority) when Enum.TryParse(filter.Value, true, out Priority outPriority):

@@ -37,17 +37,13 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
     {
         public static TheoryData<User> InvalidUserData =>
         [
-            Utilities.CreateUser(name: new string('a', 51), surname: "Lucchese", microsoftAccountId: "someId"),
-            Utilities.CreateUser(name: new string('a', 51), surname: "Lucchese", microsoftAccountId: null),
-            Utilities.CreateUser(name: "Andrea", surname: new string('a', 51), microsoftAccountId: "someId"),
-            Utilities.CreateUser(name: "Andrea", surname: new string('a', 51), microsoftAccountId: null),
-            Utilities.CreateUser(name: "Andrea", surname: "Lucchese", microsoftAccountId: new string('a', 21))
+            Utilities.CreateUser(name: new string('a', 51), surname: "Lucchese"),
+            Utilities.CreateUser(name: "Andrea", surname: new string('a', 51))
         ];
 
         public static TheoryData<User> ValidUserData =>
         [
-            Utilities.CreateUser(name: "Andrea", surname: "Lucchese", microsoftAccountId: "someId"),
-            Utilities.CreateUser(name: "Andrea", surname: "Lucchese", microsoftAccountId: null)
+            Utilities.CreateUser(name: "Andrea", surname: "Lucchese"),
         ];
 
         [Theory]
@@ -62,8 +58,7 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
             mockUserSet.Setup(s => s.Add(It.IsAny<User>()))
                 .Callback<User>(u =>
                 {
-                    if (u.Name.Length <= 50 && u.Surname.Length <= 50
-                    && (u.MicrosoftAccountId == null || u.MicrosoftAccountId.Length <= 20))
+                    if (u.Name.Length <= 50 && u.Surname.Length <= 50)
                     {
                         users.Add(u);
                     }
@@ -96,8 +91,7 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
             mockUserSet.Setup(s => s.Add(It.IsAny<User>()))
                 .Callback<User>(u =>
                 {
-                    if (u.Name.Length <= 50 && u.Surname.Length <= 50
-                    && (u.MicrosoftAccountId == null || u.MicrosoftAccountId.Length <= 20))
+                    if (u.Name.Length <= 50 && u.Surname.Length <= 50)
                     {
                         users.Add(u);
                     }

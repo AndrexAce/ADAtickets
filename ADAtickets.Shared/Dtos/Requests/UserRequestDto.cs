@@ -69,10 +69,5 @@ namespace ADAtickets.Shared.Dtos.Requests
         /// </summary>
         [Required]
         public UserType Type { get; set; } = UserType.User;
-
-        /// <summary>
-        /// The unique identifier of the user's Microsoft account.
-        /// </summary>
-        public string? MicrosoftAccountId { get; set; } = null;
     }
 }

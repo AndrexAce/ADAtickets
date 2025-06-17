@@ -45,6 +45,7 @@ namespace ADAtickets.ApiService.Services
         }
 
         /// <inheritdoc cref="IPlatformRepository.GetPlatformsByAsync"/>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1862:Use the 'StringComparison' method overloads to perform case-insensitive string comparisons", Justification = "The comparison with the StringComparison overload is not translatable by Entity Framework and the EF.Function.ILike method is not standard SQL but PostgreSQL dialect.")]
         public async Task<IEnumerable<Platform>> GetPlatformsByAsync(IEnumerable<KeyValuePair<string, string>> filters)
         {
             IQueryable<Platform> query = _context.Platforms;
@@ -58,11 +59,11 @@ namespace ADAtickets.ApiService.Services
                         break;
 
                     case nameof(Platform.Name):
-                        query = query.Where(platform => platform.Name.Contains(filter.Value, StringComparison.InvariantCultureIgnoreCase));
+                        query = query.Where(platform => platform.Name.ToLower().Contains(filter.Value.ToLower()));
                         break;
 
                     case nameof(Platform.RepositoryUrl):
-                        query = query.Where(platform => platform.RepositoryUrl.Contains(filter.Value, StringComparison.InvariantCultureIgnoreCase));
+                        query = query.Where(platform => platform.RepositoryUrl.ToLower().Contains(filter.Value.ToLower()));
                         break;
 
                     default:

@@ -39,10 +39,27 @@ namespace ADAtickets.Shared.Constants
         /// <summary>
         /// The name of the API service used by external users.
         /// </summary>
-        public const string ExternalAPI = "ADAticketsAPI";
+        public const string ExternalAPI = "ExternalADAticketsAPI";
         /// <summary>
         /// The name of the Azure DevOps API service used to interact with Azure DevOps repositories.
         /// </summary>
         public const string AzureDevOpsAPI = "AzureDevOpsAPI";
+
+        /// <summary>
+        /// The version of the database service.
+        /// </summary>
+        public const string DatabaseVersion = "17.5";
+        /// <summary>
+        /// The name of the cache service.
+        /// </summary>
+        public const string CacheVersion = "8.0.2";
+        /// <summary>
+        /// The version of the API service.
+        /// </summary>
+        public const string APIVersion = "1";
+        /// <summary>
+        /// The version of the Azure DevOps API service used to interact with Azure DevOps repositories.
+        /// </summary>
+        public const string AzureDevOpsAPIVersion = "7.2-preview";
     }
 }

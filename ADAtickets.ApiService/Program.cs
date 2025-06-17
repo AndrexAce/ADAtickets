@@ -121,9 +121,9 @@ namespace ADAtickets.ApiService
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options =>
             {
-                options.SwaggerDoc("v1", new OpenApiInfo
+                options.SwaggerDoc($"v{Service.APIVersion}", new OpenApiInfo
                 {
-                    Version = "v1",
+                    Version = $"v{Service.APIVersion}",
                     Title = "ADAtickets API",
                     Description = "Web API to interact with the ADAtickets ticketing system with authentication endpoints and JWT validation.",
                     Contact = new OpenApiContact

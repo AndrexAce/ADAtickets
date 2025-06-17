@@ -46,6 +46,7 @@ namespace ADAtickets.ApiService.Services
         }
 
         /// <inheritdoc cref="IAttachmentRepository.GetAttachmentsByAsync"/>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1862:Use the 'StringComparison' method overloads to perform case-insensitive string comparisons", Justification = "The comparison with the StringComparison overload is not translatable by Entity Framework and the EF.Function.ILike method is not standard SQL but PostgreSQL dialect.")]
         public async Task<IEnumerable<Attachment>> GetAttachmentsByAsync(IEnumerable<KeyValuePair<string, string>> filters)
         {
             IQueryable<Attachment> query = _context.Attachments;
@@ -63,7 +64,7 @@ namespace ADAtickets.ApiService.Services
                         break;
 
                     case nameof(Attachment.Path):
-                        query = query.Where(attachment => attachment.Path.Contains(filter.Value, StringComparison.InvariantCultureIgnoreCase));
+                        query = query.Where(attachment => attachment.Path.ToLower().Contains(filter.Value.ToLower()));
                         break;
 
                     default:
@@ -144,7 +145,6 @@ namespace ADAtickets.ApiService.Services
         {
             try
             {
-#pragma warning disable SYSLIB1045 // Convert to 'GeneratedRegexAttribute'.
                 if (!Regex.IsMatch(attachmentPath, @"^(?!.*//)[a-zA-Z0-9_\-\\/\.]+$", RegexOptions.None, TimeSpan.FromMilliseconds(100)))
                 {
                     return false;
@@ -153,7 +153,6 @@ namespace ADAtickets.ApiService.Services
                 {
                     File.Delete(attachmentPath);
                 }
-#pragma warning restore SYSLIB1045 // Convert to 'GeneratedRegexAttribute'.
 
                 return true;
             }

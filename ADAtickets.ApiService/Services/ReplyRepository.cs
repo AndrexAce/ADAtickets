@@ -46,6 +46,7 @@ namespace ADAtickets.ApiService.Services
         }
 
         /// <inheritdoc cref="IReplyRepository.GetRepliesByAsync"/>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1862:Use the 'StringComparison' method overloads to perform case-insensitive string comparisons", Justification = "The comparison with the StringComparison overload is not translatable by Entity Framework and the EF.Function.ILike method is not standard SQL but PostgreSQL dialect.")]
         public async Task<IEnumerable<Reply>> GetRepliesByAsync(IEnumerable<KeyValuePair<string, string>> filters)
         {
             IQueryable<Reply> query = _context.Replies;
@@ -63,7 +64,7 @@ namespace ADAtickets.ApiService.Services
                         break;
 
                     case nameof(Reply.Message):
-                        query = query.Where(reply => reply.Message.Contains(filter.Value, StringComparison.InvariantCultureIgnoreCase));
+                        query = query.Where(reply => reply.Message.ToLower().Contains(filter.Value.ToLower()));
                         break;
 
                     case nameof(Reply.AuthorUserId) when Guid.TryParse(filter.Value, out Guid outGuid):

@@ -25,9 +25,9 @@ namespace ADAtickets.ApiService.Configs
     /// <summary>
     /// Defines a set of methods with annotations (called conventions) that is used to personalize the behavior of the ASP.NET Core API controller.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "The parameters are not meant to be used, they are only needed to estabilish a pattern to apply the conventions.")]
     static class ADAticketsApiConventions
     {
-#pragma warning disable IDE0060 // Remove unused parameter
         /// <summary>
         /// GET api methods convention (single entity).
         /// </summary>
@@ -40,8 +40,8 @@ namespace ADAtickets.ApiService.Configs
         [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
         [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
         public static void Get(
-            [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Suffix)]
-            [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.Any)]
+            [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Exact)]
+            [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.AssignableFrom)]
 
             Guid id)
         {
@@ -59,8 +59,8 @@ namespace ADAtickets.ApiService.Configs
         [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
         [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
         public static void Get(
-            [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Suffix)]
-            [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.Any)]
+            [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Exact)]
+            [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.AssignableFrom)]
 
             IEnumerable<KeyValuePair<string, string>> filters)
         {
@@ -79,7 +79,7 @@ namespace ADAtickets.ApiService.Configs
         [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
         public static void Post(
             [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Any)]
-            [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.Any)]
+            [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.AssignableFrom)]
             object model)
         {
             // This method is intentionally left empty. The attributes above are used to define the convention.
@@ -100,12 +100,12 @@ namespace ADAtickets.ApiService.Configs
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
         public static void Put(
-            [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Suffix)]
-            [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.Any)]
+            [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Exact)]
+            [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.AssignableFrom)]
             Guid id,
 
             [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Any)]
-            [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.Any)]
+            [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.AssignableFrom)]
             object model)
         {
             // This method is intentionally left empty. The attributes above are used to define the convention.
@@ -123,12 +123,11 @@ namespace ADAtickets.ApiService.Configs
         [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
         [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
         public static void Delete(
-            [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Suffix)]
-            [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.Any)]
+            [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Exact)]
+            [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.AssignableFrom)]
             Guid id)
         {
             // This method is intentionally left empty. The attributes above are used to define the convention.
         }
     }
-#pragma warning restore IDE0060 // Remove unused parameter
 }
