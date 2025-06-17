@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ADAtickets.ApiService.Migrations
 {
     [DbContext(typeof(ADAticketsDbContext))]
-    [Migration("20250616165855_FirstMigration")]
+    [Migration("20250617195811_FirstMigration")]
     partial class FirstMigration
     {
         /// <inheritdoc />
@@ -334,11 +334,6 @@ namespace ADAtickets.ApiService.Migrations
                         .HasColumnType("text")
                         .HasColumnName("email");
 
-                    b.Property<string>("MicrosoftAccountId")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("microsoft_account_id");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -372,10 +367,6 @@ namespace ADAtickets.ApiService.Migrations
                     b.HasIndex("Email")
                         .IsUnique()
                         .HasDatabaseName("ix_users_email");
-
-                    b.HasIndex("MicrosoftAccountId")
-                        .IsUnique()
-                        .HasDatabaseName("ix_users_microsoft_account_id");
 
                     b.HasIndex("PhoneNumber")
                         .IsUnique()

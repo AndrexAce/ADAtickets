@@ -1,4 +1,5 @@
-﻿using ADAtickets.Shared.Models;
+﻿using System;
+using ADAtickets.Shared.Models;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -43,7 +44,6 @@ namespace ADAtickets.ApiService.Migrations
                     are_email_notifications_enabled = table.Column<bool>(type: "boolean", nullable: false),
                     are_phone_notifications_enabled = table.Column<bool>(type: "boolean", nullable: false),
                     type = table.Column<UserType>(type: "user_type", nullable: false),
-                    microsoft_account_id = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
                     xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
@@ -380,12 +380,6 @@ namespace ADAtickets.ApiService.Migrations
                 name: "ix_users_email",
                 table: "users",
                 column: "email",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "ix_users_microsoft_account_id",
-                table: "users",
-                column: "microsoft_account_id",
                 unique: true);
 
             migrationBuilder.CreateIndex(
