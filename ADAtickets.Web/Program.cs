@@ -19,6 +19,7 @@
  */
 using ADAtickets.Shared.Constants;
 using ADAtickets.Web.Components;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
@@ -54,7 +55,7 @@ namespace ADAtickets.Web
         /// <param name="builder">The <see cref="WebApplicationBuilder"/> that creates the required services.</param>
         public static void ConfigureServices(WebApplicationBuilder builder)
         {
-            // Authentication and Authorization
+            // Add authentication and authorization services for both Entra ID and Entra External ID.
             var authBuilder = builder.Services.AddAuthentication(options =>
             {
                 options.DefaultScheme = Scheme.PolicySchemeDefault;
@@ -81,24 +82,26 @@ namespace ADAtickets.Web
                 };
             });
 
-            builder.Services.AddAuthorization();
-
-            builder.Services.AddCascadingAuthenticationState();
-
-            // Basic services
-            builder.Services.AddHttpContextAccessor();
             builder.Services.AddStackExchangeRedisCache(options =>
             {
                 options.Configuration = builder.Configuration.GetConnectionString(Service.Cache);
             });
 
-            // Localization
+            builder.Services.AddCascadingAuthenticationState();
+
+            // Add authorization policies.
+            CreatePolicies(builder.Services.AddAuthorizationBuilder());
+
+            // Add access to the HTTP context.
+            builder.Services.AddHttpContextAccessor();
+
+            // Add localization services.
             builder.Services.AddLocalization();
 
-            // UI Components
+            // Add Fluent UI components.
             builder.Services.AddFluentUIComponents();
 
-            // Razor services
+            // Add services related to Razor pages and components.
             builder.Services.AddRazorPages()
                 .AddMicrosoftIdentityUI();
 
@@ -113,7 +116,7 @@ namespace ADAtickets.Web
         /// <param name="app">The <see cref="WebApplication"/> with the created services.</param>
         public static void ConfigureApplication(WebApplication app)
         {
-            // Configure localization
+            // Configure localization.
             var supportedCultures = new[] { "en-US", "it-IT" };
             var localizationOptions = new RequestLocalizationOptions()
                 .SetDefaultCulture(supportedCultures[0])
@@ -121,31 +124,61 @@ namespace ADAtickets.Web
                 .AddSupportedUICultures(supportedCultures);
             app.UseRequestLocalization(localizationOptions);
 
-            // Configure security based on environment
-            if (!app.Environment.IsDevelopment())
+            // Configure security based on environment.
+            if (app.Environment.IsDevelopment())
             {
                 // Enable production error handling and HTTPS requirements
                 app.UseExceptionHandler("/Error");
+            }
+            else
+            {
+                // Add HTTPS redirection for production.
                 app.UseHsts();
+                app.UseHttpsRedirection();
             }
 
-            app.UseHttpsRedirection();
-
-            // Authentication and authorization
+            // Add authentication middleware.
             app.UseAuthentication();
+
+            // Add authorization middleware.
             app.UseAuthorization();
 
-            // Configure other middleware pipelines
+            // Configure antiforgery protection.
             app.UseAntiforgery();
 
-            // Configure routing
+            // Map static data paths.
             app.MapStaticAssets();
+
+            // Map the controllers endpoints for business logic APIs.
             app.MapControllers();
+
+            // Map Razor pages paths.
             app.MapRazorPages();
+
+            // Map Razor components paths.
             app.MapRazorComponents<App>()
                 .AddInteractiveServerRenderMode();
+        }
 
-            app.Run();
+        private static void CreatePolicies(AuthorizationBuilder builder)
+        {
+            builder.AddDefaultPolicy(Policy.AdminOnly, policy =>
+            {
+                policy.RequireAuthenticatedUser()
+                .RequireRole("Azure DevOps Administrator")
+                .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault);
+
+            })
+            .AddPolicy(Policy.OperatorOrAdmin, policy =>
+            {
+                policy.RequireAuthenticatedUser()
+                .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault);
+            })
+            .AddPolicy(Policy.Everyone, policy =>
+            {
+                policy.RequireAuthenticatedUser()
+                .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault, Scheme.ExternalOpenIdConnectDefault);
+            });
         }
     }
 }

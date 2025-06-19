@@ -68,6 +68,26 @@ namespace ADAtickets.ApiService.Configs
         }
 
         /// <summary>
+        /// GET api methods convention (single entity).
+        /// </summary>
+        /// <param name="candidateKey">Another possible identifier of the resource to fetch.</param>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
+        [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
+        public static void Get(
+            [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Any)]
+            [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.AssignableFrom)]
+
+            string candidateKey)
+        {
+            // This method is intentionally left empty. The attributes above are used to define the convention.
+        }
+
+        /// <summary>
         /// POST api methods convention.
         /// </summary>
         /// <param name="model">The resource to create.</param>

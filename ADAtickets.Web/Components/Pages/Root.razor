@@ -16,11 +16,16 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @page "/"
+
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
+
 @inject IStringLocalizer<Signin> Loc
 @inject NavigationManager navManager
 @inject AuthenticationStateProvider authStateProvider
 @inject IConfiguration configuration
+
+@attribute [AllowAnonymous]
 
 <PageTitle>ADAtickets</PageTitle>
 <style>

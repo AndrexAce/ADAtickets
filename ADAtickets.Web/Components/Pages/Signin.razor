@@ -17,10 +17,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @page "/signin-oidc-entra"
 @page "/signin-oidc-external-entra"
+
+@using ADAtickets.Shared.Constants
+@using ADAtickets.Shared.Dtos
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.Identity.Abstractions
+@using Microsoft.VisualStudio.Services.Identity
+
 @inject NavigationManager navManager
 @inject AuthenticationStateProvider authStateProvider
 @inject IConfiguration configuration
+@inject IDownstreamApi downstreamApi
+
+@attribute [Authorize(Policy = Policy.Everyone)]
 
 <PageTitle>ADAtickets</PageTitle>
 <style>
@@ -42,7 +52,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
             if (tenantId == primaryTenantId)
             {        
-                // TODO: check Azure DevOps access
+                var hasAccess = await downstreamApi.GetForUserAsync<ValueWrapper<bool>>("ADAticketsAPI", options =>
+                {
+                    options.RelativePath = $"v{Service.APIVersion}/AzureDevOps/{user.Identity.Name}/has-access";
+                    options.AcquireTokenOptions.AuthenticationOptionsName = "Entra";
+                }, user);
+
+                navManager.NavigateTo((hasAccess?.Value ?? false) ? "/home" : "/no-access", true);
             }
             else
             {

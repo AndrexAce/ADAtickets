@@ -83,17 +83,6 @@ namespace ADAtickets.ApiService
             authBuilder.AddMicrosoftIdentityWebApi(builder.Configuration.GetSection(Scheme.OpenIdConnectDefault), Scheme.OpenIdConnectDefault);
             authBuilder.AddMicrosoftIdentityWebApi(builder.Configuration.GetSection(Scheme.ExternalOpenIdConnectDefault), Scheme.ExternalOpenIdConnectDefault);
 
-            // Add authentication for the DevOps service principal.
-            authBuilder.AddMicrosoftIdentityWebApi(builder.Configuration.GetSection(Scheme.AzureDevOpsOpenIdConnectDefault), Scheme.AzureDevOpsOpenIdConnectDefault)
-                .EnableTokenAcquisitionToCallDownstreamApi()
-                .AddDownstreamApi(Service.AzureDevOpsAPI, builder.Configuration.GetSection(Service.AzureDevOpsAPI))
-                .AddDistributedTokenCaches();
-
-            builder.Services.AddStackExchangeRedisCache(options =>
-            {
-                options.Configuration = builder.Configuration.GetConnectionString(Service.Cache);
-            });
-
             // Add authorization policies.
             CreatePolicies(builder.Services.AddAuthorizationBuilder());
 
@@ -188,6 +177,7 @@ namespace ADAtickets.ApiService
             else
             {
                 // Add HTTPS redirection for production.
+                app.UseHsts();
                 app.UseHttpsRedirection();
             }
 

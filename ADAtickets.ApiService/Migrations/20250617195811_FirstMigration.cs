@@ -1,5 +1,4 @@
-﻿using System;
-using ADAtickets.Shared.Models;
+﻿using ADAtickets.Shared.Models;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
