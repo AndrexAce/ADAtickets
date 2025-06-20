@@ -17,45 +17,46 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using ADAtickets.Shared.Models;
+
 namespace ADAtickets.Shared.Constants
 {
     /// <summary>
-    /// Represents the services used by the applications.
+    /// Represents the path of an API controller.
     /// </summary>
-    static class Service
+    static class Controller
     {
         /// <summary>
-        /// The name of the database service.
+        /// Path to the API controller for <see cref="Attachment"/> entities.
         /// </summary>
-        public const string Database = "PostgreSQL";
+        public const string Attachments = "Attachments";
         /// <summary>
-        /// The name of the cache service.
+        /// Path to the API controller for Azure DevOps operations.
         /// </summary>
-        public const string Cache = "Redis";
+        public const string AzureDevOps = "AzureDevOps";
         /// <summary>
-        /// The name of the API service used by internal users.
+        /// Path to the API controller for <see cref="Edit"/> entities.
         /// </summary>
-        public const string API = "ADAticketsAPI";
+        public const string Edits = "Edits";
         /// <summary>
-        /// The name of the API service used by external users.
+        /// Path to the API controller for <see cref="Notification"/> entities.
         /// </summary>
-        public const string ExternalAPI = "ExternalADAticketsAPI";
-
+        public const string Notifications = "Notifications";
         /// <summary>
-        /// The version of the database service.
+        /// Path to the API controller for <see cref="Platform"/> entities.
         /// </summary>
-        public const string DatabaseVersion = "17.5";
+        public const string Platforms = "Platforms";
         /// <summary>
-        /// The name of the cache service.
+        /// Path to the API controller for <see cref="Reply"/> entities.
         /// </summary>
-        public const string CacheVersion = "8.0.2";
+        public const string Replies = "Replies";
         /// <summary>
-        /// The version of the API service.
+        /// Path to the API controller for <see cref="Ticket"/> entities.
         /// </summary>
-        public const string APIVersion = "1";
+        public const string Tickets = "Tickets";
         /// <summary>
-        /// The version of the Azure DevOps API service used to interact with Azure DevOps repositories.
+        /// Path to the API controller for <see cref="User"/> entities.
         /// </summary>
-        public const string AzureDevOpsAPIVersion = "7.2-preview";
+        public const string Users = "Users";
     }
 }

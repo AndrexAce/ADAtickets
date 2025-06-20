@@ -32,6 +32,7 @@ using Microsoft.VisualStudio.Services.Identity.Client;
 using Microsoft.VisualStudio.Services.WebApi;
 using System.Net.Mime;
 using System.Security.Cryptography.X509Certificates;
+using Controller = ADAtickets.Shared.Constants.Controller;
 
 namespace ADAtickets.ApiService.Controllers
 {
@@ -40,7 +41,7 @@ namespace ADAtickets.ApiService.Controllers
     /// </summary>
     /// <param name="userRepository">Object defining the operations allowed on the entity type.</param>
     /// <param name="configuration">Configuration object containing the application settings.</param>
-    [Route($"v{Service.APIVersion}/AzureDevOps")]
+    [Route($"v{Service.APIVersion}/{Controller.AzureDevOps}")]
     [ApiController]
     [Consumes(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
     [Produces(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]

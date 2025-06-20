@@ -48,10 +48,5 @@ namespace ADAtickets.Shared.Constants
         /// Cookie scheme employed by the logged in user or operator in the external tenant.
         /// </summary>
         public const string ExternalCookieDefault = "ExternalEntraCookies";
-
-        /// <summary>
-        /// OpenID Connect scheme employed by the service principal in the organizational tenant.
-        /// </summary>
-        public const string AzureDevOpsOpenIdConnectDefault = "AzureDevOps";
     }
 }

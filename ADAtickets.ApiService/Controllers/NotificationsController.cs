@@ -29,6 +29,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web.Resource;
 using System.Net.Mime;
+using Controller = ADAtickets.Shared.Constants.Controller;
 
 namespace ADAtickets.ApiService.Controllers
 {
@@ -37,7 +38,7 @@ namespace ADAtickets.ApiService.Controllers
     /// </summary>
     /// <param name="notificationRepository">Object defining the operations allowed on the entity type.</param>
     /// <param name="mapper">Object definining the mappings of fields between the <see cref="Notification"/> entity and its <see cref="NotificationRequestDto"/> or <see cref="NotificationResponseDto"/> correspondant.</param>
-    [Route($"v{Service.APIVersion}/Notifications")]
+    [Route($"v{Service.APIVersion}/{Controller.Notifications}")]
     [ApiController]
     [Consumes(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
     [Produces(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
