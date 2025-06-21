@@ -18,6 +18,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @page "/signin-oidc-entra"
 @page "/signin-oidc-external-entra"
 
+@using ADAtickets.Client
+@using ADAtickets.Client.Extensions
 @using ADAtickets.Shared.Constants
 @using ADAtickets.Shared.Dtos
 @using Microsoft.AspNetCore.Authorization
@@ -28,7 +30,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @inject NavigationManager navManager
 @inject AuthenticationStateProvider authStateProvider
 @inject IConfiguration configuration
-@inject IDownstreamApi downstreamApi
+@inject AzureDevOpsClient azureDevOpsClient
 
 @attribute [Authorize(Policy = Policy.Everyone)]
 
@@ -47,18 +49,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
         if (user?.Identity?.IsAuthenticated == true)
         {
+            // Takes the user email to check if it is listed in Azure DevOps members.
             var tenantId = user.Claims?.FirstOrDefault(c => c.Type.Equals("http://schemas.microsoft.com/identity/claims/tenantid"))?.Value;
             var primaryTenantId = configuration.GetSection("Entra:TenantId").Value;
 
             if (tenantId == primaryTenantId)
-            {        
-                var hasAccess = await downstreamApi.GetForUserAsync<ValueWrapper<bool>>("ADAticketsAPI", options =>
-                {
-                    options.RelativePath = $"v{Service.APIVersion}/AzureDevOps/{user.Identity.Name}/has-access";
-                    options.AcquireTokenOptions.AuthenticationOptionsName = "Entra";
-                }, user);
+            {
+                var (code, hasAccess) = await azureDevOpsClient.GetUserDevOpsAccessAsync(user.Identity.Name!);
 
-                navManager.NavigateTo((hasAccess?.Value ?? false) ? "/home" : "/no-access", true);
+                // If the request was completed and the user has access, go to home. Otherwise, go to a no-access page.
+                navManager.NavigateTo((code.IsSuccess() && (hasAccess?.Value ?? false)) ? "/home" : "/no-access", true);
             }
             else
             {

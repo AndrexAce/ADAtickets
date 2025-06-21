@@ -17,6 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using ADAtickets.Client.Extensions;
 using ADAtickets.Shared.Constants;
 using ADAtickets.Web.Components;
 using Microsoft.AspNetCore.Authorization;
@@ -108,6 +109,9 @@ namespace ADAtickets.Web
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents()
                 .AddMicrosoftIdentityConsentHandler();
+
+            // Add ADAtickets client services.
+            builder.Services.AddADAticketsClient();
         }
 
         /// <summary>

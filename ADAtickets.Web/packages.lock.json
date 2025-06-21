@@ -1744,6 +1744,14 @@
           "System.Xml.XmlDocument": "4.3.0"
         }
       },
+      "adatickets.client": {
+        "type": "Project",
+        "dependencies": {
+          "ADAtickets.Shared": "[1.0.0, )",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "[9.0.6, )",
+          "Microsoft.Identity.Web.DownstreamApi": "[3.9.4, )"
+        }
+      },
       "adatickets.shared": {
         "type": "Project",
         "dependencies": {
