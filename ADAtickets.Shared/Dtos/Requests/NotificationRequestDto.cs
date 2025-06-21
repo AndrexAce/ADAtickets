@@ -25,7 +25,7 @@ namespace ADAtickets.Shared.Dtos.Requests
     /// <para>Represents a notification sent to a user triggered by an action like ticket modification, reply or assignment.</para>
     /// <para>It is a simplified version of the <see cref="Notification"/> class, used for data transfer to the server.</para>
     /// </summary>
-    public sealed class NotificationRequestDto
+    public sealed class NotificationRequestDto : RequestDto
     {
         /// <summary>
         /// The date and time when the notification was sent.

@@ -17,26 +17,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-using System.ComponentModel.DataAnnotations;
+using System.ComponentModel;
 
 namespace ADAtickets.Shared.Dtos.Requests
 {
     /// <summary>
-    /// <para>Represents a platform managed by the enterprise which tickets are related to.</para>
-    /// <para>It is a simplified version of the <see cref="Platform"/> class, used for data transfer to the server.</para>
+    /// <para>Base class for all requests DTOs in the ADAtickets model.</para>
+    /// <para>Contains common properties and methods.</para>
     /// </summary>
-    public sealed class PlatformRequestDto : RequestDto
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public abstract class RequestDto
     {
-        /// <summary>
-        /// The name of the platform.
-        /// </summary>
-        [Required]
-        public string Name { get; set; } = string.Empty;
-
-        /// <summary>
-        /// The URL of the repository where the source code of the platform is hosted.
-        /// </summary>
-        [Required]
-        public string RepositoryUrl { get; set; } = string.Empty;
+        // The class is empty since it is only meant to serve as a base for other request DTOs.
     }
 }

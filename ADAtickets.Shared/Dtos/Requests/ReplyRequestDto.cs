@@ -25,7 +25,7 @@ namespace ADAtickets.Shared.Dtos.Requests
     /// <para>Represents a reply in a ticket comment thread.</para>
     /// <para>It is a simplified version of the <see cref="Reply"/> class, used for data transfer to the server.</para>
     /// </summary>
-    public sealed class ReplyRequestDto
+    public sealed class ReplyRequestDto : RequestDto
     {
         /// <summary>
         /// The date and time when the reply was sent.

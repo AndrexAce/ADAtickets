@@ -23,7 +23,7 @@ namespace ADAtickets.Client
         /// Determines if a specific <see cref="User"/> entity with <paramref name="email"/> has access to the Azure DevOps organization.
         /// </summary>
         /// <param name="email">Email of the <see cref="User"/> entity to check.</param>
-        /// <returns>A tuple containing the <see cref="HttpStatusCode"/> and a <see cref="ValueWrapper{TEntity}"/> indicating access.</returns>
+        /// <returns>A tuple containing the <see cref="HttpStatusCode"/> and a <see cref="ValueWrapper{TValue}"/> indicating access.</returns>
         /// <exception cref="OperationCanceledException">When the operation is canceled.</exception>
         public async Task<(HttpStatusCode, ValueWrapper<bool>?)> GetUserDevOpsAccessAsync(string email)
         {
