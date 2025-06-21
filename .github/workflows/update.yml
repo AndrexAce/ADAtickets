@@ -37,16 +37,16 @@ jobs:
           git config user.email "andrylook14@gmail.com"
       
       - name: Get Installer version
-        run: echo "VERSION=v$(cat ADAtickets.Installer/VERSION)" >> $GITHUB_ENV
+        run: echo "INSTALLER_VERSION=v$(cat ADAtickets.Installer/VERSION)" >> $GITHUB_ENV
 
       - name: Push tag if it doesn't already exist
         run: |
-          if ! git ls-remote --tags origin | grep -q "refs/tags/${{ env.VERSION }}$"; then
-            git tag ${{ env.VERSION }}
+          if ! git ls-remote --tags origin | grep -q "refs/tags/${{ env.INSTALLER_VERSION }}$"; then
+            git tag ${{ env.INSTALLER_VERSION }}
             git remote set-url origin https://x-access-token:${{ secrets.PAT }}@github.com/${{ github.repository }}.git
-            git push origin ${{ env.VERSION }}
+            git push origin ${{ env.INSTALLER_VERSION }}
           else
-            echo "Tag ${{ env.VERSION }} already exists. Skipping tag creation."
+            echo "Tag ${{ env.INSTALLER_VERSION }} already exists. Skipping tag creation."
           fi
       
       - name: Build and pack NuGet package
