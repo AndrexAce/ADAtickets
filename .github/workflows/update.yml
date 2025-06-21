@@ -21,6 +21,16 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.PAT }}
 
+      - name: Cache NuGet packages
+        id: cache-nuget-packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.nuget/packages
+            ~/.dotnet/tools
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: ${{ runner.os }}-nuget-
+
       - name: Set up Git
         run: |
           git config user.name "Andrea Lucchese"
@@ -41,7 +51,7 @@ jobs:
       
       - name: Build and pack NuGet package
         run: |
-          dotnet build "ADAtickets.Client" --configuration Release --no-restore
+          dotnet build "ADAtickets.Client" --configuration Release
           dotnet pack "ADAtickets.Client" --configuration Release --no-build --output ./nupkg
       
       - name: Publish NuGet package to GitHub Packages
