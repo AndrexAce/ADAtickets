@@ -6,20 +6,21 @@
     <Nullable>enable</Nullable>
 	<RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
 	<GenerateDocumentationFile>True</GenerateDocumentationFile>
-	<Title>ADAtickets API Library</Title>
-	<Authors>Andrea Lucchese</Authors>
-	<Company>AceWorks</Company>
-	<Copyright>GPL-3.0</Copyright>
+	<Title>ADAtickets API Client</Title>
+	<Authors>AndrexAce</Authors>
 	<IncludeSymbols>True</IncludeSymbols>
 	<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 	<NeutralLanguage>en</NeutralLanguage>
 	<AssemblyVersion>1.0.0</AssemblyVersion>
 	<FileVersion>1.0.0</FileVersion>
 	<PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
-	<Description>NuGet package that allows to interact programmatically with ADAtickets APIs.</Description>
+	<Description>Official .NET client library for interacting programmatically with ADAtickets APIs.</Description>
 	<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 	<RepositoryType>git</RepositoryType>
 	<RepositoryUrl>https://github.com/AndrexAce/ADAtickets</RepositoryUrl>
+	<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+	<IsPackable>True</IsPackable>
+	<PackageIcon>NuGetIcon.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -29,5 +30,12 @@
 
   <ItemGroup>
   	<ProjectReference Include="..\ADAtickets.Shared\ADAtickets.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="NuGetIcon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 </Project>

@@ -11,6 +11,11 @@ jobs:
     name: Tag, containerize and update
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
+      - name: Setup .NET 9.0
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -33,7 +38,17 @@ jobs:
           else
             echo "Tag ${{ env.VERSION }} already exists. Skipping tag creation."
           fi
-
+      
+      - name: Build and pack NuGet package
+        run: |
+          dotnet build "ADAtickets.Client" --configuration Release --no-restore
+          dotnet pack "ADAtickets.Client" --configuration Release --no-build --output ./nupkg
+      
+      - name: Publish NuGet package to GitHub Packages
+        run: |
+          dotnet nuget add source --username ${{ github.actor }} --password ${{ secrets.PAT }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+          dotnet nuget push "./nupkg/*.nupkg" --source "github" --api-key ${{ secrets.PAT }} --skip-duplicate
+      
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
