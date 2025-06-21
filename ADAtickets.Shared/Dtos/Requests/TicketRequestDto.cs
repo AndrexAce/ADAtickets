@@ -28,7 +28,7 @@ namespace ADAtickets.Shared.Dtos.Requests
     /// <para>Represents a ticket sent by a user to the system.</para>
     /// <para>It is a simplified version of the <see cref="Ticket"/> class, used for data transfer to the server.</para>
     /// </summary>
-    public sealed class TicketRequestDto
+    public sealed class TicketRequestDto : RequestDto
     {
         /// <summary>
         /// The type of user request bound to the ticket.

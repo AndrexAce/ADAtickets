@@ -26,7 +26,7 @@ namespace ADAtickets.Shared.Dtos.Requests
     /// <para>Represents a user of the system.</para>
     /// <para>It is a simplified version of the <see cref="User"/> class, used for data transfer to the server.</para>
     /// </summary>
-    public sealed class UserRequestDto
+    public sealed class UserRequestDto : RequestDto
     {
         /// <summary>
         /// The email address of the user.

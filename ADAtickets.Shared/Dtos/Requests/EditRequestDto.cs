@@ -28,7 +28,7 @@ namespace ADAtickets.Shared.Dtos.Requests
     /// <para>Represents a modification made to a ticket, either by a user or by the system.</para>
     /// <para>It is a simplified version of the <see cref="Edit"/> class, used for data transfer to the server.</para>
     /// </summary>
-    public sealed class EditRequestDto
+    public sealed class EditRequestDto : RequestDto
     {
         /// <summary>
         /// The date and time when the edit was made.
