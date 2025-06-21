@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using AutoMapper.Configuration.Annotations;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
@@ -27,7 +28,9 @@ namespace ADAtickets.Shared.Models
     /// <summary>
     /// Represents a modification made to a ticket, either by a user or by the system.
     /// </summary>
-    public sealed class Edit : EntityBase
+    /// <remarks>This class is intended for internal use only; it is public only to allow for testing.</remarks>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public sealed class Edit : Entity
     {
         /// <summary>
         /// The unique identifier of the edit.

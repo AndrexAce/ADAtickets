@@ -19,6 +19,7 @@
  */
 using AutoMapper.Configuration.Annotations;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
@@ -28,6 +29,8 @@ namespace ADAtickets.Shared.Models
     /// <summary>
     /// Represents the link between users and their preferred platforms.
     /// </summary>
+    /// <remarks>This class is intended for internal use only; it is public only to allow for testing.</remarks>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     [PrimaryKey(nameof(UserId), nameof(PlatformId))]
     public sealed class UserPlatform
     {

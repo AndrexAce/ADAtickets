@@ -19,6 +19,7 @@
  */
 using AutoMapper.Configuration.Annotations;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
@@ -28,9 +29,11 @@ namespace ADAtickets.Shared.Models
     /// <summary>
     /// Represents a user of the system.
     /// </summary>
+    /// <remarks>This class is intended for internal use only; it is public only to allow for testing.</remarks>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     [Index(nameof(Email), IsUnique = true)]
     [Index(nameof(PhoneNumber), IsUnique = true)]
-    public sealed class User : EntityBase
+    public sealed class User : Entity
     {
         /// <summary>
         /// The unique identifier of the user.

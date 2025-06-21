@@ -17,32 +17,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 namespace ADAtickets.Shared.Dtos.Responses
 {
     /// <summary>
-    /// <para>Represents a reply in a ticket comment thread.</para>
-    /// <para>It is a simplified version of the <see cref="Reply"/> class, used for data transfer to the client.</para>
+    /// Wraps a value of type <typeparamref name="TValue"/> to allow its use in HTTP exchanges.
     /// </summary>
-    public sealed class ReplyResponseDto : ResponseDto
+    /// <typeparam name="TValue">The value type the class contains.</typeparam>
+    /// <param name="value">The value to wrap.</param>
+    public sealed class ValueWrapper<TValue> where TValue : struct
     {
-        /// <summary>
-        /// The date and time when the reply was sent.
-        /// </summary>
-        public DateTimeOffset ReplyDateTime { get; set; } = DateTimeOffset.UtcNow;
+        private ValueWrapper()
+        {
+            Value = default;
+        }
 
         /// <summary>
-        /// The message written in the reply.
+        /// Constructs a new instance of <see cref="ValueWrapper{TValue}"/> with the specified value.
         /// </summary>
-        public string Message { get; set; } = string.Empty;
+        /// <param name="value">The value to wrap.</param>
+        public ValueWrapper(TValue value)
+        {
+            Value = value;
+        }
 
         /// <summary>
-        /// The id of the user who sent the reply.
+        /// The wrapped <typeparamref name="TValue"/>.
         /// </summary>
-        public Guid AuthorUserId { get; set; } = Guid.Empty;
-
-        /// <summary>
-        /// The id of the ticket this reply was sent to.
-        /// </summary>
-        public Guid TicketId { get; set; } = Guid.Empty;
+        public TValue Value { get; set; }
     }
 }

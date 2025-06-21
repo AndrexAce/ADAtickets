@@ -19,6 +19,7 @@
  */
 using AutoMapper.Configuration.Annotations;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
@@ -28,8 +29,10 @@ namespace ADAtickets.Shared.Models
     /// <summary>
     /// Represents an attachment associated with a ticket.
     /// </summary>
+    /// <remarks>This class is intended for internal use only; it is public only to allow for testing.</remarks>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     [Index(nameof(Path), nameof(TicketId), IsUnique = true)]
-    public sealed class Attachment : EntityBase
+    public sealed class Attachment : Entity
     {
         /// <summary>
         /// The unique identifier of the attachment.

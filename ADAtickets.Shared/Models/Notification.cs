@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using AutoMapper.Configuration.Annotations;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
@@ -27,7 +28,9 @@ namespace ADAtickets.Shared.Models
     /// <summary>
     /// Represents a notification sent to a user triggered by an action like ticket modification, reply or assignment.
     /// </summary>
-    public sealed class Notification : EntityBase
+    /// <remarks>This class is intended for internal use only; it is public only to allow for testing.</remarks>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public sealed class Notification : Entity
     {
         /// <summary>
         /// The unique identifier of the notification.

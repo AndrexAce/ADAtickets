@@ -27,13 +27,8 @@ namespace ADAtickets.Shared.Dtos.Responses
     /// <para>Represents a modification made to a ticket, either by a user or by the system.</para>
     /// <para>It is a simplified version of the <see cref="Edit"/> class, used for data transfer to the client.</para>
     /// </summary>
-    public sealed class EditResponseDto
+    public sealed class EditResponseDto : ResponseDto
     {
-        /// <summary>
-        /// The unique identifier of the edit.
-        /// </summary>
-        public Guid Id { get; set; } = Guid.NewGuid();
-
         /// <summary>
         /// The date and time when the edit was made.
         /// </summary>

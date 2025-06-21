@@ -17,29 +17,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using AutoMapper.Configuration.Annotations;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
-namespace ADAtickets.Shared.Dtos
+namespace ADAtickets.Shared.Models
 {
     /// <summary>
-    /// Wraps a value of type <typeparamref name="TValue"/> to allow its use in HTTP exchanges.
+    /// <para>Base class for all entities in the ADAtickets model.</para>
+    /// <para>Contains common properties and methods.</para>
     /// </summary>
-    /// <typeparam name="TValue">The value type the class contains.</typeparam>
-    /// <param name="value">The value to wrap.</param>
-    public class ValueWrapper<TValue> where TValue : struct
+    /// <remarks>This class is intended for internal use only; it is public only to allow for testing.</remarks>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public abstract class Entity
     {
-        private ValueWrapper()
-        {
-            Value = default;
-        }
-
-        public ValueWrapper(TValue value)
-        {
-            Value = value;
-        }
-
         /// <summary>
-        /// The wrapped <typeparamref name="TValue"/>.
+        /// Reserved field used to detect concurrent modification to the entity.
         /// </summary>
-        public TValue Value { get; set; }
+        [Timestamp]
+        [Ignore]
+        [JsonIgnore]
+        public uint Version { get; set; } = 0;
     }
 }

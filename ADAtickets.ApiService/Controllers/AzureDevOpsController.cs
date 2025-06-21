@@ -20,7 +20,7 @@
 using ADAtickets.ApiService.Configs;
 using ADAtickets.ApiService.Repositories;
 using ADAtickets.Shared.Constants;
-using ADAtickets.Shared.Dtos;
+using ADAtickets.Shared.Dtos.Responses;
 using ADAtickets.Shared.Models;
 using Azure.Identity;
 using Microsoft.AspNetCore.Authorization;
@@ -53,7 +53,7 @@ namespace ADAtickets.ApiService.Controllers
         private readonly IConfiguration _configuration = configuration;
 
         /// <summary>
-        /// Determines if a specific <see cref="User"/> entity has access to the Azure DevOps organization.
+        /// Determines if a specific <see cref="User"/> entity with <paramref name="email"/> has access to the Azure DevOps organization.
         /// </summary>
         /// <param name="email">Email of the <see cref="User"/> entity to check.</param>
         /// <returns>A <see cref="Task"/> returning an <see cref="ActionResult"/>, which wraps the server response.</returns>

@@ -17,24 +17,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-using AutoMapper.Configuration.Annotations;
-using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
+using System.ComponentModel;
 
-namespace ADAtickets.Shared.Models
+namespace ADAtickets.Shared.Dtos.Responses
 {
     /// <summary>
-    /// <para>Base class for all entities in the ADAtickets model.</para>
+    /// <para>Base class for all response DTOs in the ADAtickets model.</para>
     /// <para>Contains common properties and methods.</para>
     /// </summary>
-    public abstract class EntityBase
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public abstract class ResponseDto
     {
         /// <summary>
-        /// Reserved field used to detect concurrent modification to the entity.
+        /// The unique identifier of the entity.
         /// </summary>
-        [Timestamp]
-        [Ignore]
-        [JsonIgnore]
-        public uint Version { get; set; } = 0;
+        public Guid Id { get; set; } = Guid.Empty;
     }
 }
