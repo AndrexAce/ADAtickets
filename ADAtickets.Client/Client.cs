@@ -17,12 +17,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using ADAtickets.Shared.Constants;
 using ADAtickets.Shared.Dtos.Requests;
 using ADAtickets.Shared.Dtos.Responses;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Identity.Abstractions;
 using System.ComponentModel;
 using System.Net;
+using System.Net.Http.Json;
+using System.Net.Mime;
 
 namespace ADAtickets.Client
 {
@@ -38,35 +42,101 @@ namespace ADAtickets.Client
         where TResponse : ResponseDto
         where TRequest : RequestDto
     {
+        private readonly IDownstreamApi _downstreamApi = downstreamApi;
+
+        private readonly AuthenticationStateProvider _authenticationStateProvider = authenticationStateProvider;
+
+        private string Endpoint => $"v{Service.APIVersion}/{ControllerName}";
+
         /// <summary>
-        /// Object providing the authentication state of the user to call APIs on his behalf.
+        /// The endpoint of the controller to interact with.
         /// </summary>
-        protected readonly IDownstreamApi _downstreamApi = downstreamApi;
-        /// <summary>
-        /// Object providing the necessary data to make API calls.
-        /// </summary>
-        protected readonly AuthenticationStateProvider _authenticationStateProvider = authenticationStateProvider;
+        protected abstract string ControllerName { get; }
 
         /// <summary>
         /// Fetch a specific entity.
         /// </summary>
         /// <param name="id">Identifier of the entity to fetch.</param>
         /// <returns>A tuple containing the <see cref="HttpStatusCode"/> and the requested entity if it exists.</returns>
-        public virtual Task<(HttpStatusCode, TResponse?)> GetAsync(Guid id) => throw new NotImplementedException();
+        public async Task<(HttpStatusCode, TResponse?)> GetAsync(Guid id)
+        {
+            // Fetch the logged in user
+            var user = (await _authenticationStateProvider.GetAuthenticationStateAsync()).User;
+
+            // Call the APIs with the permissions granted to the user
+            var response = await _downstreamApi.CallApiForUserAsync(
+                serviceName: Service.API,
+                downstreamApiOptionsOverride: options =>
+                {
+                    options.HttpMethod = nameof(HttpMethod.Get);
+                    options.RelativePath = $"{Endpoint}/{id}";
+                    options.AcquireTokenOptions.AuthenticationOptionsName = Scheme.PolicySchemeDefault;
+                },
+                user: user);
+
+            return (response.StatusCode, response.IsSuccessStatusCode
+                ? await response.Content.ReadFromJsonAsync<TResponse>()
+                : null);
+        }
 
         /// <summary>
         /// Fetch all the entities or all the entities respecting the given criteria.
         /// </summary>
         /// <param name="filters">A group of key-value pairs defining the property name and value entities should be filtered by.</param>
         /// <returns>A tuple containing the <see cref="HttpStatusCode"/> and the collection of entities.</returns>
-        public virtual Task<(HttpStatusCode, IEnumerable<TResponse>)> GetAllAsync(IEnumerable<KeyValuePair<string, string>>? filters = null) => throw new NotImplementedException();
+        public async Task<(HttpStatusCode, IEnumerable<TResponse>)> GetAllAsync(IEnumerable<KeyValuePair<string, string>>? filters = null)
+        {
+            // Fetch the logged in user
+            var user = (await _authenticationStateProvider.GetAuthenticationStateAsync()).User;
+
+            // Build the filters from the query string if provided
+            var query = filters != null
+                ? "?" + string.Join("&", filters.Select(f => $"{Uri.EscapeDataString(f.Key)}={Uri.EscapeDataString(f.Value)}"))
+                : string.Empty;
+
+            // Call the APIs with the permissions granted to the user
+            var response = await _downstreamApi.CallApiForUserAsync(
+                serviceName: Service.API,
+                downstreamApiOptionsOverride: options =>
+                {
+                    options.HttpMethod = nameof(HttpMethod.Get);
+                    options.RelativePath = $"{Endpoint}{query}";
+                    options.AcquireTokenOptions.AuthenticationOptionsName = Scheme.PolicySchemeDefault;
+                },
+                user: user);
+
+            return (response.StatusCode, response.IsSuccessStatusCode
+                ? await response.Content.ReadFromJsonAsync<IEnumerable<TResponse>>() ?? []
+                : []);
+        }
 
         /// <summary>
         /// Create a new entity.
         /// </summary>
         /// <param name="entity">Object containing the values the new entity should have.</param>
         /// <returns>A tuple containing the <see cref="HttpStatusCode"/> and the created entity if it was created.</returns>
-        public virtual Task<(HttpStatusCode, TResponse?)> PostAsync(TRequest entity) => throw new NotImplementedException();
+        public async Task<(HttpStatusCode, TResponse?)> PostAsync(TRequest entity)
+        {
+            // Fetch the logged in user
+            var user = (await _authenticationStateProvider.GetAuthenticationStateAsync()).User;
+
+            // Call the APIs with the permissions granted to the user
+            var response = await _downstreamApi.CallApiForUserAsync(
+                serviceName: Service.API,
+                downstreamApiOptionsOverride: options =>
+                {
+                    options.HttpMethod = nameof(HttpMethod.Post);
+                    options.ContentType = MediaTypeNames.Application.Json;
+                    options.RelativePath = Endpoint;
+                    options.AcquireTokenOptions.AuthenticationOptionsName = Scheme.PolicySchemeDefault;
+                },
+                user: user,
+                content: JsonContent.Create(entity));
+
+            return (response.StatusCode, response.IsSuccessStatusCode
+                ? await response.Content.ReadFromJsonAsync<TResponse>()
+                : null);
+        }
 
         /// <summary>
         /// Update a specific entity.
@@ -74,13 +144,51 @@ namespace ADAtickets.Client
         /// <param name="id">Identifier of the entity to update.</param>
         /// <param name="entity">Object containing the new values the fields should be updated to.</param>
         /// <returns>A tuple containing the <see cref="HttpStatusCode"/> and the updated entity if it was updated.</returns>
-        public virtual Task<(HttpStatusCode, TResponse?)> PutAsync(Guid id, TRequest entity) => throw new NotImplementedException();
+        public async Task<(HttpStatusCode, TResponse?)> PutAsync(Guid id, TRequest entity)
+        {
+            // Fetch the logged in user
+            var user = (await _authenticationStateProvider.GetAuthenticationStateAsync()).User;
+
+            // Call the APIs with the permissions granted to the user
+            var response = await _downstreamApi.CallApiForUserAsync(
+                serviceName: Service.API,
+                downstreamApiOptionsOverride: options =>
+                {
+                    options.HttpMethod = nameof(HttpMethod.Put);
+                    options.ContentType = MediaTypeNames.Application.Json;
+                    options.RelativePath = $"{Endpoint}/{id}";
+                    options.AcquireTokenOptions.AuthenticationOptionsName = Scheme.PolicySchemeDefault;
+                },
+                user: user,
+                content: JsonContent.Create(entity));
+
+            return (response.StatusCode, response.IsSuccessStatusCode
+                ? await response.Content.ReadFromJsonAsync<TResponse>()
+                : null);
+        }
 
         /// <summary>
         /// Delete a specific entity.
         /// </summary>
         /// <param name="id">Identifier of the entity to delete.</param>
         /// <returns>A <see cref="HttpStatusCode"/> indicating the status of the deletion.</returns>
-        public virtual Task<HttpStatusCode> DeleteAsync(Guid id) => throw new NotImplementedException();
+        public async Task<HttpStatusCode> DeleteAsync(Guid id)
+        {
+            // Fetch the logged in user
+            var user = (await _authenticationStateProvider.GetAuthenticationStateAsync()).User;
+
+            // Call the APIs with the permissions granted to the user
+            var response = await _downstreamApi.CallApiForUserAsync(
+                serviceName: Service.API,
+                downstreamApiOptionsOverride: options =>
+                {
+                    options.HttpMethod = nameof(HttpMethod.Delete);
+                    options.RelativePath = $"{Endpoint}/{id}";
+                    options.AcquireTokenOptions.AuthenticationOptionsName = Scheme.PolicySchemeDefault;
+                },
+                user: user);
+
+            return response.StatusCode;
+        }
     }
 }
