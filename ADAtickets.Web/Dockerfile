@@ -11,6 +11,7 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["ADAtickets.Web/ADAtickets.Web.csproj", "ADAtickets.Web/"]
+COPY ["ADAtickets.Client/ADAtickets.Client.csproj", "ADAtickets.Client/"]
 COPY ["ADAtickets.Shared/ADAtickets.Shared.csproj", "ADAtickets.Shared/"]
 RUN dotnet restore "./ADAtickets.Web/ADAtickets.Web.csproj"
 COPY . .
