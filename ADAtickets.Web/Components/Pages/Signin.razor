@@ -15,8 +15,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
-@page "/signin-oidc-entra"
-@page "/signin-oidc-external-entra"
+@page "/signin-oidc"
 
 @using ADAtickets.Client
 @using ADAtickets.Client.Extensions
@@ -28,8 +27,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
 @inject NavigationManager navManager
 @inject AuthenticationStateProvider authStateProvider
-@inject IConfiguration configuration
-@inject AzureDevOpsClient azureDevOpsClient
 
 @attribute [Authorize(Policy = Policy.Everyone)]
 
@@ -48,21 +45,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
         if (user?.Identity?.IsAuthenticated == true)
         {
-            // Takes the user email to check if it is listed in Azure DevOps members.
-            var tenantId = user.Claims?.FirstOrDefault(c => c.Type.Equals("http://schemas.microsoft.com/identity/claims/tenantid"))?.Value;
-            var primaryTenantId = configuration.GetSection("Entra:TenantId").Value;
-
-            if (tenantId == primaryTenantId)
-            {
-                var (code, hasAccess) = await azureDevOpsClient.GetUserDevOpsAccessAsync(user.Identity.Name!);
-
-                // If the request was completed and the user has access, go to home. Otherwise, go to a no-access page.
-                navManager.NavigateTo((code.IsSuccess() && (hasAccess?.Value ?? false)) ? "/home" : "/no-access", true);
-            }
-            else
-            {
-                navManager.NavigateTo("/home", true);
-            }
+            navManager.NavigateTo("/home", true);
         }
     }
 }

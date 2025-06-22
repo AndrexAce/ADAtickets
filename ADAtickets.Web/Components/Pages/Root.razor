@@ -17,13 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @page "/"
 
+@using ADAtickets.Shared.Constants
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 
-@inject IStringLocalizer<Signin> Loc
 @inject NavigationManager navManager
 @inject AuthenticationStateProvider authStateProvider
-@inject IConfiguration configuration
 
 @attribute [AllowAnonymous]
 
@@ -38,22 +37,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         var authState = await authStateProvider.GetAuthenticationStateAsync();
-
         var user = authState.User;
 
         if (user?.Identity?.IsAuthenticated == true)
         {
-            var tenantId = user.Claims?.FirstOrDefault(c => c.Type.Equals("http://schemas.microsoft.com/identity/claims/tenantid"))?.Value;
-            var primaryTenantId = configuration.GetSection("Entra:TenantId").Value;
-
-            if (tenantId == primaryTenantId)
-            {
-                navManager.NavigateTo("/signin-oidc-entra", true);
-            }
-            else
-            {
-                navManager.NavigateTo("/signin-oidc-external-entra", true); 
-            }
+            navManager.NavigateTo("/home", true);
         }
         else
         {

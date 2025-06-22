@@ -18,6 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @page "/welcome"
 
 @using System.Globalization
+@using ADAtickets.Shared.Constants
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 
@@ -52,7 +53,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             <FluentButton Appearance="Appearance.Accent" 
                           IconStart="@(new Icons.Regular.Size20.Person())" 
                           Style="width: 100%; min-width: 240px;" 
-                          OnClick="@(() => navManager.NavigateTo("MicrosoftIdentity/Account/SignIn/ExternalEntra?redirectUri=/signin-oidc-external-entra", true))">
+                          OnClick="@(() => navManager.NavigateTo("MicrosoftIdentity/Account/SignIn/ExternalEntra", true))">
                 @loc["UserButton"]
             </FluentButton>
             <FluentIcon Id="UserButton" Icon="Icons.Regular.Size20.Info"></FluentIcon>
@@ -62,7 +63,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             <FluentButton Appearance="Appearance.Accent" 
                           IconStart="@(new Icons.Regular.Size20.Wrench())" 
                           Style="width: 100%; min-width: 240px;" 
-                          OnClick="@(() => navManager.NavigateTo("MicrosoftIdentity/Account/SignIn/Entra?redirectUri=/signin-oidc-entra", true))">
+                          OnClick="@(() => navManager.NavigateTo("MicrosoftIdentity/Account/SignIn/Entra", true))">
                 @loc["AdminButton"]
             </FluentButton>
             <FluentIcon Id="AdminButton" Icon="Icons.Regular.Size20.Info"></FluentIcon>
@@ -77,24 +78,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-
         var authState = await authStateProvider.GetAuthenticationStateAsync();
-
         var user = authState.User;
 
         if (user?.Identity?.IsAuthenticated == true)
         {
-            var tenantId = user.Claims?.FirstOrDefault(c => c.Type.Equals("http://schemas.microsoft.com/identity/claims/tenantid"))?.Value;
-            var primaryTenantId = configuration.GetSection("Entra:TenantId").Value;
-
-            if (tenantId == primaryTenantId)
-            {
-                navManager.NavigateTo("/signin-oidc-entra", true);
-            }
-            else
-            {
-                navManager.NavigateTo("/signin-oidc-external-entra", true);
-            }
+            navManager.NavigateTo("/home", true);
         }
     }
 }

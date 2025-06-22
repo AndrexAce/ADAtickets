@@ -17,7 +17,7 @@ services:
       - Entra__TenantId=${TENANTID:?error}
       - Entra__ClientId=${APIAPPID:?error}
       # External Entra configuration variables
-      - ExternalEntra__Instance=https://login.microsoftonline.com
+      - ExternalEntra__Instance=https://${EXTERNALTENANTID:?error}.ciamlogin.com
       - ExternalEntra__TenantId=${EXTERNALTENANTID:?error}
       - ExternalEntra__ClientId=${EXTERNALAPIAPPID:?error}
       # Azure DevOps configuration variables
@@ -49,18 +49,14 @@ services:
       - Entra__Instance=https://login.microsoftonline.com
       - Entra__TenantId=${TENANTID:?error}
       - Entra__ClientId=${WEBAPPID:?error}
-      - Entra__CallbackPath=/signin-oidc-entra
-      - Entra__SignedOutCallbackPath=/signout-oidc-entra
       - Entra__SkipUnrecognizedRequests=true
       - Entra__ClientCertificates__0__SourceType=Path
       - Entra__ClientCertificates__0__CertificateDiskPath=/certs/${WEBAUTHCERTIFICATENAME:?error}
       - Entra__ClientCertificates__0__CertificatePassword=${WEBAUTHCERTIFICATEPASSWORD:?error}
       # External Entra configuration variables
-      - ExternalEntra__Instance=https://login.microsoftonline.com
+      - ExternalEntra__Instance=https://${EXTERNALTENANTID:?error}.ciamlogin.com
       - ExternalEntra__TenantId=${EXTERNALTENANTID:?error}
       - ExternalEntra__ClientId=${EXTERNALWEBAPPID:?error}
-      - ExternalEntra__CallbackPath=/signin-oidc-external-entra
-      - ExternalEntra__SignedOutCallbackPath=/signout-oidc-external-entra
       - ExternalEntra__SkipUnrecognizedRequests=true
       - ExternalEntra__ClientCertificates__0__SourceType=Path
       - ExternalEntra__ClientCertificates__0__CertificateDiskPath=/certs/${WEBAUTHCERTIFICATENAME:?error}
@@ -68,11 +64,11 @@ services:
       # ADAtickets API configuration variables
       - ADAticketsAPI__BaseUrl=http://adatickets.apiservice:8080
       - ADAticketsAPI__Scopes__0=api://${APIAPPID:?error}/Read
-      - ADAticketsAPI__Scopes__1=api://${APIAPPID:?error}/ReadWrite
+      - ADAticketsAPI__Scopes__1=api://${APIAPPID:?error}/Write
       # External ADAtickets API configuration variables
       - ExternalADAticketsAPI__BaseUrl=http://adatickets.apiservice:8080
       - ExternalADAticketsAPI__Scopes__0=api://${EXTERNALAPIAPPID:?error}/Read
-      - ExternalADAticketsAPI__Scopes__1=api://${EXTERNALAPIAPPID:?error}/ReadWrite
+      - ExternalADAticketsAPI__Scopes__1=api://${EXTERNALAPIAPPID:?error}/Write
     volumes:
       - ${SSLCERTIFICATEDISKPATH:?error}:/https:ro
       - ${WEBAUTHCERTIFICATEDISKPATH:?error}:/certs:ro
