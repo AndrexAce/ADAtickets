@@ -46,9 +46,6 @@ namespace ADAtickets.ApiService.Controllers
     [ApiConventionType(typeof(ADAticketsApiConventions))]
     public sealed class UsersController(IUserRepository userRepository, IMapper mapper) : ControllerBase
     {
-        private readonly IUserRepository _userRepository = userRepository;
-        private readonly IMapper _mapper = mapper;
-
         /// <summary>
         /// Fetch all the <see cref="User"/> entities or all the entities respecting the given criteria.
         /// </summary>
@@ -69,9 +66,9 @@ namespace ADAtickets.ApiService.Controllers
         [RequiredScope(Scope.Read)]
         public async Task<ActionResult<IEnumerable<UserResponseDto>>> GetUsers([FromQuery] IEnumerable<KeyValuePair<string, string>>? filters)
         {
-            var users = await (filters != null ? _userRepository.GetUsersByAsync(filters) : _userRepository.GetUsersAsync());
+            var users = await (filters != null ? userRepository.GetUsersByAsync(filters) : userRepository.GetUsersAsync());
 
-            return Ok(users.Select(user => _mapper.Map(user, new UserResponseDto())));
+            return Ok(users.Select(user => mapper.Map(user, new UserResponseDto())));
         }
 
         /// <summary>
@@ -91,13 +88,13 @@ namespace ADAtickets.ApiService.Controllers
         public async Task<ActionResult<UserResponseDto>> GetUser(Guid id)
         {
             // Check if the requested entity exists.
-            if (await _userRepository.GetUserByIdAsync(id) is not User user)
+            if (await userRepository.GetUserByIdAsync(id) is not User user)
             {
                 return NotFound();
             }
 
             // Insert the entity data into a new DTO and send it to the client.
-            return Ok(_mapper.Map(user, new UserResponseDto()));
+            return Ok(mapper.Map(user, new UserResponseDto()));
         }
 
         /// <summary>
@@ -149,7 +146,7 @@ namespace ADAtickets.ApiService.Controllers
         public async Task<ActionResult<UserResponseDto>> PutUser(Guid id, UserRequestDto userDto)
         {
             // If the requested entity does not exist, create a new one.
-            if (await _userRepository.GetUserByIdAsync(id) is not User user)
+            if (await userRepository.GetUserByIdAsync(id) is not User user)
             {
                 return await PostUser(userDto);
             }
@@ -157,12 +154,12 @@ namespace ADAtickets.ApiService.Controllers
             try
             {
                 // Update the existing entity with the new data.
-                await _userRepository.UpdateUserAsync(_mapper.Map(userDto, user));
+                await userRepository.UpdateUserAsync(mapper.Map(userDto, user));
             }
             catch (DbUpdateConcurrencyException)
             {
                 // If the entity is not found in the data source, it was deleted by another user while updating.
-                if (await _userRepository.GetUserByIdAsync(id) is null)
+                if (await userRepository.GetUserByIdAsync(id) is null)
                 {
                     return NotFound();
                 }
@@ -218,10 +215,10 @@ namespace ADAtickets.ApiService.Controllers
         [RequiredScope(Scope.Read, Scope.Write)]
         public async Task<ActionResult<UserResponseDto>> PostUser(UserRequestDto userDto)
         {
-            var user = _mapper.Map(userDto, new User());
+            var user = mapper.Map(userDto, new User());
 
             // Insert the DTO info into a new entity and add it to the data source.
-            await _userRepository.AddUserAsync(user);
+            await userRepository.AddUserAsync(user);
 
             // Return the created entity and its location to the client.
             return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
@@ -244,12 +241,12 @@ namespace ADAtickets.ApiService.Controllers
         public async Task<IActionResult> DeleteUser(Guid id)
         {
             // Check if the requested entity exists.
-            if (await _userRepository.GetUserByIdAsync(id) is not User user)
+            if (await userRepository.GetUserByIdAsync(id) is not User user)
             {
                 return NotFound();
             }
 
-            await _userRepository.DeleteUserAsync(user);
+            await userRepository.DeleteUserAsync(user);
 
             return NoContent();
         }

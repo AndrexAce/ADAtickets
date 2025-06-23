@@ -31,25 +31,23 @@ namespace ADAtickets.ApiService.Services
     /// </summary>
     sealed class AttachmentRepository(ADAticketsDbContext context) : IAttachmentRepository
     {
-        readonly ADAticketsDbContext _context = context;
-
         /// <inheritdoc cref="IAttachmentRepository.GetAttachmentByIdAsync"/>
         public async Task<Attachment?> GetAttachmentByIdAsync(Guid id)
         {
-            return await _context.Attachments.FindAsync(id);
+            return await context.Attachments.FindAsync(id);
         }
 
         /// <inheritdoc cref="IAttachmentRepository.GetAttachmentsAsync"/>
         public async Task<IEnumerable<Attachment>> GetAttachmentsAsync()
         {
-            return await _context.Attachments.ToListAsync();
+            return await context.Attachments.ToListAsync();
         }
 
         /// <inheritdoc cref="IAttachmentRepository.GetAttachmentsByAsync"/>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1862:Use the 'StringComparison' method overloads to perform case-insensitive string comparisons", Justification = "The comparison with the StringComparison overload is not translatable by Entity Framework and the EF.Function.ILike method is not standard SQL but PostgreSQL dialect.")]
         public async Task<IEnumerable<Attachment>> GetAttachmentsByAsync(IEnumerable<KeyValuePair<string, string>> filters)
         {
-            IQueryable<Attachment> query = _context.Attachments;
+            IQueryable<Attachment> query = context.Attachments;
 
             foreach (var filter in filters)
             {
@@ -83,8 +81,8 @@ namespace ADAtickets.ApiService.Services
                 // Since the path contains only the file name, make the attachment path match with the file system path.
                 attachment.Path = Path.Combine("media/", DateTime.UtcNow.Year.ToString(), DateTime.UtcNow.Month.ToString(), DateTime.UtcNow.Day.ToString(), attachment.Path);
 
-                _context.Attachments.Add(attachment);
-                await _context.SaveChangesAsync();
+                context.Attachments.Add(attachment);
+                await context.SaveChangesAsync();
             }
         }
 
@@ -96,8 +94,8 @@ namespace ADAtickets.ApiService.Services
                 // Since the path contains only the file name, make the attachment path match with the file system path.
                 attachment.Path = Path.Combine("media/", DateTime.UtcNow.Year.ToString(), DateTime.UtcNow.Month.ToString(), DateTime.UtcNow.Day.ToString(), attachment.Path);
 
-                _context.Attachments.Update(attachment);
-                await _context.SaveChangesAsync();
+                context.Attachments.Update(attachment);
+                await context.SaveChangesAsync();
             }
         }
 
@@ -106,8 +104,8 @@ namespace ADAtickets.ApiService.Services
         {
             if (DeleteAttachmentFromFileSystem(attachment.Path))
             {
-                _context.Attachments.Remove(attachment);
-                await _context.SaveChangesAsync();
+                context.Attachments.Remove(attachment);
+                await context.SaveChangesAsync();
             }
         }
 
@@ -145,7 +143,7 @@ namespace ADAtickets.ApiService.Services
         {
             try
             {
-                if (!Regex.IsMatch(attachmentPath, @"^(?!.*//)[a-zA-Z0-9_\-\\/\.]+$", RegexOptions.None, TimeSpan.FromMilliseconds(100)))
+                if (!Regex.IsMatch(attachmentPath, @"^(?!.*//)[a-zA-Z0-9\-\\/\.]+$", RegexOptions.None, TimeSpan.FromMilliseconds(100)))
                 {
                     return false;
                 }

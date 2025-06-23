@@ -31,25 +31,23 @@ namespace ADAtickets.ApiService.Services
     /// </summary>
     class ReplyRepository(ADAticketsDbContext context) : IReplyRepository
     {
-        readonly ADAticketsDbContext _context = context;
-
         /// <inheritdoc cref="IReplyRepository.GetReplyByIdAsync"/>
         public async Task<Reply?> GetReplyByIdAsync(Guid id)
         {
-            return await _context.Replies.FindAsync(id);
+            return await context.Replies.FindAsync(id);
         }
 
         /// <inheritdoc cref="IReplyRepository.GetRepliesAsync"/>
         public async Task<IEnumerable<Reply>> GetRepliesAsync()
         {
-            return await _context.Replies.ToListAsync();
+            return await context.Replies.ToListAsync();
         }
 
         /// <inheritdoc cref="IReplyRepository.GetRepliesByAsync"/>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1862:Use the 'StringComparison' method overloads to perform case-insensitive string comparisons", Justification = "The comparison with the StringComparison overload is not translatable by Entity Framework and the EF.Function.ILike method is not standard SQL but PostgreSQL dialect.")]
         public async Task<IEnumerable<Reply>> GetRepliesByAsync(IEnumerable<KeyValuePair<string, string>> filters)
         {
-            IQueryable<Reply> query = _context.Replies;
+            IQueryable<Reply> query = context.Replies;
 
             foreach (var filter in filters)
             {
@@ -86,22 +84,22 @@ namespace ADAtickets.ApiService.Services
         /// <inheritdoc cref="IReplyRepository.AddReplyAsync"/>
         public async Task AddReplyAsync(Reply reply)
         {
-            _context.Replies.Add(reply);
-            await _context.SaveChangesAsync();
+            context.Replies.Add(reply);
+            await context.SaveChangesAsync();
         }
 
         /// <inheritdoc cref="IReplyRepository.UpdateReplyAsync"/>
         public async Task UpdateReplyAsync(Reply reply)
         {
-            _context.Replies.Update(reply);
-            await _context.SaveChangesAsync();
+            context.Replies.Update(reply);
+            await context.SaveChangesAsync();
         }
 
         /// <inheritdoc cref="IReplyRepository.DeleteReplyAsync"/>
         public async Task DeleteReplyAsync(Reply reply)
         {
-            _context.Replies.Remove(reply);
-            await _context.SaveChangesAsync();
+            context.Replies.Remove(reply);
+            await context.SaveChangesAsync();
         }
     }
 }

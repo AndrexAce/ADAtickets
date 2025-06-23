@@ -31,25 +31,23 @@ namespace ADAtickets.ApiService.Services
     /// </summary>
     sealed class EditRepository(ADAticketsDbContext context) : IEditRepository
     {
-        readonly ADAticketsDbContext _context = context;
-
         /// <inheritdoc cref="IEditRepository.GetEditByIdAsync"/>
         public async Task<Edit?> GetEditByIdAsync(Guid id)
         {
-            return await _context.Edits.FindAsync(id);
+            return await context.Edits.FindAsync(id);
         }
 
         /// <inheritdoc cref="IEditRepository.GetEditsAsync"/>
         public async Task<IEnumerable<Edit>> GetEditsAsync()
         {
-            return await _context.Edits.ToListAsync();
+            return await context.Edits.ToListAsync();
         }
 
         /// <inheritdoc cref="IEditRepository.GetEditsByAsync"/>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1862:Use the 'StringComparison' method overloads to perform case-insensitive string comparisons", Justification = "The comparison with the StringComparison overload is not translatable by Entity Framework and the EF.Function.ILike method is not standard SQL but PostgreSQL dialect.")]
         public async Task<IEnumerable<Edit>> GetEditsByAsync(IEnumerable<KeyValuePair<string, string>> filters)
         {
-            IQueryable<Edit> query = _context.Edits;
+            IQueryable<Edit> query = context.Edits;
 
             foreach (var filter in filters)
             {
@@ -94,22 +92,22 @@ namespace ADAtickets.ApiService.Services
         /// <inheritdoc cref="IEditRepository.AddEditAsync"/>
         public async Task AddEditAsync(Edit edit)
         {
-            _context.Edits.Add(edit);
-            await _context.SaveChangesAsync();
+            context.Edits.Add(edit);
+            await context.SaveChangesAsync();
         }
 
         /// <inheritdoc cref="IEditRepository.UpdateEditAsync"/>
         public async Task UpdateEditAsync(Edit edit)
         {
-            _context.Edits.Update(edit);
-            await _context.SaveChangesAsync();
+            context.Edits.Update(edit);
+            await context.SaveChangesAsync();
         }
 
         /// <inheritdoc cref="IEditRepository.DeleteEditAsync"/>
         public async Task DeleteEditAsync(Edit edit)
         {
-            _context.Edits.Remove(edit);
-            await _context.SaveChangesAsync();
+            context.Edits.Remove(edit);
+            await context.SaveChangesAsync();
         }
     }
 }

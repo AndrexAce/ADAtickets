@@ -46,9 +46,6 @@ namespace ADAtickets.ApiService.Controllers
     [ApiConventionType(typeof(ADAticketsApiConventions))]
     public sealed class NotificationsController(INotificationRepository notificationRepository, IMapper mapper) : ControllerBase
     {
-        private readonly INotificationRepository _notificationRepository = notificationRepository;
-        private readonly IMapper _mapper = mapper;
-
         /// <summary>
         /// Fetch all the <see cref="Notification"/> entities or all the entities respecting the given criteria.
         /// </summary>
@@ -69,9 +66,9 @@ namespace ADAtickets.ApiService.Controllers
         [RequiredScope(Scope.Read)]
         public async Task<ActionResult<IEnumerable<NotificationResponseDto>>> GetNotifications([FromQuery] IEnumerable<KeyValuePair<string, string>>? filters)
         {
-            var notifications = await (filters != null ? _notificationRepository.GetNotificationsByAsync(filters) : _notificationRepository.GetNotificationsAsync());
+            var notifications = await (filters != null ? notificationRepository.GetNotificationsByAsync(filters) : notificationRepository.GetNotificationsAsync());
 
-            return Ok(notifications.Select(notification => _mapper.Map(notification, new NotificationResponseDto())));
+            return Ok(notifications.Select(notification => mapper.Map(notification, new NotificationResponseDto())));
         }
 
         /// <summary>
@@ -91,13 +88,13 @@ namespace ADAtickets.ApiService.Controllers
         public async Task<ActionResult<NotificationResponseDto>> GetNotification(Guid id)
         {
             // Check if the requested entity exists.
-            if (await _notificationRepository.GetNotificationByIdAsync(id) is not Notification notification)
+            if (await notificationRepository.GetNotificationByIdAsync(id) is not Notification notification)
             {
                 return NotFound();
             }
 
             // Insert the entity data into a new DTO and send it to the client.
-            return Ok(_mapper.Map(notification, new NotificationResponseDto()));
+            return Ok(mapper.Map(notification, new NotificationResponseDto()));
         }
 
         /// <summary>
@@ -142,7 +139,7 @@ namespace ADAtickets.ApiService.Controllers
         public async Task<ActionResult<NotificationResponseDto>> PutNotification(Guid id, NotificationRequestDto notificationDto)
         {
             // If the requested entity does not exist, create a new one.
-            if (await _notificationRepository.GetNotificationByIdAsync(id) is not Notification notification)
+            if (await notificationRepository.GetNotificationByIdAsync(id) is not Notification notification)
             {
                 return await PostNotification(notificationDto);
             }
@@ -150,12 +147,12 @@ namespace ADAtickets.ApiService.Controllers
             try
             {
                 // Update the existing entity with the new data.
-                await _notificationRepository.UpdateNotificationAsync(_mapper.Map(notificationDto, notification));
+                await notificationRepository.UpdateNotificationAsync(mapper.Map(notificationDto, notification));
             }
             catch (DbUpdateConcurrencyException)
             {
                 // If the entity is not found in the data source, it was deleted by another user while updating.
-                if (await _notificationRepository.GetNotificationByIdAsync(id) is null)
+                if (await notificationRepository.GetNotificationByIdAsync(id) is null)
                 {
                     return NotFound();
                 }
@@ -204,10 +201,10 @@ namespace ADAtickets.ApiService.Controllers
         [RequiredScope(Scope.Read, Scope.Write)]
         public async Task<ActionResult<NotificationResponseDto>> PostNotification(NotificationRequestDto notificationDto)
         {
-            var notification = _mapper.Map(notificationDto, new Notification());
+            var notification = mapper.Map(notificationDto, new Notification());
 
             // Insert the DTO info into a new entity and add it to the data source.
-            await _notificationRepository.AddNotificationAsync(notification);
+            await notificationRepository.AddNotificationAsync(notification);
 
             // Return the created entity and its location to the client.
             return CreatedAtAction(nameof(GetNotification), new { id = notification.Id }, notification);
@@ -230,12 +227,12 @@ namespace ADAtickets.ApiService.Controllers
         public async Task<IActionResult> DeleteNotification(Guid id)
         {
             // Check if the requested entity exists.
-            if (await _notificationRepository.GetNotificationByIdAsync(id) is not Notification notification)
+            if (await notificationRepository.GetNotificationByIdAsync(id) is not Notification notification)
             {
                 return NotFound();
             }
 
-            await _notificationRepository.DeleteNotificationAsync(notification);
+            await notificationRepository.DeleteNotificationAsync(notification);
 
             return NoContent();
         }

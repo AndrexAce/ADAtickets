@@ -46,9 +46,6 @@ namespace ADAtickets.ApiService.Controllers
     [ApiConventionType(typeof(ADAticketsApiConventions))]
     public sealed class RepliesController(IReplyRepository replyRepository, IMapper mapper) : ControllerBase
     {
-        private readonly IReplyRepository _replyRepository = replyRepository;
-        private readonly IMapper _mapper = mapper;
-
         /// <summary>
         /// Fetch all the <see cref="Reply"/> entities or all the entities respecting the given criteria.
         /// </summary>
@@ -69,9 +66,9 @@ namespace ADAtickets.ApiService.Controllers
         [RequiredScope(Scope.Read)]
         public async Task<ActionResult<IEnumerable<ReplyResponseDto>>> GetReplies([FromQuery] IEnumerable<KeyValuePair<string, string>>? filters)
         {
-            var replies = await (filters != null ? _replyRepository.GetRepliesByAsync(filters) : _replyRepository.GetRepliesAsync());
+            var replies = await (filters != null ? replyRepository.GetRepliesByAsync(filters) : replyRepository.GetRepliesAsync());
 
-            return Ok(replies.Select(reply => _mapper.Map(reply, new ReplyResponseDto())));
+            return Ok(replies.Select(reply => mapper.Map(reply, new ReplyResponseDto())));
         }
 
         /// <summary>
@@ -91,13 +88,13 @@ namespace ADAtickets.ApiService.Controllers
         public async Task<ActionResult<ReplyResponseDto>> GetReply(Guid id)
         {
             // Check if the requested entity exists.
-            if (await _replyRepository.GetReplyByIdAsync(id) is not Reply reply)
+            if (await replyRepository.GetReplyByIdAsync(id) is not Reply reply)
             {
                 return NotFound();
             }
 
             // Insert the entity data into a new DTO and send it to the client.
-            return Ok(_mapper.Map(reply, new ReplyResponseDto()));
+            return Ok(mapper.Map(reply, new ReplyResponseDto()));
         }
 
         /// <summary>
@@ -140,7 +137,7 @@ namespace ADAtickets.ApiService.Controllers
         public async Task<ActionResult<ReplyResponseDto>> PutReply(Guid id, ReplyRequestDto replyDto)
         {
             // If the requested entity does not exist, create a new one.
-            if (await _replyRepository.GetReplyByIdAsync(id) is not Reply reply)
+            if (await replyRepository.GetReplyByIdAsync(id) is not Reply reply)
             {
                 return await PostReply(replyDto);
             }
@@ -148,12 +145,12 @@ namespace ADAtickets.ApiService.Controllers
             try
             {
                 // Update the existing entity with the new data.
-                await _replyRepository.UpdateReplyAsync(_mapper.Map(replyDto, reply));
+                await replyRepository.UpdateReplyAsync(mapper.Map(replyDto, reply));
             }
             catch (DbUpdateConcurrencyException)
             {
                 // If the entity is not found in the data source, it was deleted by another user while updating.
-                if (await _replyRepository.GetReplyByIdAsync(id) is null)
+                if (await replyRepository.GetReplyByIdAsync(id) is null)
                 {
                     return NotFound();
                 }
@@ -200,10 +197,10 @@ namespace ADAtickets.ApiService.Controllers
         [RequiredScope(Scope.Read, Scope.Write)]
         public async Task<ActionResult<ReplyResponseDto>> PostReply(ReplyRequestDto replyDto)
         {
-            var reply = _mapper.Map(replyDto, new Reply());
+            var reply = mapper.Map(replyDto, new Reply());
 
             // Insert the DTO info into a new entity and add it to the data source.
-            await _replyRepository.AddReplyAsync(reply);
+            await replyRepository.AddReplyAsync(reply);
 
             // Return the created entity and its location to the client.
             return CreatedAtAction(nameof(GetReply), new { id = reply.Id }, reply);
@@ -226,12 +223,12 @@ namespace ADAtickets.ApiService.Controllers
         public async Task<IActionResult> DeleteReply(Guid id)
         {
             // Check if the requested entity exists.
-            if (await _replyRepository.GetReplyByIdAsync(id) is not Reply reply)
+            if (await replyRepository.GetReplyByIdAsync(id) is not Reply reply)
             {
                 return NotFound();
             }
 
-            await _replyRepository.DeleteReplyAsync(reply);
+            await replyRepository.DeleteReplyAsync(reply);
 
             return NoContent();
         }

@@ -47,9 +47,6 @@ namespace ADAtickets.ApiService.Controllers
     [Authorize(Policy = Policy.AdminOnly)]
     public sealed class PlatformsController(IPlatformRepository platformRepository, IMapper mapper) : ControllerBase
     {
-        private readonly IPlatformRepository _platformRepository = platformRepository;
-        private readonly IMapper _mapper = mapper;
-
         /// <summary>
         /// Fetch all the <see cref="Platform"/> entities or all the entities respecting the given criteria.
         /// </summary>
@@ -69,9 +66,9 @@ namespace ADAtickets.ApiService.Controllers
         [RequiredScope(Scope.Read)]
         public async Task<ActionResult<IEnumerable<PlatformResponseDto>>> GetPlatforms([FromQuery] IEnumerable<KeyValuePair<string, string>>? filters)
         {
-            var platforms = await (filters != null ? _platformRepository.GetPlatformsByAsync(filters) : _platformRepository.GetPlatformsAsync());
+            var platforms = await (filters != null ? platformRepository.GetPlatformsByAsync(filters) : platformRepository.GetPlatformsAsync());
 
-            return Ok(platforms.Select(platform => _mapper.Map(platform, new PlatformResponseDto())));
+            return Ok(platforms.Select(platform => mapper.Map(platform, new PlatformResponseDto())));
         }
 
         /// <summary>
@@ -90,13 +87,13 @@ namespace ADAtickets.ApiService.Controllers
         public async Task<ActionResult<PlatformResponseDto>> GetPlatform(Guid id)
         {
             // Check if the requested entity exists.
-            if (await _platformRepository.GetPlatformByIdAsync(id) is not Platform platform)
+            if (await platformRepository.GetPlatformByIdAsync(id) is not Platform platform)
             {
                 return NotFound();
             }
 
             // Insert the entity data into a new DTO and send it to the client.
-            return Ok(_mapper.Map(platform, new PlatformResponseDto()));
+            return Ok(mapper.Map(platform, new PlatformResponseDto()));
         }
 
         /// <summary>
@@ -134,7 +131,7 @@ namespace ADAtickets.ApiService.Controllers
         public async Task<ActionResult<PlatformResponseDto>> PutPlatform(Guid id, PlatformRequestDto platformDto)
         {
             // If the requested entity does not exist, create a new one.
-            if (await _platformRepository.GetPlatformByIdAsync(id) is not Platform platform)
+            if (await platformRepository.GetPlatformByIdAsync(id) is not Platform platform)
             {
                 return await PostPlatform(platformDto);
             }
@@ -142,12 +139,12 @@ namespace ADAtickets.ApiService.Controllers
             try
             {
                 // Update the existing entity with the new data.
-                await _platformRepository.UpdatePlatformAsync(_mapper.Map(platformDto, platform));
+                await platformRepository.UpdatePlatformAsync(mapper.Map(platformDto, platform));
             }
             catch (DbUpdateConcurrencyException)
             {
                 // If the entity is not found in the data source, it was deleted by another user while updating.
-                if (await _platformRepository.GetPlatformByIdAsync(id) is null)
+                if (await platformRepository.GetPlatformByIdAsync(id) is null)
                 {
                     return NotFound();
                 }
@@ -189,10 +186,10 @@ namespace ADAtickets.ApiService.Controllers
         [RequiredScope(Scope.Read, Scope.Write)]
         public async Task<ActionResult<PlatformResponseDto>> PostPlatform(PlatformRequestDto platformDto)
         {
-            var platform = _mapper.Map(platformDto, new Platform());
+            var platform = mapper.Map(platformDto, new Platform());
 
             // Insert the DTO info into a new entity and add it to the data source.
-            await _platformRepository.AddPlatformAsync(platform);
+            await platformRepository.AddPlatformAsync(platform);
 
             // Return the created entity and its location to the client.
             return CreatedAtAction(nameof(GetPlatform), new { id = platform.Id }, platform);
@@ -214,12 +211,12 @@ namespace ADAtickets.ApiService.Controllers
         public async Task<IActionResult> DeletePlatform(Guid id)
         {
             // Check if the requested entity exists.
-            if (await _platformRepository.GetPlatformByIdAsync(id) is not Platform platform)
+            if (await platformRepository.GetPlatformByIdAsync(id) is not Platform platform)
             {
                 return NotFound();
             }
 
-            await _platformRepository.DeletePlatformAsync(platform);
+            await platformRepository.DeletePlatformAsync(platform);
 
             return NoContent();
         }

@@ -30,25 +30,23 @@ namespace ADAtickets.ApiService.Services
     /// </summary>
     class UserRepository(ADAticketsDbContext context) : IUserRepository
     {
-        readonly ADAticketsDbContext _context = context;
-
         /// <inheritdoc cref="IUserRepository.GetUserByIdAsync"/>
         public async Task<User?> GetUserByIdAsync(Guid id)
         {
-            return await _context.Users.FindAsync(id);
+            return await context.Users.FindAsync(id);
         }
 
         /// <inheritdoc cref="IUserRepository.GetUsersAsync"/>
         public async Task<IEnumerable<User>> GetUsersAsync()
         {
-            return await _context.Users.ToListAsync();
+            return await context.Users.ToListAsync();
         }
 
         /// <inheritdoc cref="IUserRepository.GetUsersByAsync"/>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1862:Use the 'StringComparison' method overloads to perform case-insensitive string comparisons", Justification = "The comparison with the StringComparison overload is not translatable by Entity Framework and the EF.Function.ILike method is not standard SQL but PostgreSQL dialect.")]
         public async Task<IEnumerable<User>> GetUsersByAsync(IEnumerable<KeyValuePair<string, string>> filters)
         {
-            IQueryable<User> query = _context.Users;
+            IQueryable<User> query = context.Users;
 
             foreach (var filter in filters)
             {
@@ -97,22 +95,22 @@ namespace ADAtickets.ApiService.Services
         /// <inheritdoc cref="IUserRepository.AddUserAsync"/>
         public async Task AddUserAsync(User user)
         {
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            context.Users.Add(user);
+            await context.SaveChangesAsync();
         }
 
         /// <inheritdoc cref="IUserRepository.UpdateUserAsync"/>
         public async Task UpdateUserAsync(User user)
         {
-            _context.Users.Update(user);
-            await _context.SaveChangesAsync();
+            context.Users.Update(user);
+            await context.SaveChangesAsync();
         }
 
         /// <inheritdoc cref="IUserRepository.DeleteUserAsync"/>
         public async Task DeleteUserAsync(User user)
         {
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
+            context.Users.Remove(user);
+            await context.SaveChangesAsync();
         }
     }
 }

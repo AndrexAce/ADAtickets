@@ -30,25 +30,23 @@ namespace ADAtickets.ApiService.Services
     /// </summary>
     class PlatformRepository(ADAticketsDbContext context) : IPlatformRepository
     {
-        readonly ADAticketsDbContext _context = context;
-
         /// <inheritdoc cref="IPlatformRepository.GetPlatformByIdAsync"/>
         public async Task<Platform?> GetPlatformByIdAsync(Guid id)
         {
-            return await _context.Platforms.FindAsync(id);
+            return await context.Platforms.FindAsync(id);
         }
 
         /// <inheritdoc cref="IPlatformRepository.GetPlatformsAsync"/>
         public async Task<IEnumerable<Platform>> GetPlatformsAsync()
         {
-            return await _context.Platforms.ToListAsync();
+            return await context.Platforms.ToListAsync();
         }
 
         /// <inheritdoc cref="IPlatformRepository.GetPlatformsByAsync"/>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1862:Use the 'StringComparison' method overloads to perform case-insensitive string comparisons", Justification = "The comparison with the StringComparison overload is not translatable by Entity Framework and the EF.Function.ILike method is not standard SQL but PostgreSQL dialect.")]
         public async Task<IEnumerable<Platform>> GetPlatformsByAsync(IEnumerable<KeyValuePair<string, string>> filters)
         {
-            IQueryable<Platform> query = _context.Platforms;
+            IQueryable<Platform> query = context.Platforms;
 
             foreach (var filter in filters)
             {
@@ -77,22 +75,22 @@ namespace ADAtickets.ApiService.Services
         /// <inheritdoc cref="IPlatformRepository.AddPlatformAsync"/>
         public async Task AddPlatformAsync(Platform platform)
         {
-            _context.Platforms.Add(platform);
-            await _context.SaveChangesAsync();
+            context.Platforms.Add(platform);
+            await context.SaveChangesAsync();
         }
 
         /// <inheritdoc cref="IPlatformRepository.UpdatePlatformAsync"/>
         public async Task UpdatePlatformAsync(Platform platform)
         {
-            _context.Platforms.Update(platform);
-            await _context.SaveChangesAsync();
+            context.Platforms.Update(platform);
+            await context.SaveChangesAsync();
         }
 
         /// <inheritdoc cref="IPlatformRepository.DeletePlatformAsync"/>
         public async Task DeletePlatformAsync(Platform platform)
         {
-            _context.Platforms.Remove(platform);
-            await _context.SaveChangesAsync();
+            context.Platforms.Remove(platform);
+            await context.SaveChangesAsync();
         }
     }
 }

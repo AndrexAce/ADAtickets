@@ -47,9 +47,6 @@ namespace ADAtickets.ApiService.Controllers
     [Authorize(Policy.AdminOnly)]
     public sealed class AttachmentsController(IAttachmentRepository attachmentRepository, IMapper mapper) : ControllerBase
     {
-        private readonly IAttachmentRepository _attachmentRepository = attachmentRepository;
-        private readonly IMapper _mapper = mapper;
-
         /// <summary>
         /// Fetch all the <see cref="Attachment"/> entities or all the entities respecting the given criteria.
         /// </summary>
@@ -69,9 +66,9 @@ namespace ADAtickets.ApiService.Controllers
         [RequiredScope(Scope.Read)]
         public async Task<ActionResult<IEnumerable<AttachmentResponseDto>>> GetAttachments([FromQuery] IEnumerable<KeyValuePair<string, string>>? filters)
         {
-            var attachments = await (filters != null ? _attachmentRepository.GetAttachmentsByAsync(filters) : _attachmentRepository.GetAttachmentsAsync());
+            var attachments = await (filters != null ? attachmentRepository.GetAttachmentsByAsync(filters) : attachmentRepository.GetAttachmentsAsync());
 
-            return Ok(attachments.Select(attachment => _mapper.Map(attachment, new AttachmentResponseDto())));
+            return Ok(attachments.Select(attachment => mapper.Map(attachment, new AttachmentResponseDto())));
         }
 
         /// <summary>
@@ -90,13 +87,13 @@ namespace ADAtickets.ApiService.Controllers
         public async Task<ActionResult<AttachmentResponseDto>> GetAttachment(Guid id)
         {
             // Check if the requested entity exists.
-            if (await _attachmentRepository.GetAttachmentByIdAsync(id) is not Attachment attachment)
+            if (await attachmentRepository.GetAttachmentByIdAsync(id) is not Attachment attachment)
             {
                 return NotFound();
             }
 
             // Insert the entity data into a new DTO and send it to the client.
-            return Ok(_mapper.Map(attachment, new AttachmentResponseDto()));
+            return Ok(mapper.Map(attachment, new AttachmentResponseDto()));
         }
 
         /// <summary>
@@ -136,7 +133,7 @@ namespace ADAtickets.ApiService.Controllers
         public async Task<ActionResult<AttachmentResponseDto>> PutAttachment(Guid id, AttachmentRequestDto attachmentDto)
         {
             // If the requested entity does not exist, create a new one.
-            if (await _attachmentRepository.GetAttachmentByIdAsync(id) is not Attachment attachment)
+            if (await attachmentRepository.GetAttachmentByIdAsync(id) is not Attachment attachment)
             {
                 return await PostAttachment(attachmentDto);
             }
@@ -144,12 +141,12 @@ namespace ADAtickets.ApiService.Controllers
             try
             {
                 // Update the existing entity with the new data.
-                await _attachmentRepository.UpdateAttachmentAsync(_mapper.Map(attachmentDto, attachment), attachmentDto.Content, attachment.Path);
+                await attachmentRepository.UpdateAttachmentAsync(mapper.Map(attachmentDto, attachment), attachmentDto.Content, attachment.Path);
             }
             catch (DbUpdateConcurrencyException)
             {
                 // If the entity is not found in the data source, it was deleted by another user while updating.
-                if (await _attachmentRepository.GetAttachmentByIdAsync(id) is null)
+                if (await attachmentRepository.GetAttachmentByIdAsync(id) is null)
                 {
                     return NotFound();
                 }
@@ -193,10 +190,10 @@ namespace ADAtickets.ApiService.Controllers
         [RequiredScope(Scope.Read, Scope.Write)]
         public async Task<ActionResult<AttachmentResponseDto>> PostAttachment(AttachmentRequestDto attachmentDto)
         {
-            var attachment = _mapper.Map(attachmentDto, new Attachment());
+            var attachment = mapper.Map(attachmentDto, new Attachment());
 
             // Insert the DTO info into a new entity and add it to the data source.
-            await _attachmentRepository.AddAttachmentAsync(attachment, attachmentDto.Content);
+            await attachmentRepository.AddAttachmentAsync(attachment, attachmentDto.Content);
 
             // Return the created entity and its location to the client.
             return CreatedAtAction(nameof(GetAttachment), new { id = attachment.Id }, attachment);
@@ -218,12 +215,12 @@ namespace ADAtickets.ApiService.Controllers
         public async Task<IActionResult> DeleteAttachment(Guid id)
         {
             // Check if the requested entity exists.
-            if (await _attachmentRepository.GetAttachmentByIdAsync(id) is not Attachment attachment)
+            if (await attachmentRepository.GetAttachmentByIdAsync(id) is not Attachment attachment)
             {
                 return NotFound();
             }
 
-            await _attachmentRepository.DeleteAttachmentAsync(attachment);
+            await attachmentRepository.DeleteAttachmentAsync(attachment);
 
             return NoContent();
         }

@@ -46,9 +46,6 @@ namespace ADAtickets.ApiService.Controllers
     [ApiConventionType(typeof(ADAticketsApiConventions))]
     public sealed class EditsController(IEditRepository editRepository, IMapper mapper) : ControllerBase
     {
-        private readonly IEditRepository _editRepository = editRepository;
-        private readonly IMapper _mapper = mapper;
-
         /// <summary>
         /// Fetch all the <see cref="Edit"/> entities or all the entities respecting the given criteria.
         /// </summary>
@@ -69,9 +66,9 @@ namespace ADAtickets.ApiService.Controllers
         [RequiredScope(Scope.Read)]
         public async Task<ActionResult<IEnumerable<EditResponseDto>>> GetEdits([FromQuery] IEnumerable<KeyValuePair<string, string>>? filters)
         {
-            var edits = await (filters != null ? _editRepository.GetEditsByAsync(filters) : _editRepository.GetEditsAsync());
+            var edits = await (filters != null ? editRepository.GetEditsByAsync(filters) : editRepository.GetEditsAsync());
 
-            return Ok(edits.Select(edit => _mapper.Map(edit, new EditResponseDto())));
+            return Ok(edits.Select(edit => mapper.Map(edit, new EditResponseDto())));
         }
 
         /// <summary>
@@ -91,13 +88,13 @@ namespace ADAtickets.ApiService.Controllers
         public async Task<ActionResult<EditResponseDto>> GetEdit(Guid id)
         {
             // Check if the requested entity exists.
-            if (await _editRepository.GetEditByIdAsync(id) is not Edit edit)
+            if (await editRepository.GetEditByIdAsync(id) is not Edit edit)
             {
                 return NotFound();
             }
 
             // Insert the entity data into a new DTO and send it to the client.
-            return Ok(_mapper.Map(edit, new EditResponseDto()));
+            return Ok(mapper.Map(edit, new EditResponseDto()));
         }
 
         /// <summary>
@@ -144,7 +141,7 @@ namespace ADAtickets.ApiService.Controllers
         public async Task<ActionResult<EditResponseDto>> PutEdit(Guid id, EditRequestDto editDto)
         {
             // If the requested entity does not exist, create a new one.
-            if (await _editRepository.GetEditByIdAsync(id) is not Edit edit)
+            if (await editRepository.GetEditByIdAsync(id) is not Edit edit)
             {
                 return await PostEdit(editDto);
             }
@@ -152,12 +149,12 @@ namespace ADAtickets.ApiService.Controllers
             try
             {
                 // Update the existing entity with the new data.
-                await _editRepository.UpdateEditAsync(_mapper.Map(editDto, edit));
+                await editRepository.UpdateEditAsync(mapper.Map(editDto, edit));
             }
             catch (DbUpdateConcurrencyException)
             {
                 // If the entity is not found in the data source, it was deleted by another user while updating.
-                if (await _editRepository.GetEditByIdAsync(id) is null)
+                if (await editRepository.GetEditByIdAsync(id) is null)
                 {
                     return NotFound();
                 }
@@ -208,10 +205,10 @@ namespace ADAtickets.ApiService.Controllers
         [RequiredScope(Scope.Read, Scope.Write)]
         public async Task<ActionResult<EditResponseDto>> PostEdit(EditRequestDto editDto)
         {
-            var edit = _mapper.Map(editDto, new Edit());
+            var edit = mapper.Map(editDto, new Edit());
 
             // Insert the DTO info into a new entity and add it to the data source.
-            await _editRepository.AddEditAsync(edit);
+            await editRepository.AddEditAsync(edit);
 
             // Return the created entity and its location to the client.
             return CreatedAtAction(nameof(GetEdit), new { id = edit.Id }, edit);
@@ -234,12 +231,12 @@ namespace ADAtickets.ApiService.Controllers
         public async Task<IActionResult> DeleteEdit(Guid id)
         {
             // Check if the requested entity exists.
-            if (await _editRepository.GetEditByIdAsync(id) is not Edit edit)
+            if (await editRepository.GetEditByIdAsync(id) is not Edit edit)
             {
                 return NotFound();
             }
 
-            await _editRepository.DeleteEditAsync(edit);
+            await editRepository.DeleteEditAsync(edit);
 
             return NoContent();
         }

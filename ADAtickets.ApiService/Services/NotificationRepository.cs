@@ -31,25 +31,23 @@ namespace ADAtickets.ApiService.Services
     /// </summary>
     class NotificationRepository(ADAticketsDbContext context) : INotificationRepository
     {
-        readonly ADAticketsDbContext _context = context;
-
         /// <inheritdoc cref="INotificationRepository.GetNotificationByIdAsync"/>
         public async Task<Notification?> GetNotificationByIdAsync(Guid id)
         {
-            return await _context.Notifications.FindAsync(id);
+            return await context.Notifications.FindAsync(id);
         }
 
         /// <inheritdoc cref="INotificationRepository.GetNotificationsAsync"/>
         public async Task<IEnumerable<Notification>> GetNotificationsAsync()
         {
-            return await _context.Notifications.ToListAsync();
+            return await context.Notifications.ToListAsync();
         }
 
         /// <inheritdoc cref="INotificationRepository.GetNotificationsByAsync"/>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1862:Use the 'StringComparison' method overloads to perform case-insensitive string comparisons", Justification = "The comparison with the StringComparison overload is not translatable by Entity Framework and the EF.Function.ILike method is not standard SQL but PostgreSQL dialect.")]
         public async Task<IEnumerable<Notification>> GetNotificationsByAsync(IEnumerable<KeyValuePair<string, string>> filters)
         {
-            IQueryable<Notification> query = _context.Notifications;
+            IQueryable<Notification> query = context.Notifications;
 
             foreach (var filter in filters)
             {
@@ -90,22 +88,22 @@ namespace ADAtickets.ApiService.Services
         /// <inheritdoc cref="INotificationRepository.AddNotificationAsync"/>
         public async Task AddNotificationAsync(Notification notification)
         {
-            _context.Notifications.Add(notification);
-            await _context.SaveChangesAsync();
+            context.Notifications.Add(notification);
+            await context.SaveChangesAsync();
         }
 
         /// <inheritdoc cref="INotificationRepository.UpdateNotificationAsync"/>
         public async Task UpdateNotificationAsync(Notification notification)
         {
-            _context.Notifications.Update(notification);
-            await _context.SaveChangesAsync();
+            context.Notifications.Update(notification);
+            await context.SaveChangesAsync();
         }
 
         /// <inheritdoc cref="INotificationRepository.DeleteNotificationAsync"/>
         public async Task DeleteNotificationAsync(Notification notification)
         {
-            _context.Notifications.Remove(notification);
-            await _context.SaveChangesAsync();
+            context.Notifications.Remove(notification);
+            await context.SaveChangesAsync();
         }
     }
 }

@@ -31,25 +31,23 @@ namespace ADAtickets.ApiService.Services
     /// </summary>
     class TicketRepository(ADAticketsDbContext context) : ITicketRepository
     {
-        readonly ADAticketsDbContext _context = context;
-
         /// <inheritdoc cref="ITicketRepository.GetTicketByIdAsync"/>
         public async Task<Ticket?> GetTicketByIdAsync(Guid id)
         {
-            return await _context.Tickets.FindAsync(id);
+            return await context.Tickets.FindAsync(id);
         }
 
         /// <inheritdoc cref="ITicketRepository.GetTicketsAsync"/>
         public async Task<IEnumerable<Ticket>> GetTicketsAsync()
         {
-            return await _context.Tickets.ToListAsync();
+            return await context.Tickets.ToListAsync();
         }
 
         /// <inheritdoc cref="ITicketRepository.GetTicketsByAsync"/>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1862:Use the 'StringComparison' method overloads to perform case-insensitive string comparisons", Justification = "The comparison with the StringComparison overload is not translatable by Entity Framework and the EF.Function.ILike method is not standard SQL but PostgreSQL dialect.")]
         public async Task<IEnumerable<Ticket>> GetTicketsByAsync(IEnumerable<KeyValuePair<string, string>> filters)
         {
-            IQueryable<Ticket> query = _context.Tickets;
+            IQueryable<Ticket> query = context.Tickets;
 
             foreach (var filter in filters)
             {
@@ -110,22 +108,22 @@ namespace ADAtickets.ApiService.Services
         /// <inheritdoc cref="ITicketRepository.AddTicketAsync"/>
         public async Task AddTicketAsync(Ticket ticket)
         {
-            _context.Tickets.Add(ticket);
-            await _context.SaveChangesAsync();
+            context.Tickets.Add(ticket);
+            await context.SaveChangesAsync();
         }
 
         /// <inheritdoc cref="ITicketRepository.UpdateTicketAsync"/>
         public async Task UpdateTicketAsync(Ticket ticket)
         {
-            _context.Tickets.Update(ticket);
-            await _context.SaveChangesAsync();
+            context.Tickets.Update(ticket);
+            await context.SaveChangesAsync();
         }
 
         /// <inheritdoc cref="ITicketRepository.DeleteTicketAsync"/>
         public async Task DeleteTicketAsync(Ticket ticket)
         {
-            _context.Tickets.Remove(ticket);
-            await _context.SaveChangesAsync();
+            context.Tickets.Remove(ticket);
+            await context.SaveChangesAsync();
         }
     }
 }

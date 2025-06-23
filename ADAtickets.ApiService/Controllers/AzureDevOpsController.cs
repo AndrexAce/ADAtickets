@@ -49,9 +49,6 @@ namespace ADAtickets.ApiService.Controllers
     [ApiConventionType(typeof(ADAticketsApiConventions))]
     public sealed class AzureDevOpsController(IUserRepository userRepository, IConfiguration configuration) : ControllerBase
     {
-        private readonly IUserRepository _userRepository = userRepository;
-        private readonly IConfiguration _configuration = configuration;
-
         /// <summary>
         /// Determines if a specific <see cref="User"/> entity with <paramref name="email"/> has access to the Azure DevOps organization.
         /// </summary>
@@ -69,7 +66,7 @@ namespace ADAtickets.ApiService.Controllers
         public async Task<ActionResult<ValueWrapper<bool>>> GetUserDevOpsAccess(string email)
         {
             // Check if the entity with the given key exists.
-            if (!(await _userRepository.GetUsersByAsync([new KeyValuePair<string, string>("Email", email)])).Any())
+            if (!(await userRepository.GetUsersByAsync([new KeyValuePair<string, string>("Email", email)])).Any())
             {
                 return NotFound();
             }
@@ -81,12 +78,12 @@ namespace ADAtickets.ApiService.Controllers
         private async Task<VssConnection> ConnectToAzureDevOpsAsync()
         {
             // Read AzureDevOps settings from configuration
-            var tenantId = _configuration["AzureDevOps:TenantId"]!;
-            var clientId = _configuration["AzureDevOps:ClientId"]!;
-            var certPath = _configuration["AzureDevOps:ClientCertificates:0:CertificateDiskPath"]!;
-            var certPassword = _configuration["AzureDevOps:ClientCertificates:0:CertificatePassword"]!;
-            var scope = _configuration["AzureDevOpsAPI:Scopes:0"]!;
-            var devOpsUri = _configuration["AzureDevOpsAPI:BaseUrl"]!;
+            var tenantId = configuration["AzureDevOps:TenantId"]!;
+            var clientId = configuration["AzureDevOps:ClientId"]!;
+            var certPath = configuration["AzureDevOps:ClientCertificates:0:CertificateDiskPath"]!;
+            var certPassword = configuration["AzureDevOps:ClientCertificates:0:CertificatePassword"]!;
+            var scope = configuration["AzureDevOpsAPI:Scopes:0"]!;
+            var devOpsUri = configuration["AzureDevOpsAPI:BaseUrl"]!;
 
             // Create the credentials
             var credentials = new ClientCertificateCredential(

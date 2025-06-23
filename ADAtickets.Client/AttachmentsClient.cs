@@ -21,6 +21,7 @@ using ADAtickets.Shared.Constants;
 using ADAtickets.Shared.Dtos.Requests;
 using ADAtickets.Shared.Dtos.Responses;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Identity.Abstractions;
 
 namespace ADAtickets.Client
@@ -30,8 +31,9 @@ namespace ADAtickets.Client
     /// </summary>
     /// <param name="authenticationStateProvider">The provider of the signed in user's data.</param>
     /// <param name="downstreamApi">The downstream API service to make requests.</param>
-    public sealed class AttachmentsClient(AuthenticationStateProvider authenticationStateProvider, IDownstreamApi downstreamApi)
-        : Client<AttachmentResponseDto, AttachmentRequestDto>(authenticationStateProvider, downstreamApi)
+    /// <param name="configuration">The configuration settings.</param>
+    public sealed class AttachmentsClient(AuthenticationStateProvider authenticationStateProvider, IDownstreamApi downstreamApi, IConfiguration configuration)
+        : Client<AttachmentResponseDto, AttachmentRequestDto>(authenticationStateProvider, downstreamApi, configuration)
     {
         /// <inheritdoc cref="Client{TResponse, TRequest}.ControllerName"/>
         protected override string ControllerName => Controller.Attachments;

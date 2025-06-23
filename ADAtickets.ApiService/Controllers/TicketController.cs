@@ -47,9 +47,6 @@ namespace ADAtickets.ApiService.Controllers
     [AutoValidateAntiforgeryToken]
     public sealed class TicketsController(ITicketRepository ticketRepository, IMapper mapper) : ControllerBase
     {
-        private readonly ITicketRepository _ticketRepository = ticketRepository;
-        private readonly IMapper _mapper = mapper;
-
         /// <summary>
         /// Fetch all the <see cref="Ticket"/> entities or all the entities respecting the given criteria.
         /// </summary>
@@ -70,9 +67,9 @@ namespace ADAtickets.ApiService.Controllers
         [RequiredScope(Scope.Read)]
         public async Task<ActionResult<IEnumerable<TicketResponseDto>>> GetTickets([FromQuery] IEnumerable<KeyValuePair<string, string>>? filters)
         {
-            var tickets = await (filters != null ? _ticketRepository.GetTicketsByAsync(filters) : _ticketRepository.GetTicketsAsync());
+            var tickets = await (filters != null ? ticketRepository.GetTicketsByAsync(filters) : ticketRepository.GetTicketsAsync());
 
-            return Ok(tickets.Select(ticket => _mapper.Map(ticket, new TicketResponseDto())));
+            return Ok(tickets.Select(ticket => mapper.Map(ticket, new TicketResponseDto())));
         }
 
         /// <summary>
@@ -92,13 +89,13 @@ namespace ADAtickets.ApiService.Controllers
         public async Task<ActionResult<TicketResponseDto>> GetTicket(Guid id)
         {
             // Check if the requested entity exists.
-            if (await _ticketRepository.GetTicketByIdAsync(id) is not Ticket ticket)
+            if (await ticketRepository.GetTicketByIdAsync(id) is not Ticket ticket)
             {
                 return NotFound();
             }
 
             // Insert the entity data into a new DTO and send it to the client.
-            return Ok(_mapper.Map(ticket, new TicketResponseDto()));
+            return Ok(mapper.Map(ticket, new TicketResponseDto()));
         }
 
         /// <summary>
@@ -152,7 +149,7 @@ namespace ADAtickets.ApiService.Controllers
         public async Task<ActionResult<TicketResponseDto>> PutTicket(Guid id, TicketRequestDto ticketDto)
         {
             // If the requested entity does not exist, create a new one.
-            if (await _ticketRepository.GetTicketByIdAsync(id) is not Ticket ticket)
+            if (await ticketRepository.GetTicketByIdAsync(id) is not Ticket ticket)
             {
                 return await PostTicket(ticketDto);
             }
@@ -160,12 +157,12 @@ namespace ADAtickets.ApiService.Controllers
             try
             {
                 // Update the existing entity with the new data.
-                await _ticketRepository.UpdateTicketAsync(_mapper.Map(ticketDto, ticket));
+                await ticketRepository.UpdateTicketAsync(mapper.Map(ticketDto, ticket));
             }
             catch (DbUpdateConcurrencyException)
             {
                 // If the entity is not found in the data source, it was deleted by another user while updating.
-                if (await _ticketRepository.GetTicketByIdAsync(id) is null)
+                if (await ticketRepository.GetTicketByIdAsync(id) is null)
                 {
                     return NotFound();
                 }
@@ -223,10 +220,10 @@ namespace ADAtickets.ApiService.Controllers
         [RequiredScope(Scope.Read, Scope.Write)]
         public async Task<ActionResult<TicketResponseDto>> PostTicket(TicketRequestDto ticketDto)
         {
-            var ticket = _mapper.Map(ticketDto, new Ticket());
+            var ticket = mapper.Map(ticketDto, new Ticket());
 
             // Insert the DTO info into a new entity and add it to the data source.
-            await _ticketRepository.AddTicketAsync(ticket);
+            await ticketRepository.AddTicketAsync(ticket);
 
             // Return the created entity and its location to the client.
             return CreatedAtAction(nameof(GetTicket), new { id = ticket.Id }, ticket);
@@ -249,12 +246,12 @@ namespace ADAtickets.ApiService.Controllers
         public async Task<IActionResult> DeleteTicket(Guid id)
         {
             // Check if the requested entity exists.
-            if (await _ticketRepository.GetTicketByIdAsync(id) is not Ticket ticket)
+            if (await ticketRepository.GetTicketByIdAsync(id) is not Ticket ticket)
             {
                 return NotFound();
             }
 
-            await _ticketRepository.DeleteTicketAsync(ticket);
+            await ticketRepository.DeleteTicketAsync(ticket);
 
             return NoContent();
         }
