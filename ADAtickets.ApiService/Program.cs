@@ -135,6 +135,7 @@ namespace ADAtickets.ApiService
             builder.Services.AddProblemDetails();
 
             // Configure the scoped repositories for dependency injection.
+            builder.Services.AddScoped<IAttachmentRepository, AttachmentRepository>();
             builder.Services.AddScoped<IEditRepository, EditRepository>();
             builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
             builder.Services.AddScoped<IPlatformRepository, PlatformRepository>();
@@ -202,9 +203,10 @@ namespace ADAtickets.ApiService
             builder.AddDefaultPolicy(Policy.AdminOnly, policy =>
             {
                 policy.RequireAuthenticatedUser()
-                .RequireRole("Azure DevOps Administrator")
+                // Directory roles are exposed with the "wids" claim in the ID token.
+                // The value of this claim is the standard ID for the Azure DevOps Administrator Entra directory role.
+                .RequireClaim("wids", "e3973bdf-4987-49ae-837a-ba8e231c7286")
                 .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault);
-
             })
             .AddPolicy(Policy.OperatorOrAdmin, policy =>
             {

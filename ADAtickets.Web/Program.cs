@@ -169,9 +169,10 @@ namespace ADAtickets.Web
             builder.AddDefaultPolicy(Policy.AdminOnly, policy =>
             {
                 policy.RequireAuthenticatedUser()
-                .RequireRole("Azure DevOps Administrator")
+                // Directory roles are exposed with the "wids" claim in the ID token.
+                // The value of this claim is the standard ID for the Azure DevOps Administrator Entra directory role.
+                .RequireClaim("wids", "e3973bdf-4987-49ae-837a-ba8e231c7286")
                 .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault);
-
             })
             .AddPolicy(Policy.OperatorOrAdmin, policy =>
             {
