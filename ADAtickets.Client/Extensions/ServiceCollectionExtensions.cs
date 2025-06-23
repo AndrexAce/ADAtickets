@@ -1,6 +1,6 @@
 /*
  * ADAtickets is a simple, lightweight, open source ticketing system
- * interacting with your enterprise's repositories on Azure DevOps 
+ * interacting with your enterprise repositories on Azure DevOps 
  * with a two-way synchronization.
  * Copyright (C) 2025  Andrea Lucchese
  * 

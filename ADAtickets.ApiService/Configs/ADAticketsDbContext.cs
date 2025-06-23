@@ -1,6 +1,6 @@
 ﻿/*
  * ADAtickets is a simple, lightweight, open source ticketing system
- * interacting with your enterprise's repositories on Azure DevOps 
+ * interacting with your enterprise repositories on Azure DevOps 
  * with a two-way synchronization.
  * Copyright (C) 2025  Andrea Lucchese
  * 
@@ -24,7 +24,7 @@ namespace ADAtickets.ApiService.Configs
 {
     /// <summary>
     /// <para>Represents the Entity Framework Core database context for the ADAtickets application.</para>
-    /// <para>This context is used to interact with the database and manage the application's entities.</para>
+    /// <para>This context is used to interact with the database and manage the application entities.</para>
     /// </summary>
     class ADAticketsDbContext : DbContext
     {
