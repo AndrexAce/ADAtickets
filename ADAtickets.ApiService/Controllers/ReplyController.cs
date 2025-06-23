@@ -64,7 +64,7 @@ namespace ADAtickets.ApiService.Controllers
         [HttpGet]
         [Authorize(Policy = Policy.Everyone)]
         [RequiredScope(Scope.Read)]
-        public async Task<ActionResult<IEnumerable<ReplyResponseDto>>> GetReplies([FromQuery] IEnumerable<KeyValuePair<string, string>>? filters)
+        public async Task<ActionResult<IEnumerable<ReplyResponseDto>>> GetReplies([FromQuery] Dictionary<string, string>? filters)
         {
             var replies = await (filters != null ? replyRepository.GetRepliesByAsync(filters) : replyRepository.GetRepliesAsync());
 

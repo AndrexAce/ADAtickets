@@ -64,7 +64,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpGet]
         [RequiredScope(Scope.Read)]
-        public async Task<ActionResult<IEnumerable<PlatformResponseDto>>> GetPlatforms([FromQuery] IEnumerable<KeyValuePair<string, string>>? filters)
+        public async Task<ActionResult<IEnumerable<PlatformResponseDto>>> GetPlatforms([FromQuery] Dictionary<string, string>? filters)
         {
             var platforms = await (filters != null ? platformRepository.GetPlatformsByAsync(filters) : platformRepository.GetPlatformsAsync());
 

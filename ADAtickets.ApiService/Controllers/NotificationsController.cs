@@ -64,7 +64,7 @@ namespace ADAtickets.ApiService.Controllers
         [HttpGet]
         [Authorize(Policy = Policy.Everyone)]
         [RequiredScope(Scope.Read)]
-        public async Task<ActionResult<IEnumerable<NotificationResponseDto>>> GetNotifications([FromQuery] IEnumerable<KeyValuePair<string, string>>? filters)
+        public async Task<ActionResult<IEnumerable<NotificationResponseDto>>> GetNotifications([FromQuery] Dictionary<string, string>? filters)
         {
             var notifications = await (filters != null ? notificationRepository.GetNotificationsByAsync(filters) : notificationRepository.GetNotificationsAsync());
 

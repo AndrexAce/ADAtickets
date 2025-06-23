@@ -64,7 +64,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpGet]
         [RequiredScope(Scope.Read)]
-        public async Task<ActionResult<IEnumerable<AttachmentResponseDto>>> GetAttachments([FromQuery] IEnumerable<KeyValuePair<string, string>>? filters)
+        public async Task<ActionResult<IEnumerable<AttachmentResponseDto>>> GetAttachments([FromQuery] Dictionary<string, string>? filters)
         {
             var attachments = await (filters != null ? attachmentRepository.GetAttachmentsByAsync(filters) : attachmentRepository.GetAttachmentsAsync());
 
