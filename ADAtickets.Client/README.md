@@ -30,7 +30,8 @@ A patch happens when there are bug fixes or other minor changes.
 
 ## Roadmap 🗺️
 
-- Custom JWT authentication.
+- Custom JWT authorization.
+- Call APIs for an app other than the user.
 - Implementation of user role management.
 - API rate limiting features.
 
