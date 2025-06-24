@@ -45,12 +45,40 @@ namespace ADAtickets.Client
         where TResponse : ResponseDto
         where TRequest : RequestDto
     {
-        private string Endpoint => $"v{Service.APIVersion}/{ControllerName}";
-
         /// <summary>
         /// The endpoint of the controller to interact with.
         /// </summary>
         protected abstract string ControllerName { get; }
+
+        private string Endpoint => $"v{Service.APIVersion}/{ControllerName}";
+
+        private event Action<HttpResponseMessage>? OnResponse;
+
+        /// <summary>
+        /// Registers an handler to be called when an API request completes.
+        /// </summary>
+        /// <param name="handler">The action to perform when the response is ready.</param>
+        public void AddResponseHandler(Action<HttpResponseMessage> handler)
+        {
+            OnResponse += handler;
+        }
+
+        /// <summary>
+        /// Removes an handler to be called when an API request completes.
+        /// </summary>
+        /// <param name="handler">The action to perform when the response is ready.</param>
+        public void RemoveResponseHandler(Action<HttpResponseMessage> handler)
+        {
+            OnResponse -= handler;
+        }
+
+        /// <summary>
+        /// Removes all the handlers to call when an API request completes.
+        /// </summary>
+        public void ClearResponseHandlers()
+        {
+            OnResponse = null;
+        }
 
         /// <summary>
         /// Fetch a specific entity.
@@ -74,9 +102,11 @@ namespace ADAtickets.Client
                 },
                 user: user);
 
-            return (response.StatusCode, response.IsSuccessStatusCode
-                ? await response.Content.ReadFromJsonAsync<TResponse>()
-                : null);
+            var responseEntity = response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<TResponse>() : null;
+
+            InvokeResponseHandler(response);
+
+            return (response.StatusCode, responseEntity);
         }
 
         /// <summary>
@@ -106,9 +136,11 @@ namespace ADAtickets.Client
                 },
                 user: user);
 
-            return (response.StatusCode, response.IsSuccessStatusCode
-                ? await response.Content.ReadFromJsonAsync<IEnumerable<TResponse>>() ?? []
-                : []);
+            var responseEntities = response.IsSuccessStatusCode ? (await response.Content.ReadFromJsonAsync<IEnumerable<TResponse>>() ?? []) : [];
+
+            InvokeResponseHandler(response);
+
+            return (response.StatusCode, responseEntities);
         }
 
         /// <summary>
@@ -135,9 +167,11 @@ namespace ADAtickets.Client
                 user: user,
                 content: JsonContent.Create(entity));
 
-            return (response.StatusCode, response.IsSuccessStatusCode
-                ? await response.Content.ReadFromJsonAsync<TResponse>()
-                : null);
+            var responseEntity = response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<TResponse>() : null;
+
+            InvokeResponseHandler(response);
+
+            return (response.StatusCode, responseEntity);
         }
 
         /// <summary>
@@ -165,9 +199,11 @@ namespace ADAtickets.Client
                 user: user,
                 content: JsonContent.Create(entity));
 
-            return (response.StatusCode, response.IsSuccessStatusCode
-                ? await response.Content.ReadFromJsonAsync<TResponse>()
-                : null);
+            var responseEntity = response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<TResponse>() : null;
+
+            InvokeResponseHandler(response);
+
+            return (response.StatusCode, responseEntity);
         }
 
         /// <summary>
@@ -192,7 +228,9 @@ namespace ADAtickets.Client
                 },
                 user: user);
 
-            return response.StatusCode;
+            InvokeResponseHandler(response);
+
+            return (response.StatusCode);
         }
 
         private static string GetUserTenantId(ClaimsPrincipal user)
@@ -220,6 +258,11 @@ namespace ADAtickets.Client
             var primaryTenantId = configuration.GetSection($"{Scheme.OpenIdConnectDefault}:TenantId").Value;
 
             return tenantId == primaryTenantId ? Scheme.OpenIdConnectDefault : Scheme.ExternalOpenIdConnectDefault;
+        }
+
+        private void InvokeResponseHandler(HttpResponseMessage response)
+        {
+            OnResponse?.Invoke(response);
         }
     }
 }

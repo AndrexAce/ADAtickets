@@ -23,6 +23,7 @@
 	<PackageIcon>NuGetIcon.png</PackageIcon>
 	<PublishTrimmed>false</PublishTrimmed>
 	<PublishSingleFile>true</PublishSingleFile>
+	<PackageReleaseNotes>First package version.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
