@@ -24,6 +24,9 @@
 	<PublishTrimmed>false</PublishTrimmed>
 	<PublishSingleFile>true</PublishSingleFile>
 	<PackageReleaseNotes>First package version.</PackageReleaseNotes>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
+	<Copyright>Copyright (C) 2025  Andrea Lucchese</Copyright>
+	<PackageTags>adatickets;api;client;</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
@@ -39,6 +42,10 @@
 
   <ItemGroup>
     <None Update="NuGetIcon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Update="README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
