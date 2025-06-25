@@ -99,6 +99,9 @@ namespace ADAtickets.Web
             // Add localization services.
             builder.Services.AddLocalization();
 
+            // Add access to the HTTP client class.
+            builder.Services.AddHttpClient();
+
             // Add Fluent UI components.
             builder.Services.AddFluentUIComponents();
 
@@ -131,15 +134,21 @@ namespace ADAtickets.Web
             // Configure security based on environment.
             if (app.Environment.IsDevelopment())
             {
-                // Enable production error handling and HTTPS requirements
-                app.UseExceptionHandler("/Error");
+                // Use a detailed exception page.
+                app.UseDeveloperExceptionPage();
             }
             else
             {
+                // Use a more user-friendly error page.
+                app.UseExceptionHandler("/error");
+
                 // Add HTTPS redirection for production.
                 app.UseHsts();
                 app.UseHttpsRedirection();
             }
+
+            // Allows personalized status code pages.
+            app.UseStatusCodePagesWithRedirects("/error/{0}");
 
             // Add authentication middleware.
             app.UseAuthentication();
@@ -153,7 +162,7 @@ namespace ADAtickets.Web
             // Map static data paths.
             app.MapStaticAssets();
 
-            // Map the controllers endpoints for business logic APIs.
+            // Map the controllers endpoints.
             app.MapControllers();
 
             // Map Razor pages paths.

@@ -15,10 +15,21 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
+@page "/error/404"
+
+@using System.Globalization
+@using ADAtickets.Shared.Constants
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 
-<Router AppAssembly="typeof(Program).Assembly">
-    <Found Context="routeData">
-        <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.SimpleLayout)" />
-    </Found>
-</Router>
+@inject IStringLocalizer<PageNotFound> loc
+
+@attribute [AllowAnonymous]
+
+<PageTitle>ADAtickets - @loc["Title"]</PageTitle>
+<style>
+    body {
+        background: var(--neutral-layer-2);
+    }
+</style>
+<ADAticketsLogoCard Title="@loc["CardTitle"]" Text="@loc["CardText"]" />

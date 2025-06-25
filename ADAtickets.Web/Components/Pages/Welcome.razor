@@ -35,19 +35,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         background: var(--neutral-layer-2);
     }
 </style>
-<FluentCard Width="fit-content" Height="fit-content" Style="display: flex; flex-direction: column; align-items: center; gap: 1em; padding: 2em; margin: auto; min-width: 420px;">
-    @if (CurrentTheme == DesignThemeModes.Dark)
-    {
-        <img src="LogoDark.svg" />
-    }
-    else
-    {
-        <img src="LogoLight.svg" />
-    }
-    <span style="text-align: center;">
-        <FluentLabel Weight="FontWeight.Bold">@loc["Greeting1"]</FluentLabel>
-        <FluentLabel Weight="FontWeight.Bold">@loc["Greeting2"]</FluentLabel>
-    </span>
+<ADAticketsLogoCard Title="@loc["Greeting1"]" Text="@loc["Greeting2"]">
     <span style="display: flex; flex-direction: column; gap: 1em;">
         <span style="display: flex; flex-direction: row; gap: 1em;">
             <FluentButton Appearance="Appearance.Accent" 
@@ -70,12 +58,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             <FluentTooltip Anchor="AdminButton" Position="TooltipPosition.End">@loc["AdminButtonTooltip"]</FluentTooltip>
         </span>
     </span>
-</FluentCard>
+</ADAticketsLogoCard>
 
 @code {
-    [CascadingParameter(Name = "ThemeMode")]
-    private DesignThemeModes CurrentTheme { get; set; }
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         var authState = await authStateProvider.GetAuthenticationStateAsync();
