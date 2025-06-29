@@ -17,18 +17,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @inherits LayoutComponentBase
 
-<FluentDesignTheme @bind-Mode="@Mode" CustomColor="#7A6040" StorageName="theme" />
-
-<CascadingValue Value="@Mode" Name="ThemeMode">
+<CascadingValue Value="@IsDarkThemeActive">
     <FluentLayout>
+        <FluentHeader>
+            <Header />
+        </FluentHeader>
         <FluentStack Class="main" Orientation="Orientation.Horizontal">
-            <NavMenu />
-            <FluentBodyContent Class="body-content">
+            <FluentBodyContent>
                 <div class="content">
                     @Body
                 </div>
             </FluentBodyContent>
         </FluentStack>
+        <FluentFooter>
+            <Footer @bind-IsDarkThemeActive="@IsDarkThemeActive" />
+        </FluentFooter>
     </FluentLayout>
 </CascadingValue>
 
@@ -39,5 +42,5 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 <FluentMenuProvider />
 
 @code {
-    DesignThemeModes Mode { get; set; } = DesignThemeModes.Light;
+    private bool IsDarkThemeActive { get; set; }
 }

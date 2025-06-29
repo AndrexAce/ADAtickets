@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @using System.Globalization
-@inject IJSRuntime JS
+
 @inject NavigationManager Navigation
 
 <FluentSelect TOption="CultureInfo"
@@ -35,12 +35,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         new CultureInfo("it-IT")
     ];
 
-    private CultureInfo? selectedCulture;
-
-    protected override void OnInitialized()
-    {
-        selectedCulture = CultureInfo.CurrentCulture;
-    }
+    private CultureInfo selectedCulture = CultureInfo.CurrentCulture;
 
     private void ApplySelectedCulture()
     {

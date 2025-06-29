@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
 @using System.Globalization
 @using ADAtickets.Shared.Constants
+@using ADAtickets.Web.Components.Layout
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Diagnostics
@@ -34,9 +35,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         background: var(--neutral-layer-2);
     }
 </style>
-<ADAticketsLogoCard Title="@loc["CardTitle"]" Text="@loc["CardText"]">
+<LogoCard Title="@loc["CardTitle"]" Text="@loc["CardText"]">
     <p class="error-message">@ErrorMessage</p>
-</ADAticketsLogoCard>
+</LogoCard>
 
 @code {
     private string ErrorMessage { get; set; } = string.Empty;

@@ -1,0 +1,76 @@
+﻿
+<!-- ADAtickets is a simple, lightweight, open source ticketing system
+interacting with your enterprise repositories on Azure DevOps
+with a two-way synchronization.
+Copyright (C) 2025  Andrea Lucchese
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
+@inherits ComponentBase
+
+@inject IDialogService dialogService
+@inject IStringLocalizer<Header> loc
+@inject AuthenticationStateProvider authStateProvider
+
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+
+<FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center" HorizontalGap="10">
+    @if (IsDarkThemeActive)
+    {
+        <img class="logo-icon" src="LogoDark.svg" alt="@loc["ADAticketsLogoAlt"]" />
+    }
+    else
+    {
+        <img class="logo-icon" src="LogoLight.svg" alt="@loc["ADAticketsLogoAlt"]" />
+    }
+    <FluentLabel Typo="Typography.Header" Color="Color.Fill">ADAtickets</FluentLabel>
+    <FluentSpacer />
+    <FluentProfileMenu FullName="@AccountName" ImageSize="3rem" Image="@AccountPicture" EMail="@AccountEmail" />
+    <FluentButton Appearance="Appearance.Neutral" IconStart="@(new Icons.Regular.Size20.Alert())" OnClick="OpenNotificationsOverlay"/>
+</FluentStack>
+
+@code {
+    [CascadingParameter]
+    private bool IsDarkThemeActive { get; set; }
+
+    private string? AccountName { get; set; }
+    private string? AccountPicture { get; set; }
+    private string? AccountEmail { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var authState = await authStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            if (user?.Identity?.IsAuthenticated == true)
+            {
+                var fullName = user.Claims.FirstOrDefault(c => c.Type == "name")?.Value;
+                var picture = user.Claims.FirstOrDefault(c => c.Type == "picture")?.Value;
+
+                AccountName = fullName == null ? user.Identity.Name : $"{fullName}";
+                AccountPicture = picture;
+                AccountEmail = user.Identity.Name;
+
+                StateHasChanged();
+            }
+        }
+    }
+
+    private async Task OpenNotificationsOverlay()
+    {
+        // TODO
+    }
+}

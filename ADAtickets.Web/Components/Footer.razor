@@ -1,0 +1,97 @@
+﻿<!-- ADAtickets is a simple, lightweight, open source ticketing system
+interacting with your enterprise repositories on Azure DevOps
+with a two-way synchronization.
+Copyright (C) 2025  Andrea Lucchese
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
+@inherits ComponentBase
+
+@inject IDialogService dialogService
+@inject IStringLocalizer<Footer> loc
+
+<FluentDesignTheme @bind-Mode="@Mode" CustomColor="#7A6040" StorageName="theme" OnLuminanceChanged="UpdateTheme"/>
+
+<FluentButton Appearance="Appearance.Accent" IconStart="@ThemeIcon" OnClick="UpdateTheme"></FluentButton>
+<FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.LockClosed())" OnClick="OpenPrivacyDialog"></FluentButton>
+<FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Cookies())" OnClick="OpenCookiesDialog"></FluentButton>
+<CultureSelector />
+
+@code {
+    /// <summary>
+    /// Represent whether the current theme has a dark luminance.
+    /// </summary>
+    [Parameter]
+    public bool IsDarkThemeActive { get; set; }
+
+    /// <summary>
+    /// Propagates the modification of the <see cref="IsDarkThemeActive"/> parameter to the parent components.
+    /// </summary>
+    [Parameter]
+    public EventCallback<bool> IsDarkThemeActiveChanged { get; set; }
+
+    private DesignThemeModes Mode { get; set; } = DesignThemeModes.System;
+
+    private Icon? ThemeIcon { get; set; }
+
+    protected override void OnInitialized()
+    {
+        switch (Mode)
+        {
+            case DesignThemeModes.Light:
+                ThemeIcon = new Icons.Regular.Size20.WeatherSunny();
+                break;
+            case DesignThemeModes.Dark:
+                ThemeIcon = new Icons.Regular.Size20.WeatherMoon();
+                break;
+            case DesignThemeModes.System:
+                ThemeIcon = new Icons.Regular.Size20.WebAsset();
+                break;
+        }
+    }
+
+    private void UpdateTheme(MouseEventArgs e)
+    {
+        switch (Mode)
+        {
+            case DesignThemeModes.Light:
+                Mode = DesignThemeModes.Dark;
+                ThemeIcon = new Icons.Regular.Size20.WeatherMoon();
+                break;
+            case DesignThemeModes.Dark:
+                Mode = DesignThemeModes.System;
+                ThemeIcon = new Icons.Regular.Size20.WebAsset();
+                break;
+            case DesignThemeModes.System:
+                Mode = DesignThemeModes.Light;
+                ThemeIcon = new Icons.Regular.Size20.WeatherSunny();
+                break;
+        }
+    }
+
+    private void UpdateTheme(LuminanceChangedEventArgs e)
+    {
+        IsDarkThemeActive = e.IsDark;
+        IsDarkThemeActiveChanged.InvokeAsync(e.IsDark);
+    }
+
+    private async Task OpenPrivacyDialog()
+    {
+        // TODO
+    }
+
+    private async Task OpenCookiesDialog()
+    {
+        // TODO
+    }
+}

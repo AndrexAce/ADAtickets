@@ -17,27 +17,25 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @inherits ComponentBase
 
-@inject IStringLocalizer<ADAticketsLogoCard> loc
+@inject IStringLocalizer<LogoCard> loc
 
 <FluentCard Width="@Width" Height="@Height" Style="@Style">
-    @if (CurrentTheme == DesignThemeModes.Dark)
+    @if (IsDarkThemeActive)
     {
-        <img src="LogoDark.svg" alt="@loc["ADAticketsLogoAlt"]" />
+        <img src="LogoDark.svg" alt="@loc["ADAticketsLogoAlt"]"/>
     }
     else
     {
-        <img src="LogoLight.svg" alt="@loc["ADAticketsLogoAlt"]" />
+        <img src="LogoLight.svg" alt="@loc["ADAticketsLogoAlt"]"/>
     }
-    <span style="text-align: center;">
-        <h1><b>@Title</b></h1>
-        <p>@Text</p>
-        @ChildContent
-    </span>
+    <FluentLabel Typo="Typography.H1" Weight="FontWeight.Bold" Alignment="HorizontalAlignment.Center" MarginBlock="0.5rem">@Title</FluentLabel>
+    <FluentLabel Typo="Typography.Body" Alignment="HorizontalAlignment.Center" MarginBlock="0.5rem">@Text</FluentLabel>
+    @ChildContent
 </FluentCard>
 
 @code {
-    [CascadingParameter(Name = "ThemeMode")]
-    private DesignThemeModes CurrentTheme { get; set; }
+    [CascadingParameter]
+    private bool IsDarkThemeActive { get; set; }
 
     /// <summary>
     /// The title of the card.
