@@ -906,8 +906,8 @@
       },
       "Scalar.AspNetCore": {
         "type": "Transitive",
-        "resolved": "2.5.0",
-        "contentHash": "00TuSCPxDqzLeMqx1HfKoxBAdXKP5YMk4bV/W4z4/Hm/345BkkyK1dsz1C7RLEolbtudG4fOBTUrnXJJZHVUVw=="
+        "resolved": "2.5.3",
+        "contentHash": "GhMaITeqvKVDLH/RyAH93n1uSkrP/JNI7cRIPUr5bsHjSiVSmhM68Ni+0x1IORnU5O68YiZJX2DcdGbLuEe9aQ=="
       },
       "StackExchange.Redis": {
         "type": "Transitive",
@@ -2009,7 +2009,7 @@
           "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": "[1.21.2, )",
           "Microsoft.VisualStudio.Services.InteractiveClient": "[19.225.1, )",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[9.0.4, )",
-          "Scalar.AspNetCore": "[2.5.0, )",
+          "Scalar.AspNetCore": "[2.5.3, )",
           "Swashbuckle.AspNetCore.SwaggerGen": "[9.0.1, )"
         }
       },
