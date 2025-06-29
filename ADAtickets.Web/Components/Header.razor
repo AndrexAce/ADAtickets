@@ -28,15 +28,19 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center" HorizontalGap="10">
     @if (IsDarkThemeActive)
     {
-        <img class="logo-icon" src="LogoDark.svg" alt="@loc["ADAticketsLogoAlt"]" />
+        <a href="/home">
+            <img class="logo-icon" src="LogoDark.svg" alt="@loc["ADAticketsLogoAlt"]" />
+        </a>
     }
     else
     {
-        <img class="logo-icon" src="LogoLight.svg" alt="@loc["ADAticketsLogoAlt"]" />
+        <a href="/home">
+            <img class="logo-icon" src="LogoLight.svg" alt="@loc["ADAticketsLogoAlt"]" />
+        </a>
     }
     <FluentLabel Typo="Typography.Header" Color="Color.Fill">ADAtickets</FluentLabel>
     <FluentSpacer />
-    <FluentProfileMenu FullName="@AccountName" ImageSize="3rem" Image="@AccountPicture" EMail="@AccountEmail" />
+    <FluentProfileMenu FullName="@AccountName" ImageSize="3rem" Image="@AccountPicture" EMail="@AccountEmail" OnHeaderButtonClick="SignOut"/>
     <FluentButton Appearance="Appearance.Neutral" IconStart="@(new Icons.Regular.Size20.Alert())" OnClick="OpenNotificationsOverlay"/>
 </FluentStack>
 
@@ -57,15 +61,23 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
             if (user?.Identity?.IsAuthenticated == true)
             {
-                var fullName = user.Claims.FirstOrDefault(c => c.Type == "name")?.Value;
-                var picture = user.Claims.FirstOrDefault(c => c.Type == "picture")?.Value;
-
-                AccountName = fullName == null ? user.Identity.Name : $"{fullName}";
-                AccountPicture = picture;
+                AccountName = user.FindFirstValue("name") ?? user.Identity.Name;
+                AccountPicture = user.FindFirstValue("picture");
                 AccountEmail = user.Identity.Name;
 
                 StateHasChanged();
             }
+        }
+    }
+
+    private async Task SignOut()
+    {
+        var authState = await authStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user?.Identity?.IsAuthenticated == true)
+        {
+            // TODO 
         }
     }
 

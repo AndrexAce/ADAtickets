@@ -60,7 +60,6 @@ namespace ADAtickets.Web
             var authBuilder = builder.Services.AddAuthentication(options =>
             {
                 options.DefaultScheme = Scheme.PolicySchemeDefault;
-                options.DefaultChallengeScheme = Scheme.PolicySchemeDefault;
             });
             authBuilder.AddMicrosoftIdentityWebApp(builder.Configuration.GetSection(Scheme.OpenIdConnectDefault), Scheme.OpenIdConnectDefault, Scheme.CookieDefault)
                 .EnableTokenAcquisitionToCallDownstreamApi()

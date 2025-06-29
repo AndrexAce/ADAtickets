@@ -15,7 +15,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
-@page "/signin-oidc"
+@page "/signout-oidc"
 
 @using ADAtickets.Client
 @using ADAtickets.Client.Extensions
@@ -38,9 +38,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         var authState = await authStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
-        if (user?.Identity?.IsAuthenticated == true)
+        if (user?.Identity?.IsAuthenticated == false)
         {
-            navManager.NavigateTo("/home", true);
+            navManager.NavigateTo("/welcome", true);
         }
     }
 }

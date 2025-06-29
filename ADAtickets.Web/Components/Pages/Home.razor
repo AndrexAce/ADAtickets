@@ -15,32 +15,15 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
-@page "/signin-oidc"
+@page "/home"
+@layout MainLayout
 
-@using ADAtickets.Client
-@using ADAtickets.Client.Extensions
+@using System.Globalization
 @using ADAtickets.Shared.Constants
-@using ADAtickets.Shared.Dtos
+@using ADAtickets.Web.Components.Layout
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
-@using Microsoft.Identity.Abstractions
-
-@inject NavigationManager navManager
-@inject AuthenticationStateProvider authStateProvider
 
 @attribute [Authorize(Policy = Policy.Everyone)]
 
-<PageTitle>ADAtickets</PageTitle>
-
-@code {
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        var authState = await authStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-
-        if (user?.Identity?.IsAuthenticated == true)
-        {
-            navManager.NavigateTo("/home", true);
-        }
-    }
-}
+<PageTitle>ADAtickets - Home</PageTitle>
