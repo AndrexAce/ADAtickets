@@ -21,6 +21,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @inject IDialogService dialogService
 @inject IStringLocalizer<Header> loc
 @inject AuthenticationStateProvider authStateProvider
+@inject NavigationManager navigationManager
 
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Security.Claims
@@ -77,7 +78,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
         if (user?.Identity?.IsAuthenticated == true)
         {
-            // TODO 
+            navigationManager.NavigateTo("CustomAccount/SignOut", true);
         }
     }
 
