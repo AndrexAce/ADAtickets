@@ -41,7 +41,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     }
     <FluentLabel Typo="Typography.Header" Color="Color.Fill">ADAtickets</FluentLabel>
     <FluentSpacer />
-    <FluentProfileMenu FullName="@AccountName" ImageSize="3rem" Image="@AccountPicture" EMail="@AccountEmail" OnHeaderButtonClick="SignOut"/>
+    <FluentProfileMenu FullName="@AccountName" ImageSize="5rem" EMail="@AccountEmail" HeaderLabel="@loc["HeaderLabel"]" OnHeaderButtonClick="SignOut" HeaderButton="@loc["HeaderButton"]" FooterLink="@loc["FooterLink"]">
+        <StartTemplate>@AccountName</StartTemplate>
+    </FluentProfileMenu>
     <FluentButton Appearance="Appearance.Neutral" IconStart="@(new Icons.Regular.Size20.Alert())" OnClick="OpenNotificationsOverlay"/>
 </FluentStack>
 
@@ -63,7 +65,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             if (user?.Identity?.IsAuthenticated == true)
             {
                 AccountName = user.FindFirstValue("name") ?? user.Identity.Name;
-                AccountPicture = user.FindFirstValue("picture");
                 AccountEmail = user.Identity.Name;
 
                 StateHasChanged();

@@ -120,4 +120,13 @@
   <data name="ADAticketsLogoAlt" xml:space="preserve">
     <value>ADAtickets logo</value>
   </data>
+  <data name="FooterLink" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="HeaderButton" xml:space="preserve">
+    <value>Sign out</value>
+  </data>
+  <data name="HeaderLabel" xml:space="preserve">
+    <value>Profile</value>
+  </data>
 </root>

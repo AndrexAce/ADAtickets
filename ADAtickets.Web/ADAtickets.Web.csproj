@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+	<PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="9.0.6" />
 	<PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.6" />
 	<PackageReference Include="Microsoft.Extensions.Localization" Version="9.0.6" />
 	<PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Emoji" Version="4.12.0" />

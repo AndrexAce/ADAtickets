@@ -22,9 +22,18 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ADAtickets.Web.Controllers
 {
+    /// <summary>
+    /// Handles culture-related actions.
+    /// </summary>
     [Route("[controller]/[action]")]
     public class CultureController : Controller
     {
+        /// <summary>
+        /// Sets the culture for the current request and redirects to the specified URI.
+        /// </summary>
+        /// <param name="culture"></param>
+        /// <param name="redirectUri"></param>
+        /// <returns></returns>
         public IActionResult Set(string culture, string redirectUri)
         {
             if (culture != null)

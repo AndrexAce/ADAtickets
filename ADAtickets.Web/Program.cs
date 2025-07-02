@@ -21,10 +21,12 @@ using ADAtickets.Client.Extensions;
 using ADAtickets.Shared.Constants;
 using ADAtickets.Web.Components;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using Microsoft.Net.Http.Headers;
+using StackExchange.Redis;
 
 namespace ADAtickets.Web
 {
@@ -82,10 +84,14 @@ namespace ADAtickets.Web
                 };
             });
 
+            // Add Redis cache and data protection persistance layers
             builder.Services.AddStackExchangeRedisCache(options =>
             {
                 options.Configuration = builder.Configuration.GetConnectionString(Service.Cache);
             });
+
+            builder.Services.AddDataProtection()
+                .PersistKeysToStackExchangeRedis(ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString(Service.Cache)!), "DataProtection-Keys");
 
             builder.Services.AddCascadingAuthenticationState();
 
