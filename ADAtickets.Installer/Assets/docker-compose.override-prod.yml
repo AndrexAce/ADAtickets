@@ -50,6 +50,8 @@ services:
       - Entra__TenantId=${TENANTID:?error}
       - Entra__ClientId=${WEBAPPID:?error}
       - Entra__SkipUnrecognizedRequests=true
+      - Entra__CallbackPath=/signin-oidc-entra,
+      - Entra__SignedOutCallbackPath=/signout-oidc-entra,
       - Entra__ClientCertificates__0__SourceType=Path
       - Entra__ClientCertificates__0__CertificateDiskPath=/certs/${WEBAUTHCERTIFICATENAME:?error}
       - Entra__ClientCertificates__0__CertificatePassword=${WEBAUTHCERTIFICATEPASSWORD:?error}
@@ -58,6 +60,8 @@ services:
       - ExternalEntra__TenantId=${EXTERNALTENANTID:?error}
       - ExternalEntra__ClientId=${EXTERNALWEBAPPID:?error}
       - ExternalEntra__SkipUnrecognizedRequests=true
+      - ExternalEntra__CallbackPath=/signin-oidc-external-entra,
+      - ExternalEntra__SignedOutCallbackPath=/signout-oidc-external-entra,
       - ExternalEntra__ClientCertificates__0__SourceType=Path
       - ExternalEntra__ClientCertificates__0__CertificateDiskPath=/certs/${WEBAUTHCERTIFICATENAME:?error}
       - ExternalEntra__ClientCertificates__0__CertificatePassword=${WEBAUTHCERTIFICATEPASSWORD:?error}
