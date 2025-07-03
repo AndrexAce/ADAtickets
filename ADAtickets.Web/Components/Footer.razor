@@ -20,12 +20,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @inject IDialogService dialogService
 @inject IStringLocalizer<Footer> loc
 
-<FluentDesignTheme @bind-Mode="@Mode" CustomColor="#7A6040" StorageName="theme" OnLuminanceChanged="UpdateTheme"/>
-
 <FluentButton Appearance="Appearance.Accent" IconStart="@ThemeIcon" OnClick="UpdateTheme"></FluentButton>
 <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.LockClosed())" OnClick="OpenPrivacyDialog"></FluentButton>
 <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Cookies())" OnClick="OpenCookiesDialog"></FluentButton>
 <CultureSelector />
+
+<FluentDesignTheme @bind-Mode="@Mode" CustomColor="#7A6040" StorageName="theme" OnLuminanceChanged="UpdateTheme" />
 
 @code {
     /// <summary>

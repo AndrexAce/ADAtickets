@@ -1,0 +1,49 @@
+﻿@using ADAtickets.Shared.Constants
+@using Microsoft.AspNetCore.Components.Authorization
+<!-- ADAtickets is a simple, lightweight, open source ticketing system
+interacting with your enterprise repositories on Azure DevOps
+with a two-way synchronization.
+Copyright (C) 2025  Andrea Lucchese
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
+@inject IStringLocalizer<Navigation> loc
+
+<div class="nav-menu">
+    <FluentNavMenu Width="275">
+        <FluentNavGroup Icon="@(new Icons.Regular.Size20.TicketDiagonal())" Title="@loc["Tickets"]" Expanded="true">
+            <FluentNavLink Href="/my-tickets">@loc["MyTickets"]</FluentNavLink>
+            <AuthorizeView Policy="@Policy.UserOnly">
+                <FluentNavLink Href="/new-ticket">@loc["NewTicket"]</FluentNavLink>
+            </AuthorizeView>
+        </FluentNavGroup>
+
+        <AuthorizeView Policy="@Policy.AdminOnly">
+            <FluentNavGroup Icon="@(new Icons.Regular.Size20.Database())" Title="@loc["DatabaseManagement"]" Expanded="true">
+                <FluentNavLink Href="/users">@loc["Users"]</FluentNavLink>
+                <FluentNavLink Href="/platforms">@loc["Platforms"]</FluentNavLink>
+            </FluentNavGroup>
+        </AuthorizeView>
+
+        <FluentNavGroup Icon="@(new Icons.Regular.Size20.Settings())" Title="@loc["Settings"]" Expanded="true">
+            <FluentNavLink Href="/theme-and-personalization">@loc["ThemeAndPersonalization"]</FluentNavLink>
+            <FluentNavLink Href="/notifications">@loc["Notifications"]</FluentNavLink>
+            <FluentNavLink Href="/access-and-security">@loc["AccessAndSecurity"]</FluentNavLink>
+        </FluentNavGroup>
+
+        <FluentNavGroup Icon="@(new Icons.Regular.Size20.Question())" Title="@loc["Help"]" Expanded="true">
+            <FluentNavLink Href="/privacy-policy">@loc["PrivacyPolicy"]</FluentNavLink>
+            <FluentNavLink Href="/cookie-policy">@loc["CookiePolicy"]</FluentNavLink>
+        </FluentNavGroup>
+    </FluentNavMenu>
+</div>

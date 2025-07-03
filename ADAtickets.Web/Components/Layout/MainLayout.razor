@@ -23,15 +23,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             <Header />
         </FluentHeader>
         <FluentStack Class="main" Orientation="Orientation.Horizontal">
+            <Navigation />
             <FluentBodyContent>
                 <div class="content">
                     @Body
                 </div>
             </FluentBodyContent>
         </FluentStack>
-        <FluentFooter>
-            <Footer @bind-IsDarkThemeActive="@IsDarkThemeActive" />
-        </FluentFooter>
     </FluentLayout>
 </CascadingValue>
 

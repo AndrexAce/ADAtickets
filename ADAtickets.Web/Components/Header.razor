@@ -26,16 +26,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Security.Claims
 
-<FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center" HorizontalGap="10">
+<FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center" HorizontalGap="20">
     @if (IsDarkThemeActive)
     {
-        <a href="/home">
+        <a href="/my-tickets">
             <img class="logo-icon" src="LogoDark.svg" alt="@loc["ADAticketsLogoAlt"]" />
         </a>
     }
     else
     {
-        <a href="/home">
+        <a href="/my-tickets">
             <img class="logo-icon" src="LogoLight.svg" alt="@loc["ADAticketsLogoAlt"]" />
         </a>
     }
@@ -52,7 +52,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     private bool IsDarkThemeActive { get; set; }
 
     private string? AccountName { get; set; }
-    private string? AccountPicture { get; set; }
     private string? AccountEmail { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

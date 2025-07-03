@@ -208,6 +208,11 @@ namespace ADAtickets.ApiService
                 .RequireClaim("wids", "e3973bdf-4987-49ae-837a-ba8e231c7286")
                 .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault);
             })
+            .AddPolicy(Policy.UserOnly, policy =>
+            {
+                policy.RequireAuthenticatedUser()
+                .AddAuthenticationSchemes(Scheme.ExternalOpenIdConnectDefault);
+            })
             .AddPolicy(Policy.OperatorOrAdmin, policy =>
             {
                 policy.RequireAuthenticatedUser()

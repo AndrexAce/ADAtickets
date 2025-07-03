@@ -25,6 +25,10 @@ namespace ADAtickets.Shared.Constants
     static class Policy
     {
         /// <summary>
+        /// The name of the policy that requires the user to be authenticated with the User role.
+        /// </summary>
+        public const string UserOnly = "User";
+        /// <summary>
         /// The name of the policy that requires the user to be authenticated with the Admin role.
         /// </summary>
         public const string AdminOnly = "Admin";
