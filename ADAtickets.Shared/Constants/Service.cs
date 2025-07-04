@@ -40,6 +40,14 @@ namespace ADAtickets.Shared.Constants
         /// The name of the API service used by external users.
         /// </summary>
         public const string ExternalAPI = "ExternalADAticketsAPI";
+        /// <summary>
+        /// The name of the Microsoft Graph service used by internal users.
+        /// </summary>
+        public const string Graph = "Graph";
+        /// <summary>
+        /// The name of the Microsoft Graph service used by external users.
+        /// </summary>
+        public const string ExternalGraph = "ExternalGraph";
 
         /// <summary>
         /// The version of the database service.

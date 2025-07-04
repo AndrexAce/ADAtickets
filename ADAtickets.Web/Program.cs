@@ -66,10 +66,12 @@ namespace ADAtickets.Web
             authBuilder.AddMicrosoftIdentityWebApp(builder.Configuration.GetSection(Scheme.OpenIdConnectDefault), Scheme.OpenIdConnectDefault, Scheme.CookieDefault)
                 .EnableTokenAcquisitionToCallDownstreamApi()
                 .AddDownstreamApi(Service.API, builder.Configuration.GetSection(Service.API))
+                .AddDownstreamApi(Service.Graph, builder.Configuration.GetSection(Service.Graph))
                 .AddDistributedTokenCaches();
             authBuilder.AddMicrosoftIdentityWebApp(builder.Configuration.GetSection(Scheme.ExternalOpenIdConnectDefault), Scheme.ExternalOpenIdConnectDefault, Scheme.ExternalCookieDefault)
                 .EnableTokenAcquisitionToCallDownstreamApi()
                 .AddDownstreamApi(Service.ExternalAPI, builder.Configuration.GetSection(Service.ExternalAPI))
+                .AddDownstreamApi(Service.ExternalGraph, builder.Configuration.GetSection(Service.Graph))
                 .AddDistributedTokenCaches();
             authBuilder.AddPolicyScheme(Scheme.PolicySchemeDefault, null, options =>
             {

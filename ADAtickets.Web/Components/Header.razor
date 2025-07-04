@@ -22,9 +22,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @inject IStringLocalizer<Header> loc
 @inject AuthenticationStateProvider authStateProvider
 @inject NavigationManager navigationManager
+@inject IDownstreamApi downstreamApi
 
+@using ADAtickets.Shared.Constants
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Security.Claims
+@using Microsoft.Graph.Models
+@using Microsoft.Identity.Abstractions
 
 <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center" HorizontalGap="20">
     @if (IsDarkThemeActive)
@@ -41,7 +45,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     }
     <FluentLabel Typo="Typography.Header" Color="Color.Fill">ADAtickets</FluentLabel>
     <FluentSpacer />
-    <FluentProfileMenu FullName="@AccountName" ImageSize="5rem" EMail="@AccountEmail" HeaderLabel="@loc["HeaderLabel"]" OnHeaderButtonClick="SignOut" HeaderButton="@loc["HeaderButton"]" FooterLink="@loc["FooterLink"]">
+    <FluentProfileMenu FullName="@AccountName" Image="@AccountPhoto" ImageSize="5rem" EMail="@AccountEmail" HeaderLabel="@loc["HeaderLabel"]" OnHeaderButtonClick="SignOut" HeaderButton="@loc["HeaderButton"]" FooterLink="@loc["FooterLink"]">
         <StartTemplate>@AccountName</StartTemplate>
     </FluentProfileMenu>
     <FluentButton Appearance="Appearance.Neutral" IconStart="@(new Icons.Regular.Size20.Alert())" OnClick="OpenNotificationsOverlay"/>
@@ -53,6 +57,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     private string? AccountName { get; set; }
     private string? AccountEmail { get; set; }
+    private string? AccountPhoto { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -65,10 +70,43 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             {
                 AccountName = user.FindFirstValue("name") ?? user.Identity.Name;
                 AccountEmail = user.Identity.Name;
+                AccountPhoto = await GetAccountPhoto(user);
 
                 StateHasChanged();
             }
         }
+    }
+
+    private async Task<string?> GetAccountPhoto(ClaimsPrincipal user)
+    {
+        try
+        {
+            var photoStream = await downstreamApi.GetForUserAsync<Stream>(
+                Service.ExternalGraph,
+                options =>
+                {
+                    options.RelativePath = "me/photo/$value";
+                    options.AcquireTokenOptions.AuthenticationOptionsName = Scheme.ExternalOpenIdConnectDefault;
+                },
+                user);
+
+            if (photoStream != null)
+            {
+                using var memoryStream = new MemoryStream();
+                await photoStream.CopyToAsync(memoryStream);
+                var photoBytes = memoryStream.ToArray();
+
+                // Convert to base64 data URL
+                var base64Photo = Convert.ToBase64String(photoBytes);
+                return $"data:image/jpeg;base64,{base64Photo}";
+            }
+        }
+        catch (Exception)
+        {
+            // Do not load the photo, it was not found.
+        }
+
+        return null;
     }
 
     private async Task SignOut()
