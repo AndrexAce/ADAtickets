@@ -56,7 +56,7 @@ namespace ADAtickets.Shared.Constants
         /// <summary>
         /// The name of the cache service.
         /// </summary>
-        public const string CacheVersion = "8.0.2";
+        public const string CacheVersion = "8.0.3";
         /// <summary>
         /// The version of the API service.
         /// </summary>
