@@ -107,7 +107,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         }
     }
 
-    private IEnumerable<KeyValuePair<string, string>>? GetFilters(FluentTab fluentTab)
+    private static IEnumerable<KeyValuePair<string, string>>? GetFilters(FluentTab fluentTab)
     {  
         return fluentTab.Id switch
         {  
