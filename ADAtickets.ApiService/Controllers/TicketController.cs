@@ -44,7 +44,6 @@ namespace ADAtickets.ApiService.Controllers
     [Produces(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
     [FormatFilter]
     [ApiConventionType(typeof(ADAticketsApiConventions))]
-    [AutoValidateAntiforgeryToken]
     public sealed class TicketsController(ITicketRepository ticketRepository, IMapper mapper) : ControllerBase
     {
         /// <summary>
