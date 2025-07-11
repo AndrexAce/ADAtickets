@@ -35,9 +35,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         background: var(--neutral-layer-2);
     }
 </style>
-<LogoCard Title="@loc["CardTitle"]" Text="@loc["CardText"]">
-    <p class="error-message">@ErrorMessage</p>
-</LogoCard>
+<FluentStack Orientation="Orientation.Vertical">
+    <FluentSpacer />
+    <LogoCard Title="@loc["CardTitle"]" Text="@loc["CardText"]" Style="align-self: center">
+        <p class="error-message">@ErrorMessage</p>
+    </LogoCard>
+    <FluentSpacer />
+</FluentStack>
 
 @code {
     private string ErrorMessage { get; set; } = string.Empty;

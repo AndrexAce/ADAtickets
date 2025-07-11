@@ -17,31 +17,23 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @inherits LayoutComponentBase
 
-<CascadingValue Value="@IsDarkThemeActive">
-    <FluentLayout>
-        <FluentHeader>
-            <Header />
-        </FluentHeader>
-        <FluentStack Class="main" Orientation="Orientation.Horizontal">
-            <Navigation />
-            <FluentBodyContent>
-                <div class="content">
-                    @Body
-                </div>
-            </FluentBodyContent>
-        </FluentStack>
-        <FluentFooter>
-            <Footer @bind-IsDarkThemeActive="IsDarkThemeActive"/>
-        </FluentFooter>
-    </FluentLayout>
-</CascadingValue>
+<FluentDesignTheme StorageName="theme" />
+<FluentLayout>
+    <FluentHeader>
+        <Header />
+    </FluentHeader>
+    <FluentStack Class="main" Orientation="Orientation.Horizontal" HorizontalGap="0">
+        <Navigation />
+        <FluentBodyContent>
+            <div class="content">
+                @Body
+            </div>
+        </FluentBodyContent>
+    </FluentStack>
+</FluentLayout>
 
 <FluentToastProvider />
 <FluentDialogProvider />
 <FluentTooltipProvider />
 <FluentMessageBarProvider />
 <FluentMenuProvider />
-
-@code {
-    private bool IsDarkThemeActive { get; set; }
-}

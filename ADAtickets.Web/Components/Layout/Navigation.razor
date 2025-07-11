@@ -20,7 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @inject IStringLocalizer<Navigation> loc
 
 <div class="nav-menu">
-    <FluentNavMenu Width="275">
+    <FluentNavMenu Width="250" Collapsible="true" CollapsedChildNavigation="true">
         <FluentNavGroup Icon="@(new Icons.Regular.Size20.TicketDiagonal())" Title="@loc["Tickets"]" Expanded="true">
             <FluentNavLink Href="/my-tickets">@loc["MyTickets"]</FluentNavLink>
             <AuthorizeView Policy="@Policy.UserOnly">

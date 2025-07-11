@@ -33,4 +33,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         background: var(--neutral-layer-2);
     }
 </style>
-<LogoCard Title="@loc["CardTitle"]" Text="@loc["CardText"]" />
+<FluentStack Orientation="Orientation.Vertical">
+    <FluentSpacer />
+    <LogoCard Title="@loc["CardTitle"]" Text="@loc["CardText"]" Style="align-self: center"/>
+    <FluentSpacer />
+</FluentStack>
