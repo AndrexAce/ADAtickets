@@ -24,8 +24,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @using Microsoft.AspNetCore.Components.Authorization
 
 @inject IStringLocalizer<Welcome> loc
-@inject NavigationManager navManager
-@inject AuthenticationStateProvider authStateProvider
+@inject NavigationManager navigationManager
+@inject AuthenticationStateProvider authenticationStateProvider
 @inject IConfiguration configuration
 
 @attribute [AllowAnonymous]
@@ -42,7 +42,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             <FluentButton Appearance="Appearance.Accent" 
                           IconStart="@(new Icons.Regular.Size20.Person())" 
                           Style="width: 100%;" 
-                          OnClick="@(() => navManager.NavigateTo("MicrosoftIdentity/Account/SignIn/ExternalEntra", true))">
+                          OnClick="@(() => navigationManager.NavigateTo("MicrosoftIdentity/Account/SignIn/ExternalEntra", true))">
                 @loc["UserButton"]
             </FluentButton>
             <FluentIcon Id="UserButton" Icon="Icons.Regular.Size20.Info"></FluentIcon>
@@ -52,7 +52,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             <FluentButton Appearance="Appearance.Accent" 
                           IconStart="@(new Icons.Regular.Size20.Wrench())" 
                           Style="width: 100%;" 
-                          OnClick="@(() => navManager.NavigateTo("MicrosoftIdentity/Account/SignIn/Entra", true))">
+                          OnClick="@(() => navigationManager.NavigateTo("MicrosoftIdentity/Account/SignIn/Entra", true))">
                 @loc["AdminButton"]
             </FluentButton>
             <FluentIcon Id="AdminButton" Icon="Icons.Regular.Size20.Info"></FluentIcon>
@@ -64,12 +64,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @code {
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        var authState = await authStateProvider.GetAuthenticationStateAsync();
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
         if (user?.Identity?.IsAuthenticated == true)
         {
-            navManager.NavigateTo("/my-tickets", true);
+            navigationManager.NavigateTo("/my-tickets", true);
         }
     }
 }

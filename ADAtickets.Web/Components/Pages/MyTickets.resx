@@ -117,7 +117,31 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ActionsButton" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="ClosedTab" xml:space="preserve">
+    <value>Closed</value>
+  </data>
+  <data name="EditViewButton" xml:space="preserve">
+    <value>Edit view</value>
+  </data>
+  <data name="AllTab" xml:space="preserve">
+    <value>All</value>
+  </data>
   <data name="Title" xml:space="preserve">
     <value>My tickets</value>
+  </data>
+  <data name="ToReplyTab" xml:space="preserve">
+    <value>To reply</value>
+  </data>
+  <data name="UnassignedTab" xml:space="preserve">
+    <value>Unassigned</value>
+  </data>
+  <data name="WaitingTab" xml:space="preserve">
+    <value>Waiting</value>
+  </data>
+  <data name="NoTicketsText" xml:space="preserve">
+    <value>There is nothing to see here. Congrats!</value>
   </data>
 </root>

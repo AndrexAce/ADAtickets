@@ -1,5 +1,4 @@
-﻿
-<!-- ADAtickets is a simple, lightweight, open source ticketing system
+﻿<!-- ADAtickets is a simple, lightweight, open source ticketing system
 interacting with your enterprise repositories on Azure DevOps
 with a two-way synchronization.
 Copyright (C) 2025  Andrea Lucchese
@@ -18,17 +17,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @inherits ComponentBase
 
-@inject IDialogService dialogService
-@inject IStringLocalizer<Header> loc
-@inject AuthenticationStateProvider authStateProvider
-@inject NavigationManager navigationManager
-@inject IDownstreamApi downstreamApi
-
 @using ADAtickets.Shared.Constants
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Security.Claims
 @using Microsoft.Graph.Models
 @using Microsoft.Identity.Abstractions
+
+@inject IDialogService dialogService
+@inject IStringLocalizer<Header> loc
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject NavigationManager navigationManager
+@inject IDownstreamApi downstreamApi
 
 <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center" HorizontalGap="20">
     @if (IsDarkThemeActive)
@@ -48,7 +47,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     <FluentProfileMenu FullName="@AccountName" Image="@AccountPhoto" ImageSize="5rem" EMail="@AccountEmail" HeaderLabel="@loc["HeaderLabel"]" OnHeaderButtonClick="SignOut" HeaderButton="@loc["HeaderButton"]" FooterLink="@loc["FooterLink"]">
         <StartTemplate>@AccountName</StartTemplate>
     </FluentProfileMenu>
-    <FluentButton Appearance="Appearance.Neutral" IconStart="@(new Icons.Regular.Size20.Alert())" OnClick="OpenNotificationsOverlay"/>
+    <FluentButton Appearance="Appearance.Neutral" IconStart="@(new Icons.Regular.Size20.Alert())"/>
 </FluentStack>
 
 @code {
@@ -63,7 +62,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     {
         if (firstRender)
         {
-            var authState = await authStateProvider.GetAuthenticationStateAsync();
+            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
             var user = authState.User;
 
             if (user?.Identity?.IsAuthenticated == true)
@@ -111,17 +110,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     private async Task SignOut()
     {
-        var authState = await authStateProvider.GetAuthenticationStateAsync();
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
         if (user?.Identity?.IsAuthenticated == true)
         {
             navigationManager.NavigateTo("CustomAccount/SignOut", true);
         }
-    }
-
-    private async Task OpenNotificationsOverlay()
-    {
-        // TODO
     }
 }

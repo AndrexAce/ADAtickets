@@ -19,13 +19,104 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @layout MainLayout
 
 @using System.Globalization
+@using ADAtickets.Client
 @using ADAtickets.Shared.Constants
+@using ADAtickets.Shared.Dtos.Responses
+@using ADAtickets.Shared.Models
 @using ADAtickets.Web.Components.Layout
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 
 @inject IStringLocalizer<MyTickets> loc
+@inject TicketsClient ticketsClient
 
 @attribute [Authorize(Policy = Policy.Everyone)]
 
 <PageTitle>ADAtickets - @loc["Title"]</PageTitle>
+<FluentStack Orientation="Orientation.Vertical">
+    <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center" HorizontalAlignment="HorizontalAlignment.End">
+        <FluentMenuButton Text="@loc["ActionsButton"]"
+                          IconStart="@(new Icons.Regular.Size24.SelectAllOn())">
+        </FluentMenuButton>
+        <FluentMenuButton Text="@loc["EditViewButton"]"
+                          IconStart="@(new Icons.Regular.Size24.TextAlignLeft())">
+        </FluentMenuButton>
+    </FluentStack>
+    <FluentTabs Size="TabSize.Small" Width="100%" OnTabChange="HandleTabChange">
+        <FluentTab Label="@loc["AllTab"]" Icon="@(new Icons.Regular.Size24.Grid())" Id="tab-1">
+        </FluentTab>
+        <FluentTab Label="@loc["UnassignedTab"]" Icon="@(new Icons.Regular.Size24.Question())" Id="tab-2">
+        </FluentTab>
+        <FluentTab Label="@loc["ToReplyTab"]" Icon="@(new Icons.Regular.Size24.ArrowReply())" Id="tab-3">
+        </FluentTab>
+        <FluentTab Label="@loc["WaitingTab"]" Icon="@(new Icons.Regular.Size24.HourglassHalf())" Id="tab-4">
+        </FluentTab>
+        <FluentTab Label="@loc["ClosedTab"]" Icon="@(new Icons.Regular.Size24.Checkmark())" Id="tab-5">
+        </FluentTab>
+    </FluentTabs>
+
+    @if (isLoading)
+    {
+        <div style="width: 100%; display: flex; align-items: center; padding: 2rem; flex-direction: column;">
+            <FluentProgressRing />
+        </div>
+    }
+    else if (!tickets.Any())
+    {
+        <div style="width: 100%; display: flex; align-items: center; padding: 2rem; flex-direction: column;">
+            <FluentIcon Value="@(new Icons.Filled.Size24.Checkmark())" Color="@Color.Accent" />
+            <FluentLabel Typo="Typography.H6">@loc["NoTicketsText"]</FluentLabel>
+        </div>
+    }
+    else
+    {
+        <div class="tickets-grid">
+            @foreach (var ticket in tickets)
+            {
+                <TicketCard Ticket="@ticket" />
+            }
+        </div>
+    }
+</FluentStack>
+
+@code {
+    private IEnumerable<TicketResponseDto> tickets = Enumerable.Empty<TicketResponseDto>();
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTickets(null);
+    }
+
+    private async Task HandleTabChange(FluentTab fluentTab)
+    {
+        var filters = GetFilters(fluentTab);
+        await LoadTickets(filters);
+    }
+
+    private async Task LoadTickets(IEnumerable<KeyValuePair<string, string>>? filters)
+    {
+        try
+        {
+            var result = await ticketsClient.GetAllAsync(filters);
+            tickets = result.Item2;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private IEnumerable<KeyValuePair<string, string>>? GetFilters(FluentTab fluentTab)
+    {  
+        return fluentTab.Id switch
+        {  
+            "tab-1" => null,  
+            "tab-2" => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.Unassigned) } },  
+            "tab-3" => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingOperator) } },  
+            "tab-4" => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingUser) } },  
+            "tab-5" => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.Closed) } },  
+            _ => null  
+        };  
+    }
+}

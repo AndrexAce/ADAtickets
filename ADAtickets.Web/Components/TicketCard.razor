@@ -1,0 +1,124 @@
+﻿<!-- ADAtickets is a simple, lightweight, open source ticketing system
+interacting with your enterprise repositories on Azure DevOps
+with a two-way synchronization.
+Copyright (C) 2025  Andrea Lucchese
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
+@inherits ComponentBase
+
+@using ADAtickets.Client
+@using ADAtickets.Shared.Dtos.Responses
+@using ADAtickets.Shared.Models
+@using Humanizer
+
+@inject IStringLocalizer<TicketCard> loc
+@inject UsersClient usersClient
+
+<FluentCard Style="background: var(--neutral-layer-1)" Width="20rem">
+    <FluentStack Orientation="Orientation.Vertical">
+        <FluentStack Orientation="Orientation.Horizontal">
+            @if (isLoading || creatorName == "")
+            {
+                <FluentSpacer />
+                <FluentSkeleton Shape="SkeletonShape.Circle" Shimmer="true" />
+                <FluentSkeleton Height="3.5rem" Width="4rem" Shimmer="true" />
+                <FluentSpacer />
+            }
+            else
+            {
+                <FluentCheckbox Class="hover-hide" />
+                <FluentSpacer />
+                <FluentPersona ImageSize="3rem">
+                    <FluentStack Orientation="Orientation.Vertical">
+                        <p>@creatorName</p>
+                        <FluentStack Orientation="Orientation.Horizontal">
+                            <FluentIcon Value="@(new Icons.Filled.Size20.Bug())" />
+                            <p>@(Ticket.CreationDateTime.Humanize())</p>
+                        </FluentStack>
+                    </FluentStack>
+                </FluentPersona>
+                <FluentSpacer />
+                <FluentButton class="hover-hide" Appearance="Appearance.Stealth" IconStart="@(new Icons.Regular.Size24.MoreHorizontal())"/>
+            }
+        </FluentStack>
+        @if (isLoading)
+        {
+            <FluentSkeleton Height="1rem" Width="100%" Shimmer="true" />
+            <FluentSkeleton Height="1rem" Width="100%" Shimmer="true" />
+            <FluentSkeleton Height="2.5rem" Width="100%" Shimmer="true" />
+        }
+        else
+        {
+            <p>@Ticket.Title</p>
+            <FluentStack Orientation="Orientation.Horizontal" HorizontalAlignment="HorizontalAlignment.Center">
+                @GetPriorityBadge(Ticket.Priority)
+                @GetStatusBadge(Ticket.Status)
+            </FluentStack>
+            <FluentSpacer />
+            <FluentStack Orientation="Orientation.Horizontal" HorizontalAlignment="HorizontalAlignment.SpaceBetween">
+                <FluentButton Appearance="Appearance.Neutral" IconStart="@(new Icons.Regular.Size24.Open())">Apri</FluentButton>
+                <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size24.Edit())">Modifica</FluentButton>
+            </FluentStack>
+        }
+    </FluentStack>
+</FluentCard>
+
+@code {
+    [Parameter]
+    public required TicketResponseDto Ticket { get; set; }
+
+    private bool isLoading = true;
+    private string creatorName = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var tuple = await usersClient.GetAsync(Ticket.CreatorUserId);
+            var user = tuple.Item2;
+            creatorName = $"{user?.Name} {user?.Surname}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private RenderFragment GetPriorityBadge(Priority priority) => @<FluentBadge Fill="highlight" BackgroundColor="@GetPriorityAppearance(priority)" Circular="true">
+    @priority.ToString()
+    </FluentBadge>;
+
+    private RenderFragment GetStatusBadge(Status status) => @<FluentBadge Fill="highlight" BackgroundColor="@GetStatusAppearance(status)" Circular="true">
+    @status.ToString()
+    </FluentBadge>
+    ;
+
+    private string GetPriorityAppearance(Priority priority) => priority switch
+    {
+        Priority.Low => "var(--success)",
+        Priority.Medium => "var(--warning)",
+        Priority.High => "var(--error)",
+        _ => ""
+
+    };
+
+    private string GetStatusAppearance(Status status) => status switch
+    {
+        Status.Unassigned => "var(--info)",
+        Status.WaitingUser => "var(--warning)",
+        Status.WaitingOperator => "var(--error)",
+        Status.Closed => "var(--success)",
+        _ => ""
+    };
+}

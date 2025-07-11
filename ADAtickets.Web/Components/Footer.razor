@@ -21,8 +21,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @inject IStringLocalizer<Footer> loc
 
 <FluentButton Appearance="Appearance.Accent" IconStart="@ThemeIcon" OnClick="UpdateTheme"></FluentButton>
-<FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.LockClosed())" OnClick="OpenPrivacyDialog"></FluentButton>
-<FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Cookies())" OnClick="OpenCookiesDialog"></FluentButton>
+<FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.LockClosed())"></FluentButton>
+<FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Cookies())"></FluentButton>
 <CultureSelector />
 
 <FluentDesignTheme @bind-Mode="@Mode" CustomColor="#7A6040" StorageName="theme" OnLuminanceChanged="UpdateTheme" />
@@ -83,15 +83,5 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     {
         IsDarkThemeActive = e.IsDark;
         IsDarkThemeActiveChanged.InvokeAsync(e.IsDark);
-    }
-
-    private async Task OpenPrivacyDialog()
-    {
-        // TODO
-    }
-
-    private async Task OpenCookiesDialog()
-    {
-        // TODO
     }
 }

@@ -21,8 +21,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 
-@inject NavigationManager navManager
-@inject AuthenticationStateProvider authStateProvider
+@inject NavigationManager navigationManager
+@inject AuthenticationStateProvider authenticationStateProvider
 
 @attribute [AllowAnonymous]
 
@@ -31,16 +31,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @code {
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        var authState = await authStateProvider.GetAuthenticationStateAsync();
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
         if (user?.Identity?.IsAuthenticated == true)
         {
-            navManager.NavigateTo("/my-tickets", true);
+            navigationManager.NavigateTo("/my-tickets", true);
         }
         else
         {
-            navManager.NavigateTo("/welcome", true);
+            navigationManager.NavigateTo("/welcome", true);
         }
     }
 }
