@@ -29,17 +29,55 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
 @inject IStringLocalizer<MyTickets> loc
 @inject TicketsClient ticketsClient
+@inject UsersClient usersClient
 
 @attribute [Authorize(Policy = Policy.Everyone)]
 
 <PageTitle>ADAtickets - @loc["Title"]</PageTitle>
 <FluentStack Orientation="Orientation.Vertical">
     <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center" HorizontalAlignment="HorizontalAlignment.End">
-        <FluentMenuButton Text="@loc["ActionsButton"]"
-                          IconStart="@(new Icons.Regular.Size24.SelectAllOn())">
+        <FluentMenuButton Text="@loc["ActionsButton"]" IconStart="@(new Icons.Regular.Size20.SelectAllOn())">
+            <FluentLabel Typo="Typography.H6">@loc["EditStatusMenuLabel"]</FluentLabel>
+            <FluentMenuItem Label="@loc["DeleteMenuItem"]">
+                <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.DeleteDismiss())" Color="Color.Neutral" Slot="start" /></span>
+            </FluentMenuItem>
+            <FluentMenuItem Label="@loc["CloseMenuItem"]">
+                <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Checkmark())" Color="Color.Neutral" Slot="start" /></span>
+            </FluentMenuItem>
+            <FluentDivider />
+            <FluentLabel Typo="Typography.H6">@loc["AssignmentMenuLabel"]</FluentLabel>
+            <FluentMenuItem Label="@loc["AssignMenuItem"]" MenuItems="GetUsersMenuItems()">
+                <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Person())" Color="Color.Neutral" Slot="start" /></span>
+            </FluentMenuItem>
         </FluentMenuButton>
-        <FluentMenuButton Text="@loc["EditViewButton"]"
-                          IconStart="@(new Icons.Regular.Size24.TextAlignLeft())">
+        <FluentMenuButton Text="@loc["EditViewButton"]" IconStart="@(new Icons.Regular.Size20.TextAlignLeft())">
+            <FluentLabel Typo="Typography.H6">@loc["SortMenuLabel"]</FluentLabel>
+            <FluentMenuItem Label="@loc["SortTitleMenuItem"]" MenuItems="GetSortMenuItems()">
+                <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.TextCaseTitle())" Color="Color.Neutral" Slot="start" /></span>
+            </FluentMenuItem>
+            <FluentMenuItem Label="@loc["SortLastUpdateMenuItem"]" MenuItems="GetSortMenuItems()">
+                <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Calendar())" Color="Color.Neutral" Slot="start" /></span>
+            </FluentMenuItem>
+            <FluentMenuItem Label="@loc["SortPriorityMenuItem"]" MenuItems="GetSortMenuItems()">
+                <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.ArrowDownExclamation())" Color="Color.Neutral" Slot="start" /></span>
+            </FluentMenuItem>
+            <FluentDivider />
+            <FluentLabel Typo="Typography.H6">@loc["FilterMenuLabel"]</FluentLabel>
+            <FluentMenuItem Label="@loc["FilterOperatorMenuItem"]">
+                <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Person())" Color="Color.Neutral" Slot="start" /></span>
+            </FluentMenuItem>
+            <FluentMenuItem Label="@loc["SortLastUpdateMenuItem"]">
+                <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Calendar())" Color="Color.Neutral" Slot="start" /></span>
+            </FluentMenuItem>
+            <FluentMenuItem Label="@loc["FilterCategoryMenuItem"]">
+                <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Tag())" Color="Color.Neutral" Slot="start" /></span>
+            </FluentMenuItem>
+            <FluentMenuItem Label="@loc["FilterPlatformMenuItem"]">
+                <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Apps())" Color="Color.Neutral" Slot="start" /></span>
+            </FluentMenuItem>
+            <FluentMenuItem Label="@loc["SortPriorityMenuItem"]">
+                <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.ArrowDownExclamation())" Color="Color.Neutral" Slot="start" /></span>
+            </FluentMenuItem>
         </FluentMenuButton>
     </FluentStack>
     <FluentTabs Size="TabSize.Small" Width="100%" OnTabChange="HandleTabChange">
@@ -79,19 +117,22 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     }
 </FluentStack>
 
-@code {
-    private IEnumerable<TicketResponseDto> tickets = Enumerable.Empty<TicketResponseDto>();
-    private bool isLoading = true;
+@code {  
+    private IEnumerable<TicketResponseDto> tickets = Enumerable.Empty<TicketResponseDto>();  
+    private IEnumerable<UserResponseDto> users = Enumerable.Empty<UserResponseDto>();
 
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadTickets(null);
+    private bool isLoading = true;  
+  
+    protected override async Task OnInitializedAsync()  
+    {  
+        await LoadUsers();  
+        await LoadTickets(null);  
     }
 
-    private async Task HandleTabChange(FluentTab fluentTab)
+    private async Task LoadUsers()
     {
-        var filters = GetFilters(fluentTab);
-        await LoadTickets(filters);
+        var result = await usersClient.GetAllAsync();
+        users = result.Item2;
     }
 
     private async Task LoadTickets(IEnumerable<KeyValuePair<string, string>>? filters)
@@ -106,10 +147,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             isLoading = false;
         }
     }
-
-    private static IEnumerable<KeyValuePair<string, string>>? GetFilters(FluentTab fluentTab)
+    
+    private static IEnumerable<KeyValuePair<string, string>>? GetFilters(FluentTab fluentTab)  
     {  
-        return fluentTab.Id switch
+        return fluentTab.Id switch  
         {  
             "tab-1" => null,  
             "tab-2" => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.Unassigned) } },  
@@ -118,5 +159,34 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             "tab-5" => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.Closed) } },  
             _ => null  
         };  
+    }  
+  
+    private RenderFragment GetUsersMenuItems() => builder =>  
+    {  
+        foreach (var user in users)  
+        {  
+            builder.OpenComponent<FluentMenuItem>(0);
+            builder.AddAttribute(1, "Label", $"{user.Name} {user.Surname}");
+            builder.AddAttribute(2, "Value", $"{user.Id}");
+            builder.CloseComponent();  
+        }  
+    };
+
+    private RenderFragment GetSortMenuItems() => builder =>  
+    {  
+        builder.OpenComponent<FluentMenuItem>(0);
+        builder.AddAttribute(1, "Label", loc["SortAscendantMenuItem"]);
+        builder.AddAttribute(2, "Value", "asc");
+        builder.CloseComponent();
+        builder.OpenComponent<FluentMenuItem>(1);
+        builder.AddAttribute(1, "Label", loc["SortDescendantMenuItem"]);
+        builder.AddAttribute(2, "Value", "desc");
+        builder.CloseComponent();
+    };
+
+    private async Task HandleTabChange(FluentTab fluentTab)
+    {
+        var filters = GetFilters(fluentTab);
+        await LoadTickets(filters);
     }
 }

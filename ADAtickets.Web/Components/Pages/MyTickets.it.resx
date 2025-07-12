@@ -144,4 +144,49 @@
   <data name="NoTicketsText" xml:space="preserve">
     <value>Non c'è niente da vedere qui. Congratulazioni!</value>
   </data>
+  <data name="DeleteMenuItem" xml:space="preserve">
+    <value>Elimina</value>
+  </data>
+  <data name="CloseMenuItem" xml:space="preserve">
+    <value>Chiudi</value>
+  </data>
+  <data name="AssignMenuItem" xml:space="preserve">
+    <value>Assegna a...</value>
+  </data>
+  <data name="EditStatusMenuLabel" xml:space="preserve">
+    <value>Modifica stato</value>
+  </data>
+  <data name="AssignmentMenuLabel" xml:space="preserve">
+    <value>Assegnazione</value>
+  </data>
+  <data name="SortMenuLabel" xml:space="preserve">
+    <value>Ordina</value>
+  </data>
+  <data name="SortTitleMenuItem" xml:space="preserve">
+    <value>Titolo</value>
+  </data>
+  <data name="SortLastUpdateMenuItem" xml:space="preserve">
+    <value>Ultimo aggiornamento</value>
+  </data>
+  <data name="SortPriorityMenuItem" xml:space="preserve">
+    <value>Priorità</value>
+  </data>
+  <data name="FilterMenuLabel" xml:space="preserve">
+    <value>Filtro</value>
+  </data>
+  <data name="FilterCategoryMenuItem" xml:space="preserve">
+    <value>Categoria</value>
+  </data>
+  <data name="FilterPlatformMenuItem" xml:space="preserve">
+    <value>Piattaforma</value>
+  </data>
+  <data name="FilterOperatorMenuItem" xml:space="preserve">
+    <value>Operatore</value>
+  </data>
+  <data name="SortAscendantMenuItem" xml:space="preserve">
+    <value>Crescente</value>
+  </data>
+  <data name="SortDescendantMenuItem" xml:space="preserve">
+    <value>Decrescente</value>
+  </data>
 </root>
