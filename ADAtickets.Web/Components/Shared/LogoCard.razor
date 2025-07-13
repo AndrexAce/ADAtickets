@@ -22,11 +22,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 <FluentCard Width="@Width" Height="@Height" Style="@Style">
     @if (IsDarkThemeActive)
     {
-        <img src="LogoDark.svg" alt="@loc["ADAticketsLogoAlt"]"/>
+        <img src="Images/Logos/LogoDark.svg" alt="@loc["ADAticketsLogoAlt"]"/>
     }
     else
     {
-        <img src="LogoLight.svg" alt="@loc["ADAticketsLogoAlt"]"/>
+        <img src="Images/Logos/LogoDark.svg" alt="@loc["ADAticketsLogoAlt"]" />
     }
     <FluentLabel Typo="Typography.H1" Weight="FontWeight.Bold" Alignment="HorizontalAlignment.Center" MarginBlock="0.5rem">@Title</FluentLabel>
     <FluentLabel Typo="Typography.Body" Alignment="HorizontalAlignment.Center" MarginBlock="0.5rem">@Text</FluentLabel>

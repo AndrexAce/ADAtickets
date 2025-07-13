@@ -189,4 +189,34 @@
   <data name="SortDescendantMenuItem" xml:space="preserve">
     <value>Descendant</value>
   </data>
+  <data name="FilterLastUpdateHourMenuItem" xml:space="preserve">
+    <value>Last hour</value>
+  </data>
+  <data name="FilterLastUpdateDayMenuItem" xml:space="preserve">
+    <value>Last day</value>
+  </data>
+  <data name="FilterLastUpdateWeekMenuItem" xml:space="preserve">
+    <value>Last week</value>
+  </data>
+  <data name="FilterLastUpdateMonthMenuItem" xml:space="preserve">
+    <value>Last month</value>
+  </data>
+  <data name="FilterLastUpdateYearMenuItem" xml:space="preserve">
+    <value>Last year</value>
+  </data>
+  <data name="FilterCategoryBugMenuItem" xml:space="preserve">
+    <value>Bug</value>
+  </data>
+  <data name="FilterCategoryFeatureMenuItem" xml:space="preserve">
+    <value>Feature</value>
+  </data>
+  <data name="FilterPriorityLowMenuItem" xml:space="preserve">
+    <value>Low</value>
+  </data>
+  <data name="FilterPriorityMediumMenuItem" xml:space="preserve">
+    <value>Medium</value>
+  </data>
+  <data name="FilterPriorityHighMenuItem" xml:space="preserve">
+    <value>High</value>
+  </data>
 </root>

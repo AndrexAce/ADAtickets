@@ -24,12 +24,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @using ADAtickets.Shared.Dtos.Responses
 @using ADAtickets.Shared.Models
 @using ADAtickets.Web.Components.Layout
+@using ADAtickets.Web.Components.Shared
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 
 @inject IStringLocalizer<MyTickets> loc
 @inject TicketsClient ticketsClient
 @inject UsersClient usersClient
+@inject PlatformsClient platformsClient
 
 @attribute [Authorize(Policy = Policy.Everyone)]
 
@@ -38,10 +40,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center" HorizontalAlignment="HorizontalAlignment.End">
         <FluentMenuButton Text="@loc["ActionsButton"]" IconStart="@(new Icons.Regular.Size20.SelectAllOn())">
             <FluentLabel Typo="Typography.H6">@loc["EditStatusMenuLabel"]</FluentLabel>
-            <FluentMenuItem Label="@loc["DeleteMenuItem"]">
+            <FluentMenuItem Label="@loc["DeleteMenuItem"]" Value="Delete">
                 <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.DeleteDismiss())" Color="Color.Neutral" Slot="start" /></span>
             </FluentMenuItem>
-            <FluentMenuItem Label="@loc["CloseMenuItem"]">
+            <FluentMenuItem Label="@loc["CloseMenuItem"]" Value="Close">
                 <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Checkmark())" Color="Color.Neutral" Slot="start" /></span>
             </FluentMenuItem>
             <FluentDivider />
@@ -52,31 +54,71 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         </FluentMenuButton>
         <FluentMenuButton Text="@loc["EditViewButton"]" IconStart="@(new Icons.Regular.Size20.TextAlignLeft())">
             <FluentLabel Typo="Typography.H6">@loc["SortMenuLabel"]</FluentLabel>
-            <FluentMenuItem Label="@loc["SortTitleMenuItem"]" MenuItems="GetSortMenuItems()">
-                <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.TextCaseTitle())" Color="Color.Neutral" Slot="start" /></span>
+            <FluentMenuItem Label="@loc["SortTitleMenuItem"]">
+                <ChildContent>
+                    <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.TextCaseTitle())" Color="Color.Neutral" Slot="start" /></span>
+                </ChildContent>
+                <MenuItems>
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["SortAscendantMenuItem"]" Value="Sort|Title|Asc" />
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["SortDescendantMenuItem"]" Value="Sort|Title|Desc" />
+                </MenuItems>
             </FluentMenuItem>
-            <FluentMenuItem Label="@loc["SortLastUpdateMenuItem"]" MenuItems="GetSortMenuItems()">
-                <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Calendar())" Color="Color.Neutral" Slot="start" /></span>
+            <FluentMenuItem Label="@loc["SortLastUpdateMenuItem"]">
+                <ChildContent>
+                    <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Calendar())" Color="Color.Neutral" Slot="start" /></span>
+                </ChildContent>
+                <MenuItems>
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["SortAscendantMenuItem"]" Value="Sort|LastUpdate|Asc" />
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["SortDescendantMenuItem"]" Value="Sort|LastUpdate|Desc" />
+                </MenuItems>
             </FluentMenuItem>
-            <FluentMenuItem Label="@loc["SortPriorityMenuItem"]" MenuItems="GetSortMenuItems()">
-                <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.ArrowDownExclamation())" Color="Color.Neutral" Slot="start" /></span>
+            <FluentMenuItem Label="@loc["SortPriorityMenuItem"]">
+                <ChildContent>
+                    <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.ArrowDownExclamation())" Color="Color.Neutral" Slot="start" /></span>
+                </ChildContent>
+                <MenuItems>
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["SortAscendantMenuItem"]" Value="Sort|Priority|Asc" />
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["SortDescendantMenuItem"]" Value="Sort|Priority|Desc" />
+                </MenuItems>
             </FluentMenuItem>
             <FluentDivider />
             <FluentLabel Typo="Typography.H6">@loc["FilterMenuLabel"]</FluentLabel>
-            <FluentMenuItem Label="@loc["FilterOperatorMenuItem"]">
+            <FluentMenuItem Label="@loc["FilterOperatorMenuItem"]" MenuItems="GetUsersMenuItems(isFilter: true)">
                 <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Person())" Color="Color.Neutral" Slot="start" /></span>
             </FluentMenuItem>
             <FluentMenuItem Label="@loc["SortLastUpdateMenuItem"]">
-                <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Calendar())" Color="Color.Neutral" Slot="start" /></span>
+                <ChildContent>
+                    <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Calendar())" Color="Color.Neutral" Slot="start" /></span>
+                </ChildContent>
+                <MenuItems>
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterLastUpdateHourMenuItem"]" Value="Filter|LastUpdate|Hour" />
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterLastUpdateDayMenuItem"]" Value="Filter|LastUpdate|Day" />
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterLastUpdateWeekMenuItem"]" Value="Filter|LastUpdate|Week" />
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterLastUpdateMonthMenuItem"]" Value="Filter|LastUpdate|Month" />
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterLastUpdateYearMenuItem"]" Value="Filter|LastUpdate|Year" />
+                </MenuItems>
             </FluentMenuItem>
             <FluentMenuItem Label="@loc["FilterCategoryMenuItem"]">
-                <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Tag())" Color="Color.Neutral" Slot="start" /></span>
+                <ChildContent>
+                    <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Tag())" Color="Color.Neutral" Slot="start" /></span>
+                </ChildContent>
+                <MenuItems>
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterCategoryBugMenuItem"]" Value="Filter|Category|Bug" />
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterCategoryFeatureMenuItem"]" Value="Filter|Category|Feature" />
+                </MenuItems>
             </FluentMenuItem>
-            <FluentMenuItem Label="@loc["FilterPlatformMenuItem"]">
+            <FluentMenuItem Label="@loc["FilterPlatformMenuItem"]" MenuItems="GetPlatformsMenuItems()">
                 <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Apps())" Color="Color.Neutral" Slot="start" /></span>
             </FluentMenuItem>
             <FluentMenuItem Label="@loc["SortPriorityMenuItem"]">
-                <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.ArrowDownExclamation())" Color="Color.Neutral" Slot="start" /></span>
+                <ChildContent>
+                    <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.ArrowDownExclamation())" Color="Color.Neutral" Slot="start" /></span>
+                </ChildContent>
+                <MenuItems>
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["SortPriorityLowMenuItem"]" Value="Filter|Priority|Low" />
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["SortPriorityMediumMenuItem"]" Value="Filter|Priority|Medium" />
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["SortPriorityHighMenuItem"]" Value="Filter|Priority|High" />
+                </MenuItems>
             </FluentMenuItem>
         </FluentMenuButton>
     </FluentStack>
@@ -111,22 +153,33 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         <div class="tickets-grid">
             @foreach (var ticket in tickets)
             {
-                <TicketCard Ticket="@ticket" />
+                <TicketCard Ticket="@ticket" SelectedChanged="HandleSelectedChanged"/>
             }
         </div>
     }
 </FluentStack>
 
-@code {  
+@code {
     private IEnumerable<TicketResponseDto> tickets = Enumerable.Empty<TicketResponseDto>();  
+    private IEnumerable<PlatformResponseDto> platforms = Enumerable.Empty<PlatformResponseDto>();  
     private IEnumerable<UserResponseDto> users = Enumerable.Empty<UserResponseDto>();
-
+    private readonly HashSet<Guid> selectedTickets = new HashSet<Guid>();
     private bool isLoading = true;  
-  
+
     protected override async Task OnInitializedAsync()  
     {  
-        await LoadUsers();  
-        await LoadTickets(null);  
+        try
+        {
+            await LoadUsers();
+            await LoadTickets(null);
+            await LoadPlatforms(null);
+
+            isLoading = false;
+        }
+        catch (Exception)
+        {
+            // Mostra messaggio di errore
+        }
     }
 
     private async Task LoadUsers()
@@ -137,17 +190,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     private async Task LoadTickets(IEnumerable<KeyValuePair<string, string>>? filters)
     {
-        try
-        {
-            var result = await ticketsClient.GetAllAsync(filters);
-            tickets = result.Item2;
-        }
-        finally
-        {
-            isLoading = false;
-        }
+        var result = await ticketsClient.GetAllAsync(filters);
+        tickets = result.Item2;
     }
-    
+
+    private async Task LoadPlatforms(IEnumerable<KeyValuePair<string, string>>? filters)
+    {
+        var result = await platformsClient.GetAllAsync(filters);
+        platforms = result.Item2;
+    }
+
     private static IEnumerable<KeyValuePair<string, string>>? GetFilters(FluentTab fluentTab)  
     {  
         return fluentTab.Id switch  
@@ -160,33 +212,46 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             _ => null  
         };  
     }  
-  
-    private RenderFragment GetUsersMenuItems() => builder =>  
+
+    private RenderFragment GetUsersMenuItems(bool isFilter = false) => builder =>  
     {  
         foreach (var user in users)  
         {  
             builder.OpenComponent<FluentMenuItem>(0);
-            builder.AddAttribute(1, "Label", $"{user.Name} {user.Surname}");
-            builder.AddAttribute(2, "Value", $"{user.Id}");
+            if (isFilter) builder.AddAttribute(0, "Role", MenuItemRole.MenuItem);
+            builder.AddAttribute(isFilter ? 1 : 0, "Label", $"{user.Name} {user.Surname}");
+            builder.AddAttribute(isFilter ? 2 : 1, "Value", isFilter ? $"Filter|Operator|{user.Id}" : $"AssignTo|{user.Id}");
             builder.CloseComponent();  
         }  
     };
 
-    private RenderFragment GetSortMenuItems() => builder =>  
-    {  
-        builder.OpenComponent<FluentMenuItem>(0);
-        builder.AddAttribute(1, "Label", loc["SortAscendantMenuItem"]);
-        builder.AddAttribute(2, "Value", "asc");
-        builder.CloseComponent();
-        builder.OpenComponent<FluentMenuItem>(1);
-        builder.AddAttribute(1, "Label", loc["SortDescendantMenuItem"]);
-        builder.AddAttribute(2, "Value", "desc");
-        builder.CloseComponent();
+    private RenderFragment GetPlatformsMenuItems() => builder =>
+    {
+        foreach (var platform in platforms)
+        {
+            builder.OpenComponent<FluentMenuItem>(0);
+            builder.AddAttribute(0, "Role", MenuItemRole.MenuItem);
+            builder.AddAttribute(1, "Label", platform.Name);
+            builder.AddAttribute(2, "Value", $"Filter|Platform|{platform.Id}");
+            builder.CloseComponent();
+        }
     };
 
     private async Task HandleTabChange(FluentTab fluentTab)
     {
         var filters = GetFilters(fluentTab);
         await LoadTickets(filters);
+    }
+
+    private void HandleSelectedChanged(SelectedChangedEventArgs args)
+    {
+        if (args.IsSelected)
+        {
+            selectedTickets.Add(args.TicketId);
+        }
+        else
+        {
+            selectedTickets.Remove(args.TicketId);
+        }
     }
 }

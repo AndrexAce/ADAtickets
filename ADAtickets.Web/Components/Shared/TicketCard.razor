@@ -37,7 +37,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             }
             else
             {
-                <FluentCheckbox Class="hover-hide" />
+                <FluentCheckbox Class="hover-hide" CheckStateChanged="HandleCheckStateChanged" />
                 <FluentSpacer />
                 <FluentPersona ImageSize="3rem">
                     <FluentStack Orientation="Orientation.Vertical">
@@ -75,8 +75,23 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 </FluentCard>
 
 @code {
+    /// <summary>
+    /// The ticket the card is bound to.
+    /// </summary>
     [Parameter]
     public required TicketResponseDto Ticket { get; set; }
+
+    /// <summary>
+    /// Indicates whether the card is selected.
+    /// </summary>
+    [Parameter]
+    public bool Selected { get; set; } = false;
+
+    /// <summary>
+    /// Event callback that is triggered when the selected state changes.
+    /// </summary>
+    [Parameter]
+    public EventCallback<SelectedChangedEventArgs> SelectedChanged { get; set; }
 
     private bool isLoading = true;
     private string creatorName = "";
@@ -95,11 +110,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         }
     }
 
-    private RenderFragment GetPriorityBadge(Priority priority) => @<FluentBadge Fill="highlight" BackgroundColor="@GetPriorityAppearance(priority)" Circular="true">
+    private static RenderFragment GetPriorityBadge(Priority priority) => @<FluentBadge Fill="highlight" BackgroundColor="@GetPriorityAppearance(priority)" Circular="true">
     @priority.ToString()
     </FluentBadge>;
 
-    private RenderFragment GetStatusBadge(Status status) => @<FluentBadge Fill="highlight" BackgroundColor="@GetStatusAppearance(status)" Circular="true">
+    private static RenderFragment GetStatusBadge(Status status) => @<FluentBadge Fill="highlight" BackgroundColor="@GetStatusAppearance(status)" Circular="true">
     @status.ToString()
     </FluentBadge>;
 
@@ -120,4 +135,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         Status.Closed => "var(--success)",
         _ => ""
     };
+
+    private async Task HandleCheckStateChanged(bool? checkState)
+    {
+        Selected = checkState ?? false;
+        await SelectedChanged.InvokeAsync(new() { TicketId = Ticket.Id, IsSelected = Selected });
+    }
 }
