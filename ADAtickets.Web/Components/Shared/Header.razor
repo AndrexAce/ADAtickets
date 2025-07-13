@@ -44,8 +44,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     }
     <FluentLabel Typo="Typography.Header" Color="Color.Fill">ADAtickets</FluentLabel>
     <FluentSpacer />
-    <FluentProfileMenu FullName="@AccountName" Image="@AccountPhoto" ImageSize="5rem" EMail="@AccountEmail" HeaderLabel="@loc["HeaderLabel"]" OnHeaderButtonClick="SignOut" HeaderButton="@loc["HeaderButton"]" FooterLink="@loc["FooterLink"]">
-        <StartTemplate>@AccountName</StartTemplate>
+    <FluentProfileMenu FullName="@accountName" Image="@accountPhoto" ImageSize="5rem" EMail="@accountEmail" HeaderLabel="@loc["HeaderLabel"]" OnHeaderButtonClick="SignOut" HeaderButton="@loc["HeaderButton"]" FooterLink="@loc["FooterLink"]">
+        <StartTemplate>@accountName</StartTemplate>
     </FluentProfileMenu>
     <FluentButton Appearance="Appearance.Neutral" IconStart="@(new Icons.Regular.Size20.Alert())"/>
 </FluentStack>
@@ -54,9 +54,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     [CascadingParameter]
     private bool IsDarkThemeActive { get; set; }
 
-    private string? AccountName { get; set; }
-    private string? AccountEmail { get; set; }
-    private string? AccountPhoto { get; set; }
+    private string? accountName = "";
+    private string? accountEmail = "";
+    private string? accountPhoto = "";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -67,9 +67,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
             if (user?.Identity?.IsAuthenticated == true)
             {
-                AccountName = user.FindFirstValue("name") ?? user.Identity.Name;
-                AccountEmail = user.Identity.Name;
-                AccountPhoto = await GetAccountPhoto(user);
+                accountName = user.FindFirstValue("name") ?? user.Identity.Name;
+                accountEmail = user.Identity.Name;
+                accountPhoto = await GetAccountPhoto(user);
 
                 StateHasChanged();
             }

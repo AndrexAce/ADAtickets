@@ -20,12 +20,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @inject IDialogService dialogService
 @inject IStringLocalizer<Footer> loc
 
-<FluentButton Appearance="Appearance.Accent" IconStart="@ThemeIcon" OnClick="UpdateTheme"></FluentButton>
+<FluentButton Appearance="Appearance.Accent" IconStart="@themeIcon" OnClick="UpdateTheme"></FluentButton>
 <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.LockClosed())"></FluentButton>
 <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Cookies())"></FluentButton>
 <CultureSelector />
 
-<FluentDesignTheme @bind-Mode="@Mode" CustomColor="#7A6040" StorageName="theme" OnLuminanceChanged="UpdateTheme" />
+<FluentDesignTheme @bind-Mode="@mode" CustomColor="#7A6040" StorageName="theme" OnLuminanceChanged="UpdateTheme" />
 
 @code {
     /// <summary>
@@ -40,41 +40,40 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     [Parameter]
     public EventCallback<bool> IsDarkThemeActiveChanged { get; set; }
 
-    private DesignThemeModes Mode { get; set; } = DesignThemeModes.System;
-
-    private Icon? ThemeIcon { get; set; }
+    private DesignThemeModes mode = DesignThemeModes.System;
+    private Icon? themeIcon;
 
     protected override void OnInitialized()
     {
-        switch (Mode)
+        switch (mode)
         {
             case DesignThemeModes.Light:
-                ThemeIcon = new Icons.Regular.Size20.WeatherSunny();
+                themeIcon = new Icons.Regular.Size20.WeatherSunny();
                 break;
             case DesignThemeModes.Dark:
-                ThemeIcon = new Icons.Regular.Size20.WeatherMoon();
+                themeIcon = new Icons.Regular.Size20.WeatherMoon();
                 break;
             case DesignThemeModes.System:
-                ThemeIcon = new Icons.Regular.Size20.Color();
+                themeIcon = new Icons.Regular.Size20.Color();
                 break;
         }
     }
 
     private void UpdateTheme(MouseEventArgs e)
     {
-        switch (Mode)
+        switch (mode)
         {
             case DesignThemeModes.Light:
-                Mode = DesignThemeModes.Dark;
-                ThemeIcon = new Icons.Regular.Size20.WeatherMoon();
+                mode = DesignThemeModes.Dark;
+                themeIcon = new Icons.Regular.Size20.WeatherMoon();
                 break;
             case DesignThemeModes.Dark:
-                Mode = DesignThemeModes.System;
-                ThemeIcon = new Icons.Regular.Size20.Color();
+                mode = DesignThemeModes.System;
+                themeIcon = new Icons.Regular.Size20.Color();
                 break;
             case DesignThemeModes.System:
-                Mode = DesignThemeModes.Light;
-                ThemeIcon = new Icons.Regular.Size20.WeatherSunny();
+                mode = DesignThemeModes.Light;
+                themeIcon = new Icons.Regular.Size20.WeatherSunny();
                 break;
         }
     }

@@ -49,7 +49,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                     </FluentStack>
                 </FluentPersona>
                 <FluentSpacer />
-                <FluentButton class="hover-hide" Appearance="Appearance.Stealth" IconStart="@(new Icons.Regular.Size24.MoreHorizontal())"/>
+                <FluentButton class="hover-hide" Appearance="Appearance.Stealth" IconStart="@(new Icons.Regular.Size20.MoreHorizontal())"/>
             }
         </FluentStack>
         @if (isLoading)
@@ -67,8 +67,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             </FluentStack>
             <FluentSpacer />
             <FluentStack Orientation="Orientation.Horizontal" HorizontalAlignment="HorizontalAlignment.SpaceBetween">
-                <FluentButton Appearance="Appearance.Neutral" IconStart="@(new Icons.Regular.Size24.Open())">Apri</FluentButton>
-                <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size24.Edit())">Modifica</FluentButton>
+                <FluentButton Appearance="Appearance.Neutral" IconStart="@(new Icons.Regular.Size20.Open())">Apri</FluentButton>
+                <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Edit())">Modifica</FluentButton>
             </FluentStack>
         }
     </FluentStack>
@@ -94,7 +94,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     public EventCallback<SelectedChangedEventArgs> SelectedChanged { get; set; }
 
     private bool isLoading = true;
-    private string creatorName = "";
+    private string? creatorName;
 
     protected override async Task OnInitializedAsync()
     {
@@ -124,7 +124,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         Priority.Medium => "var(--warning)",
         Priority.High => "var(--error)",
         _ => ""
-
     };
 
     private static string GetStatusAppearance(Status status) => status switch

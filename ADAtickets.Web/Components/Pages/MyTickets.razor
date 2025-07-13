@@ -115,23 +115,23 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                     <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.ArrowDownExclamation())" Color="Color.Neutral" Slot="start" /></span>
                 </ChildContent>
                 <MenuItems>
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["SortPriorityLowMenuItem"]" Value="Filter|Priority|Low" />
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["SortPriorityMediumMenuItem"]" Value="Filter|Priority|Medium" />
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["SortPriorityHighMenuItem"]" Value="Filter|Priority|High" />
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterPriorityLowMenuItem"]" Value="Filter|Priority|Low" />
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterPriorityMediumMenuItem"]" Value="Filter|Priority|Medium" />
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterPriorityHighMenuItem"]" Value="Filter|Priority|High" />
                 </MenuItems>
             </FluentMenuItem>
         </FluentMenuButton>
     </FluentStack>
     <FluentTabs Size="TabSize.Small" Width="100%" OnTabChange="HandleTabChange">
-        <FluentTab Label="@loc["AllTab"]" Icon="@(new Icons.Regular.Size24.Grid())" Id="tab-1">
+        <FluentTab Label="@loc["AllTab"]" Icon="@(new Icons.Regular.Size20.Grid())" Id="tab-1">
         </FluentTab>
-        <FluentTab Label="@loc["UnassignedTab"]" Icon="@(new Icons.Regular.Size24.Question())" Id="tab-2">
+        <FluentTab Label="@loc["UnassignedTab"]" Icon="@(new Icons.Regular.Size20.Question())" Id="tab-2">
         </FluentTab>
-        <FluentTab Label="@loc["ToReplyTab"]" Icon="@(new Icons.Regular.Size24.ArrowReply())" Id="tab-3">
+        <FluentTab Label="@loc["ToReplyTab"]" Icon="@(new Icons.Regular.Size20.ArrowReply())" Id="tab-3">
         </FluentTab>
-        <FluentTab Label="@loc["WaitingTab"]" Icon="@(new Icons.Regular.Size24.HourglassHalf())" Id="tab-4">
+        <FluentTab Label="@loc["WaitingTab"]" Icon="@(new Icons.Regular.Size20.HourglassHalf())" Id="tab-4">
         </FluentTab>
-        <FluentTab Label="@loc["ClosedTab"]" Icon="@(new Icons.Regular.Size24.Checkmark())" Id="tab-5">
+        <FluentTab Label="@loc["ClosedTab"]" Icon="@(new Icons.Regular.Size20.Checkmark())" Id="tab-5">
         </FluentTab>
     </FluentTabs>
 
@@ -144,7 +144,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     else if (!tickets.Any())
     {
         <div style="width: 100%; display: flex; align-items: center; padding: 2rem; flex-direction: column;">
-            <FluentIcon Value="@(new Icons.Filled.Size24.Checkmark())" Color="@Color.Accent" />
+            <FluentIcon Value="@(new Icons.Filled.Size20.Checkmark())" Color="@Color.Accent" />
             <FluentLabel Typo="Typography.H6">@loc["NoTicketsText"]</FluentLabel>
         </div>
     }
