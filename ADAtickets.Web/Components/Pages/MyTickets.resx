@@ -219,4 +219,10 @@
   <data name="FilterPriorityHighMenuItem" xml:space="preserve">
     <value>High</value>
   </data>
+  <data name="LoadingErrorToastTitle" xml:space="preserve">
+    <value>Data loading error</value>
+  </data>
+  <data name="LoadingErrorToastDetails" xml:space="preserve">
+    <value>An error occurred while trying to fetch data. Reach out the technical support.</value>
+  </data>
 </root>

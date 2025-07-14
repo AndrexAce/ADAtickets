@@ -18,7 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace ADAtickets.Web.Components
+namespace ADAtickets.Web.Components.Utilities
 {
     /// <summary>
     /// Wraps the event arguments for the <see cref="TicketCard.SelectedChanged"/> event.

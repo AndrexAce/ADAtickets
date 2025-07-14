@@ -219,4 +219,10 @@
   <data name="FilterPriorityHighMenuItem" xml:space="preserve">
     <value>Alta</value>
   </data>
+  <data name="LoadingErrorToastTitle" xml:space="preserve">
+    <value>Errore caricamento dati</value>
+  </data>
+  <data name="LoadingErrorToastDetails" xml:space="preserve">
+    <value>Si è verificato un errore mentre i dati venivano recuperati. Contatta il personale tecnico.</value>
+  </data>
 </root>

@@ -25,6 +25,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @using ADAtickets.Shared.Models
 @using ADAtickets.Web.Components.Layout
 @using ADAtickets.Web.Components.Shared
+@using ADAtickets.Web.Components.Utilities
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 
@@ -32,6 +33,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @inject TicketsClient ticketsClient
 @inject UsersClient usersClient
 @inject PlatformsClient platformsClient
+@inject IToastService toastService
 
 @attribute [Authorize(Policy = Policy.Everyone)]
 
@@ -176,9 +178,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
             isLoading = false;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // Mostra messaggio di errore
+            toastService.ShowCommunicationToast(Toasts.ErrorToastParameters(ex, loc["LoadingErrorToastTitle"], loc["LoadingErrorToastDetails"]));
         }
     }
 
