@@ -43,7 +43,7 @@ namespace ADAtickets.ApiService.Controllers
     [Consumes(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
     [Produces(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
     [FormatFilter]
-    [ApiConventionType(typeof(ADAticketsApiConventions))]
+    [ApiConventionType(typeof(ApiConventions))]
     [Authorize(Policy.AdminOnly)]
     public sealed class AttachmentsController(IAttachmentRepository attachmentRepository, IMapper mapper) : ControllerBase
     {

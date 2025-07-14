@@ -46,20 +46,23 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 <PageTitle>ADAtickets - @loc["Title"]</PageTitle>
 <FluentStack Orientation="Orientation.Vertical">
     <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center" HorizontalAlignment="HorizontalAlignment.End">
-        <FluentMenuButton Text="@loc["ActionsButton"]" IconStart="@(new Icons.Regular.Size20.SelectAllOn())" OnMenuChanged="HandleActionMenuChanged">
-            <FluentLabel Typo="Typography.H6">@loc["EditStatusMenuLabel"]</FluentLabel>
-            <FluentMenuItem Label="@loc["DeleteMenuItem"]" Id="Delete">
-                <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.DeleteDismiss())" Color="Color.Neutral" Slot="start" /></span>
-            </FluentMenuItem>
-            <FluentMenuItem Label="@loc["CloseMenuItem"]" Id="Close">
-                <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Checkmark())" Color="Color.Neutral" Slot="start" /></span>
-            </FluentMenuItem>
-            <FluentDivider />
-            <FluentLabel Typo="Typography.H6">@loc["AssignmentMenuLabel"]</FluentLabel>
-            <FluentMenuItem Label="@loc["AssignMenuItem"]" MenuItems="GetUsersMenuItems()">
-                <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Person())" Color="Color.Neutral" Slot="start" /></span>
-            </FluentMenuItem>
-        </FluentMenuButton>
+        @if (selectedTickets.Count > 0)
+        {
+            <FluentMenuButton Text="@loc["ActionsButton"]" IconStart="@(new Icons.Regular.Size20.SelectAllOn())" OnMenuChanged="HandleActionMenuChanged">
+                <FluentLabel Typo="Typography.H6">@loc["EditStatusMenuLabel"]</FluentLabel>
+                <FluentMenuItem Label="@loc["DeleteMenuItem"]" Id="Delete">
+                    <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.DeleteDismiss())" Color="Color.Neutral" Slot="start" /></span>
+                </FluentMenuItem>
+                <FluentMenuItem Label="@loc["CloseMenuItem"]" Id="Close">
+                    <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Checkmark())" Color="Color.Neutral" Slot="start" /></span>
+                </FluentMenuItem>
+                <FluentDivider />
+                <FluentLabel Typo="Typography.H6">@loc["AssignmentMenuLabel"]</FluentLabel>
+                <FluentMenuItem Label="@loc["AssignMenuItem"]" MenuItems="GetUsersMenuItems()">
+                    <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Person())" Color="Color.Neutral" Slot="start" /></span>
+                </FluentMenuItem>
+            </FluentMenuButton>
+        }
         <FluentMenuButton Text="@loc["EditViewButton"]" IconStart="@(new Icons.Regular.Size20.TextAlignLeft())" OnMenuChanged="HandleEditViewMenuChanged">
             <FluentLabel Typo="Typography.H6">@loc["SortMenuLabel"]</FluentLabel>
             <FluentMenuItem Label="@loc["SortTitleMenuItem"]">
@@ -306,11 +309,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     {
         var progressToastParameters = Toasts.ProgressToastParameters("Delete", loc["DeleteProgressToastTitle"], loc["DeleteProgressToastDetails"]);
 
-        if (selectedTickets.Count == 0)
-        {
-            progressToastParameters.Content.Progress = 100;
-        }
-
         toastService.ShowProgressToast(progressToastParameters);
 
         try
@@ -329,6 +327,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             toastService.ClearQueueProgressToasts();
 
             toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["DeleteSuccessToastTitle"], loc["DeleteSuccessToastDetails"]));
+
+            // Deselect all tickets.
+            selectedTickets.Clear();
+
+            // TODO: Reload the tickets
         }
         catch (Exception ex)
         {
@@ -339,11 +342,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     private async Task HandleConfirmClose(MouseEventArgs args)
     {
         var progressToastParameters = Toasts.ProgressToastParameters("Close", loc["CloseProgressToastTitle"], loc["CloseProgressToastDetails"]);
-
-        if (selectedTickets.Count == 0)
-        {
-            progressToastParameters.Content.Progress = 100;
-        }
 
         toastService.ShowProgressToast(progressToastParameters);
 
@@ -372,6 +370,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             toastService.ClearQueueProgressToasts();
 
             toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["CloseSuccessToastTitle"], loc["CloseSuccessToastDetails"]));
+
+            // Deselect all tickets.
+            selectedTickets.Clear();
+
+            // TODO: Reload the tickets
         }
         catch (Exception ex)
         {

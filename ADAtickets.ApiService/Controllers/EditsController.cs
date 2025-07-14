@@ -43,7 +43,7 @@ namespace ADAtickets.ApiService.Controllers
     [Consumes(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
     [Produces(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
     [FormatFilter]
-    [ApiConventionType(typeof(ADAticketsApiConventions))]
+    [ApiConventionType(typeof(ApiConventions))]
     public sealed class EditsController(IEditRepository editRepository, IMapper mapper) : ControllerBase
     {
         /// <summary>

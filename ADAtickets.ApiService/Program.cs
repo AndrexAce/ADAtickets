@@ -144,7 +144,7 @@ namespace ADAtickets.ApiService
             builder.Services.AddScoped<IUserRepository, UserRepository>();
 
             // Add automapping of entities.
-            builder.Services.AddAutoMapper(typeof(ADAticketsProfile));
+            builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
         }
 
         /// <summary>

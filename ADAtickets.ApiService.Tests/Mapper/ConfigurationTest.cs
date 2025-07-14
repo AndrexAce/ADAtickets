@@ -28,7 +28,7 @@ namespace ADAtickets.ApiService.Tests.Mapper
         public void ValidConfiguration_DoesNotThrow()
         {
             // Arrange
-            var mapper = new MapperConfiguration(cfg => { cfg.AddProfile<ADAticketsProfile>(); }).CreateMapper();
+            var mapper = new MapperConfiguration(cfg => { cfg.AddProfile<AutoMapperProfile>(); }).CreateMapper();
 
             // Act
             var exception = Record.Exception(() => mapper.ConfigurationProvider.AssertConfigurationIsValid());

@@ -33,7 +33,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 </FluentDialogBody>
 
 <FluentDialogFooter>
-    <FluentButton Appearance="Appearance.Accent" IconStart="Content.ConfirmButtonIcon" OnClick="Content.ConfirmAction">@Dialog.Instance.Parameters.PrimaryAction</FluentButton>
+    <FluentButton Appearance="Appearance.Accent" IconStart="Content.ConfirmButtonIcon" OnClick="HandleConfirm">@Dialog.Instance.Parameters.PrimaryAction</FluentButton>
     <FluentButton Appearance="Appearance.Neutral" OnClick="HandleCancel">@Dialog.Instance.Parameters.SecondaryAction</FluentButton>
 </FluentDialogFooter>
 
@@ -49,6 +49,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     /// </summary>
     [Parameter]
     public SimpleDialogContent Content { get; set; } = default!;
+
+    private async Task HandleConfirm(MouseEventArgs args)
+    {
+        await Dialog.CloseAsync();
+
+        if (Content.ConfirmAction != null)
+        {
+            await Content.ConfirmAction.Invoke(args);
+        }
+    }
 
     private async Task HandleCancel(MouseEventArgs args)
     {
