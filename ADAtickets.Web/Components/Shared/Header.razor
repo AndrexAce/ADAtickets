@@ -54,9 +54,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     [CascadingParameter]
     private bool IsDarkThemeActive { get; set; }
 
-    private string? accountName = "";
-    private string? accountEmail = "";
-    private string? accountPhoto = "";
+    private string? accountName;
+    private string? accountEmail;
+    private string? accountPhoto;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

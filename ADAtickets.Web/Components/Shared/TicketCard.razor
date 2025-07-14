@@ -22,6 +22,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @using ADAtickets.Shared.Models
 @using ADAtickets.Web.Components.Utilities
 @using Humanizer
+@using System.Net
 
 @inject IStringLocalizer<TicketCard> loc
 @inject UsersClient usersClient
@@ -29,7 +30,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 <FluentCard Style="background: var(--neutral-layer-1)" Width="20rem">
     <FluentStack Orientation="Orientation.Vertical">
         <FluentStack Orientation="Orientation.Horizontal">
-            @if (isLoading || creatorName == "")
+            @if (creatorName is null)
             {
                 <FluentSpacer />
                 <FluentSkeleton Shape="SkeletonShape.Circle" Shimmer="true" />
@@ -53,7 +54,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 <FluentButton class="hover-hide" Appearance="Appearance.Stealth" IconStart="@(new Icons.Regular.Size20.MoreHorizontal())"/>
             }
         </FluentStack>
-        @if (isLoading)
+        @if (creatorName is null)
         {
             <FluentSkeleton Height="1rem" Width="100%" Shimmer="true" />
             <FluentSkeleton Height="1rem" Width="100%" Shimmer="true" />
@@ -94,20 +95,23 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     [Parameter]
     public EventCallback<SelectedChangedEventArgs> SelectedChanged { get; set; }
 
-    private bool isLoading = true;
     private string? creatorName;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            var tuple = await usersClient.GetAsync(Ticket.CreatorUserId);
-            var user = tuple.Item2;
-            creatorName = $"{user?.Name} {user?.Surname}";
+            var ticketResponse = await usersClient.GetAsync(Ticket.CreatorUserId);
+
+            // If the ticket could not be found, do not update the card.
+            if (ticketResponse is (HttpStatusCode.OK, not null))
+            {
+                creatorName = $"{ticketResponse.Item2.Name} {ticketResponse.Item2.Surname}";
+            }
         }
-        finally
+        catch (Exception)
         {
-            isLoading = false;
+            // Do nothing, some data was not retrieved.
         }
     }
 

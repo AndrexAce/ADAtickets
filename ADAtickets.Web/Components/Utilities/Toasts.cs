@@ -32,7 +32,7 @@ namespace ADAtickets.Web.Components.Utilities
         /// <param name="exception">The exception which message will be shown.</param>
         /// <param name="title">The title of the toast.</param>
         /// <param name="details">The message of the toast.</param>
-        /// <returns></returns>
+        /// <returns>A <see cref="ToastParameters{T}"/> object with the specified title and details.</returns>
         public static ToastParameters<CommunicationToastContent> ErrorToastParameters(Exception exception, string title, string details) => new()
         {
             Intent = ToastIntent.Error,
@@ -44,9 +44,15 @@ namespace ADAtickets.Web.Components.Utilities
             }
         };
 
+        /// <summary>
+        /// Creates a <see cref="ToastParameters{T}"/> instance configured for a success notification.
+        /// </summary>
+        /// <param name="title">The title of the toast notification.</param>
+        /// <param name="details">The detailed message content of the toast notification.</param>
+        /// <returns>A <see cref="ToastParameters{T}"/> object with the specified title and details.</returns>
         public static ToastParameters<CommunicationToastContent> ConfirmToastParameters(string title, string details) => new()
         {
-            Intent = ToastIntent.Custom,
+            Intent = ToastIntent.Success,
             Title = title,
             Content = new CommunicationToastContent()
             {
@@ -61,7 +67,7 @@ namespace ADAtickets.Web.Components.Utilities
         /// <param name="id">The ID of the toast, used to update it with <see cref="IToastService.UpdateToast{TContent}(string, ToastParameters{TContent})"/>.</param>
         /// <param name="title">The title of the toast.</param>
         /// <param name="details">The message of the toast.</param>
-        /// <returns></returns>
+        /// <returns>A <see cref="ToastParameters{T}"/> object with the specified title and details.</returns>
         public static ToastParameters<ProgressToastContent> ProgressToastParameters(string id, string title, string details) => new()
         {
             Id = id,

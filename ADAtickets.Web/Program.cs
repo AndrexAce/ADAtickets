@@ -20,6 +20,7 @@
 using ADAtickets.Client.Extensions;
 using ADAtickets.Shared.Constants;
 using ADAtickets.Web.Components;
+using ADAtickets.Web.Components.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.FluentUI.AspNetCore.Components;
@@ -122,6 +123,9 @@ namespace ADAtickets.Web
 
             // Add ADAtickets client services.
             builder.Services.AddADAticketsClient();
+
+            // Add automapping of entities.
+            builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
         }
 
         /// <summary>

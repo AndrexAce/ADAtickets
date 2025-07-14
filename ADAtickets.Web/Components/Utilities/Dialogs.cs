@@ -33,8 +33,8 @@ namespace ADAtickets.Web.Components.Utilities
         /// <param name="title">The title of the dialog.</param>
         /// <param name="okButtonText">The text of the confirm button.</param>
         /// <param name="cancelButtonText">The text of the cancel button.</param>
-        /// <returns></returns>
-        public static DialogParameters DialogParameters(string title, string okButtonText, string cancelButtonText) => new()
+        /// <returns>A <see cref="DialogParameters"/> object with the specified title, button texts, and behavior settings.</returns>
+        public static DialogParameters ConfirmDialogParameters(string title, string okButtonText, string cancelButtonText) => new()
         {
             Title = title,
             PrimaryAction = okButtonText,

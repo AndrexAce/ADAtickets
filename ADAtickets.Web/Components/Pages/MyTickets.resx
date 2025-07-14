@@ -225,4 +225,46 @@
   <data name="LoadingErrorToastDetails" xml:space="preserve">
     <value>An error occurred while trying to fetch data. Reach out the technical support.</value>
   </data>
+  <data name="DeleteConfirmDialogTitle" xml:space="preserve">
+    <value>Confirm deletion</value>
+  </data>
+  <data name="DeleteConfirmDialogMessage" xml:space="preserve">
+    <value>If you delete these tickets, they won't be retrievable anymore.</value>
+  </data>
+  <data name="DeleteConfirmDialogConfirmButton" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="DeleteConfirmDialogCancelButton" xml:space="preserve">
+    <value>Do not delete</value>
+  </data>
+  <data name="CloseConfirmDialogTitle" xml:space="preserve">
+    <value>Confirm closure</value>
+  </data>
+  <data name="CloseConfirmDialogMessage" xml:space="preserve">
+    <value>If you close these tickets, they won't be openable anymore.</value>
+  </data>
+  <data name="CloseConfirmDialogConfirmButton" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="CloseConfirmDialogCancelButton" xml:space="preserve">
+    <value>Do not close</value>
+  </data>
+  <data name="DeleteProgressToastDetails" xml:space="preserve">
+    <value>I'm deleting the tickets. It may take some minutes.</value>
+  </data>
+  <data name="DeleteProgressToastTitle" xml:space="preserve">
+    <value>Deletion in progress</value>
+  </data>
+  <data name="DeleteErrorToastTitle" xml:space="preserve">
+    <value>Deletion error</value>
+  </data>
+  <data name="DeleteErrorToastDetails" xml:space="preserve">
+    <value>An error occurred while trying to delete the tickets. Retry.</value>
+  </data>
+  <data name="DeleteSuccessToastTitle" xml:space="preserve">
+    <value>Deletion completed</value>
+  </data>
+  <data name="DeleteSuccessToastDetails" xml:space="preserve">
+    <value>The deletion was completed successfully.</value>
+  </data>
 </root>

@@ -225,4 +225,46 @@
   <data name="LoadingErrorToastDetails" xml:space="preserve">
     <value>Si è verificato un errore mentre i dati venivano recuperati. Contatta il personale tecnico.</value>
   </data>
+  <data name="DeleteConfirmDialogTitle" xml:space="preserve">
+    <value>Conferma cancellazione</value>
+  </data>
+  <data name="DeleteConfirmDialogMessage" xml:space="preserve">
+    <value>Se cancelli questi ticket, non saranno più recuperabili.</value>
+  </data>
+  <data name="DeleteConfirmDialogConfirmButton" xml:space="preserve">
+    <value>Cancella</value>
+  </data>
+  <data name="DeleteConfirmDialogCancelButton" xml:space="preserve">
+    <value>Non cancellare</value>
+  </data>
+  <data name="CloseConfirmDialogTitle" xml:space="preserve">
+    <value>Conferma chiusura</value>
+  </data>
+  <data name="CloseConfirmDialogMessage" xml:space="preserve">
+    <value>Se chiudi questi ticket, non saranno più apribili nuovamente.</value>
+  </data>
+  <data name="CloseConfirmDialogConfirmButton" xml:space="preserve">
+    <value>Chiudi</value>
+  </data>
+  <data name="CloseConfirmDialogCancelButton" xml:space="preserve">
+    <value>Non chiudere</value>
+  </data>
+  <data name="DeleteProgressToastDetails" xml:space="preserve">
+    <value>Sto cancellando i ticket. Potrebbe volerci qualche minuto.</value>
+  </data>
+  <data name="DeleteProgressToastTitle" xml:space="preserve">
+    <value>Cancellazione in corso</value>
+  </data>
+  <data name="DeleteErrorToastTitle" xml:space="preserve">
+    <value>Errore cancellazione</value>
+  </data>
+  <data name="DeleteErrorToastDetails" xml:space="preserve">
+    <value>Si è verificato un errore mentre i ticket venivano cancellati. Riprova.</value>
+  </data>
+  <data name="DeleteSuccessToastTitle" xml:space="preserve">
+    <value>Cancellazione completata</value>
+  </data>
+  <data name="DeleteSuccessToastDetails" xml:space="preserve">
+    <value>La cancellazione è stata completata con successo.</value>
+  </data>
 </root>
