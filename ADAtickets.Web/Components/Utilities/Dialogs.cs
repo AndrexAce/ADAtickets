@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.FluentUI.AspNetCore.Components;
 
 namespace ADAtickets.Web.Components.Utilities
@@ -57,8 +56,8 @@ namespace ADAtickets.Web.Components.Utilities
             /// <summary>
             /// Function to execute when pressing the confirm button.
             /// </summary>
-            /// <remarks>It accepts a <see cref="MouseEventArgs"/> argument and returns a <see cref="Task"/>.</remarks>
-            public required Func<MouseEventArgs, Task> ConfirmAction { get; set; }
+            /// <remarks>It accepts no parameters and returns a <see cref="Task"/>.</remarks>
+            public required Func<Task> ConfirmAction { get; set; }
 
             /// <summary>
             /// Icon to show in the confirm button.

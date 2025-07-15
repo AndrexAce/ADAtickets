@@ -156,7 +156,7 @@
   <data name="EditStatusMenuLabel" xml:space="preserve">
     <value>Edit status</value>
   </data>
-  <data name="AssignmentMenuLabel" xml:space="preserve">
+  <data name="AssignMenuLabel" xml:space="preserve">
     <value>Assignment</value>
   </data>
   <data name="SortMenuLabel" xml:space="preserve">
@@ -266,5 +266,23 @@
   </data>
   <data name="DeleteSuccessToastDetails" xml:space="preserve">
     <value>The deletion was completed successfully.</value>
+  </data>
+  <data name="AssignProgressToastTitle" xml:space="preserve">
+    <value>Assignment in progress</value>
+  </data>
+  <data name="AssignProgressToastDetails" xml:space="preserve">
+    <value>I'm assigning the tickets. It may take some minutes.</value>
+  </data>
+  <data name="AssignSuccessToastTitle" xml:space="preserve">
+    <value>Assignment completed</value>
+  </data>
+  <data name="AssignSuccessToastDetails" xml:space="preserve">
+    <value>The assignment was completed successfully.</value>
+  </data>
+  <data name="AssignErrorToastTitle" xml:space="preserve">
+    <value>Assignment error</value>
+  </data>
+  <data name="AssignErrorToastDetails" xml:space="preserve">
+    <value>An error occurred while trying to assign the tickets. Retry.</value>
   </data>
 </root>

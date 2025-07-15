@@ -123,4 +123,79 @@
   <data name="ButtonOpen" xml:space="preserve">
     <value>Apri</value>
   </data>
+  <data name="DeleteMenuItem" xml:space="preserve">
+    <value>Cancella</value>
+  </data>
+  <data name="CloseMenuItem" xml:space="preserve">
+    <value>Chiudi</value>
+  </data>
+  <data name="AssignMenuItem" xml:space="preserve">
+    <value>Assegna a...</value>
+  </data>
+  <data name="EditStatusMenuLabel" xml:space="preserve">
+    <value>Modifica stato</value>
+  </data>
+  <data name="AssignMenuLabel" xml:space="preserve">
+    <value>Assegnazione</value>
+  </data>
+  <data name="DeleteConfirmDialogTitle" xml:space="preserve">
+    <value>Conferma cancellazione</value>
+  </data>
+  <data name="DeleteConfirmDialogMessage" xml:space="preserve">
+    <value>Se cancelli questo ticket, non sarà più recuperabile.</value>
+  </data>
+  <data name="DeleteConfirmDialogConfirmButton" xml:space="preserve">
+    <value>Cancella</value>
+  </data>
+  <data name="DeleteConfirmDialogCancelButton" xml:space="preserve">
+    <value>Non cancellare</value>
+  </data>
+  <data name="CloseConfirmDialogTitle" xml:space="preserve">
+    <value>Conferma chiusura</value>
+  </data>
+  <data name="CloseConfirmDialogMessage" xml:space="preserve">
+    <value>Se chiudi questo ticket, non sarà più apribile nuovamente.</value>
+  </data>
+  <data name="CloseConfirmDialogConfirmButton" xml:space="preserve">
+    <value>Chudi</value>
+  </data>
+  <data name="CloseConfirmDialogCancelButton" xml:space="preserve">
+    <value>Non chiudere</value>
+  </data>
+  <data name="DeleteSuccessToastTitle" xml:space="preserve">
+    <value>Eliminazione completata</value>
+  </data>
+  <data name="DeleteSuccessToastDetails" xml:space="preserve">
+    <value>La cancellazione è stata terminata con successo.</value>
+  </data>
+  <data name="DeleteErrorToastTitle" xml:space="preserve">
+    <value>Errore cancellazione</value>
+  </data>
+  <data name="DeleteErrorToastDetails" xml:space="preserve">
+    <value>Si è verificato un errore mentre il ticket veniva cancellato. Riprova.</value>
+  </data>
+  <data name="CloseSuccessToastTitle" xml:space="preserve">
+    <value>Chiusura completata</value>
+  </data>
+  <data name="CloseSuccessToastDetails" xml:space="preserve">
+    <value>La chiusura è stata completata con successo.</value>
+  </data>
+  <data name="CloseErrorToastTitle" xml:space="preserve">
+    <value>Errore chiusura</value>
+  </data>
+  <data name="CloseErrorToastDetails" xml:space="preserve">
+    <value>Si è verificato un errore mentre il ticket veniva chiuso. Riprova.</value>
+  </data>
+  <data name="AssignSuccessToastTitle" xml:space="preserve">
+    <value>Assegnazione completata</value>
+  </data>
+  <data name="AssignSuccessToastDetails" xml:space="preserve">
+    <value>L'assegnazione è stata completata con successo.</value>
+  </data>
+  <data name="AssignErrorToastTitle" xml:space="preserve">
+    <value>Errore assegnazione</value>
+  </data>
+  <data name="AssignErrorToastDetails" xml:space="preserve">
+    <value>Si è verificato un errore mentre il ticket veniva assegnato. Riprova.</value>
+  </data>
 </root>

@@ -156,7 +156,7 @@
   <data name="EditStatusMenuLabel" xml:space="preserve">
     <value>Modifica stato</value>
   </data>
-  <data name="AssignmentMenuLabel" xml:space="preserve">
+  <data name="AssignMenuLabel" xml:space="preserve">
     <value>Assegnazione</value>
   </data>
   <data name="SortMenuLabel" xml:space="preserve">
@@ -266,5 +266,23 @@
   </data>
   <data name="DeleteSuccessToastDetails" xml:space="preserve">
     <value>La cancellazione è stata completata con successo.</value>
+  </data>
+  <data name="AssignProgressToastTitle" xml:space="preserve">
+    <value>Assegnazione in corso</value>
+  </data>
+  <data name="AssignProgressToastDetails" xml:space="preserve">
+    <value>Sto assegnando i ticket. Potrebbe volerci qualche minuto.</value>
+  </data>
+  <data name="AssignSuccessToastTitle" xml:space="preserve">
+    <value>Assegnazione completata</value>
+  </data>
+  <data name="AssignSuccessToastDetails" xml:space="preserve">
+    <value>L'assegnazione è stata completata con successo.</value>
+  </data>
+  <data name="AssignErrorToastTitle" xml:space="preserve">
+    <value>Errore assegnazione</value>
+  </data>
+  <data name="AssignErrorToastDetails" xml:space="preserve">
+    <value>Si è verificato un errore mentre i ticket venivano assegnati. Riprova.</value>
   </data>
 </root>

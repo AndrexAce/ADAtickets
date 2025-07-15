@@ -28,6 +28,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject NavigationManager navigationManager
 @inject IDownstreamApi downstreamApi
+@inject IConfiguration configuration
 
 <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center" HorizontalGap="20">
     @if (IsDarkThemeActive)
@@ -81,11 +82,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         try
         {
             var photoStream = await downstreamApi.GetForUserAsync<Stream>(
-                Service.ExternalGraph,
+                user.FindFirstValue("tid") == configuration["Entra:TenantId"] ? Service.Graph : Service.ExternalGraph,
                 options =>
                 {
                     options.RelativePath = "me/photo/$value";
-                    options.AcquireTokenOptions.AuthenticationOptionsName = Scheme.ExternalOpenIdConnectDefault;
+                    options.AcquireTokenOptions.AuthenticationOptionsName = user.FindFirstValue("tid") == configuration["Entra:TenantId"] ? Scheme.OpenIdConnectDefault : Scheme.ExternalOpenIdConnectDefault;
                 },
                 user);
 

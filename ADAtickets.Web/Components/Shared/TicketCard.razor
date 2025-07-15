@@ -18,16 +18,23 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @inherits ComponentBase
 
 @using ADAtickets.Client
+@using ADAtickets.Shared.Dtos.Requests
 @using ADAtickets.Shared.Dtos.Responses
 @using ADAtickets.Shared.Models
 @using ADAtickets.Web.Components.Utilities
+@using AutoMapper
 @using Humanizer
 @using System.Net
+@using static ADAtickets.Web.Components.Utilities.Dialogs
 
 @inject IStringLocalizer<TicketCard> loc
 @inject UsersClient usersClient
+@inject TicketsClient ticketsClient
+@inject IToastService toastService
+@inject IDialogService dialogService
+@inject IMapper mapper
 
-<FluentCard Style="background: var(--neutral-layer-1)" Width="20rem">
+<FluentCard Id="@(Ticket.Id.ToString())" Style="background: var(--neutral-layer-1)" Width="20rem">
     <FluentStack Orientation="Orientation.Vertical">
         <FluentStack Orientation="Orientation.Horizontal">
             @if (creatorName is null)
@@ -76,7 +83,36 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     </FluentStack>
 </FluentCard>
 
+@if (creatorName is not null)
+{
+    <FluentMenu Anchor="@(Ticket.Id.ToString())" Trigger="MouseButton.Right" Anchored="false">
+        <FluentLabel Typo="Typography.H6">@loc["EditStatusMenuLabel"]</FluentLabel>
+        <FluentMenuItem Label="@loc["DeleteMenuItem"]" OnClick="HandleDeleteClick">
+            <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.DeleteDismiss())" Color="Color.Neutral" Slot="start" /></span>
+        </FluentMenuItem>
+        <FluentMenuItem Label="@loc["CloseMenuItem"]" OnClick="HandleCloseClick">
+            <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Checkmark())" Color="Color.Neutral" Slot="start" /></span>
+        </FluentMenuItem>
+        <FluentDivider />
+        <FluentLabel Typo="Typography.H6">@loc["AssignmentMenuLabel"]</FluentLabel>
+        <FluentMenuItem Label="@loc["AssignMenuItem"]">
+            <ChildContent>
+                <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Person())" Color="Color.Neutral" Slot="start" /></span>
+            </ChildContent>
+            <MenuItems>
+                @foreach (var user in Users ?? [])
+                {
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@($"{user.Name} {user.Surname}")" OnClick="args => HandleAssignClick(user.Id)"/>
+                }
+            </MenuItems>
+        </FluentMenuItem>
+    </FluentMenu>
+}
+
 @code {
+    [CascadingParameter]
+    private IEnumerable<UserResponseDto>? Users { get; set; }
+
     /// <summary>
     /// The ticket the card is bound to.
     /// </summary>
@@ -94,6 +130,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     /// </summary>
     [Parameter]
     public EventCallback<SelectedChangedEventArgs> SelectedChanged { get; set; }
+
+    /// <summary>
+    /// Event callback that is triggered when the ticket state has changed.
+    /// </summary>
+    [Parameter]
+    public EventCallback StateChanged { get; set; }
 
     private string? creatorName;
 
@@ -144,5 +186,120 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     {
         Selected = checkState ?? false;
         await SelectedChanged.InvokeAsync(new() { TicketId = Ticket.Id, IsSelected = Selected });
+    }
+
+    private async Task HandleDeleteClick()
+    {
+        await dialogService.ShowDialogAsync<SimpleDialog>(
+            new SimpleDialogContent
+            {
+                Message = loc["DeleteConfirmDialogMessage"],
+                ConfirmAction = HandleConfirmDelete,
+                ConfirmButtonIcon = new Icons.Regular.Size20.DeleteDismiss(),
+            },
+            Dialogs.ConfirmDialogParameters(loc["DeleteConfirmDialogTitle"], loc["DeleteConfirmDialogConfirmButton"], loc["DeleteConfirmDialogCancelButton"]));
+    }
+
+    private async Task HandleCloseClick()
+    {
+        await dialogService.ShowDialogAsync<SimpleDialog>(
+            new SimpleDialogContent
+            {
+                Message = loc["CloseConfirmDialogMessage"],
+                ConfirmAction = HandleConfirmClose,
+                ConfirmButtonIcon = new Icons.Regular.Size20.Checkmark(),
+            },
+            Dialogs.ConfirmDialogParameters(loc["CloseConfirmDialogTitle"], loc["CloseConfirmDialogConfirmButton"], loc["CloseConfirmDialogCancelButton"]));
+    }
+
+    private async Task HandleAssignClick(Guid operatorId)
+    {
+        await HandleAssign(operatorId);
+    }
+
+    private async Task HandleConfirmDelete()
+    {
+        try
+        {
+            var deleteResponse = await ticketsClient.DeleteAsync(Ticket.Id);
+
+            // If the ticket could not be deleted, send an error.
+            if (deleteResponse is HttpStatusCode.NoContent)
+            {
+                toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["DeleteSuccessToastTitle"], loc["DeleteSuccessToastDetails"]));
+
+                // Notify the parent component that the ticket has been deleted.
+                await StateChanged.InvokeAsync();
+            }
+            else throw new HttpRequestException(deleteResponse.ToString(), null, deleteResponse);
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowCommunicationToast(Toasts.ErrorToastParameters(ex, loc["DeleteErrorToastTitle"], loc["DeleteErrorToastDetails"]));
+        }
+    }
+
+    private async Task HandleConfirmClose()
+    {
+        try
+        {
+            var getResponse = await ticketsClient.GetAsync(Ticket.Id);
+
+            // If the ticket could not be retrieved, send an error.
+            if (getResponse is (HttpStatusCode.OK, not null))
+            {
+                // Update the ticket status to Closed.
+                getResponse.Item2.Status = Status.Closed;
+
+                var putResponse = await ticketsClient.PutAsync(Ticket.Id, mapper.Map(getResponse, new TicketRequestDto()));
+
+                // If the ticket could not be closed, send an error.
+                if (putResponse is (HttpStatusCode.OK, not null))
+                {
+                    toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["CloseSuccessToastTitle"], loc["CloseSuccessToastDetails"]));
+
+                    // Notify the parent component that the ticket has been closed.
+                    await StateChanged.InvokeAsync();
+                }
+                else throw new HttpRequestException(putResponse.Item1.ToString(), null, putResponse.Item1);
+            }
+            else throw new HttpRequestException(getResponse.Item1.ToString(), null, getResponse.Item1);
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowCommunicationToast(Toasts.ErrorToastParameters(ex, loc["CloseErrorToastTitle"], loc["CloseErrorToastDetails"]));
+        }
+    }
+
+    private async Task HandleAssign(Guid operatorId)
+    {
+        try
+        {
+            var getResponse = await ticketsClient.GetAsync(Ticket.Id);
+
+            // If the ticket could not be found, skip it.
+            if (getResponse is (HttpStatusCode.OK, not null))
+            {
+                // Update the ticket assignee.
+                getResponse.Item2.OperatorUserId = operatorId;
+
+                var putResponse = await ticketsClient.PutAsync(Ticket.Id, mapper.Map(getResponse, new TicketRequestDto()));
+
+                // If the ticket could not be assigned, send an error.
+                if (putResponse is (HttpStatusCode.OK, not null))
+                {
+                    toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["AssignSuccessToastTitle"], loc["AssignSuccessToastDetails"]));
+
+                    // Notify the parent component that the ticket has been assigned.
+                    await StateChanged.InvokeAsync();
+                }
+                else throw new HttpRequestException(putResponse.Item1.ToString(), null, putResponse.Item1);
+            }
+            else throw new HttpRequestException(getResponse.Item1.ToString(), null, getResponse.Item1);
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowCommunicationToast(Toasts.ErrorToastParameters(ex, loc["AssignErrorToastTitle"], loc["AssignErrorToastDetails"]));
+        }
     }
 }

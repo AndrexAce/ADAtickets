@@ -123,4 +123,79 @@
   <data name="ButtonOpen" xml:space="preserve">
     <value>Open</value>
   </data>
+  <data name="DeleteMenuItem" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="CloseMenuItem" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="AssignMenuItem" xml:space="preserve">
+    <value>Assign to...</value>
+  </data>
+  <data name="EditStatusMenuLabel" xml:space="preserve">
+    <value>Edit status</value>
+  </data>
+  <data name="AssignMenuLabel" xml:space="preserve">
+    <value>Assignment</value>
+  </data>
+  <data name="DeleteConfirmDialogTitle" xml:space="preserve">
+    <value>Confirm deletion</value>
+  </data>
+  <data name="DeleteConfirmDialogMessage" xml:space="preserve">
+    <value>If you delete this ticket, it won't be retrievable anymore.</value>
+  </data>
+  <data name="DeleteConfirmDialogConfirmButton" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="DeleteConfirmDialogCancelButton" xml:space="preserve">
+    <value>Do not delete</value>
+  </data>
+  <data name="CloseConfirmDialogTitle" xml:space="preserve">
+    <value>Confirm closure</value>
+  </data>
+  <data name="CloseConfirmDialogMessage" xml:space="preserve">
+    <value>If you close this ticket, it won't be openable anymore.</value>
+  </data>
+  <data name="CloseConfirmDialogConfirmButton" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="CloseConfirmDialogCancelButton" xml:space="preserve">
+    <value>Do not close</value>
+  </data>
+  <data name="DeleteSuccessToastTitle" xml:space="preserve">
+    <value>Deletion completed</value>
+  </data>
+  <data name="DeleteSuccessToastDetails" xml:space="preserve">
+    <value>The deletion was completed successfully.</value>
+  </data>
+  <data name="DeleteErrorToastTitle" xml:space="preserve">
+    <value>Deletion error</value>
+  </data>
+  <data name="DeleteErrorToastDetails" xml:space="preserve">
+    <value>An error occurred while trying to delete the ticket. Retry.</value>
+  </data>
+  <data name="CloseSuccessToastTitle" xml:space="preserve">
+    <value>Closure completed</value>
+  </data>
+  <data name="CloseSuccessToastDetails" xml:space="preserve">
+    <value>The closure was completed successfully.</value>
+  </data>
+  <data name="CloseErrorToastTitle" xml:space="preserve">
+    <value>Closure error</value>
+  </data>
+  <data name="CloseErrorToastDetails" xml:space="preserve">
+    <value>An error occurred while trying to close the ticket. Retry.</value>
+  </data>
+  <data name="AssignSuccessToastTitle" xml:space="preserve">
+    <value>Assignment completed</value>
+  </data>
+  <data name="AssignSuccessToastDetails" xml:space="preserve">
+    <value>The assignment was completed successfully.</value>
+  </data>
+  <data name="AssignErrorToastTitle" xml:space="preserve">
+    <value>Assignment error</value>
+  </data>
+  <data name="AssignErrorToastDetails" xml:space="preserve">
+    <value>An error occurred while trying to assign the ticket. Retry.</value>
+  </data>
 </root>

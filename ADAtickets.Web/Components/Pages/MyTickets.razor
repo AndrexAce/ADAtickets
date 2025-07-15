@@ -31,6 +31,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Net
+@using System.Security.Claims
 @using static ADAtickets.Web.Components.Utilities.Dialogs
 
 @inject IStringLocalizer<MyTickets> loc
@@ -40,6 +41,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @inject IToastService toastService
 @inject IDialogService dialogService
 @inject IMapper mapper
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject IConfiguration configuration
 
 @attribute [Authorize(Policy = Policy.Everyone)]
 
@@ -48,30 +51,38 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center" HorizontalAlignment="HorizontalAlignment.End">
         @if (selectedTickets.Count > 0)
         {
-            <FluentMenuButton Text="@loc["ActionsButton"]" IconStart="@(new Icons.Regular.Size20.SelectAllOn())" OnMenuChanged="HandleActionMenuChanged">
+            <FluentMenuButton Text="@loc["ActionsButton"]" IconStart="@(new Icons.Regular.Size20.SelectAllOn())">
                 <FluentLabel Typo="Typography.H6">@loc["EditStatusMenuLabel"]</FluentLabel>
-                <FluentMenuItem Label="@loc["DeleteMenuItem"]" Id="Delete">
+                <FluentMenuItem Label="@loc["DeleteMenuItem"]" OnClick="HandleDeleteClick">
                     <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.DeleteDismiss())" Color="Color.Neutral" Slot="start" /></span>
                 </FluentMenuItem>
-                <FluentMenuItem Label="@loc["CloseMenuItem"]" Id="Close">
+                <FluentMenuItem Label="@loc["CloseMenuItem"]" OnClick="HandleCloseClick">
                     <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Checkmark())" Color="Color.Neutral" Slot="start" /></span>
                 </FluentMenuItem>
                 <FluentDivider />
-                <FluentLabel Typo="Typography.H6">@loc["AssignmentMenuLabel"]</FluentLabel>
-                <FluentMenuItem Label="@loc["AssignMenuItem"]" MenuItems="GetUsersMenuItems()">
-                    <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Person())" Color="Color.Neutral" Slot="start" /></span>
+                <FluentLabel Typo="Typography.H6">@loc["AssignMenuLabel"]</FluentLabel>
+                <FluentMenuItem Label="@loc["AssignMenuItem"]">
+                    <ChildContent>
+                        <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Person())" Color="Color.Neutral" Slot="start" /></span>
+                    </ChildContent>
+                    <MenuItems>
+                        @foreach (var user in Users ?? [])
+                        {
+                            <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@($"{user.Name} {user.Surname}")" OnClick="args => HandleAssignClick(user.Id)"/>
+                        }
+                    </MenuItems>
                 </FluentMenuItem>
             </FluentMenuButton>
         }
-        <FluentMenuButton Text="@loc["EditViewButton"]" IconStart="@(new Icons.Regular.Size20.TextAlignLeft())" OnMenuChanged="HandleEditViewMenuChanged">
+        <FluentMenuButton Text="@loc["EditViewButton"]" IconStart="@(new Icons.Regular.Size20.TextAlignLeft())">
             <FluentLabel Typo="Typography.H6">@loc["SortMenuLabel"]</FluentLabel>
             <FluentMenuItem Label="@loc["SortTitleMenuItem"]">
                 <ChildContent>
                     <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.TextCaseTitle())" Color="Color.Neutral" Slot="start" /></span>
                 </ChildContent>
                 <MenuItems>
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["SortAscendantMenuItem"]" Id="Sort|Title|Asc" />
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["SortDescendantMenuItem"]" Id="Sort|Title|Desc" />
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["SortAscendantMenuItem"]" />
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["SortDescendantMenuItem"]" />
                 </MenuItems>
             </FluentMenuItem>
             <FluentMenuItem Label="@loc["SortLastUpdateMenuItem"]">
@@ -79,8 +90,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                     <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Calendar())" Color="Color.Neutral" Slot="start" /></span>
                 </ChildContent>
                 <MenuItems>
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["SortAscendantMenuItem"]" Id="Sort|LastUpdate|Asc" />
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["SortDescendantMenuItem"]" Id="Sort|LastUpdate|Desc" />
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["SortAscendantMenuItem"]" />
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["SortDescendantMenuItem"]" />
                 </MenuItems>
             </FluentMenuItem>
             <FluentMenuItem Label="@loc["SortPriorityMenuItem"]">
@@ -88,25 +99,33 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                     <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.ArrowDownExclamation())" Color="Color.Neutral" Slot="start" /></span>
                 </ChildContent>
                 <MenuItems>
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["SortAscendantMenuItem"]" Id="Sort|Priority|Asc" />
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["SortDescendantMenuItem"]" Id="Sort|Priority|Desc" />
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["SortAscendantMenuItem"]" />
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["SortDescendantMenuItem"]"/>
                 </MenuItems>
             </FluentMenuItem>
             <FluentDivider />
             <FluentLabel Typo="Typography.H6">@loc["FilterMenuLabel"]</FluentLabel>
-            <FluentMenuItem Label="@loc["FilterOperatorMenuItem"]" MenuItems="GetUsersMenuItems(isFilter: true)">
-                <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Person())" Color="Color.Neutral" Slot="start" /></span>
+            <FluentMenuItem Label="@loc["FilterOperatorMenuItem"]">
+                <ChildContent>
+                    <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Person())" Color="Color.Neutral" Slot="start" /></span>
+                </ChildContent>
+                <MenuItems>
+                    @foreach (var user in Users ?? [])
+                    {
+                        <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@($"{user.Name} {user.Surname}")" />
+                    }
+                </MenuItems>
             </FluentMenuItem>
             <FluentMenuItem Label="@loc["SortLastUpdateMenuItem"]">
                 <ChildContent>
                     <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Calendar())" Color="Color.Neutral" Slot="start" /></span>
                 </ChildContent>
                 <MenuItems>
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterLastUpdateHourMenuItem"]" Id="Filter|LastUpdate|Hour" />
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterLastUpdateDayMenuItem"]" Id="Filter|LastUpdate|Day" />
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterLastUpdateWeekMenuItem"]" Id="Filter|LastUpdate|Week" />
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterLastUpdateMonthMenuItem"]" Id="Filter|LastUpdate|Month" />
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterLastUpdateYearMenuItem"]" Id="Filter|LastUpdate|Year" />
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterLastUpdateHourMenuItem"]" />
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterLastUpdateDayMenuItem"]" />
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterLastUpdateWeekMenuItem"]" />
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterLastUpdateMonthMenuItem"]" />
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterLastUpdateYearMenuItem"]" />
                 </MenuItems>
             </FluentMenuItem>
             <FluentMenuItem Label="@loc["FilterCategoryMenuItem"]">
@@ -114,35 +133,43 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                     <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Tag())" Color="Color.Neutral" Slot="start" /></span>
                 </ChildContent>
                 <MenuItems>
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterCategoryBugMenuItem"]" Id="Filter|Category|Bug" />
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterCategoryFeatureMenuItem"]" Id="Filter|Category|Feature" />
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterCategoryBugMenuItem"]" />
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterCategoryFeatureMenuItem"]" />
                 </MenuItems>
             </FluentMenuItem>
-            <FluentMenuItem Label="@loc["FilterPlatformMenuItem"]" MenuItems="GetPlatformsMenuItems()">
-                <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Apps())" Color="Color.Neutral" Slot="start" /></span>
+            <FluentMenuItem Label="@loc["FilterPlatformMenuItem"]">
+                <ChildContent>
+                    <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Apps())" Color="Color.Neutral" Slot="start" /></span>
+                </ChildContent>
+                <MenuItems>
+                    @foreach (var platform in platforms ?? [])
+                    {
+                        <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@($"{platform.Name}")" />
+                    }
+                </MenuItems>
             </FluentMenuItem>
             <FluentMenuItem Label="@loc["SortPriorityMenuItem"]">
                 <ChildContent>
                     <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.ArrowDownExclamation())" Color="Color.Neutral" Slot="start" /></span>
                 </ChildContent>
                 <MenuItems>
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterPriorityLowMenuItem"]" Id="Filter|Priority|Low" />
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterPriorityMediumMenuItem"]" Id="Filter|Priority|Medium" />
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterPriorityHighMenuItem"]" Id="Filter|Priority|High" />
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterPriorityLowMenuItem"]" />
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterPriorityMediumMenuItem"]" />
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterPriorityHighMenuItem"]" />
                 </MenuItems>
             </FluentMenuItem>
         </FluentMenuButton>
     </FluentStack>
     <FluentTabs Size="TabSize.Small" Width="100%" OnTabChange="HandleTabChange">
-        <FluentTab Label="@loc["AllTab"]" Icon="@(new Icons.Regular.Size20.Grid())" Id="tab-1">
+        <FluentTab Label="@loc["AllTab"]" Icon="@(new Icons.Regular.Size20.Grid())" Id="AllTab">
         </FluentTab>
-        <FluentTab Label="@loc["UnassignedTab"]" Icon="@(new Icons.Regular.Size20.Question())" Id="tab-2">
+        <FluentTab Label="@loc["UnassignedTab"]" Icon="@(new Icons.Regular.Size20.Question())" Id="UnassignedTab">
         </FluentTab>
-        <FluentTab Label="@loc["ToReplyTab"]" Icon="@(new Icons.Regular.Size20.ArrowReply())" Id="tab-3">
+        <FluentTab Label="@loc["ToReplyTab"]" Icon="@(new Icons.Regular.Size20.ArrowReply())" Id="ToReplyTab">
         </FluentTab>
-        <FluentTab Label="@loc["WaitingTab"]" Icon="@(new Icons.Regular.Size20.HourglassHalf())" Id="tab-4">
+        <FluentTab Label="@loc["WaitingTab"]" Icon="@(new Icons.Regular.Size20.HourglassHalf())" Id="WaitingTab">
         </FluentTab>
-        <FluentTab Label="@loc["ClosedTab"]" Icon="@(new Icons.Regular.Size20.Checkmark())" Id="tab-5">
+        <FluentTab Label="@loc["ClosedTab"]" Icon="@(new Icons.Regular.Size20.Checkmark())" Id="ClosedTab">
         </FluentTab>
     </FluentTabs>
 
@@ -162,27 +189,31 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     else
     {
         <div class="tickets-grid">
-            @foreach (var ticket in tickets)
-            {
-                <TicketCard Ticket="@ticket" SelectedChanged="HandleSelectedChanged"/>
-            }
+            <CascadingValue Value="@Users">
+                @foreach (var ticket in tickets)
+                {
+                    <TicketCard Ticket="@ticket" SelectedChanged="HandleSelectedChanged" StateChanged="HandleStateChanged"/>
+                }
+            </CascadingValue>
         </div>
     }
 </FluentStack>
 
 @code {
+    private IEnumerable<UserResponseDto>? Users { get; set; }
+
     private IEnumerable<TicketResponseDto>? tickets;
     private IEnumerable<PlatformResponseDto>? platforms;
-    private IEnumerable<UserResponseDto>? users;
-    private readonly HashSet<Guid> selectedTickets = new HashSet<Guid>();
+    private readonly HashSet<Guid> selectedTickets = [];
+    private string? currentTab;
 
     protected override async Task OnInitializedAsync()
     {  
         try
         {
             await LoadUsers();
-            await LoadTickets(null);
-            await LoadPlatforms(null);
+            await LoadTickets(await GetFilters());
+            await LoadPlatforms();
         }
         catch (Exception ex)
         {
@@ -193,62 +224,59 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     private async Task LoadUsers()
     {
         var result = await usersClient.GetAllAsync();
-        users = result.Item2;
+        Users = result.Item2;
     }
 
-    private async Task LoadTickets(IEnumerable<KeyValuePair<string, string>>? filters)
+    private async Task LoadTickets(IEnumerable<KeyValuePair<string, string>> filters)
     {
         var result = await ticketsClient.GetAllAsync(filters);
         tickets = result.Item2;
     }
 
-    private async Task LoadPlatforms(IEnumerable<KeyValuePair<string, string>>? filters)
+    private async Task LoadPlatforms()
     {
-        var result = await platformsClient.GetAllAsync(filters);
+        var result = await platformsClient.GetAllAsync();
         platforms = result.Item2;
     }
 
-    private static IEnumerable<KeyValuePair<string, string>>? GetFilters(FluentTab fluentTab)  
-    {  
-        return fluentTab.Id switch  
-        {  
-            "tab-1" => null,  
-            "tab-2" => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.Unassigned) } },  
-            "tab-3" => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingOperator) } },  
-            "tab-4" => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingUser) } },  
-            "tab-5" => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.Closed) } },  
-            _ => null  
-        };  
-    }  
-
-    private RenderFragment GetUsersMenuItems(bool isFilter = false) => builder =>  
-    {  
-        foreach (var user in users ?? [])  
-        {  
-            builder.OpenComponent<FluentMenuItem>(0);
-            if (isFilter) builder.AddAttribute(0, "Role", MenuItemRole.MenuItem);
-            builder.AddAttribute(isFilter ? 1 : 0, "Label", $"{user.Name} {user.Surname}");
-            builder.AddAttribute(isFilter ? 2 : 1, "Id", isFilter ? $"Filter|Operator|{user.Id}" : $"Assign|{user.Id}");
-            builder.CloseComponent();  
-        }  
-    };
-
-    private RenderFragment GetPlatformsMenuItems() => builder =>
+    private async Task<IEnumerable<KeyValuePair<string, string>>> GetFilters()
     {
-        foreach (var platform in platforms ?? [])
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        return GetFilterFromUser(user).Union(GetFilterFromTab(user));
+    }
+
+    private IEnumerable<KeyValuePair<string, string>> GetFilterFromUser(ClaimsPrincipal currentUser)
+    {
+        if (currentUser?.Identity?.IsAuthenticated == true)
         {
-            builder.OpenComponent<FluentMenuItem>(0);
-            builder.AddAttribute(0, "Role", MenuItemRole.MenuItem);
-            builder.AddAttribute(1, "Label", platform.Name);
-            builder.AddAttribute(2, "Id", $"Filter|Platform|{platform.Id}");
-            builder.CloseComponent();
+            return currentUser.FindFirstValue("tid") == configuration["Entra:TenantId"] ? 
+            [] : new Dictionary<string, string> { { nameof(TicketResponseDto.CreatorUserId), currentUser.FindFirstValue("uid") ?? "" } };
         }
-    };
+
+        return [];
+    }
+
+    private IEnumerable<KeyValuePair<string, string>> GetFilterFromTab(ClaimsPrincipal currentUser)  
+    {  
+        return currentTab switch  
+        {  
+            "AllTab" => [],  
+            "UnassignedTab" => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.Unassigned) } },  
+            "ToReply" when currentUser.FindFirstValue("tid") == configuration["Entra:TenantId"] => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingOperator) } },
+            "ToReply" when currentUser.FindFirstValue("tid") != configuration["Entra:TenantId"] => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingUser) } },
+            "WaitingTab" when currentUser.FindFirstValue("tid") == configuration["Entra:TenantId"] => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingUser) } },
+            "WaitingTab" when currentUser.FindFirstValue("tid") != configuration["Entra:TenantId"] => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingOperator) } },
+            "ClosedTab" => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.Closed) } },  
+            _ => []
+        };  
+    }
 
     private async Task HandleTabChange(FluentTab fluentTab)
     {
-        var filters = GetFilters(fluentTab);
-        await LoadTickets(filters);
+        currentTab = fluentTab?.Id;
+        await LoadTickets(await GetFilters());
     }
 
     private void HandleSelectedChanged(SelectedChangedEventArgs args)
@@ -263,49 +291,36 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         }
     }
 
-    private async Task HandleActionMenuChanged(MenuChangeEventArgs args)
+    private async Task HandleDeleteClick()
     {
-        if (args.Id == "Delete")
-        {
-            await dialogService.ShowDialogAsync<SimpleDialog>(
-                new SimpleDialogContent
-                {
-                    Message = loc["DeleteConfirmDialogMessage"],
-                    ConfirmAction = HandleConfirmDelete,
-                    ConfirmButtonIcon = new Icons.Regular.Size20.DeleteDismiss(),
-                },
-                Dialogs.ConfirmDialogParameters(loc["DeleteConfirmDialogTitle"], loc["DeleteConfirmDialogConfirmButton"], loc["DeleteConfirmDialogCancelButton"]));
-        }
-        else if (args.Id == "Close")
-        {
-            await dialogService.ShowDialogAsync<SimpleDialog>(
-                new SimpleDialogContent
-                {
-                    Message = loc["CloseConfirmDialogMessage"],
-                    ConfirmAction = HandleConfirmClose,
-                    ConfirmButtonIcon = new Icons.Regular.Size20.Checkmark(),
-                },
-                Dialogs.ConfirmDialogParameters(loc["CloseConfirmDialogTitle"], loc["CloseConfirmDialogConfirmButton"], loc["CloseConfirmDialogCancelButton"]));
-        }
-        else if (args.Id?.StartsWith("Assign") == true)
-        {
-            // TODO: Handle assign action
-        }
+        await dialogService.ShowDialogAsync<SimpleDialog>(
+            new SimpleDialogContent
+            {
+                Message = loc["DeleteConfirmDialogMessage"],
+                ConfirmAction = HandleConfirmDelete,
+                ConfirmButtonIcon = new Icons.Regular.Size20.DeleteDismiss(),
+            },
+            Dialogs.ConfirmDialogParameters(loc["DeleteConfirmDialogTitle"], loc["DeleteConfirmDialogConfirmButton"], loc["DeleteConfirmDialogCancelButton"]));
     }
 
-    private async Task HandleEditViewMenuChanged(MenuChangeEventArgs args)
+    private async Task HandleCloseClick()
     {
-        if (args.Id?.StartsWith("Sort") == true)
-        {
-            // TODO: Handle sort action
-        }
-        else if (args.Id?.StartsWith("Filter") == true)
-        {
-            // TODO: Handle filter action
-        }
+        await dialogService.ShowDialogAsync<SimpleDialog>(
+            new SimpleDialogContent
+            {
+                Message = loc["CloseConfirmDialogMessage"],
+                ConfirmAction = HandleConfirmClose,
+                ConfirmButtonIcon = new Icons.Regular.Size20.Checkmark(),
+            },
+            Dialogs.ConfirmDialogParameters(loc["CloseConfirmDialogTitle"], loc["CloseConfirmDialogConfirmButton"], loc["CloseConfirmDialogCancelButton"]));
     }
 
-    private async Task HandleConfirmDelete(MouseEventArgs args)
+    private async Task HandleAssignClick(Guid operatorId)
+    {
+        await HandleAssign(operatorId);
+    }
+
+    private async Task HandleConfirmDelete()
     {
         var progressToastParameters = Toasts.ProgressToastParameters("Delete", loc["DeleteProgressToastTitle"], loc["DeleteProgressToastDetails"]);
 
@@ -315,31 +330,39 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         {
             foreach (var ticketId in selectedTickets)
             {
-                await ticketsClient.DeleteAsync(ticketId);
+                var deleteResponse = await ticketsClient.DeleteAsync(ticketId);
 
-                // Update the progress bar and the toast.
-                progressToastParameters.Content.Progress += 100 / selectedTickets.Count;
-                if (progressToastParameters.Content.Progress > 100) progressToastParameters.Content.Progress = 100;
+                // If the ticket could not be deleted, send an error.
+                if (deleteResponse is HttpStatusCode.NoContent)
+                {
+                    // Update the progress bar and the toast.
+                    progressToastParameters.Content.Progress += 100 / selectedTickets.Count;
+                    if (progressToastParameters.Content.Progress > 100) progressToastParameters.Content.Progress = 100;
 
-                toastService.UpdateToast("Delete", progressToastParameters);
+                    toastService.UpdateToast("Delete", progressToastParameters);
+                }
+                else throw new HttpRequestException(deleteResponse.ToString(), null, deleteResponse);
             }
 
-            toastService.ClearQueueProgressToasts();
-
             toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["DeleteSuccessToastTitle"], loc["DeleteSuccessToastDetails"]));
-
-            // Deselect all tickets.
-            selectedTickets.Clear();
-
-            // TODO: Reload the tickets
         }
         catch (Exception ex)
         {
             toastService.ShowCommunicationToast(Toasts.ErrorToastParameters(ex, loc["DeleteErrorToastTitle"], loc["DeleteErrorToastDetails"]));
         }
+        finally
+        {
+            toastService.ClearQueueProgressToasts();
+
+            // Deselect all tickets.
+            selectedTickets.Clear();
+
+            // Reload the tickets.
+            await LoadTickets(await GetFilters());
+        }
     }
 
-    private async Task HandleConfirmClose(MouseEventArgs args)
+    private async Task HandleConfirmClose()
     {
         var progressToastParameters = Toasts.ProgressToastParameters("Close", loc["CloseProgressToastTitle"], loc["CloseProgressToastDetails"]);
 
@@ -349,36 +372,102 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         {
             foreach (var ticketId in selectedTickets)
             {
-                var ticketResponse = await ticketsClient.GetAsync(ticketId);
+                var getResponse = await ticketsClient.GetAsync(ticketId);
 
-                // If the ticket could not be found, skip it.
-                if (ticketResponse is (HttpStatusCode.OK, not null))
+                // // If the ticket could not be retrieved, send an error.
+                if (getResponse is (HttpStatusCode.OK, not null))
                 {
                     // Update the ticket status to Closed.
-                    ticketResponse.Item2.Status = Status.Closed;
+                    getResponse.Item2.Status = Status.Closed;
 
-                    await ticketsClient.PutAsync(ticketId, mapper.Map(ticketResponse, new TicketRequestDto()));
+                    var putResponse = await ticketsClient.PutAsync(ticketId, mapper.Map(getResponse, new TicketRequestDto()));
+
+                    // If the ticket could not be closed, send an error.
+                    if (putResponse is (HttpStatusCode.OK, not null))
+                    {
+                        // Update the progress bar and the toast.
+                        progressToastParameters.Content.Progress += 100 / selectedTickets.Count;
+                        if (progressToastParameters.Content.Progress > 100) progressToastParameters.Content.Progress = 100;
+
+                        toastService.UpdateToast("Close", progressToastParameters);
+                    }
+                    else throw new HttpRequestException(putResponse.Item1.ToString(), null, putResponse.Item1);
                 }
-
-                // Update the progress bar and the toast.
-                progressToastParameters.Content.Progress += 100 / selectedTickets.Count;
-                if (progressToastParameters.Content.Progress > 100) progressToastParameters.Content.Progress = 100;
-
-                toastService.UpdateToast("Close", progressToastParameters);
+                else throw new HttpRequestException(getResponse.Item1.ToString(), null, getResponse.Item1);
             }
 
-            toastService.ClearQueueProgressToasts();
-
             toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["CloseSuccessToastTitle"], loc["CloseSuccessToastDetails"]));
-
-            // Deselect all tickets.
-            selectedTickets.Clear();
-
-            // TODO: Reload the tickets
         }
         catch (Exception ex)
         {
             toastService.ShowCommunicationToast(Toasts.ErrorToastParameters(ex, loc["CloseErrorToastTitle"], loc["CloseErrorToastDetails"]));
         }
+        finally
+        {
+            toastService.ClearQueueProgressToasts();
+
+            // Deselect all tickets.
+            selectedTickets.Clear();
+
+            // Reload the tickets.
+            await LoadTickets(await GetFilters());
+        }
+    }
+
+    private async Task HandleAssign(Guid operatorId)
+    {
+        var progressToastParameters = Toasts.ProgressToastParameters("Assign", loc["AssignProgressToastTitle"], loc["AssignProgressToastDetails"]);
+
+        toastService.ShowProgressToast(progressToastParameters);
+
+        try
+        {
+            foreach (var ticketId in selectedTickets)
+            {
+                var getResponse = await ticketsClient.GetAsync(ticketId);
+
+                // If the ticket could not be retrieved, send an error.
+                if (getResponse is (HttpStatusCode.OK, not null))
+                {
+                    // Update the ticket assignee.
+                    getResponse.Item2.OperatorUserId = operatorId;
+
+                    var putResponse = await ticketsClient.PutAsync(ticketId, mapper.Map(getResponse, new TicketRequestDto()));
+
+                    // If the ticket could not be assigned, send an error.
+                    if (putResponse is (HttpStatusCode.OK, not null))
+                    {
+                        // Update the progress bar and the toast.
+                        progressToastParameters.Content.Progress += 100 / selectedTickets.Count;
+                        if (progressToastParameters.Content.Progress > 100) progressToastParameters.Content.Progress = 100;
+
+                        toastService.UpdateToast("Assign", progressToastParameters);
+                    }
+                    else throw new HttpRequestException(putResponse.Item1.ToString(), null, putResponse.Item1);
+                }
+                else throw new HttpRequestException(getResponse.Item1.ToString(), null, getResponse.Item1);
+            }
+
+            toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["AssignSuccessToastTitle"], loc["AssignSuccessToastDetails"]));
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowCommunicationToast(Toasts.ErrorToastParameters(ex, loc["AssignErrorToastTitle"], loc["AssignErrorToastDetails"]));
+        }
+        finally
+        {
+            toastService.ClearQueueProgressToasts();
+
+            // Deselect all tickets.
+            selectedTickets.Clear();
+
+            // Reload the tickets.
+            await LoadTickets(await GetFilters());
+        }
+    }
+
+    private async Task HandleStateChanged()
+    {
+        await LoadTickets(await GetFilters());
     }
 }
