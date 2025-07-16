@@ -68,7 +68,7 @@ namespace ADAtickets.ApiService.Controllers
         {
             var platforms = await (filters != null ? platformRepository.GetPlatformsByAsync(filters) : platformRepository.GetPlatformsAsync());
 
-            return Ok(platforms.Select(platform => mapper.Map(platform, new PlatformResponseDto())));
+            return Ok(platforms.Select(mapper.Map<PlatformResponseDto>));
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace ADAtickets.ApiService.Controllers
             }
 
             // Insert the entity data into a new DTO and send it to the client.
-            return Ok(mapper.Map(platform, new PlatformResponseDto()));
+            return Ok(mapper.Map<PlatformResponseDto>(platform));
         }
 
         /// <summary>
@@ -186,13 +186,13 @@ namespace ADAtickets.ApiService.Controllers
         [RequiredScope(Scope.Read, Scope.Write)]
         public async Task<ActionResult<PlatformResponseDto>> PostPlatform(PlatformRequestDto platformDto)
         {
-            var platform = mapper.Map(platformDto, new Platform());
+            var platform = mapper.Map<Platform>(platformDto);
 
             // Insert the DTO info into a new entity and add it to the data source.
             await platformRepository.AddPlatformAsync(platform);
 
             // Return the created entity and its location to the client.
-            return CreatedAtAction(nameof(GetPlatform), new { id = platform.Id }, platform);
+            return CreatedAtAction(nameof(GetPlatform), new { id = platform.Id }, mapper.Map<PlatformResponseDto>(platform));
         }
 
         /// <summary>

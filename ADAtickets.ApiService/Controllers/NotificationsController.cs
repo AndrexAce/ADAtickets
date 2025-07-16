@@ -68,7 +68,7 @@ namespace ADAtickets.ApiService.Controllers
         {
             var notifications = await (filters != null ? notificationRepository.GetNotificationsByAsync(filters) : notificationRepository.GetNotificationsAsync());
 
-            return Ok(notifications.Select(notification => mapper.Map(notification, new NotificationResponseDto())));
+            return Ok(notifications.Select(mapper.Map<NotificationResponseDto>));
         }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace ADAtickets.ApiService.Controllers
             }
 
             // Insert the entity data into a new DTO and send it to the client.
-            return Ok(mapper.Map(notification, new NotificationResponseDto()));
+            return Ok(mapper.Map<NotificationResponseDto>(notification));
         }
 
         /// <summary>
@@ -201,13 +201,13 @@ namespace ADAtickets.ApiService.Controllers
         [RequiredScope(Scope.Read, Scope.Write)]
         public async Task<ActionResult<NotificationResponseDto>> PostNotification(NotificationRequestDto notificationDto)
         {
-            var notification = mapper.Map(notificationDto, new Notification());
+            var notification = mapper.Map<Notification>(notificationDto);
 
             // Insert the DTO info into a new entity and add it to the data source.
             await notificationRepository.AddNotificationAsync(notification);
 
             // Return the created entity and its location to the client.
-            return CreatedAtAction(nameof(GetNotification), new { id = notification.Id }, notification);
+            return CreatedAtAction(nameof(GetNotification), new { id = notification.Id }, mapper.Map<NotificationResponseDto>(notification));
         }
 
         /// <summary>

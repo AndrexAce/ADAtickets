@@ -68,7 +68,7 @@ namespace ADAtickets.ApiService.Controllers
         {
             var edits = await (filters != null ? editRepository.GetEditsByAsync(filters) : editRepository.GetEditsAsync());
 
-            return Ok(edits.Select(edit => mapper.Map(edit, new EditResponseDto())));
+            return Ok(edits.Select(mapper.Map<EditResponseDto>));
         }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace ADAtickets.ApiService.Controllers
             }
 
             // Insert the entity data into a new DTO and send it to the client.
-            return Ok(mapper.Map(edit, new EditResponseDto()));
+            return Ok(mapper.Map<EditResponseDto>(edit));
         }
 
         /// <summary>
@@ -205,13 +205,13 @@ namespace ADAtickets.ApiService.Controllers
         [RequiredScope(Scope.Read, Scope.Write)]
         public async Task<ActionResult<EditResponseDto>> PostEdit(EditRequestDto editDto)
         {
-            var edit = mapper.Map(editDto, new Edit());
+            var edit = mapper.Map<Edit>(editDto);
 
             // Insert the DTO info into a new entity and add it to the data source.
             await editRepository.AddEditAsync(edit);
 
             // Return the created entity and its location to the client.
-            return CreatedAtAction(nameof(GetEdit), new { id = edit.Id }, edit);
+            return CreatedAtAction(nameof(GetEdit), new { id = edit.Id }, mapper.Map<EditResponseDto>(edit));
         }
 
         /// <summary>

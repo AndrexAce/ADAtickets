@@ -28,31 +28,31 @@ namespace ADAtickets.Shared.Dtos.Responses
         /// <summary>
         /// The date and time when the notification was sent.
         /// </summary>
-        public DateTimeOffset SendDateTime { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset SendDateTime { get; init; } = DateTimeOffset.UtcNow;
 
         /// <summary>
         /// The message the notification comes with.
         /// </summary>
-        public string Message { get; set; } = string.Empty;
+        public string Message { get; init; } = string.Empty;
 
         /// <summary>
         /// Whether the notification has been read by the user.
         /// </summary>
-        public bool IsRead { get; set; } = false;
+        public bool IsRead { get; init; } = false;
 
         /// <summary>
         /// The id of the ticket this notification is related to.
         /// </summary>
-        public Guid TicketId { get; set; } = Guid.Empty;
+        public Guid TicketId { get; init; } = Guid.Empty;
 
         /// <summary>
         /// The id of the user this notification is related to.
         /// </summary>
-        public Guid UserId { get; set; } = Guid.Empty;
+        public Guid UserId { get; init; } = Guid.Empty;
 
         /// <summary>
         /// The collection of ids of the users the notification was sent to.
         /// </summary>
-        public ICollection<Guid> Recipients { get; } = [];
+        public ICollection<Guid> Recipients { get; init; } = [];
     }
 }

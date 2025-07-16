@@ -28,21 +28,21 @@ namespace ADAtickets.Shared.Dtos.Responses
         /// <summary>
         /// The name of the platform.
         /// </summary>
-        public string Name { get; set; } = string.Empty;
+        public string Name { get; init; } = string.Empty;
 
         /// <summary>
         /// The URL of the repository where the source code of the platform is hosted.
         /// </summary>
-        public string RepositoryUrl { get; set; } = string.Empty;
+        public string RepositoryUrl { get; init; } = string.Empty;
 
         /// <summary>
         /// The collection of ids of the tickets related to the platform.
         /// </summary>
-        public ICollection<Guid> Tickets { get; } = [];
+        public ICollection<Guid> Tickets { get; init; } = [];
 
         /// <summary>
         /// The collection of ids of the users who preferred the platform.
         /// </summary>
-        public ICollection<Guid> UsersPreferred { get; } = [];
+        public ICollection<Guid> UsersPreferred { get; init; } = [];
     }
 }

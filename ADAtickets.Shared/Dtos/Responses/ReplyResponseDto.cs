@@ -28,21 +28,21 @@ namespace ADAtickets.Shared.Dtos.Responses
         /// <summary>
         /// The date and time when the reply was sent.
         /// </summary>
-        public DateTimeOffset ReplyDateTime { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset ReplyDateTime { get; init; } = DateTimeOffset.UtcNow;
 
         /// <summary>
         /// The message written in the reply.
         /// </summary>
-        public string Message { get; set; } = string.Empty;
+        public string Message { get; init; } = string.Empty;
 
         /// <summary>
         /// The id of the user who sent the reply.
         /// </summary>
-        public Guid AuthorUserId { get; set; } = Guid.Empty;
+        public Guid AuthorUserId { get; init; } = Guid.Empty;
 
         /// <summary>
         /// The id of the ticket this reply was sent to.
         /// </summary>
-        public Guid TicketId { get; set; } = Guid.Empty;
+        public Guid TicketId { get; init; } = Guid.Empty;
     }
 }

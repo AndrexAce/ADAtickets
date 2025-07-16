@@ -32,33 +32,33 @@ namespace ADAtickets.Shared.Dtos.Responses
         /// <summary>
         /// The date and time when the edit was made.
         /// </summary>
-        public DateTimeOffset EditDateTime { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset EditDateTime { get; init; } = DateTimeOffset.UtcNow;
 
         /// <summary>
         /// The message the edit comes with.
         /// </summary>
-        public string Description { get; set; } = string.Empty;
+        public string Description { get; init; } = string.Empty;
 
         /// <summary>
         /// The status the ticket was in before the edit.
         /// </summary>
         [JsonConverter(typeof(StringEnumConverter))]
-        public Status OldStatus { get; set; } = Status.Unassigned;
+        public Status OldStatus { get; init; } = Status.Unassigned;
 
         /// <summary>
         /// The status the ticket will be after the edit.
         /// </summary>
         [JsonConverter(typeof(StringEnumConverter))]
-        public Status NewStatus { get; set; } = Status.Unassigned;
+        public Status NewStatus { get; init; } = Status.Unassigned;
 
         /// <summary>
         /// The id of the ticket this edit is related to.
         /// </summary>
-        public Guid TicketId { get; set; } = Guid.Empty;
+        public Guid TicketId { get; init; } = Guid.Empty;
 
         /// <summary>
         /// The id of the user who made the edit.
         /// </summary>
-        public Guid UserId { get; set; } = Guid.Empty;
+        public Guid UserId { get; init; } = Guid.Empty;
     }
 }

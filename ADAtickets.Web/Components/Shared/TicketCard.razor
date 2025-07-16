@@ -37,20 +37,17 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 <FluentCard Id="@(Ticket.Id.ToString())" Style="background: var(--neutral-layer-1)" Width="20rem">
     <FluentStack Orientation="Orientation.Vertical">
         <FluentStack Orientation="Orientation.Horizontal">
-            @if (creatorName is null)
+            @if (Users is null)
             {
-                <FluentSpacer />
                 <FluentSkeleton Shape="SkeletonShape.Circle" Shimmer="true" />
                 <FluentSkeleton Height="3.5rem" Width="4rem" Shimmer="true" />
                 <FluentSpacer />
             }
             else
             {
-                <FluentCheckbox Class="hover-hide" CheckStateChanged="HandleCheckStateChanged" />
-                <FluentSpacer />
                 <FluentPersona ImageSize="3rem">
                     <FluentStack Orientation="Orientation.Vertical">
-                        <p>@creatorName</p>
+                        <p>@Ticket.CreatorName</p>
                         <FluentStack Orientation="Orientation.Horizontal">
                             <FluentIcon Value="@(new Icons.Filled.Size20.Bug())" />
                             <p>@(Ticket.CreationDateTime.Humanize())</p>
@@ -58,10 +55,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                     </FluentStack>
                 </FluentPersona>
                 <FluentSpacer />
-                <FluentButton class="hover-hide" Appearance="Appearance.Stealth" IconStart="@(new Icons.Regular.Size20.MoreHorizontal())"/>
+                <FluentCheckbox Class="hover-hide" CheckStateChanged="HandleCheckStateChanged" />
             }
         </FluentStack>
-        @if (creatorName is null)
+        @if (Users is null)
         {
             <FluentSkeleton Height="1rem" Width="100%" Shimmer="true" />
             <FluentSkeleton Height="1rem" Width="100%" Shimmer="true" />
@@ -83,7 +80,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     </FluentStack>
 </FluentCard>
 
-@if (creatorName is not null)
+@if (Users is not null)
 {
     <FluentMenu Anchor="@(Ticket.Id.ToString())" Trigger="MouseButton.Right" Anchored="false">
         <FluentLabel Typo="Typography.H6">@loc["EditStatusMenuLabel"]</FluentLabel>
@@ -136,26 +133,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     /// </summary>
     [Parameter]
     public EventCallback StateChanged { get; set; }
-
-    private string? creatorName;
-
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            var ticketResponse = await usersClient.GetAsync(Ticket.CreatorUserId);
-
-            // If the ticket could not be found, do not update the card.
-            if (ticketResponse is (HttpStatusCode.OK, not null))
-            {
-                creatorName = $"{ticketResponse.Item2.Name} {ticketResponse.Item2.Surname}";
-            }
-        }
-        catch (Exception)
-        {
-            // Do nothing, some data was not retrieved.
-        }
-    }
 
     private static RenderFragment GetPriorityBadge(Priority priority) => @<FluentBadge Fill="highlight" BackgroundColor="@GetPriorityAppearance(priority)" Circular="true">
     @priority.ToString()
@@ -249,9 +226,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             if (getResponse is (HttpStatusCode.OK, not null))
             {
                 // Update the ticket status to Closed.
-                getResponse.Item2.Status = Status.Closed;
+                var requestDto = mapper.Map<TicketRequestDto>(getResponse);
+                requestDto.Status = Status.Closed;
 
-                var putResponse = await ticketsClient.PutAsync(Ticket.Id, mapper.Map(getResponse, new TicketRequestDto()));
+                var putResponse = await ticketsClient.PutAsync(Ticket.Id, requestDto);
 
                 // If the ticket could not be closed, send an error.
                 if (putResponse is (HttpStatusCode.OK, not null))
@@ -281,9 +259,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             if (getResponse is (HttpStatusCode.OK, not null))
             {
                 // Update the ticket assignee.
-                getResponse.Item2.OperatorUserId = operatorId;
+                var requestDto = mapper.Map<TicketRequestDto>(getResponse);
+                requestDto.OperatorUserId = operatorId;
 
-                var putResponse = await ticketsClient.PutAsync(Ticket.Id, mapper.Map(getResponse, new TicketRequestDto()));
+                var putResponse = await ticketsClient.PutAsync(Ticket.Id, requestDto);
 
                 // If the ticket could not be assigned, send an error.
                 if (putResponse is (HttpStatusCode.OK, not null))

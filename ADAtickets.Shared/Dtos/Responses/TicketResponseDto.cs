@@ -33,73 +33,83 @@ namespace ADAtickets.Shared.Dtos.Responses
         /// The type of user request bound to the ticket.
         /// </summary>
         [JsonConverter(typeof(StringEnumConverter))]
-        public TicketType Type { get; set; } = TicketType.Bug;
+        public TicketType Type { get; init; } = TicketType.Bug;
 
         /// <summary>
         /// The date and time when the ticket was created.
         /// </summary>
-        public DateTimeOffset CreationDateTime { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset CreationDateTime { get; init; } = DateTimeOffset.UtcNow;
 
         /// <summary>
         /// The title of the ticket, a brief recap of the issue.
         /// </summary>
-        public string Title { get; set; } = string.Empty;
+        public string Title { get; init; } = string.Empty;
 
         /// <summary>
         /// The description of the ticket, a detailed description of the issue.
         /// </summary>
-        public string Description { get; set; } = string.Empty;
+        public string Description { get; init; } = string.Empty;
 
         /// <summary>
         /// The urgency of the ticket.
         /// </summary>
         [JsonConverter(typeof(StringEnumConverter))]
-        public Priority Priority { get; set; } = Priority.Low;
+        public Priority Priority { get; init; } = Priority.Low;
 
         /// <summary>
         /// The status of the ticket.
         /// </summary>
         [JsonConverter(typeof(StringEnumConverter))]
-        public Status Status { get; set; } = Status.Unassigned;
+        public Status Status { get; init; } = Status.Unassigned;
 
         /// <summary>
         /// The id of the work item the ticket is related to in Azure DevOps.
         /// </summary>
-        public int WorkItemId { get; set; } = 0;
+        public int WorkItemId { get; init; } = 0;
 
         /// <summary>
         /// The id of the platform the ticket is related to.
         /// </summary>
-        public Guid PlatformId { get; set; } = Guid.Empty;
+        public Guid PlatformId { get; init; } = Guid.Empty;
 
         /// <summary>
         /// The id of the user who created the ticket.
         /// </summary>
-        public Guid CreatorUserId { get; set; } = Guid.Empty;
+        public Guid CreatorUserId { get; init; } = Guid.Empty;
+
+        /// <summary>
+        /// The name of the user who created the ticket (from related entity <see cref="User"/>).
+        /// </summary>
+        public string CreatorName { get; init; } = string.Empty;
 
         /// <summary>
         /// The id of the operator assigned to the ticket.
         /// </summary>
-        public Guid? OperatorUserId { get; set; } = null;
+        public Guid? OperatorUserId { get; init; } = null;
 
         /// <summary>
         /// The collection of ids of edits made to the ticket.
         /// </summary>
-        public ICollection<Guid> Edits { get; } = [];
+        public ICollection<Guid> Edits { get; init; } = [];
+
+        /// <summary>
+        /// The last update date of the ticket (from related entity <see cref="Edit"/>).
+        /// </summary>
+        public DateTimeOffset LastUpdateDateTime { get; init; } = DateTimeOffset.UtcNow;
 
         /// <summary>
         /// The collection of ids of replies sent to the ticket.
         /// </summary>
-        public ICollection<Guid> Replies { get; } = [];
+        public ICollection<Guid> Replies { get; init; } = [];
 
         /// <summary>
         /// The collection of ids of attachments attached to the ticket.
         /// </summary>
-        public ICollection<Guid> Attachments { get; } = [];
+        public ICollection<Guid> Attachments { get; init; } = [];
 
         /// <summary>
         /// The collection of ids of notifications related to the ticket.
         /// </summary>
-        public ICollection<Guid> Notifications { get; } = [];
+        public ICollection<Guid> Notifications { get; init; } = [];
     }
 }

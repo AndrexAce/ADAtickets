@@ -30,71 +30,71 @@ namespace ADAtickets.Shared.Dtos.Responses
         /// <summary>
         /// The email address of the user.
         /// </summary>
-        public string Email { get; set; } = string.Empty;
+        public string Email { get; init; } = string.Empty;
 
         /// <summary>
         /// The name of the user.
         /// </summary>
-        public string Name { get; set; } = string.Empty;
+        public string Name { get; init; } = string.Empty;
 
         /// <summary>
         /// The surname of the user.
         /// </summary>
-        public string Surname { get; set; } = string.Empty;
+        public string Surname { get; init; } = string.Empty;
 
         /// <summary>
         /// The phone number of the user.
         /// </summary>
-        public string PhoneNumber { get; set; } = string.Empty;
+        public string PhoneNumber { get; init; } = string.Empty;
 
         /// <summary>
         /// Whether the user enabled the reception of external notifications via email.
         /// </summary>
-        public bool AreEmailNotificationsEnabled { get; set; } = false;
+        public bool AreEmailNotificationsEnabled { get; init; } = false;
 
         /// <summary>
         /// Whether the user enabled the reception of external notifications via SMS.
         /// </summary>
-        public bool ArePhoneNotificationsEnabled { get; set; } = false;
+        public bool ArePhoneNotificationsEnabled { get; init; } = false;
 
         /// <summary>
         /// The role of the user in the system.
         /// </summary>
-        public UserType Type { get; set; } = UserType.User;
+        public UserType Type { get; init; } = UserType.User;
 
         /// <summary>
         /// The collection of ids of tickets created by the user (if they are a user, otherwise it must be empty).
         /// </summary>
-        public ICollection<Guid> CreatedTickets { get; } = [];
+        public ICollection<Guid> CreatedTickets { get; init; } = [];
 
         /// <summary>
         /// The collection of ids of tickets assigned to the user (if they are an operator, otherwise it must be empty).
         /// </summary>
-        public ICollection<Guid> AssignedTickets { get; } = [];
+        public ICollection<Guid> AssignedTickets { get; init; } = [];
 
         /// <summary>
         /// The collection of ids of replies sent by the user to any ticket.
         /// </summary>
-        public ICollection<Guid> Replies { get; } = [];
+        public ICollection<Guid> Replies { get; init; } = [];
 
         /// <summary>
         /// The collection of ids of edits made by the user to any ticket.
         /// </summary>
-        public ICollection<Guid> Edits { get; } = [];
+        public ICollection<Guid> Edits { get; init; } = [];
 
         /// <summary>
         /// The collection of ids of platforms the user prefers (if they are an operator, otherwise it must be empty).
         /// </summary>
-        public ICollection<Guid> PreferredPlatforms { get; } = [];
+        public ICollection<Guid> PreferredPlatforms { get; init; } = [];
 
         /// <summary>
         /// The collection of ids of notifications the user triggered the sending of.
         /// </summary>
-        public ICollection<Guid> SentNotifications { get; } = [];
+        public ICollection<Guid> SentNotifications { get; init; } = [];
 
         /// <summary>
         /// The collection of ids of notifications the user received.
         /// </summary>
-        public ICollection<Guid> ReceivedNotifications { get; } = [];
+        public ICollection<Guid> ReceivedNotifications { get; init; } = [];
     }
 }

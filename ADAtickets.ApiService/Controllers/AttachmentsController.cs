@@ -68,7 +68,7 @@ namespace ADAtickets.ApiService.Controllers
         {
             var attachments = await (filters != null ? attachmentRepository.GetAttachmentsByAsync(filters) : attachmentRepository.GetAttachmentsAsync());
 
-            return Ok(attachments.Select(attachment => mapper.Map(attachment, new AttachmentResponseDto())));
+            return Ok(attachments.Select(mapper.Map<AttachmentResponseDto>));
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace ADAtickets.ApiService.Controllers
             }
 
             // Insert the entity data into a new DTO and send it to the client.
-            return Ok(mapper.Map(attachment, new AttachmentResponseDto()));
+            return Ok(mapper.Map<AttachmentResponseDto>(attachment));
         }
 
         /// <summary>
@@ -190,13 +190,13 @@ namespace ADAtickets.ApiService.Controllers
         [RequiredScope(Scope.Read, Scope.Write)]
         public async Task<ActionResult<AttachmentResponseDto>> PostAttachment(AttachmentRequestDto attachmentDto)
         {
-            var attachment = mapper.Map(attachmentDto, new Attachment());
+            var attachment = mapper.Map<Attachment>(attachmentDto);
 
             // Insert the DTO info into a new entity and add it to the data source.
             await attachmentRepository.AddAttachmentAsync(attachment, attachmentDto.Content);
 
             // Return the created entity and its location to the client.
-            return CreatedAtAction(nameof(GetAttachment), new { id = attachment.Id }, attachment);
+            return CreatedAtAction(nameof(GetAttachment), new { id = attachment.Id }, mapper.Map<AttachmentResponseDto>(attachment));
         }
 
         /// <summary>

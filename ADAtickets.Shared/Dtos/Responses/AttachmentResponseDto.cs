@@ -28,11 +28,11 @@ namespace ADAtickets.Shared.Dtos.Responses
         /// <summary>
         /// The path of the attachment on the server.
         /// </summary>
-        public string Path { get; set; } = string.Empty;
+        public string Path { get; init; } = string.Empty;
 
         /// <summary>
         /// The id of the ticket this attachment is related to.
         /// </summary>
-        public Guid TicketId { get; set; } = Guid.Empty;
+        public Guid TicketId { get; init; } = Guid.Empty;
     }
 }

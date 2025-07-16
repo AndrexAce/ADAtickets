@@ -378,9 +378,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 if (getResponse is (HttpStatusCode.OK, not null))
                 {
                     // Update the ticket status to Closed.
-                    getResponse.Item2.Status = Status.Closed;
+                    var requestDto = mapper.Map<TicketRequestDto>(getResponse);
+                    requestDto.Status = Status.Closed;
 
-                    var putResponse = await ticketsClient.PutAsync(ticketId, mapper.Map(getResponse, new TicketRequestDto()));
+                    var putResponse = await ticketsClient.PutAsync(ticketId, requestDto);
 
                     // If the ticket could not be closed, send an error.
                     if (putResponse is (HttpStatusCode.OK, not null))
@@ -430,9 +431,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 if (getResponse is (HttpStatusCode.OK, not null))
                 {
                     // Update the ticket assignee.
-                    getResponse.Item2.OperatorUserId = operatorId;
+                    var requestDto = mapper.Map<TicketRequestDto>(getResponse);
+                    requestDto.OperatorUserId = operatorId;
 
-                    var putResponse = await ticketsClient.PutAsync(ticketId, mapper.Map(getResponse, new TicketRequestDto()));
+                    var putResponse = await ticketsClient.PutAsync(ticketId, requestDto);
 
                     // If the ticket could not be assigned, send an error.
                     if (putResponse is (HttpStatusCode.OK, not null))

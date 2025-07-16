@@ -68,7 +68,7 @@ namespace ADAtickets.ApiService.Controllers
         {
             var users = await (filters != null ? userRepository.GetUsersByAsync(filters) : userRepository.GetUsersAsync());
 
-            return Ok(users.Select(user => mapper.Map(user, new UserResponseDto())));
+            return Ok(users.Select(mapper.Map<UserResponseDto>));
         }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace ADAtickets.ApiService.Controllers
             }
 
             // Insert the entity data into a new DTO and send it to the client.
-            return Ok(mapper.Map(user, new UserResponseDto()));
+            return Ok(mapper.Map<UserResponseDto>(user));
         }
 
         /// <summary>
@@ -215,13 +215,13 @@ namespace ADAtickets.ApiService.Controllers
         [RequiredScope(Scope.Read, Scope.Write)]
         public async Task<ActionResult<UserResponseDto>> PostUser(UserRequestDto userDto)
         {
-            var user = mapper.Map(userDto, new User());
+            var user = mapper.Map<User>(userDto);
 
             // Insert the DTO info into a new entity and add it to the data source.
             await userRepository.AddUserAsync(user);
 
             // Return the created entity and its location to the client.
-            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
+            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, mapper.Map<UserResponseDto>(user));
         }
 
         /// <summary>

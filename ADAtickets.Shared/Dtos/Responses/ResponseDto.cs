@@ -31,6 +31,6 @@ namespace ADAtickets.Shared.Dtos.Responses
         /// <summary>
         /// The unique identifier of the entity.
         /// </summary>
-        public Guid Id { get; set; } = Guid.Empty;
+        public Guid Id { get; init; } = Guid.Empty;
     }
 }
