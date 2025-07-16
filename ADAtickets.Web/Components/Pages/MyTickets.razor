@@ -52,7 +52,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center" HorizontalAlignment="HorizontalAlignment.End">
         @if (currentSort is not null && currentSortDirection is not null)
         {
-            <FluentBadge Appearance="Appearance.Accent" Circular="true" OnDismissClick="HandleSortDismissClick">
+            <FluentBadge Appearance="Appearance.Accent" Circular="true" OnDismissClick="HandleSortDismissClick" DismissIcon="@(new Icons.Regular.Size20.Dismiss().WithColor(Color.Fill))">
                 @if (currentSortDirection == "asc")
                 {
                     <FluentIcon Color="Color.Fill" Value="@(new Icons.Regular.Size20.ArrowSortUp())" />
@@ -67,35 +67,35 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         @if (activeUserFilter is not null)
         {
             <FluentBadge Appearance="Appearance.Accent" Circular="true" OnDismissClick="HandleFilterUserDismissClick">
-                <FluentIcon Color="Color.Fill" Value="@(new Icons.Regular.Size20.Person())" />
+                <FluentIcon Color="Color.Fill" Value="@(new Icons.Regular.Size20.Person())" DismissIcon="@(new Icons.Regular.Size20.Dismiss().WithColor(Color.Fill))" />
                 @activeUserFilter.Name @activeUserFilter.Surname
             </FluentBadge>
         }
         @if (activePlatformFilter is not null)
         {
             <FluentBadge Appearance="Appearance.Accent" Circular="true" OnDismissClick="HandleFilterPlatformDismissClick">
-                <FluentIcon Color="Color.Fill" Value="@(new Icons.Regular.Size20.Apps())" />
+                <FluentIcon Color="Color.Fill" Value="@(new Icons.Regular.Size20.Apps())" DismissIcon="@(new Icons.Regular.Size20.Dismiss().WithColor(Color.Fill))" />
                 @activePlatformFilter.Name
             </FluentBadge>
         }
         @if (activePriorityFilter.HasValue)
         {
             <FluentBadge Appearance="Appearance.Accent" Circular="true" OnDismissClick="HandleFilterPriorityDismissClick">
-                <FluentIcon Color="Color.Fill" Value="@(new Icons.Regular.Size20.ArrowDownExclamation())" />
+                <FluentIcon Color="Color.Fill" Value="@(new Icons.Regular.Size20.ArrowDownExclamation())" DismissIcon="@(new Icons.Regular.Size20.Dismiss().WithColor(Color.Fill))" />
                 @GetPriorityFilterBadgeText()
             </FluentBadge>
         }
         @if (activeTypeFilter.HasValue)
         {
             <FluentBadge Appearance="Appearance.Accent" Circular="true" OnDismissClick="HandleFilterTypeDismissClick">
-                <FluentIcon Color="Color.Fill" Value="@(new Icons.Regular.Size20.Tag())" />
+                <FluentIcon Color="Color.Fill" Value="@(new Icons.Regular.Size20.Tag())" DismissIcon="@(new Icons.Regular.Size20.Dismiss().WithColor(Color.Fill))" />
                 @GetTypeFilterBadgeText()
             </FluentBadge>
         }
         @if (activeDateFilter.HasValue)
         {
             <FluentBadge Appearance="Appearance.Accent" Circular="true" OnDismissClick="HandleFilterDateDismissClick">
-                <FluentIcon Color="Color.Fill" Value="@(new Icons.Regular.Size20.Calendar())" />
+                <FluentIcon Color="Color.Fill" Value="@(new Icons.Regular.Size20.Calendar())" DismissIcon="@(new Icons.Regular.Size20.Dismiss().WithColor(Color.Fill))" />
                 @activeDateFilter?.ToLocalTime().Humanize()
             </FluentBadge>
         }
