@@ -28,6 +28,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @using ADAtickets.Web.Components.Shared
 @using ADAtickets.Web.Components.Utilities
 @using AutoMapper
+@using Humanizer
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Net
@@ -49,6 +50,55 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 <PageTitle>ADAtickets - @loc["Title"]</PageTitle>
 <FluentStack Orientation="Orientation.Vertical">
     <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center" HorizontalAlignment="HorizontalAlignment.End">
+        @if (currentSort is not null && currentSortDirection is not null)
+        {
+            <FluentBadge Appearance="Appearance.Accent" Circular="true" OnDismissClick="HandleSortDismissClick">
+                @if (currentSortDirection == "asc")
+                {
+                    <FluentIcon Color="Color.Fill" Value="@(new Icons.Regular.Size20.ArrowSortUp())" />
+                }
+                else
+                {
+                    <FluentIcon Color="Color.Fill" Value="@(new Icons.Regular.Size20.ArrowSortDown())" />
+                }
+                @currentSort
+            </FluentBadge>
+        }
+        @if (activeUserFilter is not null)
+        {
+            <FluentBadge Appearance="Appearance.Accent" Circular="true" OnDismissClick="HandleFilterUserDismissClick">
+                <FluentIcon Color="Color.Fill" Value="@(new Icons.Regular.Size20.Person())" />
+                @activeUserFilter.Name @activeUserFilter.Surname
+            </FluentBadge>
+        }
+        @if (activePlatformFilter is not null)
+        {
+            <FluentBadge Appearance="Appearance.Accent" Circular="true" OnDismissClick="HandleFilterPlatformDismissClick">
+                <FluentIcon Color="Color.Fill" Value="@(new Icons.Regular.Size20.Apps())" />
+                @activePlatformFilter.Name
+            </FluentBadge>
+        }
+        @if (activePriorityFilter.HasValue)
+        {
+            <FluentBadge Appearance="Appearance.Accent" Circular="true" OnDismissClick="HandleFilterPriorityDismissClick">
+                <FluentIcon Color="Color.Fill" Value="@(new Icons.Regular.Size20.ArrowDownExclamation())" />
+                @GetPriorityFilterBadgeText()
+            </FluentBadge>
+        }
+        @if (activeTypeFilter.HasValue)
+        {
+            <FluentBadge Appearance="Appearance.Accent" Circular="true" OnDismissClick="HandleFilterTypeDismissClick">
+                <FluentIcon Color="Color.Fill" Value="@(new Icons.Regular.Size20.Tag())" />
+                @GetTypeFilterBadgeText()
+            </FluentBadge>
+        }
+        @if (activeDateFilter.HasValue)
+        {
+            <FluentBadge Appearance="Appearance.Accent" Circular="true" OnDismissClick="HandleFilterDateDismissClick">
+                <FluentIcon Color="Color.Fill" Value="@(new Icons.Regular.Size20.Calendar())" />
+                @activeDateFilter?.ToLocalTime().Humanize()
+            </FluentBadge>
+        }
         @if (selectedTickets.Count > 0)
         {
             <FluentMenuButton Text="@loc["ActionsButton"]" IconStart="@(new Icons.Regular.Size20.SelectAllOn())">
@@ -81,8 +131,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                     <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.TextCaseTitle())" Color="Color.Neutral" Slot="start" /></span>
                 </ChildContent>
                 <MenuItems>
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["SortAscendantMenuItem"]" />
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["SortDescendantMenuItem"]" />
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["SortAscendantMenuItem"]" OnClick='args => HandleSortTitleClick("asc")'/>
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["SortDescendantMenuItem"]" OnClick='args => HandleSortTitleClick("desc")'/>
                 </MenuItems>
             </FluentMenuItem>
             <FluentMenuItem Label="@loc["SortLastUpdateMenuItem"]">
@@ -90,8 +140,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                     <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Calendar())" Color="Color.Neutral" Slot="start" /></span>
                 </ChildContent>
                 <MenuItems>
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["SortAscendantMenuItem"]" />
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["SortDescendantMenuItem"]" />
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["SortAscendantMenuItem"]" OnClick='args => HandleSortLastUpdateClick("asc")'/>
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["SortDescendantMenuItem"]" OnClick='args => HandleSortLastUpdateClick("desc")'/>
                 </MenuItems>
             </FluentMenuItem>
             <FluentMenuItem Label="@loc["SortPriorityMenuItem"]">
@@ -99,20 +149,20 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                     <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.ArrowDownExclamation())" Color="Color.Neutral" Slot="start" /></span>
                 </ChildContent>
                 <MenuItems>
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["SortAscendantMenuItem"]" />
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["SortDescendantMenuItem"]"/>
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["SortAscendantMenuItem"]" OnClick='args => HandleSortPriorityClick("asc")'/>
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["SortDescendantMenuItem"]" OnClick='args => HandleSortPriorityClick("desc")'/>
                 </MenuItems>
             </FluentMenuItem>
             <FluentDivider />
             <FluentLabel Typo="Typography.H6">@loc["FilterMenuLabel"]</FluentLabel>
-            <FluentMenuItem Label="@loc["FilterOperatorMenuItem"]">
+            <FluentMenuItem Label="@loc["FilterUserMenuItem"]">
                 <ChildContent>
                     <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Person())" Color="Color.Neutral" Slot="start" /></span>
                 </ChildContent>
                 <MenuItems>
                     @foreach (var user in Users ?? [])
                     {
-                        <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@($"{user.Name} {user.Surname}")" />
+                        <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@($"{user.Name} {user.Surname}")" OnClick="args => HandleFilterUserClick(user)" />
                     }
                 </MenuItems>
             </FluentMenuItem>
@@ -121,11 +171,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                     <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Calendar())" Color="Color.Neutral" Slot="start" /></span>
                 </ChildContent>
                 <MenuItems>
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterLastUpdateHourMenuItem"]" />
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterLastUpdateDayMenuItem"]" />
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterLastUpdateWeekMenuItem"]" />
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterLastUpdateMonthMenuItem"]" />
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterLastUpdateYearMenuItem"]" />
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterLastUpdateHourMenuItem"]" OnClick="args => HandleFilterLastUpdateClick(DateTimeOffset.UtcNow - TimeSpan.FromHours(1))"/>
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterLastUpdateDayMenuItem"]" OnClick="args => HandleFilterLastUpdateClick(DateTimeOffset.UtcNow - TimeSpan.FromDays(1))"/>
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterLastUpdateWeekMenuItem"]" OnClick="args => HandleFilterLastUpdateClick(DateTimeOffset.UtcNow - TimeSpan.FromDays(7))"/>
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterLastUpdateMonthMenuItem"]" OnClick="args => HandleFilterLastUpdateClick(DateTimeOffset.UtcNow - TimeSpan.FromDays(30))"/>
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterLastUpdateYearMenuItem"]" OnClick="args => HandleFilterLastUpdateClick(DateTimeOffset.UtcNow - TimeSpan.FromDays(365))"/>
                 </MenuItems>
             </FluentMenuItem>
             <FluentMenuItem Label="@loc["FilterCategoryMenuItem"]">
@@ -133,8 +183,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                     <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Tag())" Color="Color.Neutral" Slot="start" /></span>
                 </ChildContent>
                 <MenuItems>
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterCategoryBugMenuItem"]" />
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterCategoryFeatureMenuItem"]" />
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterCategoryBugMenuItem"]" OnClick="args => HandleFilterCategoryClick(TicketType.Bug)"/>
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterCategoryFeatureMenuItem"]" OnClick="args => HandleFilterCategoryClick(TicketType.Feature)"/>
                 </MenuItems>
             </FluentMenuItem>
             <FluentMenuItem Label="@loc["FilterPlatformMenuItem"]">
@@ -144,7 +194,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 <MenuItems>
                     @foreach (var platform in platforms ?? [])
                     {
-                        <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@($"{platform.Name}")" />
+                        <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@($"{platform.Name}")" OnClick="args => HandleFilterPlatformClick(platform)"/>
                     }
                 </MenuItems>
             </FluentMenuItem>
@@ -153,9 +203,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                     <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.ArrowDownExclamation())" Color="Color.Neutral" Slot="start" /></span>
                 </ChildContent>
                 <MenuItems>
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterPriorityLowMenuItem"]" />
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterPriorityMediumMenuItem"]" />
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterPriorityHighMenuItem"]" />
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterPriorityLowMenuItem"]" OnClick="args => HandleFilterPriorityClick(Priority.Low)"/>
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterPriorityMediumMenuItem"]" OnClick="args => HandleFilterPriorityClick(Priority.Medium)" />
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@loc["FilterPriorityHighMenuItem"]" OnClick="args => HandleFilterPriorityClick(Priority.High)" />
                 </MenuItems>
             </FluentMenuItem>
         </FluentMenuButton>
@@ -200,19 +250,36 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 </FluentStack>
 
 @code {
+    #region Fields
+    // Datasets
     private IEnumerable<UserResponseDto>? Users { get; set; }
 
+    private IEnumerable<TicketResponseDto>? originalTickets;
     private IEnumerable<TicketResponseDto>? tickets;
     private IEnumerable<PlatformResponseDto>? platforms;
-    private readonly HashSet<Guid> selectedTickets = [];
-    private string? currentTab;
 
+    // State management
+    private readonly HashSet<Guid> selectedTickets = [];
+
+    private string? currentTab;
+    private string? currentSort;
+    private string? currentSortDirection;
+
+    private UserResponseDto? activeUserFilter;
+    private PlatformResponseDto? activePlatformFilter;
+    private Priority? activePriorityFilter;
+    private TicketType? activeTypeFilter;
+    private DateTimeOffset? activeDateFilter;
+#endregion
+
+#region Loading data
     protected override async Task OnInitializedAsync()
     {  
         try
         {
             await LoadUsers();
-            await LoadTickets(await GetFilters());
+            // Loads from the APIs only the tickets the user can see according to their identity and the selected tab.
+            await LoadTickets(await GetBaseFilters());
             await LoadPlatforms();
         }
         catch (Exception ex)
@@ -230,7 +297,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     private async Task LoadTickets(IEnumerable<KeyValuePair<string, string>> filters)
     {
         var result = await ticketsClient.GetAllAsync(filters);
-        tickets = result.Item2;
+
+        originalTickets = result.Item2.OrderByDescending(t => t.CreationDateTime);
+        tickets = originalTickets;
+
+        // After the tickets are retrieved, sort and filter based on the user preferences.
+        ApplySelectedFiltersAndSort();
     }
 
     private async Task LoadPlatforms()
@@ -238,45 +310,44 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         var result = await platformsClient.GetAllAsync();
         platforms = result.Item2;
     }
+#endregion
 
-    private async Task<IEnumerable<KeyValuePair<string, string>>> GetFilters()
+#region Event handlers
+    private void HandleSortDismissClick()
     {
-        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-
-        return GetFilterFromUser(user).Union(GetFilterFromTab(user));
+        currentSort = null;
+        currentSortDirection = null;
     }
 
-    private IEnumerable<KeyValuePair<string, string>> GetFilterFromUser(ClaimsPrincipal currentUser)
+    private void HandleFilterUserDismissClick()
     {
-        if (currentUser?.Identity?.IsAuthenticated == true)
-        {
-            return currentUser.FindFirstValue("tid") == configuration["Entra:TenantId"] ? 
-            [] : new Dictionary<string, string> { { nameof(TicketResponseDto.CreatorUserId), currentUser.FindFirstValue("uid") ?? "" } };
-        }
-
-        return [];
+        activeUserFilter = null;
     }
 
-    private IEnumerable<KeyValuePair<string, string>> GetFilterFromTab(ClaimsPrincipal currentUser)  
-    {  
-        return currentTab switch  
-        {  
-            "AllTab" => [],  
-            "UnassignedTab" => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.Unassigned) } },  
-            "ToReply" when currentUser.FindFirstValue("tid") == configuration["Entra:TenantId"] => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingOperator) } },
-            "ToReply" when currentUser.FindFirstValue("tid") != configuration["Entra:TenantId"] => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingUser) } },
-            "WaitingTab" when currentUser.FindFirstValue("tid") == configuration["Entra:TenantId"] => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingUser) } },
-            "WaitingTab" when currentUser.FindFirstValue("tid") != configuration["Entra:TenantId"] => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingOperator) } },
-            "ClosedTab" => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.Closed) } },  
-            _ => []
-        };  
+    private void HandleFilterPlatformDismissClick()
+    {
+        activePlatformFilter = null;
+    }
+
+    private void HandleFilterPriorityDismissClick()
+    {
+        activePriorityFilter = null;
+    }
+
+    private void HandleFilterTypeDismissClick()
+    {
+        activeTypeFilter = null;
+    }
+
+    private void HandleFilterDateDismissClick()
+    {
+        activeDateFilter = null;
     }
 
     private async Task HandleTabChange(FluentTab fluentTab)
     {
         currentTab = fluentTab?.Id;
-        await LoadTickets(await GetFilters());
+        await LoadTickets(await GetBaseFilters());
     }
 
     private void HandleSelectedChanged(SelectedChangedEventArgs args)
@@ -358,7 +429,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             selectedTickets.Clear();
 
             // Reload the tickets.
-            await LoadTickets(await GetFilters());
+            await LoadTickets(await GetBaseFilters());
         }
     }
 
@@ -411,7 +482,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             selectedTickets.Clear();
 
             // Reload the tickets.
-            await LoadTickets(await GetFilters());
+            await LoadTickets(await GetBaseFilters());
         }
     }
 
@@ -464,12 +535,170 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             selectedTickets.Clear();
 
             // Reload the tickets.
-            await LoadTickets(await GetFilters());
+            await LoadTickets(await GetBaseFilters());
         }
     }
 
     private async Task HandleStateChanged()
     {
-        await LoadTickets(await GetFilters());
+        await LoadTickets(await GetBaseFilters());
     }
+
+    private void HandleSortTitleClick(string order)
+    {
+        currentSort = loc["SortTitleMenuItem"];
+        currentSortDirection = order;
+        ApplySelectedFiltersAndSort();
+    }
+
+    private void HandleSortLastUpdateClick(string order)
+    {
+        currentSort = loc["SortLastUpdateMenuItem"];
+        currentSortDirection = order;
+        ApplySelectedFiltersAndSort();
+    }
+
+    private void HandleSortPriorityClick(string order)
+    {
+        currentSort = loc["SortPriorityMenuItem"];
+        currentSortDirection = order;
+        ApplySelectedFiltersAndSort();
+    }
+
+    private void HandleFilterUserClick(UserResponseDto user)
+    {
+        activeUserFilter = user;
+        ApplySelectedFiltersAndSort();
+    }
+
+    private void HandleFilterLastUpdateClick(DateTimeOffset dateTime)
+    {
+        activeDateFilter = dateTime;
+        ApplySelectedFiltersAndSort();
+    }
+
+    private void HandleFilterCategoryClick(TicketType type)
+    {
+        activeTypeFilter = type;
+        ApplySelectedFiltersAndSort();
+    }
+
+    private void HandleFilterPlatformClick(PlatformResponseDto platform)
+    {
+        activePlatformFilter = platform;
+        ApplySelectedFiltersAndSort();
+    }
+
+    private void HandleFilterPriorityClick(Priority priority)
+    {
+        activePriorityFilter = priority;
+        ApplySelectedFiltersAndSort();
+    }
+#endregion
+
+#region Auxiliary functions
+    private string GetPriorityFilterBadgeText()
+    {
+        return activePriorityFilter switch
+        {
+            Priority.Low => loc["FilterPriorityLowMenuItem"],
+            Priority.Medium => loc["FilterPriorityMediumMenuItem"],
+            Priority.High => loc["FilterPriorityHighMenuItem"],
+            _ => string.Empty
+        };
+    }
+
+    private string GetTypeFilterBadgeText()
+    {
+        return activeTypeFilter switch
+        {
+            TicketType.Bug => loc["FilterCategoryBugMenuItem"],
+            TicketType.Feature => loc["FilterCategoryFeatureMenuItem"],
+            _ => string.Empty
+        };
+    }
+
+    private async Task<IEnumerable<KeyValuePair<string, string>>> GetBaseFilters()
+    {
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        return GetBaseFilterFromUser(user).Union(GetBaseFilterFromTab(user));
+    }
+
+    private IEnumerable<KeyValuePair<string, string>> GetBaseFilterFromUser(ClaimsPrincipal currentUser)
+    {
+        if (currentUser?.Identity?.IsAuthenticated == true)
+        {
+            return currentUser.FindFirstValue("tid") == configuration["Entra:TenantId"] ?
+            [] : new Dictionary<string, string> { { nameof(TicketResponseDto.CreatorUserId), currentUser.FindFirstValue("uid") ?? "" } };
+        }
+
+        return [];
+    }
+
+    private IEnumerable<KeyValuePair<string, string>> GetBaseFilterFromTab(ClaimsPrincipal currentUser)
+    {
+        return currentTab switch
+        {
+            "AllTab" => [],
+            "UnassignedTab" => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.Unassigned) } },
+            "ToReply" when currentUser.FindFirstValue("tid") == configuration["Entra:TenantId"] => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingOperator) } },
+            "ToReply" when currentUser.FindFirstValue("tid") != configuration["Entra:TenantId"] => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingUser) } },
+            "WaitingTab" when currentUser.FindFirstValue("tid") == configuration["Entra:TenantId"] => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingUser) } },
+            "WaitingTab" when currentUser.FindFirstValue("tid") != configuration["Entra:TenantId"] => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingOperator) } },
+            "ClosedTab" => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.Closed) } },
+            _ => []
+        };
+    }
+
+    private void ApplySelectedFiltersAndSort()
+    {
+        var filteredTickets = ApplyFilters(originalTickets);
+
+        filteredTickets = ApplySort(filteredTickets);
+
+        tickets = filteredTickets;
+    }
+
+    private IEnumerable<TicketResponseDto>? ApplyFilters(IEnumerable<TicketResponseDto>? tickets)
+    {
+        // Apply all active filters
+        if (activeUserFilter is not null)
+            tickets = tickets?.Where(t => t.OperatorUserId == activeUserFilter.Id || t.CreatorUserId == activeUserFilter.Id);
+
+        if (activePlatformFilter is not null)
+            tickets = tickets?.Where(t => t.PlatformId == activePlatformFilter.Id);
+
+        if (activePriorityFilter.HasValue)
+            tickets = tickets?.Where(t => t.Priority == activePriorityFilter);
+
+        if (activeTypeFilter.HasValue)
+            tickets = tickets?.Where(t => t.Type == activeTypeFilter);
+
+        if (activeDateFilter.HasValue)
+            tickets = tickets?.Where(t => t.LastUpdateDateTime >= activeDateFilter);
+
+        return tickets;
+    }
+
+    private IEnumerable<TicketResponseDto>? ApplySort(IEnumerable<TicketResponseDto>? tickets)
+    {
+        // Apply only the current sort
+        if (currentSort == loc["SortTitleMenuItem"])
+        {
+            return currentSortDirection == "asc" ? tickets?.OrderBy(t => t.Title) : tickets?.OrderByDescending(t => t.Title);
+        }
+        else if (currentSort == loc["SortLastUpdateMenuItem"])
+        {
+            return currentSortDirection == "asc" ? tickets?.OrderBy(t => t.LastUpdateDateTime) : tickets?.OrderByDescending(t => t.LastUpdateDateTime);
+        }
+        else if (currentSort == loc["SortPriorityMenuItem"])
+        {
+            return currentSortDirection == "asc" ? tickets?.OrderBy(t => t.Priority) : tickets?.OrderByDescending(t => t.Priority);
+        }
+
+        return tickets;
+    }
+#endregion
 }

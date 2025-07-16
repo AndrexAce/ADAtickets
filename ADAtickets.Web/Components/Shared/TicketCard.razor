@@ -50,7 +50,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                         <p>@Ticket.CreatorName</p>
                         <FluentStack Orientation="Orientation.Horizontal">
                             <FluentIcon Value="@(new Icons.Filled.Size20.Bug())" />
-                            <p>@(Ticket.CreationDateTime.Humanize())</p>
+                            <p>@(Ticket.CreationDateTime.ToLocalTime().Humanize())</p>
                         </FluentStack>
                     </FluentStack>
                 </FluentPersona>
@@ -134,12 +134,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     [Parameter]
     public EventCallback StateChanged { get; set; }
 
-    private static RenderFragment GetPriorityBadge(Priority priority) => @<FluentBadge Fill="highlight" BackgroundColor="@GetPriorityAppearance(priority)" Circular="true">
-    @priority.ToString()
+    private RenderFragment GetPriorityBadge(Priority priority) => @<FluentBadge Fill="highlight" BackgroundColor="@GetPriorityAppearance(priority)" Circular="true">
+    @GetPriorityText(priority)
     </FluentBadge>;
 
-    private static RenderFragment GetStatusBadge(Status status) => @<FluentBadge Fill="highlight" BackgroundColor="@GetStatusAppearance(status)" Circular="true">
-    @status.ToString()
+    private RenderFragment GetStatusBadge(Status status) => @<FluentBadge Fill="highlight" BackgroundColor="@GetStatusAppearance(status)" Circular="true">
+    @GetStatusText(status)
     </FluentBadge>;
 
     private static string GetPriorityAppearance(Priority priority) => priority switch
@@ -150,12 +150,29 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         _ => ""
     };
 
+    private string GetPriorityText(Priority priority) => priority switch
+    {
+        Priority.Low => loc["PriorityLow"],
+        Priority.Medium => loc["PriorityMedium"],
+        Priority.High => loc["PriorityHigh"],
+        _ => ""
+    };
+
     private static string GetStatusAppearance(Status status) => status switch
     {
         Status.Unassigned => "var(--info)",
         Status.WaitingUser => "var(--warning)",
         Status.WaitingOperator => "var(--error)",
         Status.Closed => "var(--success)",
+        _ => ""
+    };
+
+    private string GetStatusText(Status status) => status switch
+    {
+        Status.Unassigned => loc["StatusUnassigned"],
+        Status.WaitingUser => loc["StatusWaitingUser"],
+        Status.WaitingOperator => loc["StatusWaitingOperator"],
+        Status.Closed => loc["StatusClosed"],
         _ => ""
     };
 

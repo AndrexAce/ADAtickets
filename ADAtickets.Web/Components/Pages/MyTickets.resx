@@ -180,8 +180,8 @@
   <data name="FilterPlatformMenuItem" xml:space="preserve">
     <value>Platform</value>
   </data>
-  <data name="FilterOperatorMenuItem" xml:space="preserve">
-    <value>Operator</value>
+  <data name="FilterUserMenuItem" xml:space="preserve">
+    <value>User</value>
   </data>
   <data name="SortAscendantMenuItem" xml:space="preserve">
     <value>Ascendant</value>

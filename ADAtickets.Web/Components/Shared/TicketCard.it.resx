@@ -195,7 +195,28 @@
   <data name="AssignErrorToastTitle" xml:space="preserve">
     <value>Errore assegnazione</value>
   </data>
-  <data name="AssignErrorToastDetails" xml:space="preserve">
+  <data name="Ba" xml:space="preserve">
     <value>Si è verificato un errore mentre il ticket veniva assegnato. Riprova.</value>
+  </data>
+  <data name="PriorityLow" xml:space="preserve">
+    <value>Bassa</value>
+  </data>
+  <data name="PriorityMedium" xml:space="preserve">
+    <value>Media</value>
+  </data>
+  <data name="PriorityHigh" xml:space="preserve">
+    <value>Alta</value>
+  </data>
+  <data name="StatusUnassigned" xml:space="preserve">
+    <value>Non assegnato</value>
+  </data>
+  <data name="StatusWaitingOperator" xml:space="preserve">
+    <value>Attesa operatore</value>
+  </data>
+  <data name="StatusWaitingUser" xml:space="preserve">
+    <value>Attesa utente</value>
+  </data>
+  <data name="StatusClosed" xml:space="preserve">
+    <value>Chiuso</value>
   </data>
 </root>
