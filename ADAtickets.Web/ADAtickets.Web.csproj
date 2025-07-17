@@ -15,9 +15,9 @@
 	<PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="9.0.7" />
 	<PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.7" />
 	<PackageReference Include="Microsoft.Extensions.Localization" Version="9.0.7" />
-	<PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Emoji" Version="4.12.0" />
-	<PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.12.0" />
-	<PackageReference Include="Microsoft.Graph" Version="5.85.0" />
+	<PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Emoji" Version="4.12.1" />
+	<PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.12.1" />
+	<PackageReference Include="Microsoft.Graph" Version="5.86.0" />
 	<PackageReference Include="Microsoft.Identity.Web.DownstreamApi" Version="3.10.0" />
 	<PackageReference Include="Microsoft.Identity.Web.UI" Version="3.10.0" />
 	<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
