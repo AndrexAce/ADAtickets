@@ -84,7 +84,7 @@ namespace ADAtickets.ApiService
             authBuilder.AddMicrosoftIdentityWebApi(builder.Configuration.GetSection(Scheme.ExternalOpenIdConnectDefault), Scheme.ExternalOpenIdConnectDefault);
 
             // Add authorization policies.
-            CreatePolicies(builder.Services.AddAuthorizationBuilder());
+            CreatePolicies(builder.Services.AddAuthorizationBuilder(), builder.Configuration);
 
             // Add services commonly used with controllers APIs.
             builder.Services
@@ -198,25 +198,28 @@ namespace ADAtickets.ApiService
             app.MapControllers();
         }
 
-        private static void CreatePolicies(AuthorizationBuilder builder)
+        private static void CreatePolicies(AuthorizationBuilder authorizationBuilder, IConfiguration configuration)
         {
-            builder.AddDefaultPolicy(Policy.AdminOnly, policy =>
+            authorizationBuilder.AddDefaultPolicy(Policy.AdminOnly, policy =>
             {
                 policy.RequireAuthenticatedUser()
                 // Directory roles are exposed with the "wids" claim in the ID token.
                 // The value of this claim is the standard ID for the Azure DevOps Administrator Entra directory role.
                 .RequireClaim("wids", "e3973bdf-4987-49ae-837a-ba8e231c7286")
-                .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault);
+                .RequireClaim("utid", configuration["Entra:TenantId"]!)
+                .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault, Scheme.ExternalOpenIdConnectDefault);
             })
             .AddPolicy(Policy.UserOnly, policy =>
             {
                 policy.RequireAuthenticatedUser()
-                .AddAuthenticationSchemes(Scheme.ExternalOpenIdConnectDefault);
+                .RequireClaim("utid", configuration["ExternalEntra:TenantId"]!)
+                .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault, Scheme.ExternalOpenIdConnectDefault);
             })
             .AddPolicy(Policy.OperatorOrAdmin, policy =>
             {
                 policy.RequireAuthenticatedUser()
-                .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault);
+                .RequireClaim("utid", configuration["Entra:TenantId"]!)
+                .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault, Scheme.ExternalOpenIdConnectDefault);
             })
             .AddPolicy(Policy.Everyone, policy =>
             {
