@@ -184,7 +184,7 @@ namespace ADAtickets.Web
                 .AddInteractiveServerRenderMode();
         }
 
-        private static void CreatePolicies(AuthorizationBuilder authorizationBuilder, IConfiguration configuration)
+        private static void CreatePolicies(AuthorizationBuilder authorizationBuilder, ConfigurationManager configuration)
         {
             authorizationBuilder.AddDefaultPolicy(Policy.AdminOnly, policy =>
             {

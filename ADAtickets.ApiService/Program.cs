@@ -198,7 +198,7 @@ namespace ADAtickets.ApiService
             app.MapControllers();
         }
 
-        private static void CreatePolicies(AuthorizationBuilder authorizationBuilder, IConfiguration configuration)
+        private static void CreatePolicies(AuthorizationBuilder authorizationBuilder, ConfigurationManager configuration)
         {
             authorizationBuilder.AddDefaultPolicy(Policy.AdminOnly, policy =>
             {
