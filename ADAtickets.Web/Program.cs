@@ -105,7 +105,7 @@ namespace ADAtickets.Web
             builder.Services.AddHttpContextAccessor();
 
             // Add localization services.
-            builder.Services.AddLocalization();
+            builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
             // Add access to the HTTP client class.
             builder.Services.AddHttpClient();
