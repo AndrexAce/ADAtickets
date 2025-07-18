@@ -16,16 +16,20 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @using ADAtickets.Shared.Constants
+@using ADAtickets.Web.Components.Shared
+@using ADAtickets.Web.Components.Utilities
 @using Microsoft.AspNetCore.Components.Authorization
+@using static ADAtickets.Web.Components.Utilities.Dialogs
 
 @inject IStringLocalizer<Navigation> loc
+@inject IDialogService dialogService
 
 <div class="nav-menu">
     <FluentNavMenu Width="250" Collapsible="true" CollapsedChildNavigation="true">
         <FluentNavGroup Icon="@(new Icons.Regular.Size20.TicketDiagonal())" Title="@loc["Tickets"]" Expanded="true">
             <FluentNavLink Href="/my-tickets">@loc["MyTickets"]</FluentNavLink>
             <AuthorizeView Policy="@Policy.UserOnly">
-                <FluentNavLink Href="/new-ticket">@loc["NewTicket"]</FluentNavLink>
+                <FluentNavLink OnClick="ShowNewTicketDialog">@loc["NewTicket"]</FluentNavLink>
             </AuthorizeView>
         </FluentNavGroup>
 
@@ -48,3 +52,23 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         </FluentNavGroup>
     </FluentNavMenu>
 </div>
+
+@code {
+    private async Task ShowNewTicketDialog()
+    {
+        await dialogService.ShowDialogAsync<TicketDialog>(
+            new TicketDialogContent
+            {
+                IsEdit = false,
+                IsUser = true,
+                InitialTicketData = null
+            },
+            new DialogParameters
+            {
+                TrapFocus = true,
+                PreventScroll = true,
+                PreventDismissOnOverlayClick = true
+            }
+        );
+    }
+}

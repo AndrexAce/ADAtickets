@@ -17,6 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using ADAtickets.Shared.Dtos.Requests;
+using ADAtickets.Shared.Models;
 using Microsoft.FluentUI.AspNetCore.Components;
 
 namespace ADAtickets.Web.Components.Utilities
@@ -51,18 +53,39 @@ namespace ADAtickets.Web.Components.Utilities
             /// <summary>
             /// Message to show in the dialog.
             /// </summary>
-            public required string Message { get; set; }
+            public required string Message { get; init; }
 
             /// <summary>
             /// Function to execute when pressing the confirm button.
             /// </summary>
             /// <remarks>It accepts no parameters and returns a <see cref="Task"/>.</remarks>
-            public required Func<Task> ConfirmAction { get; set; }
+            public required Func<Task> ConfirmAction { get; init; }
 
             /// <summary>
             /// Icon to show in the confirm button.
             /// </summary>
-            public required Icon ConfirmButtonIcon { get; set; }
+            public required Icon ConfirmButtonIcon { get; init; }
+        }
+
+        /// <summary>
+        /// Contains data to show in the <c>SimpleDialog.razor</c> component.
+        /// </summary>
+        public record TicketDialogContent
+        {
+            /// <summary>
+            /// Whether the dialog is in edit mode or not.
+            /// </summary>
+            public required bool IsEdit { get; init; }
+
+            /// <summary>
+            /// Whether the person opening the dialog is a <see cref="UserType.User"/>.
+            /// </summary>
+            public required bool IsUser { get; init; }
+
+            /// <summary>
+            /// Initial data to show in the ticket dialog (optional).
+            /// </summary>
+            public TicketRequestDto? InitialTicketData { get; init; }
         }
     }
 }

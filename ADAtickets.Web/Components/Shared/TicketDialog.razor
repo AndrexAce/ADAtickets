@@ -1,0 +1,227 @@
+﻿<!-- ADAtickets is a simple, lightweight, open source ticketing system
+interacting with your enterprise repositories on Azure DevOps
+with a two-way synchronization.
+Copyright (C) 2025  Andrea Lucchese
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
+@implements IDialogContentComponent<TicketDialogContent>
+
+@using ADAtickets.Shared.Dtos.Requests
+@using ADAtickets.Shared.Dtos.Responses
+@using ADAtickets.Shared.Models
+@using ADAtickets.Web.Components.Pages
+@using AutoMapper
+@using static ADAtickets.Web.Components.Utilities.Dialogs
+
+@inject IMapper mapper
+
+<FluentDialogHeader ShowDismiss="true" ShowDismissTooltip="false">
+    <FluentStack VerticalAlignment="VerticalAlignment.Center">
+        @if (Content.IsEdit)
+        {
+            <FluentLabel Typo="Typography.PaneHeader">
+                Modifica ticket
+            </FluentLabel>
+        }
+        else
+        {
+            <FluentLabel Typo="Typography.PaneHeader">
+                Nuovo ticket
+            </FluentLabel>
+        }
+    </FluentStack>
+</FluentDialogHeader>
+
+<FluentDialogBody>
+    <EditForm Model="@TicketRequest" OnValidSubmit="HandleValidSubmit" FormName="new_ticket_form">
+        <DataAnnotationsValidator />
+        <FluentValidationSummary />
+
+        @if (Content.IsEdit && !Content.IsUser)
+        {
+            <FluentSelect TOption="UserResponseDto"
+                          Label="Operatore assegnato"
+                          Name="OperatorUserId"
+                          Items="users"
+                          OptionText="@(u => u.Name)"
+                          OptionValue="@(u => u.Id.ToString())"
+                          ReadOnly="@(Content.IsEdit && Content.IsUser)"
+                          @bind-Value="operatorUserIdString"
+                          Required>
+                <FluentIcon Value="@(new Icons.Regular.Size20.Person())" Color="@Color.Neutral" Slot="indicator" />
+            </FluentSelect>
+        }
+
+        <FluentStack Orientation="Orientation.Vertical">
+            <FluentRadioGroup Name="Type"
+                Label="Tipo di ticket"
+                Orientation="Orientation.Vertical"
+                ReadOnly="@(Content.IsEdit && Content.IsUser)"
+                @bind-Value="TicketRequest.Type"
+                Required>
+                <FluentRadio Value="TicketType.Bug">Problema</FluentRadio>
+                <FluentRadio Value="TicketType.Feature">Suggerimento</FluentRadio>
+            </FluentRadioGroup>
+            <FluentValidationMessage For="@(() => TicketRequest.Type)" />
+
+            <FluentSelect TOption="PlatformResponseDto"
+                Label="Piattaforma"
+                Name="PlatformId"
+                Items="platforms"
+                OptionText="@(p => p.Name)"
+                OptionValue="@(p => p.Id.ToString())"
+                ReadOnly="@(Content.IsEdit && Content.IsUser)"
+                @bind-Value="platformIdString"
+                Required>
+                <FluentIcon Value="@(new Icons.Regular.Size20.Apps())" Color="@Color.Neutral" Slot="indicator" />
+            </FluentSelect>
+            <FluentValidationMessage For="@(() => TicketRequest.PlatformId)" />
+
+            <FluentTextField Name="Title"
+                Label="Titolo"
+                Spellcheck="true"
+                Style="width: 75%"
+                ReadOnly="@(Content.IsEdit && !Content.IsUser)"
+                @bind-Value="TicketRequest.Title"
+                Required>
+                <FluentIcon Value="@(new Icons.Regular.Size20.TextT())" Color="@Color.Neutral" Slot="start" />
+            </FluentTextField>
+            <FluentValidationMessage For="@(() => TicketRequest.Title)" />
+
+            <FluentTextArea Name="Description" 
+                Label="Descrizione"
+                Maxlength="5000"
+                Spellcheck="true"
+                Style="width: 100%"
+                ReadOnly="@(Content.IsEdit && !Content.IsUser)"
+                @bind-Value="TicketRequest.Description"
+                Required />
+            <FluentValidationMessage For="@(() => TicketRequest.Description)" />
+
+            <FluentRadioGroup Name="Priority"
+                Label="Priorità"
+                Orientation="Orientation.Vertical"
+                ReadOnly="@(Content.IsEdit && Content.IsUser)"
+                @bind-Value="TicketRequest.Priority"
+                Required>
+                <FluentRadio Value="Priority.Low">Bassa</FluentRadio>
+                <FluentRadio Value="Priority.Medium">Media</FluentRadio>
+                <FluentRadio Value="Priority.High">Alta</FluentRadio>
+            </FluentRadioGroup>
+            <FluentValidationMessage For="@(() => TicketRequest.Priority)" />
+
+            <FluentInputLabel Label="Allegati" />
+            <FluentStack Orientation="Orientation.Horizontal">
+                <FluentInputFile Id="photoUploader" Mode="InputFileMode.Buffer" Accept=".png, .jpg, .jpeg, .gif, .webp" Style="height: 3.1rem">
+                    <ChildContent>
+                        <label for="photoUploader">
+                            <FluentIcon Value="@(new @Icons.Regular.Size24.ArrowUpload())" />
+                        </label>
+
+                        <div>
+                            Carica immagine
+                        </div>
+                    </ChildContent>
+                </FluentInputFile>
+
+                <FluentInputFile Id="videoUploader" Mode="InputFileMode.Buffer" Accept=".avi, .mp4, .webm, .mov" Style="height: 3.1rem">
+                    <ChildContent>
+                        <label for="videoUploader">
+                            <FluentIcon Value="@(new @Icons.Regular.Size24.ArrowUpload())" />
+                        </label>
+
+                        <div>
+                            Carica video
+                        </div>
+                    </ChildContent>
+                </FluentInputFile>
+            </FluentStack>
+
+            @if (Content.IsEdit)
+            {
+                <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Send())">Crea</FluentButton>
+            }
+            else
+            {
+                <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Send())">Modifica</FluentButton>
+            }
+            <FluentButton Appearance="Appearance.Neutral">Annulla</FluentButton>
+        </FluentStack>
+    </EditForm>
+</FluentDialogBody>
+
+@code {
+    /// <summary>
+    /// The dialog object bound to this component.
+    /// </summary>
+    [CascadingParameter]
+    public FluentDialog Dialog { get; set; } = default!;
+
+    /// <summary>
+    /// Necessary data to display the dialog.
+    /// </summary>
+    [Parameter]
+    public TicketDialogContent Content { get; set; } = default!;
+
+    [SupplyParameterFromForm]
+    private TicketRequestDto TicketRequest { get; set; } = new();
+
+    private IEnumerable<PlatformResponseDto>? platforms;
+    private IEnumerable<UserResponseDto>? users;
+
+    private string platformIdString
+    {
+        get => TicketRequest.PlatformId.ToString();
+        set
+        {
+            if (Guid.TryParse(value, out var id))
+            {
+                TicketRequest.PlatformId = id;
+            }
+            else
+            {
+                TicketRequest.PlatformId = Guid.Empty;
+            }
+        }
+    }
+
+    private string operatorUserIdString
+    {
+        get => TicketRequest.OperatorUserId.ToString() ?? string.Empty;
+        set
+        {
+            if (Guid.TryParse(value, out var id))
+            {
+                TicketRequest.OperatorUserId = id;
+            }
+            else
+            {
+                TicketRequest.OperatorUserId = null;
+            }
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        if (Content.InitialTicketData is not null)
+        {
+            TicketRequest = mapper.Map<TicketRequestDto>(Content.InitialTicketData);
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await Dialog.CloseAsync();
+    }
+}
