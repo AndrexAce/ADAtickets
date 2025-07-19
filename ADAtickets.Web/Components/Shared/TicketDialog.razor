@@ -17,41 +17,49 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @implements IDialogContentComponent<TicketDialogContent>
 
+@using ADAtickets.Client
 @using ADAtickets.Shared.Dtos.Requests
 @using ADAtickets.Shared.Dtos.Responses
 @using ADAtickets.Shared.Models
 @using ADAtickets.Web.Components.Pages
+@using ADAtickets.Web.Components.Utilities
 @using AutoMapper
 @using static ADAtickets.Web.Components.Utilities.Dialogs
 
+@inject IStringLocalizer<TicketDialog> loc
+@inject TicketsClient ticketsClient
+@inject UsersClient usersClient
+@inject PlatformsClient platformsClient
+@inject IToastService toastService
+@inject IDialogService dialogService
 @inject IMapper mapper
 
-<FluentDialogHeader ShowDismiss="true" ShowDismissTooltip="false">
+<FluentDialogHeader ShowDismiss="false" ShowDismissTooltip="false">
     <FluentStack VerticalAlignment="VerticalAlignment.Center">
         @if (Content.IsEdit)
         {
             <FluentLabel Typo="Typography.PaneHeader">
-                Modifica ticket
+                @loc["EditTicket"]
             </FluentLabel>
         }
         else
         {
             <FluentLabel Typo="Typography.PaneHeader">
-                Nuovo ticket
+                @loc["NewTicket"]
             </FluentLabel>
         }
     </FluentStack>
 </FluentDialogHeader>
 
 <FluentDialogBody>
-    <EditForm Model="@TicketRequest" OnValidSubmit="HandleValidSubmit" FormName="new_ticket_form">
+    <EditForm id="ticket_form" Model="@TicketRequest" OnValidSubmit="HandleValidSubmit" FormName="ticket_form">
         <DataAnnotationsValidator />
-        <FluentValidationSummary />
+        <FluentValidationSummary Model="@TicketRequest"/>
 
         @if (Content.IsEdit && !Content.IsUser)
         {
             <FluentSelect TOption="UserResponseDto"
-                          Label="Operatore assegnato"
+                          Label="@loc["AssignedOperator"]"
                           Name="OperatorUserId"
                           Items="users"
                           OptionText="@(u => u.Name)"
@@ -65,18 +73,18 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
         <FluentStack Orientation="Orientation.Vertical">
             <FluentRadioGroup Name="Type"
-                Label="Tipo di ticket"
+                Label="@loc["TicketType"]"
                 Orientation="Orientation.Vertical"
                 ReadOnly="@(Content.IsEdit && Content.IsUser)"
                 @bind-Value="TicketRequest.Type"
                 Required>
-                <FluentRadio Value="TicketType.Bug">Problema</FluentRadio>
-                <FluentRadio Value="TicketType.Feature">Suggerimento</FluentRadio>
+                <FluentRadio Value="TicketType.Bug">@loc["Problem"]</FluentRadio>
+                <FluentRadio Value="TicketType.Feature">@loc["Suggestion"]</FluentRadio>
             </FluentRadioGroup>
             <FluentValidationMessage For="@(() => TicketRequest.Type)" />
 
             <FluentSelect TOption="PlatformResponseDto"
-                Label="Piattaforma"
+                Label="@loc["Platform"]"
                 Name="PlatformId"
                 Items="platforms"
                 OptionText="@(p => p.Name)"
@@ -89,7 +97,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             <FluentValidationMessage For="@(() => TicketRequest.PlatformId)" />
 
             <FluentTextField Name="Title"
-                Label="Titolo"
+                Label="@loc["Title"]"
                 Spellcheck="true"
                 Style="width: 75%"
                 ReadOnly="@(Content.IsEdit && !Content.IsUser)"
@@ -100,7 +108,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             <FluentValidationMessage For="@(() => TicketRequest.Title)" />
 
             <FluentTextArea Name="Description" 
-                Label="Descrizione"
+                Label="@loc["Description"]"
                 Maxlength="5000"
                 Spellcheck="true"
                 Style="width: 100%"
@@ -110,56 +118,92 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             <FluentValidationMessage For="@(() => TicketRequest.Description)" />
 
             <FluentRadioGroup Name="Priority"
-                Label="Priorità"
+                Label="@loc["Priority"]"
                 Orientation="Orientation.Vertical"
                 ReadOnly="@(Content.IsEdit && Content.IsUser)"
                 @bind-Value="TicketRequest.Priority"
                 Required>
-                <FluentRadio Value="Priority.Low">Bassa</FluentRadio>
-                <FluentRadio Value="Priority.Medium">Media</FluentRadio>
-                <FluentRadio Value="Priority.High">Alta</FluentRadio>
+                <FluentRadio Value="Priority.Low">@loc["Low"]</FluentRadio>
+                <FluentRadio Value="Priority.Medium">@loc["Medium"]</FluentRadio>
+                <FluentRadio Value="Priority.High">@loc["High"]</FluentRadio>
             </FluentRadioGroup>
             <FluentValidationMessage For="@(() => TicketRequest.Priority)" />
 
-            <FluentInputLabel Label="Allegati" />
-            <FluentStack Orientation="Orientation.Horizontal">
-                <FluentInputFile Id="photoUploader" Mode="InputFileMode.Buffer" Accept=".png, .jpg, .jpeg, .gif, .webp" Style="height: 3.1rem">
-                    <ChildContent>
-                        <label for="photoUploader">
-                            <FluentIcon Value="@(new @Icons.Regular.Size24.ArrowUpload())" />
-                        </label>
-
-                        <div>
-                            Carica immagine
-                        </div>
-                    </ChildContent>
-                </FluentInputFile>
-
-                <FluentInputFile Id="videoUploader" Mode="InputFileMode.Buffer" Accept=".avi, .mp4, .webm, .mov" Style="height: 3.1rem">
-                    <ChildContent>
-                        <label for="videoUploader">
-                            <FluentIcon Value="@(new @Icons.Regular.Size24.ArrowUpload())" />
-                        </label>
-
-                        <div>
-                            Carica video
-                        </div>
-                    </ChildContent>
-                </FluentInputFile>
-            </FluentStack>
-
-            @if (Content.IsEdit)
+            <FluentInputLabel Label="@loc["Attachments"]" />
+            @if (photo is null && photoName is null)
             {
-                <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Send())">Crea</FluentButton>
+                <FluentInputFile Id="photoUploader"
+                                 Mode="InputFileMode.Buffer"
+                                 Accept="image/png,image/jpg,image/jpeg,image/gif,image/webp"
+                                 OnCompleted="HandleUploadPhotoCompleted">
+                    <ChildContent>
+                        <label for="photoUploader" style="margin-top: 0.1rem;">
+                            <FluentIcon Value="@(new @Icons.Regular.Size20.ArrowUpload())" />
+                        </label>
+                        <div>
+                            @loc["UploadImage"]
+                        </div>
+                    </ChildContent>
+                </FluentInputFile>
             }
             else
             {
-                <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Send())">Modifica</FluentButton>
+                <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center">
+                    <span style="overflow: hidden; text-overflow: ellipsis; max-width: 15rem">@photoName</span>
+                    <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Open())">@loc["View"]</FluentButton>
+                    <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Delete())" OnClick="HandleDeletePhotoClick">@loc["Delete"]</FluentButton>
+                </FluentStack>
             }
-            <FluentButton Appearance="Appearance.Neutral">Annulla</FluentButton>
+
+            @if (video is null && videoName is null)
+            {
+                <FluentInputFile Id="videoUploader"
+                                 Mode="InputFileMode.Buffer"
+                                 Accept="video/avi,video/mp4,video/webm,video/mov"
+                                 OnCompleted="HandleUploadVideoCompleted">
+                    <ChildContent>
+                        <label for="photoUploader" style="margin-top: 0.1rem;">
+                            <FluentIcon Value="@(new @Icons.Regular.Size20.ArrowUpload())" />
+                        </label>
+                        <div>
+                            @loc["UploadVideo"]
+                        </div>
+                    </ChildContent>
+                </FluentInputFile>
+            }
+            else
+            {
+                <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center">
+                    <p style="overflow: hidden; text-overflow: ellipsis; max-width: 15rem">@videoName</p>
+                    <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Open())">@loc["View"]</FluentButton>
+                    <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Delete())" OnClick="HandleDeleteVideoClick">@loc["Delete"]</FluentButton>
+                </FluentStack>
+            }
         </FluentStack>
     </EditForm>
 </FluentDialogBody>
+
+<FluentDialogFooter>
+    <FluentStack Orientation="Orientation.Horizontal" HorizontalAlignment="HorizontalAlignment.End">
+        @if (Content.IsEdit)
+        {
+            <FluentButton Id="SubmitEdit"
+                Type="ButtonType.Submit"
+                Appearance="Appearance.Accent"
+                IconStart="@(new Icons.Regular.Size20.Edit())"
+                FormId="ticket_form">@loc["Edit"]</FluentButton>
+        }
+        else
+        {
+            <FluentButton Id="SubmitCreate"
+                Type="ButtonType.Submit"
+                Appearance="Appearance.Accent"
+                IconStart="@(new Icons.Regular.Size20.Send())"
+                FormId="ticket_form">@loc["Create"]</FluentButton>
+        }
+        <FluentButton Appearance="Appearance.Neutral" OnClick="HandleCancelClick">@loc["Cancel"]</FluentButton>
+    </FluentStack>
+</FluentDialogFooter>
 
 @code {
     /// <summary>
@@ -179,6 +223,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     private IEnumerable<PlatformResponseDto>? platforms;
     private IEnumerable<UserResponseDto>? users;
+
+    private byte[]? photo;
+    private string? photoName;
+    private byte[]? video;
+    private string? videoName;
 
     private string platformIdString
     {
@@ -212,16 +261,80 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         }
     }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         if (Content.InitialTicketData is not null)
         {
             TicketRequest = mapper.Map<TicketRequestDto>(Content.InitialTicketData);
         }
+
+        try
+        {
+            users = await LoadUsers(new[] { new KeyValuePair<string, string>("UserType", "Operator") });
+            users = users.Union(await LoadUsers(new[] { new KeyValuePair<string, string>("UserType", "Admin") }));
+
+            platforms = await LoadPlatforms();
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowCommunicationToast(Toasts.ErrorToastParameters(ex, loc["LoadingErrorToastTitle"], loc["LoadingErrorToastDetails"]));
+        }
     }
+
+    private async Task<IEnumerable<UserResponseDto>> LoadUsers(IEnumerable<KeyValuePair<string, string>> filters) => (await usersClient.GetAllAsync(filters)).Item2;
+
+    private async Task<IEnumerable<PlatformResponseDto>> LoadPlatforms() => (await platformsClient.GetAllAsync()).Item2;
 
     private async Task HandleValidSubmit()
     {
+        // TODO
+
         await Dialog.CloseAsync();
+    }
+
+    private async Task HandleCancelClick()
+    {
+        await dialogService.ShowDialogAsync<SimpleDialog>(
+            new SimpleDialogContent
+            {
+                Message = loc["CancelConfirmDialogMessage"],
+                ConfirmAction = HandleConfirmCancel,
+                ConfirmButtonIcon = new Icons.Regular.Size20.DismissCircle(),
+            },
+            Dialogs.ConfirmDialogParameters(loc["CancelConfirmDialogTitle"], loc["CancelConfirmDialogConfirmButton"], loc["CancelConfirmDialogCancelButton"]));
+    }
+
+    private async Task HandleConfirmCancel() => await Dialog.CloseAsync();
+
+    private void HandleUploadPhotoCompleted(IEnumerable<FluentInputFileEventArgs> args)
+    {
+        if (args.Any())
+        {
+            var file = args.First();
+            photo = file.Buffer.Data;
+            photoName = file.Name;
+        }
+    }
+
+    private void HandleUploadVideoCompleted(IEnumerable<FluentInputFileEventArgs> args)
+    {
+        if (args.Any())
+        {
+            var file = args.First();
+            video = file.Buffer.Data;
+            videoName = file.Name;
+        }
+    }
+
+    private void HandleDeletePhotoClick()
+    {
+        photo = null;
+        photoName = null;
+    }
+
+    private void HandleDeleteVideoClick()
+    {
+        video = null;
+        videoName = null;
     }
 }

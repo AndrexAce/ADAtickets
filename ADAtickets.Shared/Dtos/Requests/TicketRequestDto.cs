@@ -53,6 +53,7 @@ namespace ADAtickets.Shared.Dtos.Requests
         /// The description of the ticket, a detailed description of the issue.
         /// </summary>
         [Required]
+        [MaxLength(5000)]
         public string Description { get; set; } = string.Empty;
 
         /// <summary>

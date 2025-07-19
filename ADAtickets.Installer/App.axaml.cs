@@ -19,7 +19,6 @@
  */
 using ADAtickets.Installer.ViewModels;
 using ADAtickets.Installer.Views;
-
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
