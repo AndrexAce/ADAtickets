@@ -45,7 +45,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     }
     <FluentLabel Typo="Typography.Header" Color="Color.Fill">ADAtickets</FluentLabel>
     <FluentSpacer />
-    <FluentProfileMenu FullName="@accountName" Image="@accountPhoto" ImageSize="5rem" EMail="@accountEmail" HeaderLabel="@loc["HeaderLabel"]" OnHeaderButtonClick="SignOut" HeaderButton="@loc["HeaderButton"]" FooterLink="@loc["FooterLink"]">
+    <FluentProfileMenu FullName="@accountName" ImageSize="5rem" EMail="@accountEmail" HeaderLabel="@loc["HeaderLabel"]" OnHeaderButtonClick="SignOut" HeaderButton="@loc["HeaderButton"]" FooterLink="@loc["FooterLink"]">
         <StartTemplate>@accountName</StartTemplate>
     </FluentProfileMenu>
     <FluentButton Appearance="Appearance.Neutral" IconStart="@(new Icons.Regular.Size20.Alert())"/>
@@ -57,7 +57,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     private string? accountName;
     private string? accountEmail;
-    private string? accountPhoto;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -70,43 +69,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             {
                 accountName = user.FindFirstValue("name") ?? user.Identity.Name;
                 accountEmail = user.Identity.Name;
-                accountPhoto = await GetAccountPhoto(user);
 
                 StateHasChanged();
             }
         }
-    }
-
-    private async Task<string?> GetAccountPhoto(ClaimsPrincipal user)
-    {
-        try
-        {
-            var photoStream = await downstreamApi.GetForUserAsync<Stream>(
-                user.FindFirstValue("tid") == configuration["Entra:TenantId"] ? Service.Graph : Service.ExternalGraph,
-                options =>
-                {
-                    options.RelativePath = "me/photo/$value";
-                    options.AcquireTokenOptions.AuthenticationOptionsName = user.FindFirstValue("tid") == configuration["Entra:TenantId"] ? Scheme.OpenIdConnectDefault : Scheme.ExternalOpenIdConnectDefault;
-                },
-                user);
-
-            if (photoStream != null)
-            {
-                using var memoryStream = new MemoryStream();
-                await photoStream.CopyToAsync(memoryStream);
-                var photoBytes = memoryStream.ToArray();
-
-                // Convert to base64 data URL
-                var base64Photo = Convert.ToBase64String(photoBytes);
-                return $"data:image/jpeg;base64,{base64Photo}";
-            }
-        }
-        catch (Exception)
-        {
-            // Do not load the photo, it was not found.
-        }
-
-        return null;
     }
 
     private async Task SignOut()

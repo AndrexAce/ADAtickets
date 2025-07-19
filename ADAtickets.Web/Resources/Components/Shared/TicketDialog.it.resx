@@ -192,4 +192,13 @@
   <data name="CancelConfirmDialogCancelButton" xml:space="preserve">
     <value>Non uscire</value>
   </data>
+  <data name="ResourceLoadingBefore" xml:space="preserve">
+    <value>Caricamento...</value>
+  </data>
+  <data name="ResourceLoadingCompleted" xml:space="preserve">
+    <value>Completato</value>
+  </data>
+  <data name="ClosePreview" xml:space="preserve">
+    <value>Chiudi</value>
+  </data>
 </root>

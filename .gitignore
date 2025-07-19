@@ -404,3 +404,7 @@ ADAtickets.ApiService/appsettings.Development.json
 ADAtickets.AppHost/appsettings.Development.json
 ADAtickets.Web/appsettings.Development.json
 /.env
+
+# Media folders
+ADAtickets.ApiService/media/*
+ADAtickets.Web/wwwroot/uploads/*

@@ -130,14 +130,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             <FluentValidationMessage For="@(() => TicketRequest.Priority)" />
 
             <FluentInputLabel Label="@loc["Attachments"]" />
-            @if (photo is null && photoName is null)
+            @if (photoPath is null)
             {
                 <FluentInputFile Id="photoUploader"
-                                 Mode="InputFileMode.Buffer"
+                                 Mode="InputFileMode.Stream"
                                  Accept="image/png,image/jpg,image/jpeg,image/gif,image/webp"
                                  OnCompleted="HandleUploadPhotoCompleted">
                     <ChildContent>
-                        <label for="photoUploader" style="margin-top: 0.1rem;">
+                        <label for="photoUploader" style="margin-top: 0.3rem;">
                             <FluentIcon Value="@(new @Icons.Regular.Size20.ArrowUpload())" />
                         </label>
                         <div>
@@ -149,20 +149,20 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             else
             {
                 <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center">
-                    <span style="overflow: hidden; text-overflow: ellipsis; max-width: 15rem">@photoName</span>
-                    <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Open())">@loc["View"]</FluentButton>
+                    <span style="overflow: hidden; text-overflow: ellipsis; max-width: 15rem">@Path.GetFileName(photoPath)</span>
+                    <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Open())" OnClick="HandleViewPhotoClick">@loc["View"]</FluentButton>
                     <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Delete())" OnClick="HandleDeletePhotoClick">@loc["Delete"]</FluentButton>
                 </FluentStack>
             }
 
-            @if (video is null && videoName is null)
+            @if (videoPath is null)
             {
                 <FluentInputFile Id="videoUploader"
-                                 Mode="InputFileMode.Buffer"
-                                 Accept="video/avi,video/mp4,video/webm,video/mov"
+                                 Mode="InputFileMode.Stream"
+                                 Accept="video/mp4,video/webm"
                                  OnCompleted="HandleUploadVideoCompleted">
                     <ChildContent>
-                        <label for="photoUploader" style="margin-top: 0.1rem;">
+                        <label for="videoUploader" style="margin-top: 0.3rem;">
                             <FluentIcon Value="@(new @Icons.Regular.Size20.ArrowUpload())" />
                         </label>
                         <div>
@@ -174,8 +174,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             else
             {
                 <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center">
-                    <p style="overflow: hidden; text-overflow: ellipsis; max-width: 15rem">@videoName</p>
-                    <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Open())">@loc["View"]</FluentButton>
+                    <p style="overflow: hidden; text-overflow: ellipsis; max-width: 15rem">@Path.GetFileName(videoPath)</p>
+                    <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Open())" OnClick="HandleViewVideoClick">@loc["View"]</FluentButton>
                     <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Delete())" OnClick="HandleDeleteVideoClick">@loc["Delete"]</FluentButton>
                 </FluentStack>
             }
@@ -205,6 +205,45 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     </FluentStack>
 </FluentDialogFooter>
 
+@if (photoPath is not null)
+{
+    <FluentOverlay @bind-Visible=@showPhoto
+               Opacity="0.4"
+               FullScreen="true"
+               PreventScroll="true"
+               Dismissable="false">
+        <FluentCard>
+            <FluentStack Orientation="Orientation.Vertical">
+                <FluentStack Orientation="Orientation.Horizontal">
+                    <FluentLabel Typo="Typography.PaneHeader">Anteprima foto</FluentLabel>
+                    <FluentSpacer />
+                    <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.DismissCircle())" OnClick="HandleViewPhotoClose">@loc["ClosePreview"]</FluentButton>
+                </FluentStack>
+                <img src="@photoPath" style="max-width: 75vw; max-height: 75vh;" />
+            </FluentStack>
+        </FluentCard>
+    </FluentOverlay>
+}
+@if (videoPath is not null)
+{
+    <FluentOverlay @bind-Visible=@showVideo
+               Opacity="0.4"
+               FullScreen="true"
+               PreventScroll="true"
+               Dismissable="false">
+        <FluentCard>
+            <FluentStack Orientation="Orientation.Vertical">
+                <FluentStack Orientation="Orientation.Horizontal">
+                    <FluentLabel Typo="Typography.PaneHeader">Anteprima video</FluentLabel>
+                    <FluentSpacer />
+                    <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.DismissCircle())" OnClick="HandleViewVideoClose">@loc["ClosePreview"]</FluentButton>
+                </FluentStack>
+                <video src="@videoPath" style="max-width: 75vw; max-height: 75vh;" controls></video>
+            </FluentStack>
+        </FluentCard>
+    </FluentOverlay>
+}
+
 @code {
     /// <summary>
     /// The dialog object bound to this component.
@@ -224,10 +263,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     private IEnumerable<PlatformResponseDto>? platforms;
     private IEnumerable<UserResponseDto>? users;
 
-    private byte[]? photo;
-    private string? photoName;
-    private byte[]? video;
-    private string? videoName;
+    private string? photoPath;
+    private string? videoPath;
+
+    private bool showPhoto = false;
+    private bool showVideo = false;
 
     private string platformIdString
     {
@@ -268,12 +308,17 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             TicketRequest = mapper.Map<TicketRequestDto>(Content.InitialTicketData);
         }
 
+        FluentInputFile.ResourceLoadingBefore = loc["ResourceLoadingBefore"];
+        FluentInputFile.ResourceLoadingCompleted = loc["ResourceLoadingCompleted"];
+
         try
         {
             users = await LoadUsers(new[] { new KeyValuePair<string, string>("UserType", "Operator") });
             users = users.Union(await LoadUsers(new[] { new KeyValuePair<string, string>("UserType", "Admin") }));
 
             platforms = await LoadPlatforms();
+
+            // TODO: load attachments and assign the path to the photoPath and videoPath variables
         }
         catch (Exception ex)
         {
@@ -287,7 +332,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     private async Task HandleValidSubmit()
     {
-        // TODO
+        // TODO: save/update the ticket and the attachments on the server
 
         await Dialog.CloseAsync();
     }
@@ -304,37 +349,82 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             Dialogs.ConfirmDialogParameters(loc["CancelConfirmDialogTitle"], loc["CancelConfirmDialogConfirmButton"], loc["CancelConfirmDialogCancelButton"]));
     }
 
-    private async Task HandleConfirmCancel() => await Dialog.CloseAsync();
+    private async Task HandleConfirmCancel()
+    {
+        DeleteTempFiles();
 
-    private void HandleUploadPhotoCompleted(IEnumerable<FluentInputFileEventArgs> args)
+        await Dialog.CloseAsync();
+    }
+
+    private async Task HandleUploadPhotoCompleted(IEnumerable<FluentInputFileEventArgs> args)
     {
         if (args.Any())
         {
             var file = args.First();
-            photo = file.Buffer.Data;
-            photoName = file.Name;
+
+            string uploadsDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "temp");
+            Directory.CreateDirectory(uploadsDir);
+
+            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.Name)}";
+            var fullPath = Path.Combine(uploadsDir, fileName);
+
+            await using FileStream fs = new(fullPath, FileMode.Create);
+            await file.Stream!.CopyToAsync(fs);
+            await file.Stream!.DisposeAsync();
+
+            photoPath = $"/uploads/temp/{fileName}";
         }
     }
 
-    private void HandleUploadVideoCompleted(IEnumerable<FluentInputFileEventArgs> args)
+    private async Task HandleUploadVideoCompleted(IEnumerable<FluentInputFileEventArgs> args)
     {
         if (args.Any())
         {
             var file = args.First();
-            video = file.Buffer.Data;
-            videoName = file.Name;
+
+            string uploadsDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "temp");
+            Directory.CreateDirectory(uploadsDir);
+
+            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.Name)}";
+            var fullPath = Path.Combine(uploadsDir, fileName);
+
+            await using FileStream fs = new(fullPath, FileMode.Create);
+            await file.Stream!.CopyToAsync(fs);
+            await file.Stream!.DisposeAsync();
+
+            videoPath = $"/uploads/temp/{fileName}";
         }
     }
 
     private void HandleDeletePhotoClick()
     {
-        photo = null;
-        photoName = null;
+        DeleteTempFiles();
+        photoPath = null;
     }
 
     private void HandleDeleteVideoClick()
     {
-        video = null;
-        videoName = null;
+        DeleteTempFiles();
+        videoPath = null;
+    }
+
+    private void HandleViewPhotoClick() => showPhoto = true;
+
+    private void HandleViewVideoClick() => showVideo = true;
+
+    private void HandleViewPhotoClose() => showPhoto = false;
+
+    private void HandleViewVideoClose() => showVideo = false;
+
+    private void DeleteTempFiles()
+    {
+        if (photoPath is not null && File.Exists(photoPath))
+        {
+            File.Delete(photoPath);
+        }
+        if (videoPath is not null && File.Exists(videoPath))
+        {
+            File.Delete(videoPath);
+        }
     }
 }

@@ -76,10 +76,11 @@ namespace ADAtickets.ApiService.Services
         /// <inheritdoc cref="IAttachmentRepository.AddAttachmentAsync"/>
         public async Task AddAttachmentAsync(Attachment attachment, byte[] data)
         {
-            if (await SaveAttachmentToFileSystem(attachment.Path, data))
+            string? fullPath = await SaveAttachmentToFileSystem(attachment.Path, data);
+
+            if (fullPath is not null)
             {
-                // Since the path contains only the file name, make the attachment path match with the file system path.
-                attachment.Path = Path.Combine("media/", DateTime.UtcNow.Year.ToString(), DateTime.UtcNow.Month.ToString(), DateTime.UtcNow.Day.ToString(), attachment.Path);
+                attachment.Path = fullPath;
 
                 _ = context.Attachments.Add(attachment);
                 _ = await context.SaveChangesAsync();
@@ -89,10 +90,11 @@ namespace ADAtickets.ApiService.Services
         /// <inheritdoc cref="IAttachmentRepository.UpdateAttachmentAsync"/>
         public async Task UpdateAttachmentAsync(Attachment attachment, byte[] data, string oldAttachmentPath)
         {
-            if (await ReplaceAttachmentInFileSystem(attachment.Path, data, oldAttachmentPath))
+            string? fullPath = await ReplaceAttachmentInFileSystem(attachment.Path, data, oldAttachmentPath);
+
+            if (fullPath is not null)
             {
-                // Since the path contains only the file name, make the attachment path match with the file system path.
-                attachment.Path = Path.Combine("media/", DateTime.UtcNow.Year.ToString(), DateTime.UtcNow.Month.ToString(), DateTime.UtcNow.Day.ToString(), attachment.Path);
+                attachment.Path = fullPath;
 
                 _ = context.Attachments.Update(attachment);
                 _ = await context.SaveChangesAsync();
@@ -115,23 +117,25 @@ namespace ADAtickets.ApiService.Services
         /// </summary>
         /// <param name="attachmentName">The name of the attachment file.</param>
         /// <param name="attachmentData">Byte array encoding the file data.</param>
-        /// <returns>A <see cref="Task"/> returning <see langword="true"/> if the attachment was successfully saved, and <see langword="false"/> otherwise.</returns>
-        private static async Task<bool> SaveAttachmentToFileSystem(string attachmentName, byte[] attachmentData)
+        /// <returns>A <see cref="Task"/> returning the full path if the attachment was successfully saved, or <see langword="null"/> otherwise.</returns>
+        private static async Task<string?> SaveAttachmentToFileSystem(string attachmentName, byte[] attachmentData)
         {
             try
             {
-                string saveDirectoryPath = Path.Combine("media/", DateTime.UtcNow.Year.ToString(), DateTime.UtcNow.Month.ToString(), DateTime.UtcNow.Day.ToString());
+                string baseDirectory = Path.Combine(Directory.GetCurrentDirectory(), "media");
+                string saveDirectoryPath = Path.Combine(baseDirectory, DateTime.UtcNow.Year.ToString(), DateTime.UtcNow.Month.ToString(), DateTime.UtcNow.Day.ToString());
 
                 _ = Directory.CreateDirectory(saveDirectoryPath);
 
-                await File.WriteAllBytesAsync(Path.Combine(saveDirectoryPath, attachmentName), attachmentData);
+                string fullPath = Path.Combine(saveDirectoryPath, attachmentName);
+                await File.WriteAllBytesAsync(fullPath, attachmentData);
+
+                return fullPath;
             }
             catch
             {
-                return false;
+                return null;
             }
-
-            return true;
         }
 
         /// <summary>
@@ -166,10 +170,10 @@ namespace ADAtickets.ApiService.Services
         /// <param name="attachmentName">The new name of the attachment file.</param>
         /// <param name="attachmentData">Byte array encoding the file data.</param>
         /// <param name="oldAttachmentPath">Full path of the old attachment file.</param>
-        /// <returns></returns>
-        private static async Task<bool> ReplaceAttachmentInFileSystem(string attachmentName, byte[] attachmentData, string oldAttachmentPath)
+        /// <returns>A <see cref="Task"/> returning the full path if the attachment was successfully replaced, or <see langword="null"/> otherwise.</returns>
+        private static async Task<string?> ReplaceAttachmentInFileSystem(string attachmentName, byte[] attachmentData, string oldAttachmentPath)
         {
-            return DeleteAttachmentFromFileSystem(oldAttachmentPath) && await SaveAttachmentToFileSystem(attachmentName, attachmentData);
+            return DeleteAttachmentFromFileSystem(oldAttachmentPath) ? await SaveAttachmentToFileSystem(attachmentName, attachmentData) : null;
         }
     }
 }
