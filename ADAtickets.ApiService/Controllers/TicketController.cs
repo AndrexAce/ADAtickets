@@ -66,7 +66,7 @@ namespace ADAtickets.ApiService.Controllers
         [RequiredScope(Scope.Read)]
         public async Task<ActionResult<IEnumerable<TicketResponseDto>>> GetTickets([FromQuery] Dictionary<string, string>? filters)
         {
-            var tickets = await (filters != null ? ticketRepository.GetTicketsByAsync(filters) : ticketRepository.GetTicketsAsync());
+            IEnumerable<Ticket> tickets = await (filters != null ? ticketRepository.GetTicketsByAsync(filters) : ticketRepository.GetTicketsAsync());
 
             return Ok(tickets.Select(mapper.Map<TicketResponseDto>));
         }
@@ -219,7 +219,7 @@ namespace ADAtickets.ApiService.Controllers
         [RequiredScope(Scope.Read, Scope.Write)]
         public async Task<ActionResult<TicketResponseDto>> PostTicket(TicketRequestDto ticketDto)
         {
-            var ticket = mapper.Map<Ticket>(ticketDto);
+            Ticket ticket = mapper.Map<Ticket>(ticketDto);
 
             // Insert the DTO info into a new entity and add it to the data source.
             await ticketRepository.AddTicketAsync(ticket);

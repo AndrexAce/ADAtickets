@@ -52,15 +52,15 @@ namespace ADAtickets.ApiService.Tests.Services.EditRepository
         public async Task UpdateEdit_ValidEntity_ReturnsNew(Edit inEdit)
         {
             // Arrange
-            var edits = new List<Edit> { new() { Id = inEdit.Id, Description = "Old description.", TicketId = Guid.AllBitsSet, UserId = Guid.AllBitsSet } };
-            var tickets = new List<Ticket> { new() { Id = Guid.AllBitsSet } };
-            var users = new List<User> { new() { Id = Guid.AllBitsSet } };
+            List<Edit> edits = [new() { Id = inEdit.Id, Description = "Old description.", TicketId = Guid.AllBitsSet, UserId = Guid.AllBitsSet }];
+            List<Ticket> tickets = [new() { Id = Guid.AllBitsSet }];
+            List<User> users = [new() { Id = Guid.AllBitsSet }];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockEditSet = edits.BuildMockDbSet();
-            var mockTicketSet = tickets.BuildMockDbSet();
-            var mockUserSet = users.BuildMockDbSet();
-            mockEditSet.Setup(s => s.Update(It.IsAny<Edit>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<DbSet<Edit>> mockEditSet = edits.BuildMockDbSet();
+            Mock<DbSet<Ticket>> mockTicketSet = tickets.BuildMockDbSet();
+            Mock<DbSet<User>> mockUserSet = users.BuildMockDbSet();
+            _ = mockEditSet.Setup(s => s.Update(It.IsAny<Edit>()))
                 .Callback<Edit>(e =>
                 {
                     if (e.Description.Length <= 200 && mockTicketSet.Object.Single().Id == e.TicketId && mockUserSet.Object.Single().Id == e.UserId)
@@ -68,16 +68,16 @@ namespace ADAtickets.ApiService.Tests.Services.EditRepository
                         edits[0].Description = inEdit.Description;
                     }
                 });
-            mockContext.Setup(c => c.Edits)
+            _ = mockContext.Setup(c => c.Edits)
                 .Returns(mockEditSet.Object);
 
-            var service = new EditService(mockContext.Object);
+            EditService service = new(mockContext.Object);
 
-            var cancellationToken = TestContext.Current.CancellationToken;
+            CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
             // Act
             await service.UpdateEditAsync(inEdit);
-            var updatedEdit = await mockContext.Object.Edits.SingleOrDefaultAsync(cancellationToken);
+            Edit? updatedEdit = await mockContext.Object.Edits.SingleOrDefaultAsync(cancellationToken);
 
             // Assert
             Assert.NotNull(updatedEdit);
@@ -89,15 +89,15 @@ namespace ADAtickets.ApiService.Tests.Services.EditRepository
         public async Task UpdateEdit_InvalidEntity_ReturnsOld(Edit inEdit)
         {
             // Arrange
-            var edits = new List<Edit> { new() { Id = inEdit.Id, Description = "Old description.", TicketId = Guid.AllBitsSet, UserId = Guid.AllBitsSet } };
-            var tickets = new List<Ticket> { new() { Id = Guid.AllBitsSet } };
-            var users = new List<User> { new() { Id = Guid.AllBitsSet } };
+            List<Edit> edits = [new() { Id = inEdit.Id, Description = "Old description.", TicketId = Guid.AllBitsSet, UserId = Guid.AllBitsSet }];
+            List<Ticket> tickets = [new() { Id = Guid.AllBitsSet }];
+            List<User> users = [new() { Id = Guid.AllBitsSet }];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockEditSet = edits.BuildMockDbSet();
-            var mockTicketSet = tickets.BuildMockDbSet();
-            var mockUserSet = users.BuildMockDbSet();
-            mockEditSet.Setup(s => s.Update(It.IsAny<Edit>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<DbSet<Edit>> mockEditSet = edits.BuildMockDbSet();
+            Mock<DbSet<Ticket>> mockTicketSet = tickets.BuildMockDbSet();
+            Mock<DbSet<User>> mockUserSet = users.BuildMockDbSet();
+            _ = mockEditSet.Setup(s => s.Update(It.IsAny<Edit>()))
                 .Callback<Edit>(e =>
                 {
                     if (e.Description.Length <= 200 && mockTicketSet.Object.Single().Id == e.TicketId && mockUserSet.Object.Single().Id == e.UserId)
@@ -105,16 +105,16 @@ namespace ADAtickets.ApiService.Tests.Services.EditRepository
                         edits[0].Description = inEdit.Description;
                     }
                 });
-            mockContext.Setup(c => c.Edits)
+            _ = mockContext.Setup(c => c.Edits)
                 .Returns(mockEditSet.Object);
 
-            var service = new EditService(mockContext.Object);
+            EditService service = new(mockContext.Object);
 
-            var cancellationToken = TestContext.Current.CancellationToken;
+            CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
             // Act
             await service.UpdateEditAsync(inEdit);
-            var updatedEdit = await mockContext.Object.Edits.SingleOrDefaultAsync(cancellationToken);
+            Edit? updatedEdit = await mockContext.Object.Edits.SingleOrDefaultAsync(cancellationToken);
 
             // Assert
             Assert.NotNull(updatedEdit);

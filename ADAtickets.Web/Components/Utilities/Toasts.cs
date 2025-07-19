@@ -33,16 +33,19 @@ namespace ADAtickets.Web.Components.Utilities
         /// <param name="title">The title of the toast.</param>
         /// <param name="details">The message of the toast.</param>
         /// <returns>A <see cref="ToastParameters{T}"/> object with the specified title and details.</returns>
-        public static ToastParameters<CommunicationToastContent> ErrorToastParameters(Exception exception, string title, string details) => new()
+        public static ToastParameters<CommunicationToastContent> ErrorToastParameters(Exception exception, string title, string details)
         {
-            Intent = ToastIntent.Error,
-            Title = title,
-            Content = new CommunicationToastContent()
+            return new()
             {
-                Details = details,
-                Subtitle = exception.Message
-            }
-        };
+                Intent = ToastIntent.Error,
+                Title = title,
+                Content = new CommunicationToastContent()
+                {
+                    Details = details,
+                    Subtitle = exception.Message
+                }
+            };
+        }
 
         /// <summary>
         /// Creates a <see cref="ToastParameters{T}"/> instance configured for a success notification.
@@ -50,15 +53,18 @@ namespace ADAtickets.Web.Components.Utilities
         /// <param name="title">The title of the toast notification.</param>
         /// <param name="details">The detailed message content of the toast notification.</param>
         /// <returns>A <see cref="ToastParameters{T}"/> object with the specified title and details.</returns>
-        public static ToastParameters<CommunicationToastContent> ConfirmToastParameters(string title, string details) => new()
+        public static ToastParameters<CommunicationToastContent> ConfirmToastParameters(string title, string details)
         {
-            Intent = ToastIntent.Success,
-            Title = title,
-            Content = new CommunicationToastContent()
+            return new()
             {
-                Details = details
-            }
-        };
+                Intent = ToastIntent.Success,
+                Title = title,
+                Content = new CommunicationToastContent()
+                {
+                    Details = details
+                }
+            };
+        }
 
 
         /// <summary>
@@ -68,16 +74,19 @@ namespace ADAtickets.Web.Components.Utilities
         /// <param name="title">The title of the toast.</param>
         /// <param name="details">The message of the toast.</param>
         /// <returns>A <see cref="ToastParameters{T}"/> object with the specified title and details.</returns>
-        public static ToastParameters<ProgressToastContent> ProgressToastParameters(string id, string title, string details) => new()
+        public static ToastParameters<ProgressToastContent> ProgressToastParameters(string id, string title, string details)
         {
-            Id = id,
-            Intent = ToastIntent.Progress,
-            Title = title,
-            Content = new ProgressToastContent()
+            return new()
             {
-                Details = details,
-                Progress = 0
-            }
-        };
+                Id = id,
+                Intent = ToastIntent.Progress,
+                Title = title,
+                Content = new ProgressToastContent()
+                {
+                    Details = details,
+                    Progress = 0
+                }
+            };
+        }
     }
 }

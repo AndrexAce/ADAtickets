@@ -66,7 +66,7 @@ namespace ADAtickets.ApiService.Controllers
         [RequiredScope(Scope.Read)]
         public async Task<ActionResult<IEnumerable<NotificationResponseDto>>> GetNotifications([FromQuery] Dictionary<string, string>? filters)
         {
-            var notifications = await (filters != null ? notificationRepository.GetNotificationsByAsync(filters) : notificationRepository.GetNotificationsAsync());
+            IEnumerable<Notification> notifications = await (filters != null ? notificationRepository.GetNotificationsByAsync(filters) : notificationRepository.GetNotificationsAsync());
 
             return Ok(notifications.Select(mapper.Map<NotificationResponseDto>));
         }
@@ -201,7 +201,7 @@ namespace ADAtickets.ApiService.Controllers
         [RequiredScope(Scope.Read, Scope.Write)]
         public async Task<ActionResult<NotificationResponseDto>> PostNotification(NotificationRequestDto notificationDto)
         {
-            var notification = mapper.Map<Notification>(notificationDto);
+            Notification notification = mapper.Map<Notification>(notificationDto);
 
             // Insert the DTO info into a new entity and add it to the data source.
             await notificationRepository.AddNotificationAsync(notification);

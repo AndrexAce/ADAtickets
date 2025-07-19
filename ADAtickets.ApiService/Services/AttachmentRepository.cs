@@ -29,7 +29,7 @@ namespace ADAtickets.ApiService.Services
     /// <summary>
     /// Implements the methods to manage the <see cref="Attachment"/> entities in the underlying database.
     /// </summary>
-    sealed class AttachmentRepository(ADAticketsDbContext context) : IAttachmentRepository
+    internal sealed class AttachmentRepository(ADAticketsDbContext context) : IAttachmentRepository
     {
         /// <inheritdoc cref="IAttachmentRepository.GetAttachmentByIdAsync"/>
         public async Task<Attachment?> GetAttachmentByIdAsync(Guid id)
@@ -49,7 +49,7 @@ namespace ADAtickets.ApiService.Services
         {
             IQueryable<Attachment> query = context.Attachments;
 
-            foreach (var filter in filters)
+            foreach (KeyValuePair<string, string> filter in filters)
             {
                 switch (filter.Key.Pascalize())
                 {
@@ -81,8 +81,8 @@ namespace ADAtickets.ApiService.Services
                 // Since the path contains only the file name, make the attachment path match with the file system path.
                 attachment.Path = Path.Combine("media/", DateTime.UtcNow.Year.ToString(), DateTime.UtcNow.Month.ToString(), DateTime.UtcNow.Day.ToString(), attachment.Path);
 
-                context.Attachments.Add(attachment);
-                await context.SaveChangesAsync();
+                _ = context.Attachments.Add(attachment);
+                _ = await context.SaveChangesAsync();
             }
         }
 
@@ -94,8 +94,8 @@ namespace ADAtickets.ApiService.Services
                 // Since the path contains only the file name, make the attachment path match with the file system path.
                 attachment.Path = Path.Combine("media/", DateTime.UtcNow.Year.ToString(), DateTime.UtcNow.Month.ToString(), DateTime.UtcNow.Day.ToString(), attachment.Path);
 
-                context.Attachments.Update(attachment);
-                await context.SaveChangesAsync();
+                _ = context.Attachments.Update(attachment);
+                _ = await context.SaveChangesAsync();
             }
         }
 
@@ -104,8 +104,8 @@ namespace ADAtickets.ApiService.Services
         {
             if (DeleteAttachmentFromFileSystem(attachment.Path))
             {
-                context.Attachments.Remove(attachment);
-                await context.SaveChangesAsync();
+                _ = context.Attachments.Remove(attachment);
+                _ = await context.SaveChangesAsync();
             }
         }
 
@@ -116,13 +116,13 @@ namespace ADAtickets.ApiService.Services
         /// <param name="attachmentName">The name of the attachment file.</param>
         /// <param name="attachmentData">Byte array encoding the file data.</param>
         /// <returns>A <see cref="Task"/> returning <see langword="true"/> if the attachment was successfully saved, and <see langword="false"/> otherwise.</returns>
-        private async static Task<bool> SaveAttachmentToFileSystem(string attachmentName, byte[] attachmentData)
+        private static async Task<bool> SaveAttachmentToFileSystem(string attachmentName, byte[] attachmentData)
         {
             try
             {
-                var saveDirectoryPath = Path.Combine("media/", DateTime.UtcNow.Year.ToString(), DateTime.UtcNow.Month.ToString(), DateTime.UtcNow.Day.ToString());
+                string saveDirectoryPath = Path.Combine("media/", DateTime.UtcNow.Year.ToString(), DateTime.UtcNow.Month.ToString(), DateTime.UtcNow.Day.ToString());
 
-                Directory.CreateDirectory(saveDirectoryPath);
+                _ = Directory.CreateDirectory(saveDirectoryPath);
 
                 await File.WriteAllBytesAsync(Path.Combine(saveDirectoryPath, attachmentName), attachmentData);
             }
@@ -169,12 +169,7 @@ namespace ADAtickets.ApiService.Services
         /// <returns></returns>
         private static async Task<bool> ReplaceAttachmentInFileSystem(string attachmentName, byte[] attachmentData, string oldAttachmentPath)
         {
-            if (DeleteAttachmentFromFileSystem(oldAttachmentPath))
-            {
-                return await SaveAttachmentToFileSystem(attachmentName, attachmentData);
-            }
-
-            return false;
+            return DeleteAttachmentFromFileSystem(oldAttachmentPath) && await SaveAttachmentToFileSystem(attachmentName, attachmentData);
         }
     }
 }

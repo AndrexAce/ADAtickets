@@ -31,14 +31,14 @@ namespace ADAtickets.Client.Extensions
         /// </summary>
         public static IServiceCollection AddADAticketsClient(this IServiceCollection services)
         {
-            services.AddScoped<AzureDevOpsClient>();
-            services.AddScoped<AttachmentsClient>();
-            services.AddScoped<EditsClient>();
-            services.AddScoped<NotificationsClient>();
-            services.AddScoped<PlatformsClient>();
-            services.AddScoped<RepliesClient>();
-            services.AddScoped<TicketsClient>();
-            services.AddScoped<UsersClient>();
+            _ = services.AddScoped<AzureDevOpsClient>();
+            _ = services.AddScoped<AttachmentsClient>();
+            _ = services.AddScoped<EditsClient>();
+            _ = services.AddScoped<NotificationsClient>();
+            _ = services.AddScoped<PlatformsClient>();
+            _ = services.AddScoped<RepliesClient>();
+            _ = services.AddScoped<TicketsClient>();
+            _ = services.AddScoped<UsersClient>();
 
             return services;
         }

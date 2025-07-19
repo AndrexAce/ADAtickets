@@ -66,7 +66,7 @@ namespace ADAtickets.ApiService.Controllers
         [RequiredScope(Scope.Read)]
         public async Task<ActionResult<IEnumerable<EditResponseDto>>> GetEdits([FromQuery] Dictionary<string, string>? filters)
         {
-            var edits = await (filters != null ? editRepository.GetEditsByAsync(filters) : editRepository.GetEditsAsync());
+            IEnumerable<Edit> edits = await (filters != null ? editRepository.GetEditsByAsync(filters) : editRepository.GetEditsAsync());
 
             return Ok(edits.Select(mapper.Map<EditResponseDto>));
         }
@@ -205,7 +205,7 @@ namespace ADAtickets.ApiService.Controllers
         [RequiredScope(Scope.Read, Scope.Write)]
         public async Task<ActionResult<EditResponseDto>> PostEdit(EditRequestDto editDto)
         {
-            var edit = mapper.Map<Edit>(editDto);
+            Edit edit = mapper.Map<Edit>(editDto);
 
             // Insert the DTO info into a new entity and add it to the data source.
             await editRepository.AddEditAsync(edit);

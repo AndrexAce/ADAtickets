@@ -29,7 +29,7 @@ namespace ADAtickets.ApiService.Services
     /// <summary>
     /// Implements the methods to manage the <see cref="Ticket"/> entities in the underlying database.
     /// </summary>
-    class TicketRepository(ADAticketsDbContext context) : ITicketRepository
+    internal class TicketRepository(ADAticketsDbContext context) : ITicketRepository
     {
         /// <inheritdoc cref="ITicketRepository.GetTicketByIdAsync"/>
         public async Task<Ticket?> GetTicketByIdAsync(Guid id)
@@ -49,7 +49,7 @@ namespace ADAtickets.ApiService.Services
         {
             IQueryable<Ticket> query = context.Tickets;
 
-            foreach (var filter in filters)
+            foreach (KeyValuePair<string, string> filter in filters)
             {
                 switch (filter.Key.Pascalize())
                 {
@@ -108,22 +108,22 @@ namespace ADAtickets.ApiService.Services
         /// <inheritdoc cref="ITicketRepository.AddTicketAsync"/>
         public async Task AddTicketAsync(Ticket ticket)
         {
-            context.Tickets.Add(ticket);
-            await context.SaveChangesAsync();
+            _ = context.Tickets.Add(ticket);
+            _ = await context.SaveChangesAsync();
         }
 
         /// <inheritdoc cref="ITicketRepository.UpdateTicketAsync"/>
         public async Task UpdateTicketAsync(Ticket ticket)
         {
-            context.Tickets.Update(ticket);
-            await context.SaveChangesAsync();
+            _ = context.Tickets.Update(ticket);
+            _ = await context.SaveChangesAsync();
         }
 
         /// <inheritdoc cref="ITicketRepository.DeleteTicketAsync"/>
         public async Task DeleteTicketAsync(Ticket ticket)
         {
-            context.Tickets.Remove(ticket);
-            await context.SaveChangesAsync();
+            _ = context.Tickets.Remove(ticket);
+            _ = await context.SaveChangesAsync();
         }
     }
 }

@@ -38,28 +38,28 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
     ///     <item>Full set</item>
     /// </list>
     /// </summary>
-    sealed public class GetTests
+    public sealed class GetTests
     {
         #region GetOne
         [Fact]
         public async Task GetAttachmentByIdAsync_ExistingId_ReturnsAttachment()
         {
             // Arrange
-            var existingId = Guid.NewGuid();
+            Guid existingId = Guid.NewGuid();
 
-            var attachments = new List<Attachment> { new() { Id = existingId } };
+            List<Attachment> attachments = [new() { Id = existingId }];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = attachments.BuildMockDbSet();
-            mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Attachment>> mockSet = attachments.BuildMockDbSet();
+            _ = mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
                 .ReturnsAsync((object[] arguments) => attachments.Find(a => a.Id == (Guid)arguments[0]));
-            mockContext.Setup(c => c.Attachments)
+            _ = mockContext.Setup(c => c.Attachments)
                 .Returns(mockSet.Object);
 
-            var service = new AttachmentService(mockContext.Object);
+            AttachmentService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetAttachmentByIdAsync(existingId);
+            Attachment? result = await service.GetAttachmentByIdAsync(existingId);
 
             // Assert
             Assert.NotNull(result);
@@ -70,19 +70,19 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
         public async Task GetAttachmentByIdAsync_NonExistingId_ReturnsNull()
         {
             // Arrange
-            var attachments = new List<Attachment> { new() { Id = Guid.NewGuid() } };
+            List<Attachment> attachments = [new() { Id = Guid.NewGuid() }];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = attachments.BuildMockDbSet();
-            mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Attachment>> mockSet = attachments.BuildMockDbSet();
+            _ = mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
                 .ReturnsAsync((object[] arguments) => attachments.Find(a => a.Id == (Guid)arguments[0]));
-            mockContext.Setup(c => c.Attachments)
+            _ = mockContext.Setup(c => c.Attachments)
                 .Returns(mockSet.Object);
 
-            var service = new AttachmentService(mockContext.Object);
+            AttachmentService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetAttachmentByIdAsync(Guid.NewGuid());
+            Attachment? result = await service.GetAttachmentByIdAsync(Guid.NewGuid());
 
             // Assert
             Assert.Null(result);
@@ -92,19 +92,19 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
         public async Task GetAttachmentByIdAsync_EmptyId_ReturnsNull()
         {
             // Arrange
-            var attachments = new List<Attachment> { new() { Id = Guid.NewGuid() } };
+            List<Attachment> attachments = [new() { Id = Guid.NewGuid() }];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = attachments.BuildMockDbSet();
-            mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Attachment>> mockSet = attachments.BuildMockDbSet();
+            _ = mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
                 .ReturnsAsync((object[] arguments) => attachments.Find(a => a.Id == (Guid)arguments[0]));
-            mockContext.Setup(c => c.Attachments)
+            _ = mockContext.Setup(c => c.Attachments)
                 .Returns(mockSet.Object);
 
-            var service = new AttachmentService(mockContext.Object);
+            AttachmentService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetAttachmentByIdAsync(Guid.Empty);
+            Attachment? result = await service.GetAttachmentByIdAsync(Guid.Empty);
 
             // Assert
             Assert.Null(result);
@@ -116,17 +116,17 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
         public async Task GetAttachments_EmptySet_ReturnsNothing()
         {
             // Arrange
-            var attachments = new List<Attachment>();
+            List<Attachment> attachments = [];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = attachments.BuildMockDbSet();
-            mockContext.Setup(c => c.Attachments)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Attachment>> mockSet = attachments.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Attachments)
                 .Returns(mockSet.Object);
 
-            var service = new AttachmentService(mockContext.Object);
+            AttachmentService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetAttachmentsAsync();
+            IEnumerable<Attachment> result = await service.GetAttachmentsAsync();
 
             // Assert
             Assert.Empty(result);
@@ -136,25 +136,26 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
         public async Task GetAttachments_FullSet_ReturnsAttachments()
         {
             // Arrange
-            var guid1 = Guid.NewGuid();
-            var guid2 = Guid.NewGuid();
-            var guid3 = Guid.NewGuid();
+            Guid guid1 = Guid.NewGuid();
+            Guid guid2 = Guid.NewGuid();
+            Guid guid3 = Guid.NewGuid();
 
-            var attachments = new List<Attachment> {
+            List<Attachment> attachments =
+            [
                 new() { Id = guid1 },
                 new() { Id = guid2 },
                 new() { Id = guid3 }
-            };
+            ];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = attachments.BuildMockDbSet();
-            mockContext.Setup(c => c.Attachments)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Attachment>> mockSet = attachments.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Attachments)
                 .Returns(mockSet.Object);
 
-            var service = new AttachmentService(mockContext.Object);
+            AttachmentService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetAttachmentsAsync();
+            IEnumerable<Attachment> result = await service.GetAttachmentsAsync();
 
             // Assert
             Assert.Equal(3, result.Count());
@@ -169,21 +170,22 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
         public async Task GetAttachmentsBy_OneFilterWithMatch_ReturnsAttachments()
         {
             // Arrange
-            var attachments = new List<Attachment> {
+            List<Attachment> attachments =
+            [
                 new() { Path = "/path/example.png" },
                 new() { Path = "/path/trial.png"},
                 new() { Path = "/path/test.png" }
-            };
+            ];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = attachments.BuildMockDbSet();
-            mockContext.Setup(c => c.Attachments)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Attachment>> mockSet = attachments.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Attachments)
                 .Returns(mockSet.Object);
 
-            var service = new AttachmentService(mockContext.Object);
+            AttachmentService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetAttachmentsByAsync([new KeyValuePair<string, string>("Path", "path")]);
+            IEnumerable<Attachment> result = await service.GetAttachmentsByAsync([new KeyValuePair<string, string>("Path", "path")]);
 
             // Assert
             Assert.Equal(3, result.Count());
@@ -196,21 +198,22 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
         public async Task GetAttachmentsBy_MoreFiltersWithMatch_ReturnAttachments()
         {
             // Arrange
-            var attachments = new List<Attachment> {
+            List<Attachment> attachments =
+            [
                 new() { Path = "/path/example.png", TicketId = Guid.AllBitsSet },
                 new() { Path = "/path/trial.png" },
                 new() { Path = "/path/test.png", TicketId = Guid.AllBitsSet }
-            };
+            ];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = attachments.BuildMockDbSet();
-            mockContext.Setup(c => c.Attachments)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Attachment>> mockSet = attachments.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Attachments)
                 .Returns(mockSet.Object);
 
-            var service = new AttachmentService(mockContext.Object);
+            AttachmentService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetAttachmentsByAsync([
+            IEnumerable<Attachment> result = await service.GetAttachmentsByAsync([
                 new KeyValuePair<string, string>("Path", "path"),
                 new KeyValuePair<string, string>("TicketId", Guid.AllBitsSet.ToString())
                 ]);
@@ -227,21 +230,22 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
         public async Task GetAttachmentsBy_NoMatch_ReturnsNothing()
         {
             // Arrange
-            var attachments = new List<Attachment> {
+            List<Attachment> attachments =
+            [
                 new() { Path = "/path/example.png" },
                 new() { Path = "/path/trial.png" },
                 new() { Path = "/path/test.png" }
-            };
+            ];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = attachments.BuildMockDbSet();
-            mockContext.Setup(c => c.Attachments)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Attachment>> mockSet = attachments.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Attachments)
                 .Returns(mockSet.Object);
 
-            var service = new AttachmentService(mockContext.Object);
+            AttachmentService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetAttachmentsByAsync([new KeyValuePair<string, string>("Path", "image")]);
+            IEnumerable<Attachment> result = await service.GetAttachmentsByAsync([new KeyValuePair<string, string>("Path", "image")]);
 
             // Assert
             Assert.Empty(result);
@@ -251,21 +255,22 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
         public async Task GetAttachmentsBy_InvalidFilter_ReturnsNothing()
         {
             // Arrange
-            var attachments = new List<Attachment> {
+            List<Attachment> attachments =
+            [
                 new() { Path = "/path/example.png" },
                 new() { Path = "/path/trial.png" },
                 new() { Path = "/path/test.png" }
-            };
+            ];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = attachments.BuildMockDbSet();
-            mockContext.Setup(c => c.Attachments)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Attachment>> mockSet = attachments.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Attachments)
                 .Returns(mockSet.Object);
 
-            var service = new AttachmentService(mockContext.Object);
+            AttachmentService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetAttachmentsByAsync([new KeyValuePair<string, string>("SomeName", "value")]);
+            IEnumerable<Attachment> result = await service.GetAttachmentsByAsync([new KeyValuePair<string, string>("SomeName", "value")]);
 
             // Assert
             Assert.Empty(result);

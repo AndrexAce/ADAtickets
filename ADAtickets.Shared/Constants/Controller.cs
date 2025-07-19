@@ -24,7 +24,7 @@ namespace ADAtickets.Shared.Constants
     /// <summary>
     /// Represents the path of an API controller.
     /// </summary>
-    static class Controller
+    internal static class Controller
     {
         /// <summary>
         /// Path to the API controller for <see cref="Attachment"/> entities.

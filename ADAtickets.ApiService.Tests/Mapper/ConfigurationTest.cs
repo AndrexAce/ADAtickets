@@ -22,16 +22,16 @@ using AutoMapper;
 
 namespace ADAtickets.ApiService.Tests.Mapper
 {
-    sealed public class ConfigurationTest
+    public sealed class ConfigurationTest
     {
         [Fact]
         public void ValidConfiguration_DoesNotThrow()
         {
             // Arrange
-            var mapper = new MapperConfiguration(cfg => { cfg.AddProfile<AutoMapperProfile>(); }).CreateMapper();
+            IMapper mapper = new MapperConfiguration(cfg => { cfg.AddProfile<AutoMapperProfile>(); }).CreateMapper();
 
             // Act
-            var exception = Record.Exception(() => mapper.ConfigurationProvider.AssertConfigurationIsValid());
+            Exception? exception = Record.Exception(mapper.ConfigurationProvider.AssertConfigurationIsValid);
 
             // Assert
             Assert.Null(exception);

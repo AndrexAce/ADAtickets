@@ -21,7 +21,7 @@ using Avalonia.Controls;
 
 namespace ADAtickets.Installer.Views;
 
-partial class MainWindow : Window
+internal partial class MainWindow : Window
 {
     public MainWindow()
     {

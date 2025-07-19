@@ -38,28 +38,28 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
     ///     <item>Full set</item>
     /// </list>
     /// </summary>
-    sealed public class GetTests
+    public sealed class GetTests
     {
         #region GetOne
         [Fact]
         public async Task GetUserByIdAsync_ExistingId_ReturnsUser()
         {
             // Arrange
-            var existingId = Guid.NewGuid();
+            Guid existingId = Guid.NewGuid();
 
-            var users = new List<User> { new() { Id = existingId } };
+            List<User> users = [new() { Id = existingId }];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = users.BuildMockDbSet();
-            mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<User>> mockSet = users.BuildMockDbSet();
+            _ = mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
                 .ReturnsAsync((object[] arguments) => users.Find(u => u.Id == (Guid)arguments[0]));
-            mockContext.Setup(c => c.Users)
+            _ = mockContext.Setup(c => c.Users)
                 .Returns(mockSet.Object);
 
-            var service = new UserService(mockContext.Object);
+            UserService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetUserByIdAsync(existingId);
+            User? result = await service.GetUserByIdAsync(existingId);
 
             // Assert
             Assert.NotNull(result);
@@ -70,19 +70,19 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
         public async Task GetUserByIdAsync_NonExistingId_ReturnsNull()
         {
             // Arrange
-            var users = new List<User> { new() { Id = Guid.NewGuid() } };
+            List<User> users = [new() { Id = Guid.NewGuid() }];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = users.BuildMockDbSet();
-            mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<User>> mockSet = users.BuildMockDbSet();
+            _ = mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
                 .ReturnsAsync((object[] arguments) => users.Find(u => u.Id == (Guid)arguments[0]));
-            mockContext.Setup(c => c.Users)
+            _ = mockContext.Setup(c => c.Users)
                 .Returns(mockSet.Object);
 
-            var service = new UserService(mockContext.Object);
+            UserService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetUserByIdAsync(Guid.NewGuid());
+            User? result = await service.GetUserByIdAsync(Guid.NewGuid());
 
             // Assert
             Assert.Null(result);
@@ -92,19 +92,19 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
         public async Task GetUserByIdAsync_EmptyId_ReturnsNull()
         {
             // Arrange
-            var users = new List<User> { new() { Id = Guid.NewGuid() } };
+            List<User> users = [new() { Id = Guid.NewGuid() }];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = users.BuildMockDbSet();
-            mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<User>> mockSet = users.BuildMockDbSet();
+            _ = mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
                 .ReturnsAsync((object[] arguments) => users.Find(u => u.Id == (Guid)arguments[0]));
-            mockContext.Setup(c => c.Users)
+            _ = mockContext.Setup(c => c.Users)
                 .Returns(mockSet.Object);
 
-            var service = new UserService(mockContext.Object);
+            UserService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetUserByIdAsync(Guid.Empty);
+            User? result = await service.GetUserByIdAsync(Guid.Empty);
 
             // Assert
             Assert.Null(result);
@@ -116,17 +116,17 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
         public async Task GetUsers_EmptySet_ReturnsNothing()
         {
             // Arrange
-            var users = new List<User>();
+            List<User> users = [];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = users.BuildMockDbSet();
-            mockContext.Setup(c => c.Users)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<User>> mockSet = users.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Users)
                 .Returns(mockSet.Object);
 
-            var service = new UserService(mockContext.Object);
+            UserService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetUsersAsync();
+            IEnumerable<User> result = await service.GetUsersAsync();
 
             // Assert
             Assert.Empty(result);
@@ -136,25 +136,26 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
         public async Task GetUsers_FullSet_ReturnsUsers()
         {
             // Arrange
-            var guid1 = Guid.NewGuid();
-            var guid2 = Guid.NewGuid();
-            var guid3 = Guid.NewGuid();
+            Guid guid1 = Guid.NewGuid();
+            Guid guid2 = Guid.NewGuid();
+            Guid guid3 = Guid.NewGuid();
 
-            var users = new List<User> {
+            List<User> users =
+            [
                 new() { Id = guid1 },
                 new() { Id = guid2 },
                 new() { Id = guid3 }
-            };
+            ];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = users.BuildMockDbSet();
-            mockContext.Setup(c => c.Users)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<User>> mockSet = users.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Users)
                 .Returns(mockSet.Object);
 
-            var service = new UserService(mockContext.Object);
+            UserService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetUsersAsync();
+            IEnumerable<User> result = await service.GetUsersAsync();
 
             // Assert
             Assert.Equal(3, result.Count());
@@ -169,21 +170,22 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
         public async Task GetUsersBy_OneFilterWithMatch_ReturnsUsers()
         {
             // Arrange
-            var users = new List<User> {
+            List<User> users =
+            [
                 new() { Name = "Jonathan" },
                 new() { Name = "Jack" },
                 new() { Name = "James" }
-            };
+            ];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = users.BuildMockDbSet();
-            mockContext.Setup(c => c.Users)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<User>> mockSet = users.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Users)
                 .Returns(mockSet.Object);
 
-            var service = new UserService(mockContext.Object);
+            UserService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetUsersByAsync([new KeyValuePair<string, string>("Name", "j")]);
+            IEnumerable<User> result = await service.GetUsersByAsync([new KeyValuePair<string, string>("Name", "j")]);
 
             // Assert
             Assert.Equal(3, result.Count());
@@ -196,21 +198,22 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
         public async Task GetUsersBy_MoreFiltersWithMatch_ReturnUsers()
         {
             // Arrange
-            var users = new List<User> {
+            List<User> users =
+            [
                 new() { Name = "Jonathan", Type = UserType.Admin },
                 new() { Name = "Jack" },
                 new() { Name = "James", Type = UserType.Admin }
-            };
+            ];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = users.BuildMockDbSet();
-            mockContext.Setup(c => c.Users)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<User>> mockSet = users.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Users)
                 .Returns(mockSet.Object);
 
-            var service = new UserService(mockContext.Object);
+            UserService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetUsersByAsync([
+            IEnumerable<User> result = await service.GetUsersByAsync([
                 new KeyValuePair<string, string>("Name", "j"),
                 new KeyValuePair<string, string>("Type", UserType.Admin.ToString())
                 ]);
@@ -227,21 +230,22 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
         public async Task GetUsersBy_NoMatch_ReturnsNothing()
         {
             // Arrange
-            var users = new List<User> {
+            List<User> users =
+            [
                 new() { Name = "Jonathan" },
                 new() { Name = "Jack" },
                 new() { Name = "James" }
-            };
+            ];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = users.BuildMockDbSet();
-            mockContext.Setup(c => c.Users)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<User>> mockSet = users.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Users)
                 .Returns(mockSet.Object);
 
-            var service = new UserService(mockContext.Object);
+            UserService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetUsersByAsync([new KeyValuePair<string, string>("Name", "i")]);
+            IEnumerable<User> result = await service.GetUsersByAsync([new KeyValuePair<string, string>("Name", "i")]);
 
             // Assert
             Assert.Empty(result);
@@ -251,21 +255,22 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
         public async Task GetAttachmentsBy_InvalidFilter_ReturnsNothing()
         {
             // Arrange
-            var users = new List<User> {
+            List<User> users =
+            [
                 new() { Name = "Jonathan" },
                 new() { Name = "Jack" },
                 new() { Name = "James" }
-            };
+            ];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = users.BuildMockDbSet();
-            mockContext.Setup(c => c.Users)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<User>> mockSet = users.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Users)
                 .Returns(mockSet.Object);
 
-            var service = new UserService(mockContext.Object);
+            UserService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetUsersByAsync([new KeyValuePair<string, string>("SomeName", "value")]);
+            IEnumerable<User> result = await service.GetUsersByAsync([new KeyValuePair<string, string>("SomeName", "value")]);
 
             // Assert
             Assert.Empty(result);

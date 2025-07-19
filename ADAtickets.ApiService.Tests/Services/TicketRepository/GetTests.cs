@@ -38,28 +38,28 @@ namespace ADAtickets.ApiService.Tests.Services.TicketRepository
     ///     <item>Full set</item>
     /// </list>
     /// </summary>
-    sealed public class GetTests
+    public sealed class GetTests
     {
         #region GetOne
         [Fact]
         public async Task GetTicketByIdAsync_ExistingId_ReturnsTicket()
         {
             // Arrange
-            var existingId = Guid.NewGuid();
+            Guid existingId = Guid.NewGuid();
 
-            var tickets = new List<Ticket> { new() { Id = existingId } };
+            List<Ticket> tickets = [new() { Id = existingId }];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = tickets.BuildMockDbSet();
-            mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Ticket>> mockSet = tickets.BuildMockDbSet();
+            _ = mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
                 .ReturnsAsync((object[] arguments) => tickets.Find(t => t.Id == (Guid)arguments[0]));
-            mockContext.Setup(c => c.Tickets)
+            _ = mockContext.Setup(c => c.Tickets)
                 .Returns(mockSet.Object);
 
-            var service = new TicketService(mockContext.Object);
+            TicketService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetTicketByIdAsync(existingId);
+            Ticket? result = await service.GetTicketByIdAsync(existingId);
 
             // Assert
             Assert.NotNull(result);
@@ -70,19 +70,19 @@ namespace ADAtickets.ApiService.Tests.Services.TicketRepository
         public async Task GetTicketByIdAsync_NonExistingId_ReturnsNull()
         {
             // Arrange
-            var tickets = new List<Ticket> { new() { Id = Guid.NewGuid() } };
+            List<Ticket> tickets = [new() { Id = Guid.NewGuid() }];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = tickets.BuildMockDbSet();
-            mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Ticket>> mockSet = tickets.BuildMockDbSet();
+            _ = mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
                 .ReturnsAsync((object[] arguments) => tickets.Find(t => t.Id == (Guid)arguments[0]));
-            mockContext.Setup(c => c.Tickets)
+            _ = mockContext.Setup(c => c.Tickets)
                 .Returns(mockSet.Object);
 
-            var service = new TicketService(mockContext.Object);
+            TicketService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetTicketByIdAsync(Guid.NewGuid());
+            Ticket? result = await service.GetTicketByIdAsync(Guid.NewGuid());
 
             // Assert
             Assert.Null(result);
@@ -92,19 +92,19 @@ namespace ADAtickets.ApiService.Tests.Services.TicketRepository
         public async Task GetTicketByIdAsync_EmptyId_ReturnsNull()
         {
             // Arrange
-            var tickets = new List<Ticket> { new() { Id = Guid.NewGuid() } };
+            List<Ticket> tickets = [new() { Id = Guid.NewGuid() }];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = tickets.BuildMockDbSet();
-            mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Ticket>> mockSet = tickets.BuildMockDbSet();
+            _ = mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
                 .ReturnsAsync((object[] arguments) => tickets.Find(t => t.Id == (Guid)arguments[0]));
-            mockContext.Setup(c => c.Tickets)
+            _ = mockContext.Setup(c => c.Tickets)
                 .Returns(mockSet.Object);
 
-            var service = new TicketService(mockContext.Object);
+            TicketService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetTicketByIdAsync(Guid.Empty);
+            Ticket? result = await service.GetTicketByIdAsync(Guid.Empty);
 
             // Assert
             Assert.Null(result);
@@ -116,17 +116,17 @@ namespace ADAtickets.ApiService.Tests.Services.TicketRepository
         public async Task GetTickets_EmptySet_ReturnsNothing()
         {
             // Arrange
-            var tickets = new List<Ticket>();
+            List<Ticket> tickets = [];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = tickets.BuildMockDbSet();
-            mockContext.Setup(c => c.Tickets)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Ticket>> mockSet = tickets.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Tickets)
                 .Returns(mockSet.Object);
 
-            var service = new TicketService(mockContext.Object);
+            TicketService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetTicketsAsync();
+            IEnumerable<Ticket> result = await service.GetTicketsAsync();
 
             // Assert
             Assert.Empty(result);
@@ -136,25 +136,26 @@ namespace ADAtickets.ApiService.Tests.Services.TicketRepository
         public async Task GetTickets_FullSet_ReturnsTickets()
         {
             // Arrange
-            var guid1 = Guid.NewGuid();
-            var guid2 = Guid.NewGuid();
-            var guid3 = Guid.NewGuid();
+            Guid guid1 = Guid.NewGuid();
+            Guid guid2 = Guid.NewGuid();
+            Guid guid3 = Guid.NewGuid();
 
-            var tickets = new List<Ticket> {
+            List<Ticket> tickets =
+            [
                 new() { Id = guid1 },
                 new() { Id = guid2 },
                 new() { Id = guid3 }
-            };
+            ];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = tickets.BuildMockDbSet();
-            mockContext.Setup(c => c.Tickets)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Ticket>> mockSet = tickets.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Tickets)
                 .Returns(mockSet.Object);
 
-            var service = new TicketService(mockContext.Object);
+            TicketService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetTicketsAsync();
+            IEnumerable<Ticket> result = await service.GetTicketsAsync();
 
             // Assert
             Assert.Equal(3, result.Count());
@@ -169,21 +170,22 @@ namespace ADAtickets.ApiService.Tests.Services.TicketRepository
         public async Task GetTicketsBy_OneFilterWithMatch_ReturnsTickets()
         {
             // Arrange
-            var tickets = new List<Ticket> {
+            List<Ticket> tickets =
+            [
                 new() { Description = "Example description." },
                 new() { Description = "Trial description."},
                 new() { Description = "Test description." }
-            };
+            ];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = tickets.BuildMockDbSet();
-            mockContext.Setup(c => c.Tickets)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Ticket>> mockSet = tickets.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Tickets)
                 .Returns(mockSet.Object);
 
-            var service = new TicketService(mockContext.Object);
+            TicketService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetTicketsByAsync([new KeyValuePair<string, string>("Description", "description")]);
+            IEnumerable<Ticket> result = await service.GetTicketsByAsync([new KeyValuePair<string, string>("Description", "description")]);
 
             // Assert
             Assert.Equal(3, result.Count());
@@ -196,21 +198,22 @@ namespace ADAtickets.ApiService.Tests.Services.TicketRepository
         public async Task GetTicketsBy_MoreFiltersWithMatch_ReturnTickets()
         {
             // Arrange
-            var tickets = new List<Ticket> {
+            List<Ticket> tickets =
+            [
                 new() { Description = "Example description.", Status = Status.Closed },
                 new() { Description = "Trial description." },
                 new() { Description = "Test description.", Status = Status.Closed }
-            };
+            ];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = tickets.BuildMockDbSet();
-            mockContext.Setup(c => c.Tickets)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Ticket>> mockSet = tickets.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Tickets)
                 .Returns(mockSet.Object);
 
-            var service = new TicketService(mockContext.Object);
+            TicketService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetTicketsByAsync([
+            IEnumerable<Ticket> result = await service.GetTicketsByAsync([
                 new KeyValuePair<string, string>("Description", "description"),
                 new KeyValuePair<string, string>("Status", Status.Closed.ToString())
                 ]);
@@ -227,21 +230,22 @@ namespace ADAtickets.ApiService.Tests.Services.TicketRepository
         public async Task GetTicketsBy_NoMatch_ReturnsNothing()
         {
             // Arrange
-            var tickets = new List<Ticket> {
+            List<Ticket> tickets =
+            [
                 new() { Description = "Example description." },
                 new() { Description = "Trial description."},
                 new() { Description = "Test description." }
-            };
+            ];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = tickets.BuildMockDbSet();
-            mockContext.Setup(c => c.Tickets)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Ticket>> mockSet = tickets.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Tickets)
                 .Returns(mockSet.Object);
 
-            var service = new TicketService(mockContext.Object);
+            TicketService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetTicketsByAsync([new KeyValuePair<string, string>("Description", "text")]);
+            IEnumerable<Ticket> result = await service.GetTicketsByAsync([new KeyValuePair<string, string>("Description", "text")]);
 
             // Assert
             Assert.Empty(result);
@@ -251,21 +255,22 @@ namespace ADAtickets.ApiService.Tests.Services.TicketRepository
         public async Task GetAttachmentsBy_InvalidFilter_ReturnsNothing()
         {
             // Arrange
-            var tickets = new List<Ticket> {
+            List<Ticket> tickets =
+            [
                 new() { Description = "Example description." },
                 new() { Description = "Trial description."},
                 new() { Description = "Test description." }
-            };
+            ];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = tickets.BuildMockDbSet();
-            mockContext.Setup(c => c.Tickets)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Ticket>> mockSet = tickets.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Tickets)
                 .Returns(mockSet.Object);
 
-            var service = new TicketService(mockContext.Object);
+            TicketService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetTicketsByAsync([new KeyValuePair<string, string>("SomeName", "value")]);
+            IEnumerable<Ticket> result = await service.GetTicketsByAsync([new KeyValuePair<string, string>("SomeName", "value")]);
 
             // Assert
             Assert.Empty(result);

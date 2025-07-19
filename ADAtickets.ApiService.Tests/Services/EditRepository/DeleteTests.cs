@@ -32,29 +32,29 @@ namespace ADAtickets.ApiService.Tests.Services.EditRepository
     ///     <item>Existing entity</item>
     /// </list>
     /// </summary>
-    sealed public class DeleteTests
+    public sealed class DeleteTests
     {
         [Fact]
         public async Task DeleteEditByIdAsync_ExistingEntity_DeletesEntity()
         {
             // Arrange
-            var edit = new Edit { Id = Guid.NewGuid() };
-            var edits = new List<Edit> { edit };
+            Edit edit = new() { Id = Guid.NewGuid() };
+            List<Edit> edits = [edit];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = edits.BuildMockDbSet();
-            mockSet.Setup(s => s.Remove(It.IsAny<Edit>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<DbSet<Edit>> mockSet = edits.BuildMockDbSet();
+            _ = mockSet.Setup(s => s.Remove(It.IsAny<Edit>()))
                 .Callback<Edit>(edit => edits.RemoveAll(e => e.Id == edit.Id));
-            mockContext.Setup(c => c.Edits)
+            _ = mockContext.Setup(c => c.Edits)
                 .Returns(mockSet.Object);
 
-            var service = new EditService(mockContext.Object);
+            EditService service = new(mockContext.Object);
 
-            var cancellationToken = TestContext.Current.CancellationToken;
+            CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
             // Act
             await service.DeleteEditAsync(edit);
-            var deletedEdit = await mockContext.Object.Edits.SingleOrDefaultAsync(cancellationToken);
+            Edit? deletedEdit = await mockContext.Object.Edits.SingleOrDefaultAsync(cancellationToken);
 
             // Assert
             Assert.Null(deletedEdit);

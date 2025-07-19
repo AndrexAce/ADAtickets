@@ -22,6 +22,7 @@ using ADAtickets.ApiService.Repositories;
 using ADAtickets.Shared.Constants;
 using ADAtickets.Shared.Dtos.Responses;
 using ADAtickets.Shared.Models;
+using Azure.Core;
 using Azure.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -78,27 +79,27 @@ namespace ADAtickets.ApiService.Controllers
         private async Task<VssConnection> ConnectToAzureDevOpsAsync()
         {
             // Read AzureDevOps settings from configuration
-            var tenantId = configuration["AzureDevOps:TenantId"]!;
-            var clientId = configuration["AzureDevOps:ClientId"]!;
-            var certPath = configuration["AzureDevOps:ClientCertificates:0:CertificateDiskPath"]!;
-            var certPassword = configuration["AzureDevOps:ClientCertificates:0:CertificatePassword"]!;
-            var scope = configuration["AzureDevOpsAPI:Scopes:0"]!;
-            var devOpsUri = configuration["AzureDevOpsAPI:BaseUrl"]!;
+            string tenantId = configuration["AzureDevOps:TenantId"]!;
+            string clientId = configuration["AzureDevOps:ClientId"]!;
+            string certPath = configuration["AzureDevOps:ClientCertificates:0:CertificateDiskPath"]!;
+            string certPassword = configuration["AzureDevOps:ClientCertificates:0:CertificatePassword"]!;
+            string scope = configuration["AzureDevOpsAPI:Scopes:0"]!;
+            string devOpsUri = configuration["AzureDevOpsAPI:BaseUrl"]!;
 
             // Create the credentials
-            var credentials = new ClientCertificateCredential(
+            ClientCertificateCredential credentials = new(
                 tenantId: tenantId,
                 clientId: clientId,
                 clientCertificate: X509CertificateLoader.LoadPkcs12FromFile(certPath, certPassword)
             );
 
             // Get the Entra access token
-            var accessToken = await credentials.GetTokenAsync(
-                new Azure.Core.TokenRequestContext([scope])
+            AccessToken accessToken = await credentials.GetTokenAsync(
+                new TokenRequestContext([scope])
             );
 
-            var vssToken = new VssAadToken("Bearer", accessToken.Token);
-            var vssCredential = new VssAadCredential(vssToken);
+            VssAadToken vssToken = new("Bearer", accessToken.Token);
+            VssAadCredential vssCredential = new(vssToken);
 
             // Connect to Azure DevOps
             return new(new Uri(devOpsUri), vssCredential);
@@ -106,12 +107,12 @@ namespace ADAtickets.ApiService.Controllers
 
         private async Task<ValueWrapper<bool>> CheckAzureDevOpsAccessAsync(string email)
         {
-            var connection = await ConnectToAzureDevOpsAsync();
+            VssConnection connection = await ConnectToAzureDevOpsAsync();
 
-            var identityClient = await connection.GetClientAsync<IdentityHttpClient>();
+            IdentityHttpClient identityClient = await connection.GetClientAsync<IdentityHttpClient>();
 
             // Queries the list of users who belong to the Azure DevOps organization
-            var identities = await identityClient.ReadIdentitiesAsync(
+            IdentitiesCollection identities = await identityClient.ReadIdentitiesAsync(
                 IdentitySearchFilter.MailAddress,
                 email,
                 queryMembership: QueryMembership.None);

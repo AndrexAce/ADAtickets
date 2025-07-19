@@ -38,28 +38,28 @@ namespace ADAtickets.ApiService.Tests.Services.NotificationRepository
     ///     <item>Full set</item>
     /// </list>
     /// </summary>
-    sealed public class GetTests
+    public sealed class GetTests
     {
         #region GetOne
         [Fact]
         public async Task GetNotificationByIdAsync_ExistingId_ReturnsNotification()
         {
             // Arrange
-            var existingId = Guid.NewGuid();
+            Guid existingId = Guid.NewGuid();
 
-            var notifications = new List<Notification> { new() { Id = existingId } };
+            List<Notification> notifications = [new() { Id = existingId }];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = notifications.BuildMockDbSet();
-            mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Notification>> mockSet = notifications.BuildMockDbSet();
+            _ = mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
                 .ReturnsAsync((object[] arguments) => notifications.Find(n => n.Id == (Guid)arguments[0]));
-            mockContext.Setup(c => c.Notifications)
+            _ = mockContext.Setup(c => c.Notifications)
                 .Returns(mockSet.Object);
 
-            var service = new NotificationService(mockContext.Object);
+            NotificationService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetNotificationByIdAsync(existingId);
+            Notification? result = await service.GetNotificationByIdAsync(existingId);
 
             // Assert
             Assert.NotNull(result);
@@ -70,19 +70,19 @@ namespace ADAtickets.ApiService.Tests.Services.NotificationRepository
         public async Task GetNotificationByIdAsync_NonExistingId_ReturnsNull()
         {
             // Arrange
-            var notifications = new List<Notification> { new() { Id = Guid.NewGuid() } };
+            List<Notification> notifications = [new() { Id = Guid.NewGuid() }];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = notifications.BuildMockDbSet();
-            mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Notification>> mockSet = notifications.BuildMockDbSet();
+            _ = mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
                 .ReturnsAsync((object[] arguments) => notifications.Find(n => n.Id == (Guid)arguments[0]));
-            mockContext.Setup(c => c.Notifications)
+            _ = mockContext.Setup(c => c.Notifications)
                 .Returns(mockSet.Object);
 
-            var service = new NotificationService(mockContext.Object);
+            NotificationService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetNotificationByIdAsync(Guid.NewGuid());
+            Notification? result = await service.GetNotificationByIdAsync(Guid.NewGuid());
 
             // Assert
             Assert.Null(result);
@@ -92,19 +92,19 @@ namespace ADAtickets.ApiService.Tests.Services.NotificationRepository
         public async Task GetNotificationByIdAsync_EmptyId_ReturnsNull()
         {
             // Arrange
-            var notifications = new List<Notification> { new() { Id = Guid.NewGuid() } };
+            List<Notification> notifications = [new() { Id = Guid.NewGuid() }];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = notifications.BuildMockDbSet();
-            mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Notification>> mockSet = notifications.BuildMockDbSet();
+            _ = mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
                 .ReturnsAsync((object[] arguments) => notifications.Find(n => n.Id == (Guid)arguments[0]));
-            mockContext.Setup(c => c.Notifications)
+            _ = mockContext.Setup(c => c.Notifications)
                 .Returns(mockSet.Object);
 
-            var service = new NotificationService(mockContext.Object);
+            NotificationService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetNotificationByIdAsync(Guid.Empty);
+            Notification? result = await service.GetNotificationByIdAsync(Guid.Empty);
 
             // Assert
             Assert.Null(result);
@@ -116,17 +116,17 @@ namespace ADAtickets.ApiService.Tests.Services.NotificationRepository
         public async Task GetNotifications_EmptySet_ReturnsNothing()
         {
             // Arrange
-            var notifications = new List<Notification>();
+            List<Notification> notifications = [];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = notifications.BuildMockDbSet();
-            mockContext.Setup(c => c.Notifications)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Notification>> mockSet = notifications.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Notifications)
                 .Returns(mockSet.Object);
 
-            var service = new NotificationService(mockContext.Object);
+            NotificationService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetNotificationsAsync();
+            IEnumerable<Notification> result = await service.GetNotificationsAsync();
 
             // Assert
             Assert.Empty(result);
@@ -136,25 +136,26 @@ namespace ADAtickets.ApiService.Tests.Services.NotificationRepository
         public async Task GetNotifications_FullSet_ReturnsNotifications()
         {
             // Arrange
-            var guid1 = Guid.NewGuid();
-            var guid2 = Guid.NewGuid();
-            var guid3 = Guid.NewGuid();
+            Guid guid1 = Guid.NewGuid();
+            Guid guid2 = Guid.NewGuid();
+            Guid guid3 = Guid.NewGuid();
 
-            var notifications = new List<Notification> {
+            List<Notification> notifications =
+            [
                 new() { Id = guid1 },
                 new() { Id = guid2 },
                 new() { Id = guid3 }
-            };
+            ];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = notifications.BuildMockDbSet();
-            mockContext.Setup(c => c.Notifications)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Notification>> mockSet = notifications.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Notifications)
                 .Returns(mockSet.Object);
 
-            var service = new NotificationService(mockContext.Object);
+            NotificationService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetNotificationsAsync();
+            IEnumerable<Notification> result = await service.GetNotificationsAsync();
 
             // Assert
             Assert.Equal(3, result.Count());
@@ -169,21 +170,22 @@ namespace ADAtickets.ApiService.Tests.Services.NotificationRepository
         public async Task GetNotificationsBy_OneFilterWithMatch_ReturnsNotifications()
         {
             // Arrange
-            var notifications = new List<Notification> {
+            List<Notification> notifications =
+            [
                 new() { Message = "Example message." },
                 new() { Message = "Trial message."},
                 new() { Message = "Test message." }
-            };
+            ];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = notifications.BuildMockDbSet();
-            mockContext.Setup(c => c.Notifications)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Notification>> mockSet = notifications.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Notifications)
                 .Returns(mockSet.Object);
 
-            var service = new NotificationService(mockContext.Object);
+            NotificationService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetNotificationsByAsync([new KeyValuePair<string, string>("Message", "message")]);
+            IEnumerable<Notification> result = await service.GetNotificationsByAsync([new KeyValuePair<string, string>("Message", "message")]);
 
             // Assert
             Assert.Equal(3, result.Count());
@@ -196,21 +198,22 @@ namespace ADAtickets.ApiService.Tests.Services.NotificationRepository
         public async Task GetNotificationsBy_MoreFiltersWithMatch_ReturnNotifications()
         {
             // Arrange
-            var notifications = new List<Notification> {
+            List<Notification> notifications =
+            [
                 new() { Message = "Example message.", SendDateTime = DateTimeOffset.UnixEpoch },
                 new() { Message = "Trial message." },
                 new() { Message = "Test message.", SendDateTime = DateTimeOffset.UnixEpoch }
-            };
+            ];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = notifications.BuildMockDbSet();
-            mockContext.Setup(c => c.Notifications)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Notification>> mockSet = notifications.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Notifications)
                 .Returns(mockSet.Object);
 
-            var service = new NotificationService(mockContext.Object);
+            NotificationService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetNotificationsByAsync([
+            IEnumerable<Notification> result = await service.GetNotificationsByAsync([
                 new KeyValuePair<string, string>("Message", "message"),
                 new KeyValuePair<string, string>("SendDateTime", DateTimeOffset.UnixEpoch.ToString())
                 ]);
@@ -227,21 +230,22 @@ namespace ADAtickets.ApiService.Tests.Services.NotificationRepository
         public async Task GetNotificationsBy_NoMatch_ReturnsNothing()
         {
             // Arrange
-            var notifications = new List<Notification> {
+            List<Notification> notifications =
+            [
                 new() { Message = "Example message." },
                 new() { Message = "Trial message."},
                 new() { Message = "Test message." }
-            };
+            ];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = notifications.BuildMockDbSet();
-            mockContext.Setup(c => c.Notifications)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Notification>> mockSet = notifications.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Notifications)
                 .Returns(mockSet.Object);
 
-            var service = new NotificationService(mockContext.Object);
+            NotificationService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetNotificationsByAsync([new KeyValuePair<string, string>("Message", "text")]);
+            IEnumerable<Notification> result = await service.GetNotificationsByAsync([new KeyValuePair<string, string>("Message", "text")]);
 
             // Assert
             Assert.Empty(result);
@@ -251,21 +255,22 @@ namespace ADAtickets.ApiService.Tests.Services.NotificationRepository
         public async Task GetAttachmentsBy_InvalidFilter_ReturnsNothing()
         {
             // Arrange
-            var notifications = new List<Notification> {
+            List<Notification> notifications =
+            [
                 new() { Message = "Example description." },
                 new() { Message = "Trial description."},
                 new() { Message = "Test description." }
-            };
+            ];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = notifications.BuildMockDbSet();
-            mockContext.Setup(c => c.Notifications)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Notification>> mockSet = notifications.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Notifications)
                 .Returns(mockSet.Object);
 
-            var service = new NotificationService(mockContext.Object);
+            NotificationService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetNotificationsByAsync([new KeyValuePair<string, string>("SomeName", "value")]);
+            IEnumerable<Notification> result = await service.GetNotificationsByAsync([new KeyValuePair<string, string>("SomeName", "value")]);
 
             // Assert
             Assert.Empty(result);

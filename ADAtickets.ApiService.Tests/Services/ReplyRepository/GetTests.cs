@@ -38,28 +38,28 @@ namespace ADAtickets.ApiService.Tests.Services.ReplyRepository
     ///     <item>Full set</item>
     /// </list>
     /// </summary>
-    sealed public class GetTests
+    public sealed class GetTests
     {
         #region GetOne
         [Fact]
         public async Task GetReplyByIdAsync_ExistingId_ReturnsReply()
         {
             // Arrange
-            var existingId = Guid.NewGuid();
+            Guid existingId = Guid.NewGuid();
 
-            var replies = new List<Reply> { new() { Id = existingId } };
+            List<Reply> replies = [new() { Id = existingId }];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = replies.BuildMockDbSet();
-            mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Reply>> mockSet = replies.BuildMockDbSet();
+            _ = mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
                 .ReturnsAsync((object[] arguments) => replies.Find(r => r.Id == (Guid)arguments[0]));
-            mockContext.Setup(c => c.Replies)
+            _ = mockContext.Setup(c => c.Replies)
                 .Returns(mockSet.Object);
 
-            var service = new ReplyService(mockContext.Object);
+            ReplyService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetReplyByIdAsync(existingId);
+            Reply? result = await service.GetReplyByIdAsync(existingId);
 
             // Assert
             Assert.NotNull(result);
@@ -70,19 +70,19 @@ namespace ADAtickets.ApiService.Tests.Services.ReplyRepository
         public async Task GetReplyByIdAsync_NonExistingId_ReturnsNull()
         {
             // Arrange
-            var replies = new List<Reply> { new() { Id = Guid.NewGuid() } };
+            List<Reply> replies = [new() { Id = Guid.NewGuid() }];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = replies.BuildMockDbSet();
-            mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Reply>> mockSet = replies.BuildMockDbSet();
+            _ = mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
                 .ReturnsAsync((object[] arguments) => replies.Find(r => r.Id == (Guid)arguments[0]));
-            mockContext.Setup(c => c.Replies)
+            _ = mockContext.Setup(c => c.Replies)
                 .Returns(mockSet.Object);
 
-            var service = new ReplyService(mockContext.Object);
+            ReplyService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetReplyByIdAsync(Guid.NewGuid());
+            Reply? result = await service.GetReplyByIdAsync(Guid.NewGuid());
 
             // Assert
             Assert.Null(result);
@@ -92,19 +92,19 @@ namespace ADAtickets.ApiService.Tests.Services.ReplyRepository
         public async Task GetReplyByIdAsync_EmptyId_ReturnsNull()
         {
             // Arrange
-            var replies = new List<Reply> { new() { Id = Guid.NewGuid() } };
+            List<Reply> replies = [new() { Id = Guid.NewGuid() }];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = replies.BuildMockDbSet();
-            mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Reply>> mockSet = replies.BuildMockDbSet();
+            _ = mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
                 .ReturnsAsync((object[] arguments) => replies.Find(r => r.Id == (Guid)arguments[0]));
-            mockContext.Setup(c => c.Replies)
+            _ = mockContext.Setup(c => c.Replies)
                 .Returns(mockSet.Object);
 
-            var service = new ReplyService(mockContext.Object);
+            ReplyService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetReplyByIdAsync(Guid.Empty);
+            Reply? result = await service.GetReplyByIdAsync(Guid.Empty);
 
             // Assert
             Assert.Null(result);
@@ -116,17 +116,17 @@ namespace ADAtickets.ApiService.Tests.Services.ReplyRepository
         public async Task GetReplies_EmptySet_ReturnsNothing()
         {
             // Arrange
-            var replies = new List<Reply>();
+            List<Reply> replies = [];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = replies.BuildMockDbSet();
-            mockContext.Setup(c => c.Replies)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Reply>> mockSet = replies.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Replies)
                 .Returns(mockSet.Object);
 
-            var service = new ReplyService(mockContext.Object);
+            ReplyService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetRepliesAsync();
+            IEnumerable<Reply> result = await service.GetRepliesAsync();
 
             // Assert
             Assert.Empty(result);
@@ -136,25 +136,26 @@ namespace ADAtickets.ApiService.Tests.Services.ReplyRepository
         public async Task GetReplies_FullSet_ReturnsReplies()
         {
             // Arrange
-            var guid1 = Guid.NewGuid();
-            var guid2 = Guid.NewGuid();
-            var guid3 = Guid.NewGuid();
+            Guid guid1 = Guid.NewGuid();
+            Guid guid2 = Guid.NewGuid();
+            Guid guid3 = Guid.NewGuid();
 
-            var replies = new List<Reply> {
+            List<Reply> replies =
+            [
                 new() { Id = guid1 },
                 new() { Id = guid2 },
                 new() { Id = guid3 }
-            };
+            ];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = replies.BuildMockDbSet();
-            mockContext.Setup(c => c.Replies)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Reply>> mockSet = replies.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Replies)
                 .Returns(mockSet.Object);
 
-            var service = new ReplyService(mockContext.Object);
+            ReplyService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetRepliesAsync();
+            IEnumerable<Reply> result = await service.GetRepliesAsync();
 
             // Assert
             Assert.Equal(3, result.Count());
@@ -169,21 +170,22 @@ namespace ADAtickets.ApiService.Tests.Services.ReplyRepository
         public async Task GetRepliesBy_OneFilterWithMatch_ReturnsReplies()
         {
             // Arrange
-            var replies = new List<Reply> {
+            List<Reply> replies =
+            [
                 new() { Message = "Example message." },
                 new() { Message = "Trial message."},
                 new() { Message = "Test message." }
-            };
+            ];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = replies.BuildMockDbSet();
-            mockContext.Setup(c => c.Replies)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Reply>> mockSet = replies.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Replies)
                 .Returns(mockSet.Object);
 
-            var service = new ReplyService(mockContext.Object);
+            ReplyService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetRepliesByAsync([new KeyValuePair<string, string>("Message", "message")]);
+            IEnumerable<Reply> result = await service.GetRepliesByAsync([new KeyValuePair<string, string>("Message", "message")]);
 
             // Assert
             Assert.Equal(3, result.Count());
@@ -196,21 +198,22 @@ namespace ADAtickets.ApiService.Tests.Services.ReplyRepository
         public async Task GetRepliesBy_MoreFiltersWithMatch_ReturnReplies()
         {
             // Arrange
-            var replies = new List<Reply> {
+            List<Reply> replies =
+            [
                 new() { Message = "Example message.", ReplyDateTime = DateTimeOffset.UnixEpoch },
                 new() { Message = "Trial message." },
                 new() { Message = "Test message.", ReplyDateTime = DateTimeOffset.UnixEpoch }
-            };
+            ];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = replies.BuildMockDbSet();
-            mockContext.Setup(c => c.Replies)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Reply>> mockSet = replies.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Replies)
                 .Returns(mockSet.Object);
 
-            var service = new ReplyService(mockContext.Object);
+            ReplyService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetRepliesByAsync([
+            IEnumerable<Reply> result = await service.GetRepliesByAsync([
                 new KeyValuePair<string, string>("Message", "message"),
                 new KeyValuePair<string, string>("ReplyDateTime", DateTimeOffset.UnixEpoch.ToString())
                 ]);
@@ -227,21 +230,22 @@ namespace ADAtickets.ApiService.Tests.Services.ReplyRepository
         public async Task GetRepliesBy_NoMatch_ReturnsNothing()
         {
             // Arrange
-            var replies = new List<Reply> {
+            List<Reply> replies =
+            [
                 new() { Message = "Example message." },
                 new() { Message = "Trial message."},
                 new() { Message = "Test message." }
-            };
+            ];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = replies.BuildMockDbSet();
-            mockContext.Setup(c => c.Replies)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Reply>> mockSet = replies.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Replies)
                 .Returns(mockSet.Object);
 
-            var service = new ReplyService(mockContext.Object);
+            ReplyService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetRepliesByAsync([new KeyValuePair<string, string>("Message", "text")]);
+            IEnumerable<Reply> result = await service.GetRepliesByAsync([new KeyValuePair<string, string>("Message", "text")]);
 
             // Assert
             Assert.Empty(result);
@@ -251,21 +255,22 @@ namespace ADAtickets.ApiService.Tests.Services.ReplyRepository
         public async Task GetAttachmentsBy_InvalidFilter_ReturnsNothing()
         {
             // Arrange
-            var replies = new List<Reply> {
+            List<Reply> replies =
+            [
                 new() { Message = "Example description." },
                 new() { Message = "Trial description."},
                 new() { Message = "Test description." }
-            };
+            ];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = replies.BuildMockDbSet();
-            mockContext.Setup(c => c.Replies)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Reply>> mockSet = replies.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Replies)
                 .Returns(mockSet.Object);
 
-            var service = new ReplyService(mockContext.Object);
+            ReplyService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetRepliesByAsync([new KeyValuePair<string, string>("SomeName", "value")]);
+            IEnumerable<Reply> result = await service.GetRepliesByAsync([new KeyValuePair<string, string>("SomeName", "value")]);
 
             // Assert
             Assert.Empty(result);

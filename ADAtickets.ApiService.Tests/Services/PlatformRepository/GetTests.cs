@@ -38,28 +38,28 @@ namespace ADAtickets.ApiService.Tests.Services.PlatformRepository
     ///     <item>Full set</item>
     /// </list>
     /// </summary>
-    sealed public class GetTests
+    public sealed class GetTests
     {
         #region GetOne
         [Fact]
         public async Task GetPlatformByIdAsync_ExistingId_ReturnsPlatform()
         {
             // Arrange
-            var existingId = Guid.NewGuid();
+            Guid existingId = Guid.NewGuid();
 
-            var platforms = new List<Platform> { new() { Id = existingId } };
+            List<Platform> platforms = [new() { Id = existingId }];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = platforms.BuildMockDbSet();
-            mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Platform>> mockSet = platforms.BuildMockDbSet();
+            _ = mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
                 .ReturnsAsync((object[] arguments) => platforms.Find(p => p.Id == (Guid)arguments[0]));
-            mockContext.Setup(c => c.Platforms)
+            _ = mockContext.Setup(c => c.Platforms)
                 .Returns(mockSet.Object);
 
-            var service = new PlatformService(mockContext.Object);
+            PlatformService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetPlatformByIdAsync(existingId);
+            Platform? result = await service.GetPlatformByIdAsync(existingId);
 
             // Assert
             Assert.NotNull(result);
@@ -70,19 +70,19 @@ namespace ADAtickets.ApiService.Tests.Services.PlatformRepository
         public async Task GetPlatformByIdAsync_NonExistingId_ReturnsNull()
         {
             // Arrange
-            var platforms = new List<Platform> { new() { Id = Guid.NewGuid() } };
+            List<Platform> platforms = [new() { Id = Guid.NewGuid() }];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = platforms.BuildMockDbSet();
-            mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Platform>> mockSet = platforms.BuildMockDbSet();
+            _ = mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
                 .ReturnsAsync((object[] arguments) => platforms.Find(p => p.Id == (Guid)arguments[0]));
-            mockContext.Setup(c => c.Platforms)
+            _ = mockContext.Setup(c => c.Platforms)
                 .Returns(mockSet.Object);
 
-            var service = new PlatformService(mockContext.Object);
+            PlatformService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetPlatformByIdAsync(Guid.NewGuid());
+            Platform? result = await service.GetPlatformByIdAsync(Guid.NewGuid());
 
             // Assert
             Assert.Null(result);
@@ -92,19 +92,19 @@ namespace ADAtickets.ApiService.Tests.Services.PlatformRepository
         public async Task GetPlatformByIdAsync_EmptyId_ReturnsNull()
         {
             // Arrange
-            var platforms = new List<Platform> { new() { Id = Guid.NewGuid() } };
+            List<Platform> platforms = [new() { Id = Guid.NewGuid() }];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = platforms.BuildMockDbSet();
-            mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Platform>> mockSet = platforms.BuildMockDbSet();
+            _ = mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
                 .ReturnsAsync((object[] arguments) => platforms.Find(p => p.Id == (Guid)arguments[0]));
-            mockContext.Setup(c => c.Platforms)
+            _ = mockContext.Setup(c => c.Platforms)
                 .Returns(mockSet.Object);
 
-            var service = new PlatformService(mockContext.Object);
+            PlatformService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetPlatformByIdAsync(Guid.Empty);
+            Platform? result = await service.GetPlatformByIdAsync(Guid.Empty);
 
             // Assert
             Assert.Null(result);
@@ -116,17 +116,17 @@ namespace ADAtickets.ApiService.Tests.Services.PlatformRepository
         public async Task GetPlatforms_EmptySet_ReturnsNothing()
         {
             // Arrange
-            var platforms = new List<Platform>();
+            List<Platform> platforms = [];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = platforms.BuildMockDbSet();
-            mockContext.Setup(c => c.Platforms)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Platform>> mockSet = platforms.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Platforms)
                 .Returns(mockSet.Object);
 
-            var service = new PlatformService(mockContext.Object);
+            PlatformService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetPlatformsAsync();
+            IEnumerable<Platform> result = await service.GetPlatformsAsync();
 
             // Assert
             Assert.Empty(result);
@@ -136,25 +136,26 @@ namespace ADAtickets.ApiService.Tests.Services.PlatformRepository
         public async Task GetPlatforms_FullSet_ReturnsPlatforms()
         {
             // Arrange
-            var guid1 = Guid.NewGuid();
-            var guid2 = Guid.NewGuid();
-            var guid3 = Guid.NewGuid();
+            Guid guid1 = Guid.NewGuid();
+            Guid guid2 = Guid.NewGuid();
+            Guid guid3 = Guid.NewGuid();
 
-            var platforms = new List<Platform> {
+            List<Platform> platforms =
+            [
                 new() { Id = guid1 },
                 new() { Id = guid2 },
                 new() { Id = guid3 }
-            };
+            ];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = platforms.BuildMockDbSet();
-            mockContext.Setup(c => c.Platforms)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Platform>> mockSet = platforms.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Platforms)
                 .Returns(mockSet.Object);
 
-            var service = new PlatformService(mockContext.Object);
+            PlatformService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetPlatformsAsync();
+            IEnumerable<Platform> result = await service.GetPlatformsAsync();
 
             // Assert
             Assert.Equal(3, result.Count());
@@ -169,21 +170,22 @@ namespace ADAtickets.ApiService.Tests.Services.PlatformRepository
         public async Task GetPlatformsBy_OneFilterWithMatch_ReturnsPlatforms()
         {
             // Arrange
-            var platforms = new List<Platform> {
+            List<Platform> platforms =
+            [
                 new() { RepositoryUrl = "https://example.com" },
                 new() { RepositoryUrl = "https://trial.com"},
                 new() { RepositoryUrl = "https://test.com" }
-            };
+            ];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = platforms.BuildMockDbSet();
-            mockContext.Setup(c => c.Platforms)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Platform>> mockSet = platforms.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Platforms)
                 .Returns(mockSet.Object);
 
-            var service = new PlatformService(mockContext.Object);
+            PlatformService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetPlatformsByAsync([new KeyValuePair<string, string>("RepositoryUrl", "https")]);
+            IEnumerable<Platform> result = await service.GetPlatformsByAsync([new KeyValuePair<string, string>("RepositoryUrl", "https")]);
 
             // Assert
             Assert.Equal(3, result.Count());
@@ -196,21 +198,22 @@ namespace ADAtickets.ApiService.Tests.Services.PlatformRepository
         public async Task GetPlatformsBy_MoreFiltersWithMatch_ReturnPlatforms()
         {
             // Arrange
-            var platforms = new List<Platform> {
+            List<Platform> platforms =
+            [
                 new() { Name = "Example repo", RepositoryUrl = "https://example.com" },
                 new() { Name = "Trial repo", RepositoryUrl = "https://trial.com"},
                 new() { Name = "Test repo", RepositoryUrl = "https://test.com" }
-            };
+            ];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = platforms.BuildMockDbSet();
-            mockContext.Setup(c => c.Platforms)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Platform>> mockSet = platforms.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Platforms)
                 .Returns(mockSet.Object);
 
-            var service = new PlatformService(mockContext.Object);
+            PlatformService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetPlatformsByAsync([
+            IEnumerable<Platform> result = await service.GetPlatformsByAsync([
                 new KeyValuePair<string, string>("Name", "repo"),
                 new KeyValuePair<string, string>("RepositoryUrl", "https://t")
                 ]);
@@ -227,21 +230,22 @@ namespace ADAtickets.ApiService.Tests.Services.PlatformRepository
         public async Task GetPlatformsBy_NoMatch_ReturnsNothing()
         {
             // Arrange
-            var platforms = new List<Platform> {
+            List<Platform> platforms =
+            [
                 new() { RepositoryUrl = "https://example.com" },
                 new() { RepositoryUrl = "https://trial.com"},
                 new() { RepositoryUrl = "https://test.com" }
-            };
+            ];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = platforms.BuildMockDbSet();
-            mockContext.Setup(c => c.Platforms)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Platform>> mockSet = platforms.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Platforms)
                 .Returns(mockSet.Object);
 
-            var service = new PlatformService(mockContext.Object);
+            PlatformService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetPlatformsByAsync([new KeyValuePair<string, string>("RepositoryUrl", ".it")]);
+            IEnumerable<Platform> result = await service.GetPlatformsByAsync([new KeyValuePair<string, string>("RepositoryUrl", ".it")]);
 
             // Assert
             Assert.Empty(result);
@@ -251,21 +255,22 @@ namespace ADAtickets.ApiService.Tests.Services.PlatformRepository
         public async Task GetAttachmentsBy_InvalidFilter_ReturnsNothing()
         {
             // Arrange
-            var platforms = new List<Platform> {
+            List<Platform> platforms =
+            [
                 new() { RepositoryUrl = "https://example.com" },
                 new() { RepositoryUrl = "https://trial.com"},
                 new() { RepositoryUrl = "https://test.com" }
-            };
+            ];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = platforms.BuildMockDbSet();
-            mockContext.Setup(c => c.Platforms)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Platform>> mockSet = platforms.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Platforms)
                 .Returns(mockSet.Object);
 
-            var service = new PlatformService(mockContext.Object);
+            PlatformService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetPlatformsByAsync([new KeyValuePair<string, string>("SomeName", "value")]);
+            IEnumerable<Platform> result = await service.GetPlatformsByAsync([new KeyValuePair<string, string>("SomeName", "value")]);
 
             // Assert
             Assert.Empty(result);

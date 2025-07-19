@@ -28,7 +28,7 @@ namespace ADAtickets.ApiService.Services
     /// <summary>
     /// Implements the methods to manage the <see cref="Platform"/> entities in the underlying database.
     /// </summary>
-    class PlatformRepository(ADAticketsDbContext context) : IPlatformRepository
+    internal class PlatformRepository(ADAticketsDbContext context) : IPlatformRepository
     {
         /// <inheritdoc cref="IPlatformRepository.GetPlatformByIdAsync"/>
         public async Task<Platform?> GetPlatformByIdAsync(Guid id)
@@ -48,7 +48,7 @@ namespace ADAtickets.ApiService.Services
         {
             IQueryable<Platform> query = context.Platforms;
 
-            foreach (var filter in filters)
+            foreach (KeyValuePair<string, string> filter in filters)
             {
                 switch (filter.Key.Pascalize())
                 {
@@ -75,22 +75,22 @@ namespace ADAtickets.ApiService.Services
         /// <inheritdoc cref="IPlatformRepository.AddPlatformAsync"/>
         public async Task AddPlatformAsync(Platform platform)
         {
-            context.Platforms.Add(platform);
-            await context.SaveChangesAsync();
+            _ = context.Platforms.Add(platform);
+            _ = await context.SaveChangesAsync();
         }
 
         /// <inheritdoc cref="IPlatformRepository.UpdatePlatformAsync"/>
         public async Task UpdatePlatformAsync(Platform platform)
         {
-            context.Platforms.Update(platform);
-            await context.SaveChangesAsync();
+            _ = context.Platforms.Update(platform);
+            _ = await context.SaveChangesAsync();
         }
 
         /// <inheritdoc cref="IPlatformRepository.DeletePlatformAsync"/>
         public async Task DeletePlatformAsync(Platform platform)
         {
-            context.Platforms.Remove(platform);
-            await context.SaveChangesAsync();
+            _ = context.Platforms.Remove(platform);
+            _ = await context.SaveChangesAsync();
         }
     }
 }

@@ -26,7 +26,7 @@ namespace ADAtickets.ApiService.Configs
     /// <para>Represents the Entity Framework Core database context for the ADAtickets application.</para>
     /// <para>This context is used to interact with the database and manage the application entities.</para>
     /// </summary>
-    class ADAticketsDbContext : DbContext
+    internal class ADAticketsDbContext : DbContext
     {
         /// <summary>
         /// Paramteless constructor for testing purposes.

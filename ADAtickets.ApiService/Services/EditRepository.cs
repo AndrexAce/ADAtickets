@@ -29,7 +29,7 @@ namespace ADAtickets.ApiService.Services
     /// <summary>
     /// Implements the methods to manage the <see cref="Edit"/> entities in the underlying database.
     /// </summary>
-    sealed class EditRepository(ADAticketsDbContext context) : IEditRepository
+    internal sealed class EditRepository(ADAticketsDbContext context) : IEditRepository
     {
         /// <inheritdoc cref="IEditRepository.GetEditByIdAsync"/>
         public async Task<Edit?> GetEditByIdAsync(Guid id)
@@ -49,7 +49,7 @@ namespace ADAtickets.ApiService.Services
         {
             IQueryable<Edit> query = context.Edits;
 
-            foreach (var filter in filters)
+            foreach (KeyValuePair<string, string> filter in filters)
             {
                 switch (filter.Key.Pascalize())
                 {
@@ -92,22 +92,22 @@ namespace ADAtickets.ApiService.Services
         /// <inheritdoc cref="IEditRepository.AddEditAsync"/>
         public async Task AddEditAsync(Edit edit)
         {
-            context.Edits.Add(edit);
-            await context.SaveChangesAsync();
+            _ = context.Edits.Add(edit);
+            _ = await context.SaveChangesAsync();
         }
 
         /// <inheritdoc cref="IEditRepository.UpdateEditAsync"/>
         public async Task UpdateEditAsync(Edit edit)
         {
-            context.Edits.Update(edit);
-            await context.SaveChangesAsync();
+            _ = context.Edits.Update(edit);
+            _ = await context.SaveChangesAsync();
         }
 
         /// <inheritdoc cref="IEditRepository.DeleteEditAsync"/>
         public async Task DeleteEditAsync(Edit edit)
         {
-            context.Edits.Remove(edit);
-            await context.SaveChangesAsync();
+            _ = context.Edits.Remove(edit);
+            _ = await context.SaveChangesAsync();
         }
     }
 }

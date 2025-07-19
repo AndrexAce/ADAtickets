@@ -29,7 +29,7 @@ namespace ADAtickets.ApiService.Services
     /// <summary>
     /// Implements the methods to manage the <see cref="Reply"/> entities in the underlying database.
     /// </summary>
-    class ReplyRepository(ADAticketsDbContext context) : IReplyRepository
+    internal class ReplyRepository(ADAticketsDbContext context) : IReplyRepository
     {
         /// <inheritdoc cref="IReplyRepository.GetReplyByIdAsync"/>
         public async Task<Reply?> GetReplyByIdAsync(Guid id)
@@ -49,7 +49,7 @@ namespace ADAtickets.ApiService.Services
         {
             IQueryable<Reply> query = context.Replies;
 
-            foreach (var filter in filters)
+            foreach (KeyValuePair<string, string> filter in filters)
             {
                 switch (filter.Key.Pascalize())
                 {
@@ -84,22 +84,22 @@ namespace ADAtickets.ApiService.Services
         /// <inheritdoc cref="IReplyRepository.AddReplyAsync"/>
         public async Task AddReplyAsync(Reply reply)
         {
-            context.Replies.Add(reply);
-            await context.SaveChangesAsync();
+            _ = context.Replies.Add(reply);
+            _ = await context.SaveChangesAsync();
         }
 
         /// <inheritdoc cref="IReplyRepository.UpdateReplyAsync"/>
         public async Task UpdateReplyAsync(Reply reply)
         {
-            context.Replies.Update(reply);
-            await context.SaveChangesAsync();
+            _ = context.Replies.Update(reply);
+            _ = await context.SaveChangesAsync();
         }
 
         /// <inheritdoc cref="IReplyRepository.DeleteReplyAsync"/>
         public async Task DeleteReplyAsync(Reply reply)
         {
-            context.Replies.Remove(reply);
-            await context.SaveChangesAsync();
+            _ = context.Replies.Remove(reply);
+            _ = await context.SaveChangesAsync();
         }
     }
 }

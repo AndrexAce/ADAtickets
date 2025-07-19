@@ -38,28 +38,28 @@ namespace ADAtickets.ApiService.Tests.Services.EditRepository
     ///     <item>Full set</item>
     /// </list>
     /// </summary>
-    sealed public class GetTests
+    public sealed class GetTests
     {
         #region GetOne
         [Fact]
         public async Task GetEditByIdAsync_ExistingId_ReturnsEdit()
         {
             // Arrange
-            var existingId = Guid.NewGuid();
+            Guid existingId = Guid.NewGuid();
 
-            var edits = new List<Edit> { new() { Id = existingId } };
+            List<Edit> edits = [new() { Id = existingId }];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = edits.BuildMockDbSet();
-            mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Edit>> mockSet = edits.BuildMockDbSet();
+            _ = mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
                 .ReturnsAsync((object[] arguments) => edits.Find(e => e.Id == (Guid)arguments[0]));
-            mockContext.Setup(c => c.Edits)
+            _ = mockContext.Setup(c => c.Edits)
                 .Returns(mockSet.Object);
 
-            var service = new EditService(mockContext.Object);
+            EditService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetEditByIdAsync(existingId);
+            Edit? result = await service.GetEditByIdAsync(existingId);
 
             // Assert
             Assert.NotNull(result);
@@ -70,19 +70,19 @@ namespace ADAtickets.ApiService.Tests.Services.EditRepository
         public async Task GetEditByIdAsync_NonExistingId_ReturnsNull()
         {
             // Arrange
-            var edits = new List<Edit> { new() { Id = Guid.NewGuid() } };
+            List<Edit> edits = [new() { Id = Guid.NewGuid() }];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = edits.BuildMockDbSet();
-            mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Edit>> mockSet = edits.BuildMockDbSet();
+            _ = mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
                 .ReturnsAsync((object[] arguments) => edits.Find(e => e.Id == (Guid)arguments[0]));
-            mockContext.Setup(c => c.Edits)
+            _ = mockContext.Setup(c => c.Edits)
                 .Returns(mockSet.Object);
 
-            var service = new EditService(mockContext.Object);
+            EditService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetEditByIdAsync(Guid.NewGuid());
+            Edit? result = await service.GetEditByIdAsync(Guid.NewGuid());
 
             // Assert
             Assert.Null(result);
@@ -92,19 +92,19 @@ namespace ADAtickets.ApiService.Tests.Services.EditRepository
         public async Task GetEditByIdAsync_EmptyId_ReturnsNull()
         {
             // Arrange
-            var edits = new List<Edit> { new() { Id = Guid.NewGuid() } };
+            List<Edit> edits = [new() { Id = Guid.NewGuid() }];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = edits.BuildMockDbSet();
-            mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Edit>> mockSet = edits.BuildMockDbSet();
+            _ = mockSet.Setup(s => s.FindAsync(It.IsAny<Guid>()))
                 .ReturnsAsync((object[] arguments) => edits.Find(e => e.Id == (Guid)arguments[0]));
-            mockContext.Setup(c => c.Edits)
+            _ = mockContext.Setup(c => c.Edits)
                 .Returns(mockSet.Object);
 
-            var service = new EditService(mockContext.Object);
+            EditService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetEditByIdAsync(Guid.Empty);
+            Edit? result = await service.GetEditByIdAsync(Guid.Empty);
 
             // Assert
             Assert.Null(result);
@@ -116,17 +116,17 @@ namespace ADAtickets.ApiService.Tests.Services.EditRepository
         public async Task GetEdits_EmptySet_ReturnsNothing()
         {
             // Arrange
-            var edits = new List<Edit>();
+            List<Edit> edits = [];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = edits.BuildMockDbSet();
-            mockContext.Setup(c => c.Edits)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Edit>> mockSet = edits.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Edits)
                 .Returns(mockSet.Object);
 
-            var service = new EditService(mockContext.Object);
+            EditService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetEditsAsync();
+            IEnumerable<Edit> result = await service.GetEditsAsync();
 
             // Assert
             Assert.Empty(result);
@@ -136,25 +136,26 @@ namespace ADAtickets.ApiService.Tests.Services.EditRepository
         public async Task GetEdits_FullSet_ReturnsEdits()
         {
             // Arrange
-            var guid1 = Guid.NewGuid();
-            var guid2 = Guid.NewGuid();
-            var guid3 = Guid.NewGuid();
+            Guid guid1 = Guid.NewGuid();
+            Guid guid2 = Guid.NewGuid();
+            Guid guid3 = Guid.NewGuid();
 
-            var edits = new List<Edit> {
+            List<Edit> edits =
+            [
                 new() { Id = guid1 },
                 new() { Id = guid2 },
                 new() { Id = guid3 }
-            };
+            ];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = edits.BuildMockDbSet();
-            mockContext.Setup(c => c.Edits)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Edit>> mockSet = edits.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Edits)
                 .Returns(mockSet.Object);
 
-            var service = new EditService(mockContext.Object);
+            EditService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetEditsAsync();
+            IEnumerable<Edit> result = await service.GetEditsAsync();
 
             // Assert
             Assert.Equal(3, result.Count());
@@ -169,21 +170,22 @@ namespace ADAtickets.ApiService.Tests.Services.EditRepository
         public async Task GetEditsBy_OneFilterWithMatch_ReturnsEdits()
         {
             // Arrange
-            var edits = new List<Edit> {
+            List<Edit> edits =
+            [
                 new() { Description = "Example description." },
                 new() { Description = "Trial description."},
                 new() { Description = "Test description." }
-            };
+            ];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = edits.BuildMockDbSet();
-            mockContext.Setup(c => c.Edits)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Edit>> mockSet = edits.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Edits)
                 .Returns(mockSet.Object);
 
-            var service = new EditService(mockContext.Object);
+            EditService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetEditsByAsync([new KeyValuePair<string, string>("Description", "description")]);
+            IEnumerable<Edit> result = await service.GetEditsByAsync([new KeyValuePair<string, string>("Description", "description")]);
 
             // Assert
             Assert.Equal(3, result.Count());
@@ -196,21 +198,22 @@ namespace ADAtickets.ApiService.Tests.Services.EditRepository
         public async Task GetEditsBy_MoreFiltersWithMatch_ReturnEdits()
         {
             // Arrange
-            var edits = new List<Edit> {
+            List<Edit> edits =
+            [
                 new() { Description = "Example description.", EditDateTime = DateTimeOffset.UnixEpoch },
                 new() { Description = "Trial description." },
                 new() { Description = "Test description.", EditDateTime = DateTimeOffset.UnixEpoch }
-            };
+            ];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = edits.BuildMockDbSet();
-            mockContext.Setup(c => c.Edits)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Edit>> mockSet = edits.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Edits)
                 .Returns(mockSet.Object);
 
-            var service = new EditService(mockContext.Object);
+            EditService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetEditsByAsync([
+            IEnumerable<Edit> result = await service.GetEditsByAsync([
                 new KeyValuePair<string, string>("Description", "description"),
                 new KeyValuePair<string, string>("EditDateTime", DateTimeOffset.UnixEpoch.ToString())
                 ]);
@@ -227,21 +230,22 @@ namespace ADAtickets.ApiService.Tests.Services.EditRepository
         public async Task GetEditsBy_NoMatch_ReturnsNothing()
         {
             // Arrange
-            var edits = new List<Edit> {
+            List<Edit> edits =
+            [
                 new() { Description = "Example description." },
                 new() { Description = "Trial description."},
                 new() { Description = "Test description." }
-            };
+            ];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = edits.BuildMockDbSet();
-            mockContext.Setup(c => c.Edits)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Edit>> mockSet = edits.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Edits)
                 .Returns(mockSet.Object);
 
-            var service = new EditService(mockContext.Object);
+            EditService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetEditsByAsync([new KeyValuePair<string, string>("Description", "text")]);
+            IEnumerable<Edit> result = await service.GetEditsByAsync([new KeyValuePair<string, string>("Description", "text")]);
 
             // Assert
             Assert.Empty(result);
@@ -251,21 +255,22 @@ namespace ADAtickets.ApiService.Tests.Services.EditRepository
         public async Task GetAttachmentsBy_InvalidFilter_ReturnsNothing()
         {
             // Arrange
-            var edits = new List<Edit> {
+            List<Edit> edits =
+            [
                 new() { Description = "Example description." },
                 new() { Description = "Trial description."},
                 new() { Description = "Test description." }
-            };
+            ];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = edits.BuildMockDbSet();
-            mockContext.Setup(c => c.Edits)
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<Microsoft.EntityFrameworkCore.DbSet<Edit>> mockSet = edits.BuildMockDbSet();
+            _ = mockContext.Setup(c => c.Edits)
                 .Returns(mockSet.Object);
 
-            var service = new EditService(mockContext.Object);
+            EditService service = new(mockContext.Object);
 
             // Act
-            var result = await service.GetEditsByAsync([new KeyValuePair<string, string>("SomeName", "value")]);
+            IEnumerable<Edit> result = await service.GetEditsByAsync([new KeyValuePair<string, string>("SomeName", "value")]);
 
             // Assert
             Assert.Empty(result);

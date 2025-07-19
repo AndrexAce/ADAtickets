@@ -52,15 +52,15 @@ namespace ADAtickets.ApiService.Tests.Services.NotificationRepository
         public async Task AddNotification_ValidEntity_ReturnsNotification(Notification inNotification)
         {
             // Arrange
-            var notifications = new List<Notification>();
-            var tickets = new List<Ticket> { new() { Id = Guid.AllBitsSet } };
-            var users = new List<User> { new() { Id = Guid.AllBitsSet } };
+            List<Notification> notifications = [];
+            List<Ticket> tickets = [new() { Id = Guid.AllBitsSet }];
+            List<User> users = [new() { Id = Guid.AllBitsSet }];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockNotificationSet = notifications.BuildMockDbSet();
-            var mockTicketSet = tickets.BuildMockDbSet();
-            var mockUserSet = users.BuildMockDbSet();
-            mockNotificationSet.Setup(s => s.Add(It.IsAny<Notification>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<DbSet<Notification>> mockNotificationSet = notifications.BuildMockDbSet();
+            Mock<DbSet<Ticket>> mockTicketSet = tickets.BuildMockDbSet();
+            Mock<DbSet<User>> mockUserSet = users.BuildMockDbSet();
+            _ = mockNotificationSet.Setup(s => s.Add(It.IsAny<Notification>()))
                 .Callback<Notification>(n =>
                 {
                     if (n.Message.Length <= 200 && mockTicketSet.Object.Single().Id == n.TicketId && mockUserSet.Object.Single().Id == n.UserId)
@@ -68,16 +68,16 @@ namespace ADAtickets.ApiService.Tests.Services.NotificationRepository
                         notifications.Add(n);
                     }
                 });
-            mockContext.Setup(c => c.Notifications)
+            _ = mockContext.Setup(c => c.Notifications)
                 .Returns(mockNotificationSet.Object);
 
-            var service = new NotificationService(mockContext.Object);
+            NotificationService service = new(mockContext.Object);
 
-            var cancellationToken = TestContext.Current.CancellationToken;
+            CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
             // Act
             await service.AddNotificationAsync(inNotification);
-            var addedNotification = await mockContext.Object.Notifications.SingleOrDefaultAsync(cancellationToken);
+            Notification? addedNotification = await mockContext.Object.Notifications.SingleOrDefaultAsync(cancellationToken);
 
             // Assert
             Assert.NotNull(addedNotification);
@@ -89,15 +89,15 @@ namespace ADAtickets.ApiService.Tests.Services.NotificationRepository
         public async Task AddNotification_InvalidEntity_ReturnsNothing(Notification inNotification)
         {
             // Arrange
-            var notifications = new List<Notification>();
-            var tickets = new List<Ticket> { new() { Id = Guid.AllBitsSet } };
-            var users = new List<User> { new() { Id = Guid.AllBitsSet } };
+            List<Notification> notifications = [];
+            List<Ticket> tickets = [new() { Id = Guid.AllBitsSet }];
+            List<User> users = [new() { Id = Guid.AllBitsSet }];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockNotificationSet = notifications.BuildMockDbSet();
-            var mockTicketSet = tickets.BuildMockDbSet();
-            var mockUserSet = users.BuildMockDbSet();
-            mockNotificationSet.Setup(s => s.Add(It.IsAny<Notification>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<DbSet<Notification>> mockNotificationSet = notifications.BuildMockDbSet();
+            Mock<DbSet<Ticket>> mockTicketSet = tickets.BuildMockDbSet();
+            Mock<DbSet<User>> mockUserSet = users.BuildMockDbSet();
+            _ = mockNotificationSet.Setup(s => s.Add(It.IsAny<Notification>()))
                 .Callback<Notification>(n =>
                 {
                     if (n.Message.Length <= 200 && mockTicketSet.Object.Single().Id == n.TicketId && mockUserSet.Object.Single().Id == n.UserId)
@@ -105,16 +105,16 @@ namespace ADAtickets.ApiService.Tests.Services.NotificationRepository
                         notifications.Add(n);
                     }
                 });
-            mockContext.Setup(c => c.Notifications)
+            _ = mockContext.Setup(c => c.Notifications)
                 .Returns(mockNotificationSet.Object);
 
-            var service = new NotificationService(mockContext.Object);
+            NotificationService service = new(mockContext.Object);
 
-            var cancellationToken = TestContext.Current.CancellationToken;
+            CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
             // Act
             await service.AddNotificationAsync(inNotification);
-            var addedNotification = await mockContext.Object.Notifications.SingleOrDefaultAsync(cancellationToken);
+            Notification? addedNotification = await mockContext.Object.Notifications.SingleOrDefaultAsync(cancellationToken);
 
             // Assert
             Assert.Null(addedNotification);

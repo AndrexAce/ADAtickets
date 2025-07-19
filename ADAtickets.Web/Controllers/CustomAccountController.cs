@@ -21,6 +21,7 @@ using ADAtickets.Shared.Constants;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Web.UI.Areas.MicrosoftIdentity.Controllers;
 using System.Diagnostics.CodeAnalysis;
+using System.Security.Claims;
 using Controller = Microsoft.AspNetCore.Mvc.Controller;
 
 namespace ADAtickets.Web.Controllers
@@ -41,9 +42,9 @@ namespace ADAtickets.Web.Controllers
         [HttpGet]
         public new IActionResult SignOut()
         {
-            var aud = HttpContext.User.FindFirst("http://schemas.microsoft.com/identity/claims/tenantid");
+            Claim? aud = HttpContext.User.FindFirst("http://schemas.microsoft.com/identity/claims/tenantid");
 
-            var scheme = aud?.Value == configuration["Entra:TenantId"] ? Scheme.OpenIdConnectDefault : Scheme.ExternalOpenIdConnectDefault;
+            string scheme = aud?.Value == configuration["Entra:TenantId"] ? Scheme.OpenIdConnectDefault : Scheme.ExternalOpenIdConnectDefault;
 
             return SignOut(
                  scheme == Scheme.OpenIdConnectDefault ? Scheme.CookieDefault : Scheme.ExternalCookieDefault,

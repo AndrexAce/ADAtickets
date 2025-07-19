@@ -28,7 +28,7 @@ namespace ADAtickets.ApiService.Services
     /// <summary>
     /// Implements the methods to manage the <see cref="User"/> entities in the underlying database.
     /// </summary>
-    class UserRepository(ADAticketsDbContext context) : IUserRepository
+    internal class UserRepository(ADAticketsDbContext context) : IUserRepository
     {
         /// <inheritdoc cref="IUserRepository.GetUserByIdAsync"/>
         public async Task<User?> GetUserByIdAsync(Guid id)
@@ -48,7 +48,7 @@ namespace ADAtickets.ApiService.Services
         {
             IQueryable<User> query = context.Users;
 
-            foreach (var filter in filters)
+            foreach (KeyValuePair<string, string> filter in filters)
             {
                 switch (filter.Key.Pascalize())
                 {
@@ -95,22 +95,22 @@ namespace ADAtickets.ApiService.Services
         /// <inheritdoc cref="IUserRepository.AddUserAsync"/>
         public async Task AddUserAsync(User user)
         {
-            context.Users.Add(user);
-            await context.SaveChangesAsync();
+            _ = context.Users.Add(user);
+            _ = await context.SaveChangesAsync();
         }
 
         /// <inheritdoc cref="IUserRepository.UpdateUserAsync"/>
         public async Task UpdateUserAsync(User user)
         {
-            context.Users.Update(user);
-            await context.SaveChangesAsync();
+            _ = context.Users.Update(user);
+            _ = await context.SaveChangesAsync();
         }
 
         /// <inheritdoc cref="IUserRepository.DeleteUserAsync"/>
         public async Task DeleteUserAsync(User user)
         {
-            context.Users.Remove(user);
-            await context.SaveChangesAsync();
+            _ = context.Users.Remove(user);
+            _ = await context.SaveChangesAsync();
         }
     }
 }

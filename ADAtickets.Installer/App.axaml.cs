@@ -26,7 +26,7 @@ using System.Globalization;
 
 namespace ADAtickets.Installer;
 
-partial class App : Application
+internal partial class App : Application
 {
     public override void Initialize()
     {

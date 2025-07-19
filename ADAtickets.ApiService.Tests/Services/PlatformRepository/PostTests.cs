@@ -52,11 +52,11 @@ namespace ADAtickets.ApiService.Tests.Services.PlatformRepository
         public async Task AddPlatform_ValidEntity_ReturnsPlatform(Platform inPlatform)
         {
             // Arrange
-            var platforms = new List<Platform>();
+            List<Platform> platforms = [];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockPlatformSet = platforms.BuildMockDbSet();
-            mockPlatformSet.Setup(s => s.Add(It.IsAny<Platform>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<DbSet<Platform>> mockPlatformSet = platforms.BuildMockDbSet();
+            _ = mockPlatformSet.Setup(s => s.Add(It.IsAny<Platform>()))
                 .Callback<Platform>(p =>
                 {
                     if (p.Name.Length <= 254 && Regex.IsMatch(p.RepositoryUrl, @"^(https?:\/\/)?(www\.)?([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}\/?$"))
@@ -64,16 +64,16 @@ namespace ADAtickets.ApiService.Tests.Services.PlatformRepository
                         platforms.Add(p);
                     }
                 });
-            mockContext.Setup(c => c.Platforms)
+            _ = mockContext.Setup(c => c.Platforms)
                 .Returns(mockPlatformSet.Object);
 
-            var service = new PlatformService(mockContext.Object);
+            PlatformService service = new(mockContext.Object);
 
-            var cancellationToken = TestContext.Current.CancellationToken;
+            CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
             // Act
             await service.AddPlatformAsync(inPlatform);
-            var addedPlatform = await mockContext.Object.Platforms.SingleOrDefaultAsync(cancellationToken);
+            Platform? addedPlatform = await mockContext.Object.Platforms.SingleOrDefaultAsync(cancellationToken);
 
             // Assert
             Assert.NotNull(addedPlatform);
@@ -85,11 +85,11 @@ namespace ADAtickets.ApiService.Tests.Services.PlatformRepository
         public async Task AddPlatform_InvalidEntity_ReturnsNothing(Platform inPlatform)
         {
             // Arrange
-            var platforms = new List<Platform>();
+            List<Platform> platforms = [];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockPlatformSet = platforms.BuildMockDbSet();
-            mockPlatformSet.Setup(s => s.Add(It.IsAny<Platform>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<DbSet<Platform>> mockPlatformSet = platforms.BuildMockDbSet();
+            _ = mockPlatformSet.Setup(s => s.Add(It.IsAny<Platform>()))
                 .Callback<Platform>(p =>
                 {
                     if (p.Name.Length <= 254 && Regex.IsMatch(p.RepositoryUrl, @"^(https?:\/\/)?(www\.)?([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}\/?$"))
@@ -97,16 +97,16 @@ namespace ADAtickets.ApiService.Tests.Services.PlatformRepository
                         platforms.Add(p);
                     }
                 });
-            mockContext.Setup(c => c.Platforms)
+            _ = mockContext.Setup(c => c.Platforms)
                 .Returns(mockPlatformSet.Object);
 
-            var service = new PlatformService(mockContext.Object);
+            PlatformService service = new(mockContext.Object);
 
-            var cancellationToken = TestContext.Current.CancellationToken;
+            CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
             // Act
             await service.AddPlatformAsync(inPlatform);
-            var addedPlatform = await mockContext.Object.Platforms.SingleOrDefaultAsync(cancellationToken);
+            Platform? addedPlatform = await mockContext.Object.Platforms.SingleOrDefaultAsync(cancellationToken);
 
             // Assert
             Assert.Null(addedPlatform);

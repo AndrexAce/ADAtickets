@@ -66,7 +66,7 @@ namespace ADAtickets.ApiService.Controllers
         [RequiredScope(Scope.Read)]
         public async Task<ActionResult<IEnumerable<PlatformResponseDto>>> GetPlatforms([FromQuery] Dictionary<string, string>? filters)
         {
-            var platforms = await (filters != null ? platformRepository.GetPlatformsByAsync(filters) : platformRepository.GetPlatformsAsync());
+            IEnumerable<Platform> platforms = await (filters != null ? platformRepository.GetPlatformsByAsync(filters) : platformRepository.GetPlatformsAsync());
 
             return Ok(platforms.Select(mapper.Map<PlatformResponseDto>));
         }
@@ -186,7 +186,7 @@ namespace ADAtickets.ApiService.Controllers
         [RequiredScope(Scope.Read, Scope.Write)]
         public async Task<ActionResult<PlatformResponseDto>> PostPlatform(PlatformRequestDto platformDto)
         {
-            var platform = mapper.Map<Platform>(platformDto);
+            Platform platform = mapper.Map<Platform>(platformDto);
 
             // Insert the DTO info into a new entity and add it to the data source.
             await platformRepository.AddPlatformAsync(platform);

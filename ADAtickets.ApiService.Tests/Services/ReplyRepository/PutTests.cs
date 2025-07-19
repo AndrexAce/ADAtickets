@@ -52,15 +52,15 @@ namespace ADAtickets.ApiService.Tests.Services.ReplyRepository
         public async Task UpdateReply_ValidEntity_ReturnsNew(Reply inReply)
         {
             // Arrange
-            var replies = new List<Reply> { new() { Id = inReply.Id, Message = "Old message.", AuthorUserId = Guid.AllBitsSet, TicketId = Guid.AllBitsSet } };
-            var tickets = new List<Ticket> { new() { Id = Guid.AllBitsSet } };
-            var users = new List<User> { new() { Id = Guid.AllBitsSet } };
+            List<Reply> replies = [new() { Id = inReply.Id, Message = "Old message.", AuthorUserId = Guid.AllBitsSet, TicketId = Guid.AllBitsSet }];
+            List<Ticket> tickets = [new() { Id = Guid.AllBitsSet }];
+            List<User> users = [new() { Id = Guid.AllBitsSet }];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockReplySet = replies.BuildMockDbSet();
-            var mockTicketSet = tickets.BuildMockDbSet();
-            var mockUserSet = users.BuildMockDbSet();
-            mockReplySet.Setup(s => s.Update(It.IsAny<Reply>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<DbSet<Reply>> mockReplySet = replies.BuildMockDbSet();
+            Mock<DbSet<Ticket>> mockTicketSet = tickets.BuildMockDbSet();
+            Mock<DbSet<User>> mockUserSet = users.BuildMockDbSet();
+            _ = mockReplySet.Setup(s => s.Update(It.IsAny<Reply>()))
                 .Callback<Reply>(r =>
                 {
                     if (r.Message.Length <= 5000 && mockTicketSet.Object.Single().Id == r.TicketId && mockUserSet.Object.Single().Id == r.AuthorUserId)
@@ -68,16 +68,16 @@ namespace ADAtickets.ApiService.Tests.Services.ReplyRepository
                         replies[0].Message = inReply.Message;
                     }
                 });
-            mockContext.Setup(c => c.Replies)
+            _ = mockContext.Setup(c => c.Replies)
                 .Returns(mockReplySet.Object);
 
-            var service = new ReplyService(mockContext.Object);
+            ReplyService service = new(mockContext.Object);
 
-            var cancellationToken = TestContext.Current.CancellationToken;
+            CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
             // Act
             await service.UpdateReplyAsync(inReply);
-            var updatedReply = await mockContext.Object.Replies.SingleOrDefaultAsync(cancellationToken);
+            Reply? updatedReply = await mockContext.Object.Replies.SingleOrDefaultAsync(cancellationToken);
 
             // Assert
             Assert.NotNull(updatedReply);
@@ -89,15 +89,15 @@ namespace ADAtickets.ApiService.Tests.Services.ReplyRepository
         public async Task UpdateReply_InvalidEntity_ReturnsOld(Reply inReply)
         {
             // Arrange
-            var replies = new List<Reply> { new() { Id = inReply.Id, Message = "Old message.", AuthorUserId = Guid.AllBitsSet, TicketId = Guid.AllBitsSet } };
-            var tickets = new List<Ticket> { new() { Id = Guid.AllBitsSet } };
-            var users = new List<User> { new() { Id = Guid.AllBitsSet } };
+            List<Reply> replies = [new() { Id = inReply.Id, Message = "Old message.", AuthorUserId = Guid.AllBitsSet, TicketId = Guid.AllBitsSet }];
+            List<Ticket> tickets = [new() { Id = Guid.AllBitsSet }];
+            List<User> users = [new() { Id = Guid.AllBitsSet }];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockReplySet = replies.BuildMockDbSet();
-            var mockTicketSet = tickets.BuildMockDbSet();
-            var mockUserSet = users.BuildMockDbSet();
-            mockReplySet.Setup(s => s.Update(It.IsAny<Reply>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<DbSet<Reply>> mockReplySet = replies.BuildMockDbSet();
+            Mock<DbSet<Ticket>> mockTicketSet = tickets.BuildMockDbSet();
+            Mock<DbSet<User>> mockUserSet = users.BuildMockDbSet();
+            _ = mockReplySet.Setup(s => s.Update(It.IsAny<Reply>()))
                 .Callback<Reply>(r =>
                 {
                     if (r.Message.Length <= 5000 && mockTicketSet.Object.Single().Id == r.TicketId && mockUserSet.Object.Single().Id == r.AuthorUserId)
@@ -105,16 +105,16 @@ namespace ADAtickets.ApiService.Tests.Services.ReplyRepository
                         replies[0].Message = inReply.Message;
                     }
                 });
-            mockContext.Setup(c => c.Replies)
+            _ = mockContext.Setup(c => c.Replies)
                 .Returns(mockReplySet.Object);
 
-            var service = new ReplyService(mockContext.Object);
+            ReplyService service = new(mockContext.Object);
 
-            var cancellationToken = TestContext.Current.CancellationToken;
+            CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
             // Act
             await service.UpdateReplyAsync(inReply);
-            var updatedReply = await mockContext.Object.Replies.SingleOrDefaultAsync(cancellationToken);
+            Reply? updatedReply = await mockContext.Object.Replies.SingleOrDefaultAsync(cancellationToken);
 
             // Assert
             Assert.NotNull(updatedReply);

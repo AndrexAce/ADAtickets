@@ -35,15 +35,18 @@ namespace ADAtickets.Web.Components.Utilities
         /// <param name="okButtonText">The text of the confirm button.</param>
         /// <param name="cancelButtonText">The text of the cancel button.</param>
         /// <returns>A <see cref="DialogParameters"/> object with the specified title, button texts, and behavior settings.</returns>
-        public static DialogParameters ConfirmDialogParameters(string title, string okButtonText, string cancelButtonText) => new()
+        public static DialogParameters ConfirmDialogParameters(string title, string okButtonText, string cancelButtonText)
         {
-            Title = title,
-            PrimaryAction = okButtonText,
-            SecondaryAction = cancelButtonText,
-            TrapFocus = true,
-            PreventScroll = true,
-            PreventDismissOnOverlayClick = true
-        };
+            return new()
+            {
+                Title = title,
+                PrimaryAction = okButtonText,
+                SecondaryAction = cancelButtonText,
+                TrapFocus = true,
+                PreventScroll = true,
+                PreventDismissOnOverlayClick = true
+            };
+        }
 
         /// <summary>
         /// Contains data to show in the <c>SimpleDialog.razor</c> component.

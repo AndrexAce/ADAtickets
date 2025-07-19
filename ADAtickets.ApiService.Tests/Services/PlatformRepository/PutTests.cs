@@ -52,11 +52,11 @@ namespace ADAtickets.ApiService.Tests.Services.PlatformRepository
         public async Task UpdatePlatform_ValidEntity_ReturnsNew(Platform inPlatform)
         {
             // Arrange
-            var platforms = new List<Platform> { new() { Id = inPlatform.Id, RepositoryUrl = "http://example.com" } };
+            List<Platform> platforms = [new() { Id = inPlatform.Id, RepositoryUrl = "http://example.com" }];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockPlatformSet = platforms.BuildMockDbSet();
-            mockPlatformSet.Setup(s => s.Update(It.IsAny<Platform>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<DbSet<Platform>> mockPlatformSet = platforms.BuildMockDbSet();
+            _ = mockPlatformSet.Setup(s => s.Update(It.IsAny<Platform>()))
                 .Callback<Platform>(p =>
                 {
                     if (p.Name.Length <= 254 && Regex.IsMatch(p.RepositoryUrl, @"^(https?:\/\/)?(www\.)?([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}\/?$"))
@@ -64,16 +64,16 @@ namespace ADAtickets.ApiService.Tests.Services.PlatformRepository
                         platforms[0].RepositoryUrl = inPlatform.RepositoryUrl;
                     }
                 });
-            mockContext.Setup(c => c.Platforms)
+            _ = mockContext.Setup(c => c.Platforms)
                 .Returns(mockPlatformSet.Object);
 
-            var service = new PlatformService(mockContext.Object);
+            PlatformService service = new(mockContext.Object);
 
-            var cancellationToken = TestContext.Current.CancellationToken;
+            CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
             // Act
             await service.UpdatePlatformAsync(inPlatform);
-            var updatedPlatform = await mockContext.Object.Platforms.SingleOrDefaultAsync(cancellationToken);
+            Platform? updatedPlatform = await mockContext.Object.Platforms.SingleOrDefaultAsync(cancellationToken);
 
             // Assert
             Assert.NotNull(updatedPlatform);
@@ -85,11 +85,11 @@ namespace ADAtickets.ApiService.Tests.Services.PlatformRepository
         public async Task UpdatePlatform_InvalidEntity_ReturnsOld(Platform inPlatform)
         {
             // Arrange
-            var platforms = new List<Platform> { new() { Id = inPlatform.Id, RepositoryUrl = "http://example.com" } };
+            List<Platform> platforms = [new() { Id = inPlatform.Id, RepositoryUrl = "http://example.com" }];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockPlatformSet = platforms.BuildMockDbSet();
-            mockPlatformSet.Setup(s => s.Update(It.IsAny<Platform>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<DbSet<Platform>> mockPlatformSet = platforms.BuildMockDbSet();
+            _ = mockPlatformSet.Setup(s => s.Update(It.IsAny<Platform>()))
                 .Callback<Platform>(p =>
                 {
                     if (p.Name.Length <= 254 && Regex.IsMatch(p.RepositoryUrl, @"^(https?:\/\/)?(www\.)?([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}\/?$"))
@@ -97,16 +97,16 @@ namespace ADAtickets.ApiService.Tests.Services.PlatformRepository
                         platforms[0].RepositoryUrl = inPlatform.RepositoryUrl;
                     }
                 });
-            mockContext.Setup(c => c.Platforms)
+            _ = mockContext.Setup(c => c.Platforms)
                 .Returns(mockPlatformSet.Object);
 
-            var service = new PlatformService(mockContext.Object);
+            PlatformService service = new(mockContext.Object);
 
-            var cancellationToken = TestContext.Current.CancellationToken;
+            CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
             // Act
             await service.UpdatePlatformAsync(inPlatform);
-            var updatedPlatform = await mockContext.Object.Platforms.SingleOrDefaultAsync(cancellationToken);
+            Platform? updatedPlatform = await mockContext.Object.Platforms.SingleOrDefaultAsync(cancellationToken);
 
             // Assert
             Assert.NotNull(updatedPlatform);

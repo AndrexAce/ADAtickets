@@ -32,29 +32,29 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
     ///     <item>Existing entity</item>
     /// </list>
     /// </summary>
-    sealed public class DeleteTests
+    public sealed class DeleteTests
     {
         [Fact]
         public async Task DeleteUserByIdAsync_ExistingEntity_DeletesEntity()
         {
             // Arrange
-            var user = new User { Id = Guid.NewGuid() };
-            var users = new List<User> { user };
+            User user = new() { Id = Guid.NewGuid() };
+            List<User> users = [user];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = users.BuildMockDbSet();
-            mockSet.Setup(s => s.Remove(It.IsAny<User>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<DbSet<User>> mockSet = users.BuildMockDbSet();
+            _ = mockSet.Setup(s => s.Remove(It.IsAny<User>()))
                 .Callback<User>(user => users.RemoveAll(u => u.Id == user.Id));
-            mockContext.Setup(c => c.Users)
+            _ = mockContext.Setup(c => c.Users)
                 .Returns(mockSet.Object);
 
-            var service = new UserService(mockContext.Object);
+            UserService service = new(mockContext.Object);
 
-            var cancellationToken = TestContext.Current.CancellationToken;
+            CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
             // Act
             await service.DeleteUserAsync(user);
-            var deletedUser = await mockContext.Object.Users.SingleOrDefaultAsync(cancellationToken);
+            User? deletedUser = await mockContext.Object.Users.SingleOrDefaultAsync(cancellationToken);
 
             // Assert
             Assert.Null(deletedUser);

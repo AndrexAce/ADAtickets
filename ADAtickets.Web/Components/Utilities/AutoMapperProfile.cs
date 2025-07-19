@@ -26,28 +26,28 @@ namespace ADAtickets.Web.Components.Utilities
     /// <summary>
     /// Defines the AutoMapper profile to map the Response DTOs to Request DTOs.
     /// </summary>
-    sealed class AutoMapperProfile : Profile
+    internal sealed class AutoMapperProfile : Profile
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AutoMapperProfile"/> class.
         /// </summary>
         public AutoMapperProfile()
         {
-            CreateMap<EditResponseDto, EditRequestDto>(MemberList.Destination);
+            _ = CreateMap<EditResponseDto, EditRequestDto>(MemberList.Destination);
 
-            CreateMap<ReplyResponseDto, ReplyRequestDto>(MemberList.Destination);
+            _ = CreateMap<ReplyResponseDto, ReplyRequestDto>(MemberList.Destination);
 
-            CreateMap<NotificationResponseDto, NotificationRequestDto>(MemberList.Destination);
+            _ = CreateMap<NotificationResponseDto, NotificationRequestDto>(MemberList.Destination);
 
-            CreateMap<PlatformResponseDto, PlatformRequestDto>(MemberList.Destination);
+            _ = CreateMap<PlatformResponseDto, PlatformRequestDto>(MemberList.Destination);
 
-            CreateMap<TicketResponseDto, TicketRequestDto>(MemberList.Destination);
+            _ = CreateMap<TicketResponseDto, TicketRequestDto>(MemberList.Destination);
 
-            CreateMap<UserResponseDto, UserRequestDto>(MemberList.Destination);
+            _ = CreateMap<UserResponseDto, UserRequestDto>(MemberList.Destination);
 
-            CreateMap<AttachmentResponseDto, AttachmentRequestDto>(MemberList.Destination);
+            _ = CreateMap<AttachmentResponseDto, AttachmentRequestDto>(MemberList.Destination);
 
-            CreateMap<AttachmentResponseDto, AttachmentRequestDto>(MemberList.Destination)
+            _ = CreateMap<AttachmentResponseDto, AttachmentRequestDto>(MemberList.Destination)
                 .ForMember(attachmentRequest => attachmentRequest.Name, opt => opt.MapFrom(src => src.Path))
                 .ForMember(AttachmentRequest => AttachmentRequest.Content, opt => opt.Ignore());
         }

@@ -31,41 +31,59 @@ namespace ADAtickets.Client.Extensions
         /// </summary>
         /// <param name="statusCode">Status code to check for.</param>
         /// <returns><see langword="true"/> if the status code is informational; otherwise, <see langword="false"/>.</returns>
-        public static bool IsInformation(this HttpStatusCode statusCode) => ((int)statusCode >= 100) && ((int)statusCode <= 199);
+        public static bool IsInformation(this HttpStatusCode statusCode)
+        {
+            return (int)statusCode is >= 100 and <= 199;
+        }
 
         /// <summary>
         /// Checks if the <see cref="HttpStatusCode"/> is a success status code (2xx).
         /// </summary>
         /// <param name="statusCode">Status code to check for.</param>
         /// <returns><see langword="true"/> if the status code is successful; otherwise, <see langword="false"/>.</returns>
-        public static bool IsSuccess(this HttpStatusCode statusCode) => ((int)statusCode >= 200) && ((int)statusCode <= 299);
+        public static bool IsSuccess(this HttpStatusCode statusCode)
+        {
+            return (int)statusCode is >= 200 and <= 299;
+        }
 
         /// <summary>
         /// Checks if the <see cref="HttpStatusCode"/> is a redirectional status code (3xx).
         /// </summary>
         /// <param name="statusCode">Status code to check for.</param>
         /// <returns><see langword="true"/> if the status code is redirectional; otherwise, <see langword="false"/>.</returns>
-        public static bool IsRedirection(this HttpStatusCode statusCode) => ((int)statusCode >= 300) && ((int)statusCode <= 399);
+        public static bool IsRedirection(this HttpStatusCode statusCode)
+        {
+            return (int)statusCode is >= 300 and <= 399;
+        }
 
         /// <summary>
         /// Checks if the <see cref="HttpStatusCode"/> is a client error status code (4xx).
         /// </summary>
         /// <param name="statusCode">Status code to check for.</param>
         /// <returns><see langword="true"/> if the status code is a client error; otherwise, <see langword="false"/>.</returns>
-        public static bool IsClientError(this HttpStatusCode statusCode) => ((int)statusCode >= 400) && ((int)statusCode <= 499);
+        public static bool IsClientError(this HttpStatusCode statusCode)
+        {
+            return (int)statusCode is >= 400 and <= 499;
+        }
 
         /// <summary>
         /// Checks if the <see cref="HttpStatusCode"/> is a server error status code (5xx).
         /// </summary>
         /// <param name="statusCode">Status code to check for.</param>
         /// <returns><see langword="true"/> if the status code is a server error; otherwise, <see langword="false"/>.</returns>
-        public static bool IsServerError(this HttpStatusCode statusCode) => ((int)statusCode >= 500) && ((int)statusCode <= 599);
+        public static bool IsServerError(this HttpStatusCode statusCode)
+        {
+            return (int)statusCode is >= 500 and <= 599;
+        }
 
         /// <summary>
         /// Checks if the <see cref="HttpStatusCode"/> is an error status code (4xx or 5xx).
         /// </summary>
         /// <param name="statusCode"></param>
         /// <returns><see langword="true"/> if the status code is an error; otherwise, <see langword="false"/>.</returns>
-        public static bool IsError(this HttpStatusCode statusCode) => statusCode.IsClientError() || statusCode.IsServerError();
+        public static bool IsError(this HttpStatusCode statusCode)
+        {
+            return statusCode.IsClientError() || statusCode.IsServerError();
+        }
     }
 }

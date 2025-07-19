@@ -21,6 +21,7 @@ using ADAtickets.Client.Extensions;
 using ADAtickets.Shared.Constants;
 using ADAtickets.Web.Components;
 using ADAtickets.Web.Components.Utilities;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.FluentUI.AspNetCore.Components;
@@ -34,7 +35,7 @@ namespace ADAtickets.Web
     /// <summary>
     /// Bootstrap class for the application.
     /// </summary>
-    static class Program
+    internal static class Program
     {
         /// <summary>
         /// Entrypoint of the application.
@@ -43,10 +44,10 @@ namespace ADAtickets.Web
         /// <returns>The <see cref="Task"/> running the application.</returns>
         public static async Task Main(string[] args)
         {
-            var builder = WebApplication.CreateBuilder(args);
+            WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
             ConfigureServices(builder);
 
-            var app = builder.Build();
+            WebApplication app = builder.Build();
             ConfigureApplication(app);
 
             // Start the application.
@@ -60,72 +61,69 @@ namespace ADAtickets.Web
         public static void ConfigureServices(WebApplicationBuilder builder)
         {
             // Add authentication and authorization services for both Entra ID and Entra External ID.
-            var authBuilder = builder.Services.AddAuthentication(options =>
+            AuthenticationBuilder authBuilder = builder.Services.AddAuthentication(options =>
             {
                 options.DefaultScheme = Scheme.PolicySchemeDefault;
             });
-            authBuilder.AddMicrosoftIdentityWebApp(builder.Configuration.GetSection(Scheme.OpenIdConnectDefault), Scheme.OpenIdConnectDefault, Scheme.CookieDefault)
+            _ = authBuilder.AddMicrosoftIdentityWebApp(builder.Configuration.GetSection(Scheme.OpenIdConnectDefault), Scheme.OpenIdConnectDefault, Scheme.CookieDefault)
                 .EnableTokenAcquisitionToCallDownstreamApi()
                 .AddDownstreamApi(Service.API, builder.Configuration.GetSection(Service.API))
                 .AddDownstreamApi(Service.Graph, builder.Configuration.GetSection(Service.Graph))
                 .AddDistributedTokenCaches();
-            authBuilder.AddMicrosoftIdentityWebApp(builder.Configuration.GetSection(Scheme.ExternalOpenIdConnectDefault), Scheme.ExternalOpenIdConnectDefault, Scheme.ExternalCookieDefault)
+            _ = authBuilder.AddMicrosoftIdentityWebApp(builder.Configuration.GetSection(Scheme.ExternalOpenIdConnectDefault), Scheme.ExternalOpenIdConnectDefault, Scheme.ExternalCookieDefault)
                 .EnableTokenAcquisitionToCallDownstreamApi()
                 .AddDownstreamApi(Service.ExternalAPI, builder.Configuration.GetSection(Service.ExternalAPI))
                 .AddDownstreamApi(Service.ExternalGraph, builder.Configuration.GetSection(Service.Graph))
                 .AddDistributedTokenCaches();
-            authBuilder.AddPolicyScheme(Scheme.PolicySchemeDefault, null, options =>
+            _ = authBuilder.AddPolicyScheme(Scheme.PolicySchemeDefault, null, options =>
             {
                 options.ForwardDefaultSelector = context =>
                 {
-                    string? authorization = context.Request.Headers[HeaderNames.Cookie];
+                    string authorization = context.Request.Headers[HeaderNames.Cookie]!;
 
-                    if (authorization is not null)
-                        return authorization.Contains(Scheme.ExternalCookieDefault) ? Scheme.ExternalOpenIdConnectDefault : Scheme.OpenIdConnectDefault;
-                    else
-                        return Scheme.ExternalOpenIdConnectDefault;
+                    return authorization.Contains(Scheme.ExternalCookieDefault) ? Scheme.ExternalOpenIdConnectDefault : Scheme.OpenIdConnectDefault;
                 };
             });
 
             // Add Redis cache and data protection persistance layers
-            builder.Services.AddStackExchangeRedisCache(options =>
+            _ = builder.Services.AddStackExchangeRedisCache(options =>
             {
                 options.Configuration = builder.Configuration.GetConnectionString(Service.Cache);
             });
 
-            builder.Services.AddDataProtection()
+            _ = builder.Services.AddDataProtection()
                 .PersistKeysToStackExchangeRedis(ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString(Service.Cache)!), "DataProtection-Keys");
 
-            builder.Services.AddCascadingAuthenticationState();
+            _ = builder.Services.AddCascadingAuthenticationState();
 
             // Add authorization policies.
             CreatePolicies(builder.Services.AddAuthorizationBuilder(), builder.Configuration);
 
             // Add access to the HTTP context.
-            builder.Services.AddHttpContextAccessor();
+            _ = builder.Services.AddHttpContextAccessor();
 
             // Add localization services.
-            builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+            _ = builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
             // Add access to the HTTP client class.
-            builder.Services.AddHttpClient();
+            _ = builder.Services.AddHttpClient();
 
             // Add Fluent UI components.
-            builder.Services.AddFluentUIComponents();
+            _ = builder.Services.AddFluentUIComponents();
 
             // Add services related to Razor pages and components.
-            builder.Services.AddRazorPages()
+            _ = builder.Services.AddRazorPages()
                 .AddMicrosoftIdentityUI();
 
-            builder.Services.AddRazorComponents()
+            _ = builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents()
                 .AddMicrosoftIdentityConsentHandler();
 
             // Add ADAtickets client services.
-            builder.Services.AddADAticketsClient();
+            _ = builder.Services.AddADAticketsClient();
 
             // Add automapping of entities.
-            builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
+            _ = builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
         }
 
         /// <summary>
@@ -135,60 +133,60 @@ namespace ADAtickets.Web
         public static void ConfigureApplication(WebApplication app)
         {
             // Configure localization.
-            var supportedCultures = new[] { "en-US", "it-IT" };
-            var localizationOptions = new RequestLocalizationOptions()
+            string[] supportedCultures = ["en-US", "it-IT"];
+            RequestLocalizationOptions localizationOptions = new RequestLocalizationOptions()
                 .SetDefaultCulture(supportedCultures[0])
                 .AddSupportedCultures(supportedCultures)
                 .AddSupportedUICultures(supportedCultures);
-            app.UseRequestLocalization(localizationOptions);
+            _ = app.UseRequestLocalization(localizationOptions);
 
             // Configure security based on environment.
             if (app.Environment.IsDevelopment())
             {
                 // Use a detailed exception page.
-                app.UseDeveloperExceptionPage();
+                _ = app.UseDeveloperExceptionPage();
             }
             else
             {
                 // Use a more user-friendly error page.
-                app.UseExceptionHandler("/error");
+                _ = app.UseExceptionHandler("/error");
 
                 // Add HTTPS redirection for production.
-                app.UseHsts();
-                app.UseHttpsRedirection();
+                _ = app.UseHsts();
+                _ = app.UseHttpsRedirection();
             }
 
             // Allows personalized status code pages.
-            app.UseStatusCodePagesWithRedirects("/error/{0}");
+            _ = app.UseStatusCodePagesWithRedirects("/error/{0}");
 
             // Add authentication middleware.
-            app.UseAuthentication();
+            _ = app.UseAuthentication();
 
             // Add authorization middleware.
-            app.UseAuthorization();
+            _ = app.UseAuthorization();
 
             // Configure antiforgery protection.
-            app.UseAntiforgery();
+            _ = app.UseAntiforgery();
 
             // Map static data paths.
-            app.MapStaticAssets();
+            _ = app.MapStaticAssets();
 
             // Map the controllers endpoints.
-            app.MapControllers();
+            _ = app.MapControllers();
 
             // Map Razor pages paths.
-            app.MapRazorPages();
+            _ = app.MapRazorPages();
 
             // Map Razor components paths.
-            app.MapRazorComponents<App>()
+            _ = app.MapRazorComponents<App>()
                 .AddInteractiveServerRenderMode();
         }
 
         private static void CreatePolicies(AuthorizationBuilder authorizationBuilder, ConfigurationManager configuration)
         {
-            authorizationBuilder.AddDefaultPolicy(Policy.AdminOnly, policy =>
+            _ = authorizationBuilder.AddDefaultPolicy(Policy.AdminOnly, policy =>
             {
-                policy.RequireAuthenticatedUser()
+                _ = policy.RequireAuthenticatedUser()
                 // Directory roles are exposed with the "wids" claim in the ID token.
                 // The value of this claim is the standard ID for the Azure DevOps Administrator Entra directory role.
                 .RequireClaim("wids", "e3973bdf-4987-49ae-837a-ba8e231c7286")
@@ -197,19 +195,19 @@ namespace ADAtickets.Web
             })
             .AddPolicy(Policy.UserOnly, policy =>
             {
-                policy.RequireAuthenticatedUser()
+                _ = policy.RequireAuthenticatedUser()
                 .RequireClaim("utid", configuration["ExternalEntra:TenantId"]!)
                 .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault, Scheme.ExternalOpenIdConnectDefault);
             })
             .AddPolicy(Policy.OperatorOrAdmin, policy =>
             {
-                policy.RequireAuthenticatedUser()
+                _ = policy.RequireAuthenticatedUser()
                 .RequireClaim("utid", configuration["Entra:TenantId"]!)
                 .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault, Scheme.ExternalOpenIdConnectDefault);
             })
             .AddPolicy(Policy.Everyone, policy =>
             {
-                policy.RequireAuthenticatedUser()
+                _ = policy.RequireAuthenticatedUser()
                 .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault, Scheme.ExternalOpenIdConnectDefault);
             });
         }

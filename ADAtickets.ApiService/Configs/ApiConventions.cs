@@ -26,7 +26,7 @@ namespace ADAtickets.ApiService.Configs
     /// Defines a set of methods with annotations (called conventions) that is used to personalize the behavior of the ASP.NET Core API controller.
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "The parameters are not meant to be used, they are only needed to estabilish a pattern to apply the conventions.")]
-    static class ApiConventions
+    internal static class ApiConventions
     {
         /// <summary>
         /// GET api methods convention (single entity).

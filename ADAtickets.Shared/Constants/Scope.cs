@@ -22,7 +22,7 @@ namespace ADAtickets.Shared.Constants
     /// <summary>
     /// Represents the scope for the authorization.
     /// </summary>
-    static class Scope
+    internal static class Scope
     {
         /// <summary>
         /// The scope allows to read the data from the API.

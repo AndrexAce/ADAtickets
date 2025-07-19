@@ -32,29 +32,29 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
     ///     <item>Existing entity</item>
     /// </list>
     /// </summary>
-    sealed public class DeleteTests
+    public sealed class DeleteTests
     {
         [Fact]
         public async Task DeleteAttachmentByIdAsync_ExistingEntity_DeletesEntity()
         {
             // Arrange
-            var attachment = new Attachment { Id = Guid.NewGuid(), Path = "delete.png" };
-            var attachments = new List<Attachment> { attachment };
+            Attachment attachment = new() { Id = Guid.NewGuid(), Path = "delete.png" };
+            List<Attachment> attachments = [attachment];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = attachments.BuildMockDbSet();
-            mockSet.Setup(s => s.Remove(It.IsAny<Attachment>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<DbSet<Attachment>> mockSet = attachments.BuildMockDbSet();
+            _ = mockSet.Setup(s => s.Remove(It.IsAny<Attachment>()))
                 .Callback<Attachment>(attachment => attachments.RemoveAll(a => a.Id == attachment.Id));
-            mockContext.Setup(c => c.Attachments)
+            _ = mockContext.Setup(c => c.Attachments)
                 .Returns(mockSet.Object);
 
-            var service = new AttachmentService(mockContext.Object);
+            AttachmentService service = new(mockContext.Object);
 
-            var cancellationToken = TestContext.Current.CancellationToken;
+            CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
             // Act
             await service.DeleteAttachmentAsync(attachment);
-            var deletedAttachment = await mockContext.Object.Attachments.SingleOrDefaultAsync(cancellationToken);
+            Attachment? deletedAttachment = await mockContext.Object.Attachments.SingleOrDefaultAsync(cancellationToken);
 
             // Assert
             Assert.Null(deletedAttachment);

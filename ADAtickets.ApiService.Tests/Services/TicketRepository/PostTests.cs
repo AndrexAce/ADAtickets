@@ -59,15 +59,15 @@ namespace ADAtickets.ApiService.Tests.Services.TicketRepository
         public async Task AddTicket_ValidEntity_ReturnsTicket(Ticket inTicket)
         {
             // Arrange
-            var tickets = new List<Ticket>();
-            var platform = new List<Platform> { new() { Id = Guid.AllBitsSet } };
-            var users = new List<User> { new() { Id = Guid.AllBitsSet }, new() { Id = Guid.Empty } };
+            List<Ticket> tickets = [];
+            List<Platform> platform = [new() { Id = Guid.AllBitsSet }];
+            List<User> users = [new() { Id = Guid.AllBitsSet }, new() { Id = Guid.Empty }];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockTicketSet = tickets.BuildMockDbSet();
-            var mockPlatformSet = platform.BuildMockDbSet();
-            var mockUserSet = users.BuildMockDbSet();
-            mockTicketSet.Setup(s => s.Add(It.IsAny<Ticket>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<DbSet<Ticket>> mockTicketSet = tickets.BuildMockDbSet();
+            Mock<DbSet<Platform>> mockPlatformSet = platform.BuildMockDbSet();
+            Mock<DbSet<User>> mockUserSet = users.BuildMockDbSet();
+            _ = mockTicketSet.Setup(s => s.Add(It.IsAny<Ticket>()))
                 .Callback<Ticket>(t =>
                 {
                     if (t.Title.Length <= 50 && t.Description.Length <= 5000
@@ -78,16 +78,16 @@ namespace ADAtickets.ApiService.Tests.Services.TicketRepository
                         tickets.Add(t);
                     }
                 });
-            mockContext.Setup(c => c.Tickets)
+            _ = mockContext.Setup(c => c.Tickets)
                 .Returns(mockTicketSet.Object);
 
-            var service = new TicketService(mockContext.Object);
+            TicketService service = new(mockContext.Object);
 
-            var cancellationToken = TestContext.Current.CancellationToken;
+            CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
             // Act
             await service.AddTicketAsync(inTicket);
-            var addedTicket = await mockContext.Object.Tickets.SingleOrDefaultAsync(cancellationToken);
+            Ticket? addedTicket = await mockContext.Object.Tickets.SingleOrDefaultAsync(cancellationToken);
 
             // Assert
             Assert.NotNull(addedTicket);
@@ -99,15 +99,15 @@ namespace ADAtickets.ApiService.Tests.Services.TicketRepository
         public async Task AddTicket_InvalidEntity_ReturnsNothing(Ticket inTicket)
         {
             // Arrange
-            var tickets = new List<Ticket>();
-            var platform = new List<Platform> { new() { Id = Guid.AllBitsSet } };
-            var users = new List<User> { new() { Id = Guid.AllBitsSet }, new() { Id = Guid.Empty } };
+            List<Ticket> tickets = [];
+            List<Platform> platform = [new() { Id = Guid.AllBitsSet }];
+            List<User> users = [new() { Id = Guid.AllBitsSet }, new() { Id = Guid.Empty }];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockTicketSet = tickets.BuildMockDbSet();
-            var mockPlatformSet = platform.BuildMockDbSet();
-            var mockUserSet = users.BuildMockDbSet();
-            mockTicketSet.Setup(s => s.Add(It.IsAny<Ticket>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<DbSet<Ticket>> mockTicketSet = tickets.BuildMockDbSet();
+            Mock<DbSet<Platform>> mockPlatformSet = platform.BuildMockDbSet();
+            Mock<DbSet<User>> mockUserSet = users.BuildMockDbSet();
+            _ = mockTicketSet.Setup(s => s.Add(It.IsAny<Ticket>()))
                 .Callback<Ticket>(t =>
                 {
                     if (t.Title.Length <= 50 && t.Description.Length <= 5000
@@ -118,16 +118,16 @@ namespace ADAtickets.ApiService.Tests.Services.TicketRepository
                         tickets.Add(t);
                     }
                 });
-            mockContext.Setup(c => c.Tickets)
+            _ = mockContext.Setup(c => c.Tickets)
                 .Returns(mockTicketSet.Object);
 
-            var service = new TicketService(mockContext.Object);
+            TicketService service = new(mockContext.Object);
 
-            var cancellationToken = TestContext.Current.CancellationToken;
+            CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
             // Act
             await service.AddTicketAsync(inTicket);
-            var addedTicket = await mockContext.Object.Tickets.SingleOrDefaultAsync(cancellationToken);
+            Ticket? addedTicket = await mockContext.Object.Tickets.SingleOrDefaultAsync(cancellationToken);
 
             // Assert
             Assert.Null(addedTicket);

@@ -89,10 +89,10 @@ namespace ADAtickets.Client
         public async Task<(HttpStatusCode, TResponse?)> GetAsync(Guid id)
         {
             // Fetch the logged in user
-            var user = (await authenticationStateProvider.GetAuthenticationStateAsync()).User;
+            ClaimsPrincipal user = (await authenticationStateProvider.GetAuthenticationStateAsync()).User;
 
             // Call the APIs with the permissions granted to the user
-            var response = await downstreamApi.CallApiForUserAsync(
+            HttpResponseMessage response = await downstreamApi.CallApiForUserAsync(
                 serviceName: InferServiceName(user),
                 downstreamApiOptionsOverride: options =>
                 {
@@ -102,7 +102,7 @@ namespace ADAtickets.Client
                 },
                 user: user);
 
-            var responseEntity = response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<TResponse>() : null;
+            TResponse? responseEntity = response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<TResponse>() : null;
 
             InvokeResponseHandler(response);
 
@@ -118,15 +118,15 @@ namespace ADAtickets.Client
         public async Task<(HttpStatusCode, IEnumerable<TResponse>)> GetAllAsync(IEnumerable<KeyValuePair<string, string>>? filters = null)
         {
             // Fetch the logged in user
-            var user = (await authenticationStateProvider.GetAuthenticationStateAsync()).User;
+            ClaimsPrincipal user = (await authenticationStateProvider.GetAuthenticationStateAsync()).User;
 
             // Build the filters from the query string if provided
-            var query = filters != null
+            string query = filters != null
                 ? "?" + string.Join("&", filters.Select(f => $"{Uri.EscapeDataString(f.Key)}={Uri.EscapeDataString(f.Value)}"))
                 : string.Empty;
 
             // Call the APIs with the permissions granted to the user
-            var response = await downstreamApi.CallApiForUserAsync(
+            HttpResponseMessage response = await downstreamApi.CallApiForUserAsync(
                 serviceName: InferServiceName(user),
                 downstreamApiOptionsOverride: options =>
                 {
@@ -136,7 +136,7 @@ namespace ADAtickets.Client
                 },
                 user: user);
 
-            var responseEntities = response.IsSuccessStatusCode ? (await response.Content.ReadFromJsonAsync<IEnumerable<TResponse>>() ?? []) : [];
+            IEnumerable<TResponse> responseEntities = response.IsSuccessStatusCode ? (await response.Content.ReadFromJsonAsync<IEnumerable<TResponse>>() ?? []) : [];
 
             InvokeResponseHandler(response);
 
@@ -152,10 +152,10 @@ namespace ADAtickets.Client
         public async Task<(HttpStatusCode, TResponse?)> PostAsync(TRequest entity)
         {
             // Fetch the logged in user
-            var user = (await authenticationStateProvider.GetAuthenticationStateAsync()).User;
+            ClaimsPrincipal user = (await authenticationStateProvider.GetAuthenticationStateAsync()).User;
 
             // Call the APIs with the permissions granted to the user
-            var response = await downstreamApi.CallApiForUserAsync(
+            HttpResponseMessage response = await downstreamApi.CallApiForUserAsync(
                 serviceName: InferServiceName(user),
                 downstreamApiOptionsOverride: options =>
                 {
@@ -167,7 +167,7 @@ namespace ADAtickets.Client
                 user: user,
                 content: JsonContent.Create(entity));
 
-            var responseEntity = response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<TResponse>() : null;
+            TResponse? responseEntity = response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<TResponse>() : null;
 
             InvokeResponseHandler(response);
 
@@ -184,10 +184,10 @@ namespace ADAtickets.Client
         public async Task<(HttpStatusCode, TResponse?)> PutAsync(Guid id, TRequest entity)
         {
             // Fetch the logged in user
-            var user = (await authenticationStateProvider.GetAuthenticationStateAsync()).User;
+            ClaimsPrincipal user = (await authenticationStateProvider.GetAuthenticationStateAsync()).User;
 
             // Call the APIs with the permissions granted to the user
-            var response = await downstreamApi.CallApiForUserAsync(
+            HttpResponseMessage response = await downstreamApi.CallApiForUserAsync(
                 serviceName: InferServiceName(user),
                 downstreamApiOptionsOverride: options =>
                 {
@@ -199,7 +199,7 @@ namespace ADAtickets.Client
                 user: user,
                 content: JsonContent.Create(entity));
 
-            var responseEntity = response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<TResponse>() : null;
+            TResponse? responseEntity = response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<TResponse>() : null;
 
             InvokeResponseHandler(response);
 
@@ -215,10 +215,10 @@ namespace ADAtickets.Client
         public async Task<HttpStatusCode> DeleteAsync(Guid id)
         {
             // Fetch the logged in user
-            var user = (await authenticationStateProvider.GetAuthenticationStateAsync()).User;
+            ClaimsPrincipal user = (await authenticationStateProvider.GetAuthenticationStateAsync()).User;
 
             // Call the APIs with the permissions granted to the user
-            var response = await downstreamApi.CallApiForUserAsync(
+            HttpResponseMessage response = await downstreamApi.CallApiForUserAsync(
                 serviceName: InferServiceName(user),
                 downstreamApiOptionsOverride: options =>
                 {
@@ -230,32 +230,43 @@ namespace ADAtickets.Client
 
             InvokeResponseHandler(response);
 
-            return (response.StatusCode);
+            return response.StatusCode;
         }
 
         private static string GetUserTenantId(ClaimsPrincipal user)
         {
-            if (user.Identity is null) throw new InvalidOperationException();
-            if (user.Identity is null) throw new InvalidOperationException();
-            if (!user.Identity.IsAuthenticated) throw new InvalidOperationException();
+            if (user.Identity is null)
+            {
+                throw new InvalidOperationException();
+            }
 
-            var claim = user.Claims.FirstOrDefault(c => c.Type.Equals("http://schemas.microsoft.com/identity/claims/tenantid"));
+            if (user.Identity is null)
+            {
+                throw new InvalidOperationException();
+            }
+
+            if (!user.Identity.IsAuthenticated)
+            {
+                throw new InvalidOperationException();
+            }
+
+            Claim? claim = user.Claims.FirstOrDefault(c => c.Type.Equals("http://schemas.microsoft.com/identity/claims/tenantid"));
 
             return claim is null ? throw new InvalidOperationException() : claim.Value;
         }
 
         private string InferServiceName(ClaimsPrincipal user)
         {
-            var tenantId = Client<TResponse, TRequest>.GetUserTenantId(user);
-            var primaryTenantId = configuration.GetSection($"{Scheme.OpenIdConnectDefault}:TenantId").Value;
+            string tenantId = Client<TResponse, TRequest>.GetUserTenantId(user);
+            string? primaryTenantId = configuration.GetSection($"{Scheme.OpenIdConnectDefault}:TenantId").Value;
 
             return tenantId == primaryTenantId ? Service.API : Service.ExternalAPI;
         }
 
         private string InferAuthenticationScheme(ClaimsPrincipal user)
         {
-            var tenantId = Client<TResponse, TRequest>.GetUserTenantId(user);
-            var primaryTenantId = configuration.GetSection($"{Scheme.OpenIdConnectDefault}:TenantId").Value;
+            string tenantId = Client<TResponse, TRequest>.GetUserTenantId(user);
+            string? primaryTenantId = configuration.GetSection($"{Scheme.OpenIdConnectDefault}:TenantId").Value;
 
             return tenantId == primaryTenantId ? Scheme.OpenIdConnectDefault : Scheme.ExternalOpenIdConnectDefault;
         }

@@ -30,7 +30,7 @@ using System.Windows.Input;
 
 namespace ADAtickets.Installer.ViewModels;
 
-sealed class MainViewModel : ReactiveObject
+internal sealed class MainViewModel : ReactiveObject
 {
     private UserControl _currentView;
     private string? _dbUserName;
@@ -259,17 +259,21 @@ sealed class MainViewModel : ReactiveObject
     private static void ExitApp()
     {
         if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)
+        {
             lifetime.Shutdown();
+        }
     }
 
     private static void ChangeTheme()
     {
-        var app = Application.Current;
+        Application? app = Application.Current;
 
         if (app != null)
+        {
             app.RequestedThemeVariant = app.ActualThemeVariant == ThemeVariant.Light
             ? ThemeVariant.Dark
             : ThemeVariant.Light;
+        }
     }
 
     private void GoToSecondStep()
@@ -303,12 +307,12 @@ sealed class MainViewModel : ReactiveObject
     {
         if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            var mainWindow = desktop.MainWindow;
+            Window? mainWindow = desktop.MainWindow;
             if (mainWindow != null)
             {
                 Dispatcher.UIThread.Post(() =>
                 {
-                    var screen = mainWindow.Screens.ScreenFromWindow(mainWindow);
+                    Avalonia.Platform.Screen? screen = mainWindow.Screens.ScreenFromWindow(mainWindow);
                     if (screen != null)
                     {
                         double left = (screen.Bounds.Width - mainWindow.Bounds.Width) / 2;
@@ -322,8 +326,8 @@ sealed class MainViewModel : ReactiveObject
 
     private bool ValidateSecondStepDocker()
     {
-        var isValid = true;
-        var context = new ValidationContext(this)
+        bool isValid = true;
+        ValidationContext context = new(this)
         {
             MemberName = nameof(DbUserName)
         };
@@ -350,8 +354,8 @@ sealed class MainViewModel : ReactiveObject
 
     private bool ValidateSecondStepAzure()
     {
-        var isValid = true;
-        var context = new ValidationContext(this)
+        bool isValid = true;
+        ValidationContext context = new(this)
         {
             MemberName = nameof(TenantId)
         };
@@ -368,8 +372,8 @@ sealed class MainViewModel : ReactiveObject
 
     private bool ValidateThirdStep()
     {
-        var isValid = true;
-        var context = new ValidationContext(this)
+        bool isValid = true;
+        ValidationContext context = new(this)
         {
             MemberName = nameof(WebAppId)
         };

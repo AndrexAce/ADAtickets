@@ -26,7 +26,7 @@ namespace ADAtickets.Client
         public async Task<(HttpStatusCode, ValueWrapper<bool>?)> GetUserDevOpsAccessAsync(string email)
         {
             // Use the downstream API to call the backend endpoint
-            var response = await downstreamApi.CallApiForUserAsync(
+            HttpResponseMessage response = await downstreamApi.CallApiForUserAsync(
                 serviceName: Service.API,
                 options =>
                 {

@@ -66,7 +66,7 @@ namespace ADAtickets.ApiService.Controllers
         [RequiredScope(Scope.Read)]
         public async Task<ActionResult<IEnumerable<AttachmentResponseDto>>> GetAttachments([FromQuery] Dictionary<string, string>? filters)
         {
-            var attachments = await (filters != null ? attachmentRepository.GetAttachmentsByAsync(filters) : attachmentRepository.GetAttachmentsAsync());
+            IEnumerable<Attachment> attachments = await (filters != null ? attachmentRepository.GetAttachmentsByAsync(filters) : attachmentRepository.GetAttachmentsAsync());
 
             return Ok(attachments.Select(mapper.Map<AttachmentResponseDto>));
         }
@@ -190,7 +190,7 @@ namespace ADAtickets.ApiService.Controllers
         [RequiredScope(Scope.Read, Scope.Write)]
         public async Task<ActionResult<AttachmentResponseDto>> PostAttachment(AttachmentRequestDto attachmentDto)
         {
-            var attachment = mapper.Map<Attachment>(attachmentDto);
+            Attachment attachment = mapper.Map<Attachment>(attachmentDto);
 
             // Insert the DTO info into a new entity and add it to the data source.
             await attachmentRepository.AddAttachmentAsync(attachment, attachmentDto.Content);

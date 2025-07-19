@@ -34,7 +34,7 @@ using System.Threading.Tasks;
 
 namespace ADAtickets.Installer.Views;
 
-partial class LastStep : UserControl
+internal partial class LastStep : UserControl
 {
     public LastStep()
     {
@@ -62,7 +62,7 @@ partial class LastStep : UserControl
             {
                 viewModel.PhaseText = Assets.Resources.EnvFileWriting;
 
-                var tempPath = CreateRandomTempFolder();
+                string tempPath = CreateRandomTempFolder();
 
                 await Task.Run(() => WriteToEnvFileAsync(viewModel, tempPath));
                 await Task.Delay(3000);
@@ -123,14 +123,9 @@ partial class LastStep : UserControl
         // Create a temporary folder with a random name
         string tempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
 
-        if (OperatingSystem.IsWindows())
-        {
-            Directory.CreateDirectory(tempPath);
-        }
-        else
-        {
-            Directory.CreateDirectory(tempPath, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
-        }
+        _ = OperatingSystem.IsWindows()
+            ? Directory.CreateDirectory(tempPath)
+            : Directory.CreateDirectory(tempPath, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
 
         return tempPath;
     }
@@ -138,7 +133,7 @@ partial class LastStep : UserControl
     private static async Task WriteToEnvFileAsync(MainViewModel viewModel, string path)
     {
         // Get assembly containing the embedded resource
-        var assembly = Assembly.GetExecutingAssembly();
+        Assembly assembly = Assembly.GetExecutingAssembly();
         string resourceAssemblyPath = "ADAtickets.Installer.Assets.example.env";
 
         // Read the template
@@ -334,7 +329,7 @@ partial class LastStep : UserControl
                 Dispatcher.UIThread.Post(() => viewModel.PhaseText = $"{Assets.Resources.ComposeStartup}");
 
                 // Get assembly containing the embedded resource
-                var assembly = Assembly.GetExecutingAssembly();
+                Assembly assembly = Assembly.GetExecutingAssembly();
                 string composeAssemblyPath = "ADAtickets.Installer.Assets.docker-compose.yml";
                 string overrideAssemblyPath = "ADAtickets.Installer.Assets.docker-compose.override-prod.yml";
 
@@ -357,10 +352,10 @@ partial class LastStep : UserControl
                 await File.WriteAllTextAsync(tempOverridePath, overrideContent);
 
                 // Find the Docker executable in the known paths
-                var dockerExePath = OperatingSystem.IsWindows() ? WINDOWS_DOCKEREXE : LINUX_DOCKEREXE;
+                string dockerExePath = OperatingSystem.IsWindows() ? WINDOWS_DOCKEREXE : LINUX_DOCKEREXE;
 
                 // Run the docker-compose command
-                var process = new Process
+                Process process = new()
                 {
                     StartInfo = new ProcessStartInfo
                     {
@@ -373,7 +368,7 @@ partial class LastStep : UserControl
                         WorkingDirectory = path
                     }
                 };
-                process.Start();
+                _ = process.Start();
 
                 await process.WaitForExitAsync();
 

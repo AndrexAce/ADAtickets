@@ -51,11 +51,11 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
         public async Task AddUser_ValidEntity_ReturnsUser(User inUser)
         {
             // Arrange
-            var users = new List<User>();
+            List<User> users = [];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockUserSet = users.BuildMockDbSet();
-            mockUserSet.Setup(s => s.Add(It.IsAny<User>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<DbSet<User>> mockUserSet = users.BuildMockDbSet();
+            _ = mockUserSet.Setup(s => s.Add(It.IsAny<User>()))
                 .Callback<User>(u =>
                 {
                     if (u.Name.Length <= 50 && u.Surname.Length <= 50)
@@ -63,16 +63,16 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
                         users.Add(u);
                     }
                 });
-            mockContext.Setup(c => c.Users)
+            _ = mockContext.Setup(c => c.Users)
                 .Returns(mockUserSet.Object);
 
-            var service = new UserService(mockContext.Object);
+            UserService service = new(mockContext.Object);
 
-            var cancellationToken = TestContext.Current.CancellationToken;
+            CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
             // Act
             await service.AddUserAsync(inUser);
-            var addedUser = await mockContext.Object.Users.SingleOrDefaultAsync(cancellationToken);
+            User? addedUser = await mockContext.Object.Users.SingleOrDefaultAsync(cancellationToken);
 
             // Assert
             Assert.NotNull(addedUser);
@@ -84,11 +84,11 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
         public async Task AddUser_InvalidEntity_ReturnsNothing(User inUser)
         {
             // Arrange
-            var users = new List<User>();
+            List<User> users = [];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockUserSet = users.BuildMockDbSet();
-            mockUserSet.Setup(s => s.Add(It.IsAny<User>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<DbSet<User>> mockUserSet = users.BuildMockDbSet();
+            _ = mockUserSet.Setup(s => s.Add(It.IsAny<User>()))
                 .Callback<User>(u =>
                 {
                     if (u.Name.Length <= 50 && u.Surname.Length <= 50)
@@ -96,16 +96,16 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
                         users.Add(u);
                     }
                 });
-            mockContext.Setup(c => c.Users)
+            _ = mockContext.Setup(c => c.Users)
                 .Returns(mockUserSet.Object);
 
-            var service = new UserService(mockContext.Object);
+            UserService service = new(mockContext.Object);
 
-            var cancellationToken = TestContext.Current.CancellationToken;
+            CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
             // Act
             await service.AddUserAsync(inUser);
-            var addedUser = await mockContext.Object.Users.SingleOrDefaultAsync(cancellationToken);
+            User? addedUser = await mockContext.Object.Users.SingleOrDefaultAsync(cancellationToken);
 
             // Assert
             Assert.Null(addedUser);

@@ -32,29 +32,29 @@ namespace ADAtickets.ApiService.Tests.Services.ReplyRepository
     ///     <item>Existing entity</item>
     /// </list>
     /// </summary>
-    sealed public class DeleteTests
+    public sealed class DeleteTests
     {
         [Fact]
         public async Task DeleteReplyByIdAsync_ExistingEntity_DeletesEntity()
         {
             // Arrange
-            var reply = new Reply { Id = Guid.NewGuid() };
-            var replies = new List<Reply> { reply };
+            Reply reply = new() { Id = Guid.NewGuid() };
+            List<Reply> replies = [reply];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = replies.BuildMockDbSet();
-            mockSet.Setup(s => s.Remove(It.IsAny<Reply>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<DbSet<Reply>> mockSet = replies.BuildMockDbSet();
+            _ = mockSet.Setup(s => s.Remove(It.IsAny<Reply>()))
                 .Callback<Reply>(reply => replies.RemoveAll(r => r.Id == reply.Id));
-            mockContext.Setup(c => c.Replies)
+            _ = mockContext.Setup(c => c.Replies)
                 .Returns(mockSet.Object);
 
-            var service = new ReplyService(mockContext.Object);
+            ReplyService service = new(mockContext.Object);
 
-            var cancellationToken = TestContext.Current.CancellationToken;
+            CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
             // Act
             await service.DeleteReplyAsync(reply);
-            var deletedReply = await mockContext.Object.Replies.SingleOrDefaultAsync(cancellationToken);
+            Reply? deletedReply = await mockContext.Object.Replies.SingleOrDefaultAsync(cancellationToken);
 
             // Assert
             Assert.Null(deletedReply);

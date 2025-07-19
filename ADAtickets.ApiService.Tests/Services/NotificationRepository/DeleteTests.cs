@@ -32,29 +32,29 @@ namespace ADAtickets.ApiService.Tests.Services.NotificationRepository
     ///     <item>Existing entity</item>
     /// </list>
     /// </summary>
-    sealed public class DeleteTests
+    public sealed class DeleteTests
     {
         [Fact]
         public async Task DeleteNotificationByIdAsync_ExistingEntity_DeletesEntity()
         {
             // Arrange
-            var notification = new Notification { Id = Guid.NewGuid() };
-            var notifications = new List<Notification> { notification };
+            Notification notification = new() { Id = Guid.NewGuid() };
+            List<Notification> notifications = [notification];
 
-            var mockContext = new Mock<ADAticketsDbContext>();
-            var mockSet = notifications.BuildMockDbSet();
-            mockSet.Setup(s => s.Remove(It.IsAny<Notification>()))
+            Mock<ADAticketsDbContext> mockContext = new();
+            Mock<DbSet<Notification>> mockSet = notifications.BuildMockDbSet();
+            _ = mockSet.Setup(s => s.Remove(It.IsAny<Notification>()))
                 .Callback<Notification>(notification => notifications.RemoveAll(n => n.Id == notification.Id));
-            mockContext.Setup(c => c.Notifications)
+            _ = mockContext.Setup(c => c.Notifications)
                 .Returns(mockSet.Object);
 
-            var service = new NotificationService(mockContext.Object);
+            NotificationService service = new(mockContext.Object);
 
-            var cancellationToken = TestContext.Current.CancellationToken;
+            CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
             // Act
             await service.DeleteNotificationAsync(notification);
-            var deletedNotification = await mockContext.Object.Notifications.SingleOrDefaultAsync(cancellationToken);
+            Notification? deletedNotification = await mockContext.Object.Notifications.SingleOrDefaultAsync(cancellationToken);
 
             // Assert
             Assert.Null(deletedNotification);

@@ -37,11 +37,11 @@ namespace ADAtickets.ApiService.Tests
         public void ConfigureServices_RegistersRequiredServices()
         {
             // Arrange
-            var builder = WebApplication.CreateBuilder();
+            WebApplicationBuilder builder = WebApplication.CreateBuilder();
             Program.ConfigureServices(builder);
 
             // Act
-            var services = builder.Services.BuildServiceProvider();
+            ServiceProvider services = builder.Services.BuildServiceProvider();
 
             // Assert: Database context and repositories
             Assert.NotNull(services.GetService<ADAticketsDbContext>());
@@ -82,11 +82,11 @@ namespace ADAtickets.ApiService.Tests
         public async Task ConfigureApplication_RegistersMiddlewares()
         {
             // Arrange
-            var builder = WebApplication.CreateBuilder();
+            WebApplicationBuilder builder = WebApplication.CreateBuilder();
             Program.ConfigureServices(builder);
 
             // Act
-            var app = builder.Build();
+            WebApplication app = builder.Build();
 
             // Assert
             Assert.Null(await Record.ExceptionAsync(() => Program.ConfigureApplication(app)));

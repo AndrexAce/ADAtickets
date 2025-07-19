@@ -22,7 +22,7 @@ namespace ADAtickets.Shared.Constants
     /// <summary>
     /// Represents the policy for the authorization.
     /// </summary>
-    static class Policy
+    internal static class Policy
     {
         /// <summary>
         /// The name of the policy that requires the user to be authenticated with the User role.

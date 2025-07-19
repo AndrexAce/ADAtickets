@@ -29,7 +29,7 @@ namespace ADAtickets.ApiService.Services
     /// <summary>
     /// Implements the methods to manage the <see cref="Notification"/> entities in the underlying database.
     /// </summary>
-    class NotificationRepository(ADAticketsDbContext context) : INotificationRepository
+    internal class NotificationRepository(ADAticketsDbContext context) : INotificationRepository
     {
         /// <inheritdoc cref="INotificationRepository.GetNotificationByIdAsync"/>
         public async Task<Notification?> GetNotificationByIdAsync(Guid id)
@@ -49,7 +49,7 @@ namespace ADAtickets.ApiService.Services
         {
             IQueryable<Notification> query = context.Notifications;
 
-            foreach (var filter in filters)
+            foreach (KeyValuePair<string, string> filter in filters)
             {
                 switch (filter.Key.Pascalize())
                 {
@@ -88,22 +88,22 @@ namespace ADAtickets.ApiService.Services
         /// <inheritdoc cref="INotificationRepository.AddNotificationAsync"/>
         public async Task AddNotificationAsync(Notification notification)
         {
-            context.Notifications.Add(notification);
-            await context.SaveChangesAsync();
+            _ = context.Notifications.Add(notification);
+            _ = await context.SaveChangesAsync();
         }
 
         /// <inheritdoc cref="INotificationRepository.UpdateNotificationAsync"/>
         public async Task UpdateNotificationAsync(Notification notification)
         {
-            context.Notifications.Update(notification);
-            await context.SaveChangesAsync();
+            _ = context.Notifications.Update(notification);
+            _ = await context.SaveChangesAsync();
         }
 
         /// <inheritdoc cref="INotificationRepository.DeleteNotificationAsync"/>
         public async Task DeleteNotificationAsync(Notification notification)
         {
-            context.Notifications.Remove(notification);
-            await context.SaveChangesAsync();
+            _ = context.Notifications.Remove(notification);
+            _ = await context.SaveChangesAsync();
         }
     }
 }

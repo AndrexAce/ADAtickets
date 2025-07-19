@@ -22,7 +22,7 @@ namespace ADAtickets.Shared.Constants
     /// <summary>
     /// Represents the scheme for the authentication and authorization.
     /// </summary>
-    static class Scheme
+    internal static class Scheme
     {
         /// <summary>
         /// Scheme used to route requests to the right Entra ID policy authentication handler.

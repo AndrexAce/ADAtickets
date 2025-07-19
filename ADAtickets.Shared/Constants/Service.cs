@@ -22,7 +22,7 @@ namespace ADAtickets.Shared.Constants
     /// <summary>
     /// Represents the services used by the applications.
     /// </summary>
-    static class Service
+    internal static class Service
     {
         /// <summary>
         /// The name of the database service.

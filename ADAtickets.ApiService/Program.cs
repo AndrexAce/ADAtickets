@@ -22,6 +22,7 @@ using ADAtickets.ApiService.Repositories;
 using ADAtickets.ApiService.Services;
 using ADAtickets.Shared.Constants;
 using ADAtickets.Shared.Models;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -37,7 +38,7 @@ namespace ADAtickets.ApiService
     /// <summary>
     /// Bootstrap class for the application.
     /// </summary>
-    static class Program
+    internal static class Program
     {
         /// <summary>
         /// Entrypoint of the application.
@@ -46,10 +47,10 @@ namespace ADAtickets.ApiService
         /// <returns>The <see cref="Task"/> running the application.</returns>
         public static async Task Main(string[] args)
         {
-            var builder = WebApplication.CreateBuilder(args);
+            WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
             ConfigureServices(builder);
 
-            var app = builder.Build();
+            WebApplication app = builder.Build();
             await ConfigureApplication(app);
 
             // Start the application.
@@ -63,13 +64,13 @@ namespace ADAtickets.ApiService
         public static void ConfigureServices(WebApplicationBuilder builder)
         {
             // Add the DBContext to execute queries against the database.
-            builder.Services.AddDbContextPool<ADAticketsDbContext>(options =>
+            _ = builder.Services.AddDbContextPool<ADAticketsDbContext>(options =>
             {
                 // Configure the DBContext to use PostgreSQL.
-                options.UseNpgsql(builder.Configuration.GetConnectionString(Service.Database), options =>
+                _ = options.UseNpgsql(builder.Configuration.GetConnectionString(Service.Database), options =>
                 {
                     // Create the enumerations in the connected database.
-                    options.MapEnum<Priority>("priority")
+                    _ = options.MapEnum<Priority>("priority")
                         .MapEnum<Status>("status")
                         .MapEnum<TicketType>("ticket_type")
                         .MapEnum<UserType>("user_type")
@@ -79,15 +80,15 @@ namespace ADAtickets.ApiService
             });
 
             // Add JWTs decoding for both Entra ID and Entra External ID.
-            var authBuilder = builder.Services.AddAuthentication();
-            authBuilder.AddMicrosoftIdentityWebApi(builder.Configuration.GetSection(Scheme.OpenIdConnectDefault), Scheme.OpenIdConnectDefault);
-            authBuilder.AddMicrosoftIdentityWebApi(builder.Configuration.GetSection(Scheme.ExternalOpenIdConnectDefault), Scheme.ExternalOpenIdConnectDefault);
+            AuthenticationBuilder authBuilder = builder.Services.AddAuthentication();
+            _ = authBuilder.AddMicrosoftIdentityWebApi(builder.Configuration.GetSection(Scheme.OpenIdConnectDefault), Scheme.OpenIdConnectDefault);
+            _ = authBuilder.AddMicrosoftIdentityWebApi(builder.Configuration.GetSection(Scheme.ExternalOpenIdConnectDefault), Scheme.ExternalOpenIdConnectDefault);
 
             // Add authorization policies.
             CreatePolicies(builder.Services.AddAuthorizationBuilder(), builder.Configuration);
 
             // Add services commonly used with controllers APIs.
-            builder.Services
+            _ = builder.Services
                 .AddControllers(options =>
                 {
                     // Require the APIs to respect the browser request media type
@@ -107,8 +108,8 @@ namespace ADAtickets.ApiService
                 .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
             // Add Swagger documentation for the APIs.
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen(options =>
+            _ = builder.Services.AddEndpointsApiExplorer();
+            _ = builder.Services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc($"v{Service.APIVersion}", new OpenApiInfo
                 {
@@ -127,24 +128,24 @@ namespace ADAtickets.ApiService
                     }
                 });
 
-                var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                string xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
             });
 
             // Add services used to return detailed error messages for failed requests.
-            builder.Services.AddProblemDetails();
+            _ = builder.Services.AddProblemDetails();
 
             // Configure the scoped repositories for dependency injection.
-            builder.Services.AddScoped<IAttachmentRepository, AttachmentRepository>();
-            builder.Services.AddScoped<IEditRepository, EditRepository>();
-            builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
-            builder.Services.AddScoped<IPlatformRepository, PlatformRepository>();
-            builder.Services.AddScoped<IReplyRepository, ReplyRepository>();
-            builder.Services.AddScoped<ITicketRepository, TicketRepository>();
-            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            _ = builder.Services.AddScoped<IAttachmentRepository, AttachmentRepository>();
+            _ = builder.Services.AddScoped<IEditRepository, EditRepository>();
+            _ = builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+            _ = builder.Services.AddScoped<IPlatformRepository, PlatformRepository>();
+            _ = builder.Services.AddScoped<IReplyRepository, ReplyRepository>();
+            _ = builder.Services.AddScoped<ITicketRepository, TicketRepository>();
+            _ = builder.Services.AddScoped<IUserRepository, UserRepository>();
 
             // Add automapping of entities.
-            builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
+            _ = builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
         }
 
         /// <summary>
@@ -156,53 +157,53 @@ namespace ADAtickets.ApiService
             if (app.Environment.IsDevelopment())
             {
                 // Apply migrations on startup if the app is in development
-                var scope = app.Services.CreateScope();
-                var db = scope.ServiceProvider.GetRequiredService<ADAticketsDbContext>();
+                IServiceScope scope = app.Services.CreateScope();
+                ADAticketsDbContext db = scope.ServiceProvider.GetRequiredService<ADAticketsDbContext>();
                 await db.Database.MigrateAsync();
 
                 // Map endpoint to access the API documentation.
-                app.UseSwagger(options =>
+                _ = app.UseSwagger(options =>
                 {
                     options.RouteTemplate = "/openapi/{documentName}.json";
                 });
 
                 // Map endpoint to access the API documentation via Scalar.
-                app.MapScalarApiReference(options =>
+                _ = app.MapScalarApiReference(options =>
                 {
                     options.Theme = ScalarTheme.BluePlanet;
                 });
 
                 // Show detailed exception screen during development.
-                app.UseDeveloperExceptionPage();
+                _ = app.UseDeveloperExceptionPage();
             }
             else
             {
                 // Add HTTPS redirection for production.
-                app.UseHsts();
-                app.UseHttpsRedirection();
+                _ = app.UseHsts();
+                _ = app.UseHttpsRedirection();
             }
 
             // Create an exception handler for APIs.
-            app.UseExceptionHandler();
+            _ = app.UseExceptionHandler();
 
             // Configure interceptor for 4xx and 5xx errors.
-            app.UseStatusCodePages();
+            _ = app.UseStatusCodePages();
 
             // Add authentication middleware.
-            app.UseAuthentication();
+            _ = app.UseAuthentication();
 
             // Add authorization middleware.
-            app.UseAuthorization();
+            _ = app.UseAuthorization();
 
             // Map the controllers endpoints for business logic APIs.
-            app.MapControllers();
+            _ = app.MapControllers();
         }
 
         private static void CreatePolicies(AuthorizationBuilder authorizationBuilder, ConfigurationManager configuration)
         {
-            authorizationBuilder.AddDefaultPolicy(Policy.AdminOnly, policy =>
+            _ = authorizationBuilder.AddDefaultPolicy(Policy.AdminOnly, policy =>
             {
-                policy.RequireAuthenticatedUser()
+                _ = policy.RequireAuthenticatedUser()
                 // Directory roles are exposed with the "wids" claim in the ID token.
                 // The value of this claim is the standard ID for the Azure DevOps Administrator Entra directory role.
                 .RequireClaim("wids", "e3973bdf-4987-49ae-837a-ba8e231c7286")
@@ -211,19 +212,19 @@ namespace ADAtickets.ApiService
             })
             .AddPolicy(Policy.UserOnly, policy =>
             {
-                policy.RequireAuthenticatedUser()
+                _ = policy.RequireAuthenticatedUser()
                 .RequireClaim("utid", configuration["ExternalEntra:TenantId"]!)
                 .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault, Scheme.ExternalOpenIdConnectDefault);
             })
             .AddPolicy(Policy.OperatorOrAdmin, policy =>
             {
-                policy.RequireAuthenticatedUser()
+                _ = policy.RequireAuthenticatedUser()
                 .RequireClaim("utid", configuration["Entra:TenantId"]!)
                 .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault, Scheme.ExternalOpenIdConnectDefault);
             })
             .AddPolicy(Policy.Everyone, policy =>
             {
-                policy.RequireAuthenticatedUser()
+                _ = policy.RequireAuthenticatedUser()
                 .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault, Scheme.ExternalOpenIdConnectDefault);
             });
         }

@@ -23,16 +23,21 @@ using System;
 
 namespace ADAtickets.Installer.Desktop;
 
-static class Program
+internal static class Program
 {
     [STAThread]
-    public static void Main(string[] args) => BuildAvaloniaApp()
+    public static void Main(string[] args)
+    {
+        _ = BuildAvaloniaApp()
         .StartWithClassicDesktopLifetime(args);
+    }
 
     private static AppBuilder BuildAvaloniaApp()
-        => AppBuilder.Configure<App>()
-            .UsePlatformDetect()
-            .WithInterFont()
-            .LogToTrace()
-            .UseReactiveUI();
+    {
+        return AppBuilder.Configure<App>()
+                .UsePlatformDetect()
+                .WithInterFont()
+                .LogToTrace()
+                .UseReactiveUI();
+    }
 }
