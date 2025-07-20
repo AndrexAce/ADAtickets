@@ -22,7 +22,6 @@ using ADAtickets.ApiService.Repositories;
 using ADAtickets.Shared.Models;
 using Humanizer;
 using Microsoft.EntityFrameworkCore;
-using System.Text.RegularExpressions;
 
 namespace ADAtickets.ApiService.Services
 {
@@ -142,26 +141,24 @@ namespace ADAtickets.ApiService.Services
         /// Deletes an attachment file from the server's filesystem.
         /// </summary>
         /// <param name="attachmentPath">Full path of the attachment file.</param>
-        /// <returns>A <see cref="Task"/> returning <see langword="true"/> if the attachment was successfully deleted, and <see langword="false"/> otherwise.</returns>
+        /// <returns><see langword="true"/> if the attachment was successfully deleted, and <see langword="false"/> otherwise.</returns>
         private static bool DeleteAttachmentFromFileSystem(string attachmentPath)
         {
             try
             {
-                if (!Regex.IsMatch(attachmentPath, @"^(?!.*//)[a-zA-Z0-9\-\\/\.]+$", RegexOptions.None, TimeSpan.FromMilliseconds(100)))
-                {
-                    return false;
-                }
-                else if (File.Exists(attachmentPath))
+                if (File.Exists(attachmentPath))
                 {
                     File.Delete(attachmentPath);
-                }
 
-                return true;
+                    return true;
+                }
             }
             catch
             {
-                return false;
+                // Do nothing
             }
+            
+            return false;
         }
 
         /// <summary>

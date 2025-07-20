@@ -30,6 +30,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @inject TicketsClient ticketsClient
 @inject UsersClient usersClient
 @inject PlatformsClient platformsClient
+@inject AttachmentsClient attachmentsClient
 @inject IToastService toastService
 @inject IDialogService dialogService
 @inject IMapper mapper
@@ -151,7 +152,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center">
                     <span style="overflow: hidden; text-overflow: ellipsis; max-width: 15rem">@Path.GetFileName(photoPath)</span>
                     <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Open())" OnClick="HandleViewPhotoClick">@loc["View"]</FluentButton>
-                    <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Delete())" OnClick="HandleDeletePhotoClick">@loc["Delete"]</FluentButton>
+
+                    @if (!Content.IsEdit)
+                    {
+                        <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Delete())" OnClick="HandleDeletePhotoClick">@loc["Delete"]</FluentButton>
+                    }
                 </FluentStack>
             }
 
@@ -176,7 +181,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center">
                     <p style="overflow: hidden; text-overflow: ellipsis; max-width: 15rem">@Path.GetFileName(videoPath)</p>
                     <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Open())" OnClick="HandleViewVideoClick">@loc["View"]</FluentButton>
-                    <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Delete())" OnClick="HandleDeleteVideoClick">@loc["Delete"]</FluentButton>
+
+                    @if (!Content.IsEdit)
+                    {
+                        <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Delete())" OnClick="HandleDeleteVideoClick">@loc["Delete"]</FluentButton>
+                    }
                 </FluentStack>
             }
         </FluentStack>
@@ -219,7 +228,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                     <FluentSpacer />
                     <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.DismissCircle())" OnClick="HandleViewPhotoClose">@loc["ClosePreview"]</FluentButton>
                 </FluentStack>
-                <img src="@photoPath" style="max-width: 75vw; max-height: 75vh;" />
+                @if (!Content.IsEdit)
+                {
+                    <img src="@photoPath" style="max-width: 75vw; max-height: 75vh;" />
+                }
+                else
+                {
+                    <img src="@("adatickets.apiservice/" + photoPath)" style="max-width: 75vw; max-height: 75vh;" alt="@loc["TicketPhoto"]" />
+                }
             </FluentStack>
         </FluentCard>
     </FluentOverlay>
@@ -238,7 +254,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                     <FluentSpacer />
                     <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.DismissCircle())" OnClick="HandleViewVideoClose">@loc["ClosePreview"]</FluentButton>
                 </FluentStack>
-                <video src="@videoPath" style="max-width: 75vw; max-height: 75vh;" controls></video>
+                @if (!Content.IsEdit)
+                {
+                    <video src="@videoPath" style="max-width: 75vw; max-height: 75vh;" controls></video>
+                }
+                else
+                {
+                    <video src="@("adatickets.apiservice/" + videoPath)" style="max-width: 75vw; max-height: 75vh;" controls></video>
+                }
             </FluentStack>
         </FluentCard>
     </FluentOverlay>
@@ -318,7 +341,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
             platforms = await LoadPlatforms();
 
-            // TODO: load attachments and assign the path to the photoPath and videoPath variables
+            if (Content.InitialTicketData is TicketResponseDto initialTicketData)
+            {
+                IEnumerable<AttachmentResponseDto> attachments = await LoadAttachments(new[] { new KeyValuePair<string, string>("TicketId", initialTicketData.Id.ToString()) });
+
+                photoPath = attachments.ElementAtOrDefault(0)?.Path;
+                videoPath = attachments.ElementAtOrDefault(1)?.Path;
+            }
+
         }
         catch (Exception ex)
         {
@@ -329,6 +359,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     private async Task<IEnumerable<UserResponseDto>> LoadUsers(IEnumerable<KeyValuePair<string, string>> filters) => (await usersClient.GetAllAsync(filters)).Item2;
 
     private async Task<IEnumerable<PlatformResponseDto>> LoadPlatforms() => (await platformsClient.GetAllAsync()).Item2;
+
+    private async Task<IEnumerable<AttachmentResponseDto>> LoadAttachments(IEnumerable<KeyValuePair<string, string>> filters) => (await attachmentsClient.GetAllAsync(filters)).Item2;
 
     private async Task HandleValidSubmit()
     {
@@ -418,13 +450,24 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     private void DeleteTempFiles()
     {
-        if (photoPath is not null && File.Exists(photoPath))
+        if (photoPath is not null)
         {
-            File.Delete(photoPath);
+            string fullPhotoPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", photoPath);
+
+            if (File.Exists(fullPhotoPath))
+            {
+                File.Delete(fullPhotoPath);
+            }
         }
-        if (videoPath is not null && File.Exists(videoPath))
+
+        if (videoPath is not null)
         {
-            File.Delete(videoPath);
+            string fullVideoPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", videoPath);
+
+            if (File.Exists(fullVideoPath))
+            {
+                File.Delete(fullVideoPath);
+            }
         }
     }
 }
