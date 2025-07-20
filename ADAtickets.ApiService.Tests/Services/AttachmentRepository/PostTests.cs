@@ -63,7 +63,7 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
             _ = mockAttachmentSet.Setup(s => s.Add(It.IsAny<Attachment>()))
                 .Callback<Attachment>(a =>
                 {
-                    if (a.Path.Length <= 4000 && Regex.IsMatch(a.Path, @"^(?!.*//)[a-zA-Z0-9_\-\\/\.]+$") && mockTicketSet.Object.Single().Id == a.TicketId)
+                    if (a.Path.Length <= 4000 && a.Path.IndexOfAny(Path.GetInvalidPathChars()) == -1 && mockTicketSet.Object.Single().Id == a.TicketId)
                     {
                         attachments.Add(a);
                     }
@@ -99,7 +99,7 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
             _ = mockAttachmentSet.Setup(s => s.Add(It.IsAny<Attachment>()))
                 .Callback<Attachment>(a =>
                 {
-                    if (a.Path.Length <= 4000 && Regex.IsMatch(a.Path, @"^(?!.*//)[a-zA-Z0-9_\-\\/\.]+$") && mockTicketSet.Object.Single().Id == a.TicketId)
+                    if (a.Path.Length <= 4000 && a.Path.IndexOfAny(Path.GetInvalidPathChars()) == -1 && mockTicketSet.Object.Single().Id == a.TicketId)
                     {
                         attachments.Add(a);
                     }

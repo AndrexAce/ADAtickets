@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-using ADAtickets.Shared.Dtos.Requests;
+using ADAtickets.Shared.Dtos.Responses;
 using ADAtickets.Shared.Models;
 using Microsoft.FluentUI.AspNetCore.Components;
 
@@ -88,7 +88,7 @@ namespace ADAtickets.Web.Components.Utilities
             /// <summary>
             /// Initial data to show in the ticket dialog (optional).
             /// </summary>
-            public TicketRequestDto? InitialTicketData { get; init; }
+            public TicketResponseDto? InitialTicketData { get; init; }
         }
     }
 }

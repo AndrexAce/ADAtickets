@@ -408,3 +408,7 @@ ADAtickets.Web/appsettings.Development.json
 # Media folders
 ADAtickets.ApiService/media/*
 ADAtickets.Web/wwwroot/uploads/*
+
+# Rider folders and files
+.idea/
+global.json
