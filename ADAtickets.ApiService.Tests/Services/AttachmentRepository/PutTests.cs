@@ -22,7 +22,6 @@ using ADAtickets.Shared.Models;
 using Microsoft.EntityFrameworkCore;
 using MockQueryable.Moq;
 using Moq;
-using System.Text.RegularExpressions;
 using AttachmentService = ADAtickets.ApiService.Services.AttachmentRepository;
 
 namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
@@ -41,7 +40,7 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
         public static TheoryData<Attachment> InvalidAttachmentData =>
         [
             Utilities.CreateAttachment(path: "/" + new string('a', 3996) + ".png", ticketId: Guid.AllBitsSet),
-            Utilities.CreateAttachment(path: "//invalid", ticketId: Guid.AllBitsSet),
+            Utilities.CreateAttachment(path: "home/invalid", ticketId: Guid.AllBitsSet),
             Utilities.CreateAttachment(path: "valid.png", ticketId: Guid.Empty),
         ];
 
@@ -55,7 +54,7 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
         public async Task UpdateAttachment_ValidNewEntityEmptyDataValidOldPath_ReturnsNew(Attachment inAttachment)
         {
             // Arrange
-            List<Attachment> attachments = [new() { Id = inAttachment.Id, Path = "old.png", TicketId = Guid.AllBitsSet }];
+            List<Attachment> attachments = [new() { Id = inAttachment.Id, Path = "/old.png", TicketId = Guid.AllBitsSet }];
             List<Ticket> tickets = [new() { Id = Guid.AllBitsSet }];
 
             Mock<ADAticketsDbContext> mockContext = new();
@@ -64,7 +63,7 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
             _ = mockAttachmentSet.Setup(s => s.Update(It.IsAny<Attachment>()))
                 .Callback<Attachment>(a =>
                 {
-                    if (a.Id == attachments[0].Id && a.Path.Length <= 4000 && a.Path.IndexOfAny(Path.GetInvalidPathChars()) == -1 && mockTicketSet.Object.Single().Id == a.TicketId)
+                    if (a.Id == attachments[0].Id && a.Path.Length <= 4000 && Path.IsPathRooted(a.Path) && mockTicketSet.Object.Single().Id == a.TicketId)
                     {
                         attachments[0].Path = a.Path;
                     }
@@ -91,7 +90,7 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
         public async Task UpdateAttachment_ValidNewEntityValidDataValidOldPath_ReturnsNew(Attachment inAttachment)
         {
             // Arrange
-            List<Attachment> attachments = [new() { Id = inAttachment.Id, Path = "old.png", TicketId = Guid.AllBitsSet }];
+            List<Attachment> attachments = [new() { Id = inAttachment.Id, Path = "/old.png", TicketId = Guid.AllBitsSet }];
             List<Ticket> tickets = [new() { Id = Guid.AllBitsSet }];
 
             Mock<ADAticketsDbContext> mockContext = new();
@@ -100,7 +99,7 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
             _ = mockAttachmentSet.Setup(s => s.Update(It.IsAny<Attachment>()))
                 .Callback<Attachment>(a =>
                 {
-                    if (a.Id == attachments[0].Id && a.Path.Length <= 4000 && a.Path.IndexOfAny(Path.GetInvalidPathChars()) == -1 && mockTicketSet.Object.Single().Id == a.TicketId)
+                    if (a.Id == attachments[0].Id && a.Path.Length <= 4000 && Path.IsPathRooted(a.Path) && mockTicketSet.Object.Single().Id == a.TicketId)
                     {
                         attachments[0].Path = a.Path;
                     }
@@ -127,7 +126,7 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
         public async Task UpdateAttachment_InvalidNewEntityValidDataValidOldPath_ReturnsOld(Attachment inAttachment)
         {
             // Arrange
-            List<Attachment> attachments = [new() { Id = inAttachment.Id, Path = "old.png", TicketId = Guid.AllBitsSet }];
+            List<Attachment> attachments = [new() { Id = inAttachment.Id, Path = "/old.png", TicketId = Guid.AllBitsSet }];
             List<Ticket> tickets = [new() { Id = Guid.AllBitsSet }];
 
             Mock<ADAticketsDbContext> mockContext = new();
@@ -136,7 +135,7 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
             _ = mockAttachmentSet.Setup(s => s.Update(It.IsAny<Attachment>()))
                 .Callback<Attachment>(a =>
                 {
-                    if (a.Id == attachments[0].Id && a.Path.Length <= 4000 && Regex.IsMatch(a.Path, @"^(?!.*//)[a-zA-Z0-9_\-\\/\.]+$") && mockTicketSet.Object.Single().Id == a.TicketId)
+                    if (a.Id == attachments[0].Id && a.Path.Length <= 4000 && Path.IsPathRooted(a.Path) && mockTicketSet.Object.Single().Id == a.TicketId)
                     {
                         attachments[0].Path = a.Path;
                     }
@@ -162,7 +161,7 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
         public async Task UpdateAttachment_ValidNewEntityValidDataInvalidOldPath_ReturnsOld(Attachment inAttachment)
         {
             // Arrange
-            List<Attachment> attachments = [new() { Id = inAttachment.Id, Path = "old.png", TicketId = Guid.AllBitsSet }];
+            List<Attachment> attachments = [new() { Id = inAttachment.Id, Path = "/old.png", TicketId = Guid.AllBitsSet }];
             List<Ticket> tickets = [new() { Id = Guid.AllBitsSet }];
 
             Mock<ADAticketsDbContext> mockContext = new();
@@ -171,7 +170,7 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
             _ = mockAttachmentSet.Setup(s => s.Update(It.IsAny<Attachment>()))
                 .Callback<Attachment>(a =>
                 {
-                    if (a.Id == attachments[0].Id && a.Path.Length <= 4000 && Regex.IsMatch(a.Path, @"^(?!.*//)[a-zA-Z0-9_\-\\/\.]+$") && mockTicketSet.Object.Single().Id == a.TicketId)
+                    if (a.Id == attachments[0].Id && a.Path.Length <= 4000 && Path.IsPathRooted(a.Path) && mockTicketSet.Object.Single().Id == a.TicketId)
                     {
                         attachments[0].Path = a.Path;
                     }
@@ -184,7 +183,7 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
             CancellationToken cancellationToken = TestContext.Current.CancellationToken;
 
             // Act
-            await service.UpdateAttachmentAsync(inAttachment, [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A], "//" + attachments[0].Path);
+            await service.UpdateAttachmentAsync(inAttachment, [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A], "home" + attachments[0].Path);
             Attachment? updatedAttachment = await mockContext.Object.Attachments.SingleOrDefaultAsync(cancellationToken);
 
             // Assert

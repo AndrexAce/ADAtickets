@@ -38,7 +38,7 @@ namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
         public async Task DeleteAttachmentByIdAsync_ExistingEntity_DeletesEntity()
         {
             // Arrange
-            Attachment attachment = new() { Id = Guid.NewGuid(), Path = "delete.png" };
+            Attachment attachment = new() { Id = Guid.NewGuid(), Path = "/delete.png" };
             List<Attachment> attachments = [attachment];
 
             Mock<ADAticketsDbContext> mockContext = new();

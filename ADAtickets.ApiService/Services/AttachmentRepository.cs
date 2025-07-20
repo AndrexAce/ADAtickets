@@ -146,6 +146,11 @@ namespace ADAtickets.ApiService.Services
         {
             try
             {
+                if (!Path.IsPathRooted(attachmentPath))
+                {
+                    return false;
+                }
+
                 if (File.Exists(attachmentPath))
                 {
                     File.Delete(attachmentPath);
