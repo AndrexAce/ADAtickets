@@ -103,10 +103,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         {
             <FluentMenuButton Text="@loc["ActionsButton"]" IconStart="@(new Icons.Regular.Size20.SelectAllOn())">
                 <FluentLabel Typo="Typography.H6">@loc["EditStatusMenuLabel"]</FluentLabel>
-                <FluentMenuItem Label="@loc["DeleteMenuItem"]" OnClick="HandleDeleteClick">
+                <FluentMenuItem Label="@loc["DeleteMenuItem"]" OnClick="HandleDeleteClickAsync">
                     <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.DeleteDismiss())" Color="Color.Neutral" Slot="start" /></span>
                 </FluentMenuItem>
-                <FluentMenuItem Label="@loc["CloseMenuItem"]" OnClick="HandleCloseClick">
+                <FluentMenuItem Label="@loc["CloseMenuItem"]" OnClick="HandleCloseClickAsync">
                     <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Checkmark())" Color="Color.Neutral" Slot="start" /></span>
                 </FluentMenuItem>
                 <FluentDivider />
@@ -118,7 +118,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                     <MenuItems>
                         @foreach (var user in Users ?? [])
                         {
-                            <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@($"{user.Name} {user.Surname}")" OnClick="args => HandleAssignClick(user.Id)"/>
+                            <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@($"{user.Name} {user.Surname}")" OnClick="args => HandleAssignClickAsync(user.Id)"/>
                         }
                     </MenuItems>
                 </FluentMenuItem>
@@ -210,7 +210,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             </FluentMenuItem>
         </FluentMenuButton>
     </FluentStack>
-    <FluentTabs Size="TabSize.Small" Width="100%" OnTabChange="HandleTabChange">
+    <FluentTabs Size="TabSize.Small" Width="100%" OnTabChange="HandleTabChangeAsync">
         <FluentTab Label="@loc["AllTab"]" Icon="@(new Icons.Regular.Size20.Grid())" Id="AllTab">
         </FluentTab>
         <FluentTab Label="@loc["UnassignedTab"]" Icon="@(new Icons.Regular.Size20.Question())" Id="UnassignedTab">
@@ -242,7 +242,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             <CascadingValue Value="@Users">
                 @foreach (var ticket in tickets)
                 {
-                    <TicketCard Ticket="@ticket" SelectedChanged="HandleSelectedChanged" StateChanged="HandleStateChanged"/>
+                    <TicketCard Ticket="@ticket" SelectedChanged="HandleSelectedChanged" StateChanged="HandleStateChangedAsync"/>
                 }
             </CascadingValue>
         </div>
@@ -277,10 +277,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     {  
         try
         {
-            await LoadUsers();
+            await LoadUsersAsync();
             // Loads from the APIs only the tickets the user can see according to their identity and the selected tab.
-            await LoadTickets(await GetBaseFilters());
-            await LoadPlatforms();
+            await LoadTicketsAsync(await GetBaseFiltersAsync());
+            await LoadPlatformsAsync();
         }
         catch (Exception ex)
         {
@@ -288,13 +288,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         }
     }
 
-    private async Task LoadUsers()
+    private async Task LoadUsersAsync()
     {
         var result = await usersClient.GetAllAsync();
         Users = result.Item2;
     }
 
-    private async Task LoadTickets(IEnumerable<KeyValuePair<string, string>> filters)
+    private async Task LoadTicketsAsync(IEnumerable<KeyValuePair<string, string>> filters)
     {
         var result = await ticketsClient.GetAllAsync(filters);
 
@@ -305,7 +305,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         ApplySelectedFiltersAndSort();
     }
 
-    private async Task LoadPlatforms()
+    private async Task LoadPlatformsAsync()
     {
         var result = await platformsClient.GetAllAsync();
         platforms = result.Item2;
@@ -344,10 +344,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         activeDateFilter = null;
     }
 
-    private async Task HandleTabChange(FluentTab fluentTab)
+    private async Task HandleTabChangeAsync(FluentTab fluentTab)
     {
         currentTab = fluentTab?.Id;
-        await LoadTickets(await GetBaseFilters());
+        await LoadTicketsAsync(await GetBaseFiltersAsync());
     }
 
     private void HandleSelectedChanged(SelectedChangedEventArgs args)
@@ -362,36 +362,36 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         }
     }
 
-    private async Task HandleDeleteClick()
+    private async Task HandleDeleteClickAsync()
     {
         await dialogService.ShowDialogAsync<SimpleDialog>(
             new SimpleDialogContent
             {
                 Message = loc["DeleteConfirmDialogMessage"],
-                ConfirmAction = HandleConfirmDelete,
+                ConfirmAction = HandleConfirmDeleteAsync,
                 ConfirmButtonIcon = new Icons.Regular.Size20.DeleteDismiss(),
             },
             Dialogs.ConfirmDialogParameters(loc["DeleteConfirmDialogTitle"], loc["DeleteConfirmDialogConfirmButton"], loc["DeleteConfirmDialogCancelButton"]));
     }
 
-    private async Task HandleCloseClick()
+    private async Task HandleCloseClickAsync()
     {
         await dialogService.ShowDialogAsync<SimpleDialog>(
             new SimpleDialogContent
             {
                 Message = loc["CloseConfirmDialogMessage"],
-                ConfirmAction = HandleConfirmClose,
+                ConfirmAction = HandleConfirmCloseAsync,
                 ConfirmButtonIcon = new Icons.Regular.Size20.Checkmark(),
             },
             Dialogs.ConfirmDialogParameters(loc["CloseConfirmDialogTitle"], loc["CloseConfirmDialogConfirmButton"], loc["CloseConfirmDialogCancelButton"]));
     }
 
-    private async Task HandleAssignClick(Guid operatorId)
+    private async Task HandleAssignClickAsync(Guid operatorId)
     {
-        await HandleAssign(operatorId);
+        await HandleAssignAsync(operatorId);
     }
 
-    private async Task HandleConfirmDelete()
+    private async Task HandleConfirmDeleteAsync()
     {
         var progressToastParameters = Toasts.ProgressToastParameters("Delete", loc["DeleteProgressToastTitle"], loc["DeleteProgressToastDetails"]);
 
@@ -429,11 +429,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             selectedTickets.Clear();
 
             // Reload the tickets.
-            await LoadTickets(await GetBaseFilters());
+            await LoadTicketsAsync(await GetBaseFiltersAsync());
         }
     }
 
-    private async Task HandleConfirmClose()
+    private async Task HandleConfirmCloseAsync()
     {
         var progressToastParameters = Toasts.ProgressToastParameters("Close", loc["CloseProgressToastTitle"], loc["CloseProgressToastDetails"]);
 
@@ -482,11 +482,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             selectedTickets.Clear();
 
             // Reload the tickets.
-            await LoadTickets(await GetBaseFilters());
+            await LoadTicketsAsync(await GetBaseFiltersAsync());
         }
     }
 
-    private async Task HandleAssign(Guid operatorId)
+    private async Task HandleAssignAsync(Guid operatorId)
     {
         var progressToastParameters = Toasts.ProgressToastParameters("Assign", loc["AssignProgressToastTitle"], loc["AssignProgressToastDetails"]);
 
@@ -535,13 +535,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             selectedTickets.Clear();
 
             // Reload the tickets.
-            await LoadTickets(await GetBaseFilters());
+            await LoadTicketsAsync(await GetBaseFiltersAsync());
         }
     }
 
-    private async Task HandleStateChanged()
+    private async Task HandleStateChangedAsync()
     {
-        await LoadTickets(await GetBaseFilters());
+        await LoadTicketsAsync(await GetBaseFiltersAsync());
     }
 
     private void HandleSortTitleClick(string order)
@@ -618,7 +618,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         };
     }
 
-    private async Task<IEnumerable<KeyValuePair<string, string>>> GetBaseFilters()
+    private async Task<IEnumerable<KeyValuePair<string, string>>> GetBaseFiltersAsync()
     {
         var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;

@@ -45,7 +45,7 @@ internal partial class LastStep : UserControl
     {
         base.OnLoaded(e);
 
-        _ = ExecuteSetup();
+        _ = ExecuteSetupAsync();
     }
 
     private const string WINDOWS_DOCKERSERVER = "npipe://./pipe/docker_engine";
@@ -53,7 +53,7 @@ internal partial class LastStep : UserControl
     private const string WINDOWS_DOCKEREXE = @"C:\Program Files\Docker\Docker\resources\bin\docker.exe";
     private const string LINUX_DOCKEREXE = "/usr/bin/docker";
 
-    private async Task ExecuteSetup()
+    private async Task ExecuteSetupAsync()
     {
         // Get the ViewModel from DataContext
         if (DataContext is MainViewModel viewModel)

@@ -29,7 +29,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         <FluentNavGroup Icon="@(new Icons.Regular.Size20.TicketDiagonal())" Title="@loc["Tickets"]" Expanded="true">
             <FluentNavLink Href="/my-tickets">@loc["MyTickets"]</FluentNavLink>
             <AuthorizeView Policy="@Policy.UserOnly">
-                <FluentNavLink OnClick="ShowNewTicketDialog">@loc["NewTicket"]</FluentNavLink>
+                <FluentNavLink OnClick="ShowNewTicketDialogAsync">@loc["NewTicket"]</FluentNavLink>
             </AuthorizeView>
         </FluentNavGroup>
 
@@ -54,7 +54,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 </div>
 
 @code {
-    private async Task ShowNewTicketDialog()
+    private async Task ShowNewTicketDialogAsync()
     {
         await dialogService.ShowDialogAsync<TicketDialog>(
             new TicketDialogContent

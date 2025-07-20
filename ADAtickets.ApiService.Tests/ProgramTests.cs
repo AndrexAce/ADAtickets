@@ -89,7 +89,7 @@ namespace ADAtickets.ApiService.Tests
             WebApplication app = builder.Build();
 
             // Assert
-            Assert.Null(await Record.ExceptionAsync(() => Program.ConfigureApplication(app)));
+            Assert.Null(await Record.ExceptionAsync(() => Program.ConfigureApplicationAsync(app)));
         }
     }
 }

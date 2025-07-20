@@ -53,7 +53,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 </FluentDialogHeader>
 
 <FluentDialogBody>
-    <EditForm id="ticket_form" Model="@TicketRequest" OnValidSubmit="HandleValidSubmit" FormName="ticket_form">
+    <EditForm id="ticket_form" Model="@TicketRequest" OnValidSubmit="HandleValidSubmitAsync" FormName="ticket_form">
         <DataAnnotationsValidator />
         <FluentValidationSummary Model="@TicketRequest"/>
 
@@ -136,7 +136,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 <FluentInputFile Id="photoUploader"
                                  Mode="InputFileMode.Stream"
                                  Accept="image/png,image/jpg,image/jpeg,image/gif,image/webp"
-                                 OnCompleted="HandleUploadPhotoCompleted">
+                                 OnCompleted="HandleUploadPhotoCompletedAsync">
                     <ChildContent>
                         <label for="photoUploader" style="margin-top: 0.3rem;">
                             <FluentIcon Value="@(new @Icons.Regular.Size20.ArrowUpload())" />
@@ -165,7 +165,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 <FluentInputFile Id="videoUploader"
                                  Mode="InputFileMode.Stream"
                                  Accept="video/mp4,video/webm"
-                                 OnCompleted="HandleUploadVideoCompleted">
+                                 OnCompleted="HandleUploadVideoCompletedAsync">
                     <ChildContent>
                         <label for="videoUploader" style="margin-top: 0.3rem;">
                             <FluentIcon Value="@(new @Icons.Regular.Size20.ArrowUpload())" />
@@ -210,7 +210,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 IconStart="@(new Icons.Regular.Size20.Send())"
                 FormId="ticket_form">@loc["Create"]</FluentButton>
         }
-        <FluentButton Appearance="Appearance.Neutral" OnClick="HandleCancelClick">@loc["Cancel"]</FluentButton>
+        <FluentButton Appearance="Appearance.Neutral" OnClick="HandleCancelClickAsync">@loc["Cancel"]</FluentButton>
     </FluentStack>
 </FluentDialogFooter>
 
@@ -336,14 +336,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
         try
         {
-            users = await LoadUsers(new[] { new KeyValuePair<string, string>("UserType", "Operator") });
-            users = users.Union(await LoadUsers(new[] { new KeyValuePair<string, string>("UserType", "Admin") }));
+            users = await LoadUsersAsync(new[] { new KeyValuePair<string, string>("UserType", "Operator") });
+            users = users.Union(await LoadUsersAsync(new[] { new KeyValuePair<string, string>("UserType", "Admin") }));
 
-            platforms = await LoadPlatforms();
+            platforms = await LoadPlatformsAsync();
 
             if (Content.InitialTicketData is TicketResponseDto initialTicketData)
             {
-                IEnumerable<AttachmentResponseDto> attachments = await LoadAttachments(new[] { new KeyValuePair<string, string>("TicketId", initialTicketData.Id.ToString()) });
+                IEnumerable<AttachmentResponseDto> attachments = await LoadAttachmentsAsync(new[] { new KeyValuePair<string, string>("TicketId", initialTicketData.Id.ToString()) });
 
                 photoPath = attachments.ElementAtOrDefault(0)?.Path;
                 videoPath = attachments.ElementAtOrDefault(1)?.Path;
@@ -356,39 +356,39 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         }
     }
 
-    private async Task<IEnumerable<UserResponseDto>> LoadUsers(IEnumerable<KeyValuePair<string, string>> filters) => (await usersClient.GetAllAsync(filters)).Item2;
+    private async Task<IEnumerable<UserResponseDto>> LoadUsersAsync(IEnumerable<KeyValuePair<string, string>> filters) => (await usersClient.GetAllAsync(filters)).Item2;
 
-    private async Task<IEnumerable<PlatformResponseDto>> LoadPlatforms() => (await platformsClient.GetAllAsync()).Item2;
+    private async Task<IEnumerable<PlatformResponseDto>> LoadPlatformsAsync() => (await platformsClient.GetAllAsync()).Item2;
 
-    private async Task<IEnumerable<AttachmentResponseDto>> LoadAttachments(IEnumerable<KeyValuePair<string, string>> filters) => (await attachmentsClient.GetAllAsync(filters)).Item2;
+    private async Task<IEnumerable<AttachmentResponseDto>> LoadAttachmentsAsync(IEnumerable<KeyValuePair<string, string>> filters) => (await attachmentsClient.GetAllAsync(filters)).Item2;
 
-    private async Task HandleValidSubmit()
+    private async Task HandleValidSubmitAsync()
     {
         // TODO: save/update the ticket and the attachments on the server
 
         await Dialog.CloseAsync();
     }
 
-    private async Task HandleCancelClick()
+    private async Task HandleCancelClickAsync()
     {
         await dialogService.ShowDialogAsync<SimpleDialog>(
             new SimpleDialogContent
             {
                 Message = loc["CancelConfirmDialogMessage"],
-                ConfirmAction = HandleConfirmCancel,
+                ConfirmAction = HandleConfirmCancelAsync,
                 ConfirmButtonIcon = new Icons.Regular.Size20.DismissCircle(),
             },
             Dialogs.ConfirmDialogParameters(loc["CancelConfirmDialogTitle"], loc["CancelConfirmDialogConfirmButton"], loc["CancelConfirmDialogCancelButton"]));
     }
 
-    private async Task HandleConfirmCancel()
+    private async Task HandleConfirmCancelAsync()
     {
         DeleteTempFiles();
 
         await Dialog.CloseAsync();
     }
 
-    private async Task HandleUploadPhotoCompleted(IEnumerable<FluentInputFileEventArgs> args)
+    private async Task HandleUploadPhotoCompletedAsync(IEnumerable<FluentInputFileEventArgs> args)
     {
         if (args.Any())
         {
@@ -408,7 +408,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         }
     }
 
-    private async Task HandleUploadVideoCompleted(IEnumerable<FluentInputFileEventArgs> args)
+    private async Task HandleUploadVideoCompletedAsync(IEnumerable<FluentInputFileEventArgs> args)
     {
         if (args.Any())
         {

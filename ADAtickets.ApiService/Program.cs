@@ -51,7 +51,7 @@ namespace ADAtickets.ApiService
             ConfigureServices(builder);
 
             WebApplication app = builder.Build();
-            await ConfigureApplication(app);
+            await ConfigureApplicationAsync(app);
 
             // Start the application.
             await app.RunAsync();
@@ -152,7 +152,7 @@ namespace ADAtickets.ApiService
         /// Configures the application.
         /// </summary>
         /// <param name="app">The <see cref="WebApplication"/> with the created services.</param>
-        public static async Task ConfigureApplication(WebApplication app)
+        public static async Task ConfigureApplicationAsync(WebApplication app)
         {
             if (app.Environment.IsDevelopment())
             {

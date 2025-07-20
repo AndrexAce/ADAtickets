@@ -33,8 +33,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 </FluentDialogBody>
 
 <FluentDialogFooter>
-    <FluentButton Appearance="Appearance.Accent" IconStart="Content.ConfirmButtonIcon" OnClick="HandleConfirm">@Dialog.Instance.Parameters.PrimaryAction</FluentButton>
-    <FluentButton Appearance="Appearance.Neutral" OnClick="HandleCancel">@Dialog.Instance.Parameters.SecondaryAction</FluentButton>
+    <FluentButton Appearance="Appearance.Accent" IconStart="Content.ConfirmButtonIcon" OnClick="HandleConfirmAsync">@Dialog.Instance.Parameters.PrimaryAction</FluentButton>
+    <FluentButton Appearance="Appearance.Neutral" OnClick="HandleCancelAsync">@Dialog.Instance.Parameters.SecondaryAction</FluentButton>
 </FluentDialogFooter>
 
 @code {
@@ -50,7 +50,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     [Parameter]
     public SimpleDialogContent Content { get; set; } = default!;
 
-    private async Task HandleConfirm(MouseEventArgs args)
+    private async Task HandleConfirmAsync(MouseEventArgs args)
     {
         await Dialog.CloseAsync();
 
@@ -60,7 +60,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         }
     }
 
-    private async Task HandleCancel(MouseEventArgs args)
+    private async Task HandleCancelAsync(MouseEventArgs args)
     {
         await Dialog.CancelAsync();
     }

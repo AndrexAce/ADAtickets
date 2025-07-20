@@ -55,7 +55,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                     </FluentStack>
                 </FluentPersona>
                 <FluentSpacer />
-                <FluentCheckbox Class="hover-hide" CheckStateChanged="HandleCheckStateChanged" />
+                <FluentCheckbox Class="hover-hide" CheckStateChanged="HandleCheckStateChangedAsync" />
             }
         </FluentStack>
         @if (Users is null)
@@ -84,10 +84,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 {
     <FluentMenu Anchor="@(Ticket.Id.ToString())" Trigger="MouseButton.Right" Anchored="false">
         <FluentLabel Typo="Typography.H6">@loc["EditStatusMenuLabel"]</FluentLabel>
-        <FluentMenuItem Label="@loc["DeleteMenuItem"]" OnClick="HandleDeleteClick">
+        <FluentMenuItem Label="@loc["DeleteMenuItem"]" OnClick="HandleDeleteClickAsync">
             <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.DeleteDismiss())" Color="Color.Neutral" Slot="start" /></span>
         </FluentMenuItem>
-        <FluentMenuItem Label="@loc["CloseMenuItem"]" OnClick="HandleCloseClick">
+        <FluentMenuItem Label="@loc["CloseMenuItem"]" OnClick="HandleCloseClickAsync">
             <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Checkmark())" Color="Color.Neutral" Slot="start" /></span>
         </FluentMenuItem>
         <FluentDivider />
@@ -99,7 +99,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             <MenuItems>
                 @foreach (var user in Users ?? [])
                 {
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@($"{user.Name} {user.Surname}")" OnClick="args => HandleAssignClick(user.Id)"/>
+                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@($"{user.Name} {user.Surname}")" OnClick="args => HandleAssignClickAsync(user.Id)"/>
                 }
             </MenuItems>
         </FluentMenuItem>
@@ -176,42 +176,42 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         _ => ""
     };
 
-    private async Task HandleCheckStateChanged(bool? checkState)
+    private async Task HandleCheckStateChangedAsync(bool? checkState)
     {
         Selected = checkState ?? false;
         await SelectedChanged.InvokeAsync(new() { TicketId = Ticket.Id, IsSelected = Selected });
     }
 
-    private async Task HandleDeleteClick()
+    private async Task HandleDeleteClickAsync()
     {
         await dialogService.ShowDialogAsync<SimpleDialog>(
             new SimpleDialogContent
             {
                 Message = loc["DeleteConfirmDialogMessage"],
-                ConfirmAction = HandleConfirmDelete,
+                ConfirmAction = HandleConfirmDeleteAsync,
                 ConfirmButtonIcon = new Icons.Regular.Size20.DeleteDismiss(),
             },
             Dialogs.ConfirmDialogParameters(loc["DeleteConfirmDialogTitle"], loc["DeleteConfirmDialogConfirmButton"], loc["DeleteConfirmDialogCancelButton"]));
     }
 
-    private async Task HandleCloseClick()
+    private async Task HandleCloseClickAsync()
     {
         await dialogService.ShowDialogAsync<SimpleDialog>(
             new SimpleDialogContent
             {
                 Message = loc["CloseConfirmDialogMessage"],
-                ConfirmAction = HandleConfirmClose,
+                ConfirmAction = HandleConfirmCloseAsync,
                 ConfirmButtonIcon = new Icons.Regular.Size20.Checkmark(),
             },
             Dialogs.ConfirmDialogParameters(loc["CloseConfirmDialogTitle"], loc["CloseConfirmDialogConfirmButton"], loc["CloseConfirmDialogCancelButton"]));
     }
 
-    private async Task HandleAssignClick(Guid operatorId)
+    private async Task HandleAssignClickAsync(Guid operatorId)
     {
-        await HandleAssign(operatorId);
+        await HandleAssignAsync(operatorId);
     }
 
-    private async Task HandleConfirmDelete()
+    private async Task HandleConfirmDeleteAsync()
     {
         try
         {
@@ -233,7 +233,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         }
     }
 
-    private async Task HandleConfirmClose()
+    private async Task HandleConfirmCloseAsync()
     {
         try
         {
@@ -266,7 +266,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         }
     }
 
-    private async Task HandleAssign(Guid operatorId)
+    private async Task HandleAssignAsync(Guid operatorId)
     {
         try
         {

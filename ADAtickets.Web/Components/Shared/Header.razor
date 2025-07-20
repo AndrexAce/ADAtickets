@@ -45,7 +45,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     }
     <FluentLabel Typo="Typography.Header" Color="Color.Fill">ADAtickets</FluentLabel>
     <FluentSpacer />
-    <FluentProfileMenu FullName="@accountName" ImageSize="5rem" EMail="@accountEmail" HeaderLabel="@loc["HeaderLabel"]" OnHeaderButtonClick="SignOut" HeaderButton="@loc["HeaderButton"]" FooterLink="@loc["FooterLink"]">
+    <FluentProfileMenu FullName="@accountName" ImageSize="5rem" EMail="@accountEmail" HeaderLabel="@loc["HeaderLabel"]" OnHeaderButtonClick="SignOutAsync" HeaderButton="@loc["HeaderButton"]" FooterLink="@loc["FooterLink"]">
         <StartTemplate>@accountName</StartTemplate>
     </FluentProfileMenu>
     <FluentButton Appearance="Appearance.Neutral" IconStart="@(new Icons.Regular.Size20.Alert())"/>
@@ -75,7 +75,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         }
     }
 
-    private async Task SignOut()
+    private async Task SignOutAsync()
     {
         var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
