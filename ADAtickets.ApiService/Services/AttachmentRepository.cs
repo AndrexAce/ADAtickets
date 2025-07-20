@@ -149,16 +149,14 @@ namespace ADAtickets.ApiService.Services
                 if (File.Exists(attachmentPath))
                 {
                     File.Delete(attachmentPath);
-
-                    return true;
                 }
+
+                return true;
             }
             catch
             {
-                // Do nothing
+                return false;
             }
-            
-            return false;
         }
 
         /// <summary>

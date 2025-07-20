@@ -230,11 +230,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 </FluentStack>
                 @if (!Content.IsEdit)
                 {
-                    <img src="@photoPath" style="max-width: 75vw; max-height: 75vh;" />
+                    <img src="@($"/{photoPath}")" style="max-width: 75vw; max-height: 75vh;" />
                 }
                 else
                 {
-                    <img src="@("adatickets.apiservice/" + photoPath)" style="max-width: 75vw; max-height: 75vh;" alt="@loc["TicketPhoto"]" />
+                    <img src="@($"adatickets.apiservice/{photoPath}")" style="max-width: 75vw; max-height: 75vh;" />
                 }
             </FluentStack>
         </FluentCard>
@@ -256,11 +256,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 </FluentStack>
                 @if (!Content.IsEdit)
                 {
-                    <video src="@videoPath" style="max-width: 75vw; max-height: 75vh;" controls></video>
+                    <video src="@($"/{videoPath}")" style="max-width: 75vw; max-height: 75vh;" controls></video>
                 }
                 else
                 {
-                    <video src="@("adatickets.apiservice/" + videoPath)" style="max-width: 75vw; max-height: 75vh;" controls></video>
+                    <video src="@($"adatickets.apiservice/{videoPath}")" style="max-width: 75vw; max-height: 75vh;" controls></video>
                 }
             </FluentStack>
         </FluentCard>
@@ -404,7 +404,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             await file.Stream!.CopyToAsync(fs);
             await file.Stream!.DisposeAsync();
 
-            photoPath = $"/uploads/temp/{fileName}";
+            photoPath = $"uploads/temp/{fileName}";
         }
     }
 
@@ -424,7 +424,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             await file.Stream!.CopyToAsync(fs);
             await file.Stream!.DisposeAsync();
 
-            videoPath = $"/uploads/temp/{fileName}";
+            videoPath = $"uploads/temp/{fileName}";
         }
     }
 
