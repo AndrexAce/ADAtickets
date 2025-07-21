@@ -201,4 +201,46 @@
   <data name="ClosePreview" xml:space="preserve">
     <value>Close</value>
   </data>
+  <data name="LoadingErrorToastTitle" xml:space="preserve">
+    <value>Data loading error</value>
+  </data>
+  <data name="LoadingErrorToastDetails" xml:space="preserve">
+    <value>An error occurred while trying to fetch data. Reach out the technical support.</value>
+  </data>
+  <data name="CreateProgressToastTitle" xml:space="preserve">
+    <value>Creation in progress</value>
+  </data>
+  <data name="UpdateProgressToastTitle" xml:space="preserve">
+    <value>Update in progress</value>
+  </data>
+  <data name="CreateProgressToastDetails" xml:space="preserve">
+    <value>The creation is in progress. It may take some minutes.</value>
+  </data>
+  <data name="UpdateProgressToastDetails" xml:space="preserve">
+    <value>The update is in progress. It may take some minutes.</value>
+  </data>
+  <data name="CreateErrorToastTitle" xml:space="preserve">
+    <value>Creation error</value>
+  </data>
+  <data name="UpdateErrorToastTitle" xml:space="preserve">
+    <value>Update error</value>
+  </data>
+  <data name="CreateErrorToastDetails" xml:space="preserve">
+    <value>An error occurred while creating the ticket. Retry.</value>
+  </data>
+  <data name="UpdateErrorToastDetails" xml:space="preserve">
+    <value>An error occurred while updating the ticket. Retry.</value>
+  </data>
+  <data name="CreateSuccessToastTitle" xml:space="preserve">
+    <value>Creation completed</value>
+  </data>
+  <data name="UpdateSuccessToastTitle" xml:space="preserve">
+    <value>Update completed</value>
+  </data>
+  <data name="CreateSuccessToastDetails" xml:space="preserve">
+    <value>The creation was completed successfully.</value>
+  </data>
+  <data name="UpdateSuccessToastDetails" xml:space="preserve">
+    <value>The update was completed successfully.</value>
+  </data>
 </root>

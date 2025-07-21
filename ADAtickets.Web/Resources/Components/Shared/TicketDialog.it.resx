@@ -201,4 +201,46 @@
   <data name="ClosePreview" xml:space="preserve">
     <value>Chiudi</value>
   </data>
+  <data name="LoadingErrorToastTitle" xml:space="preserve">
+    <value>Errore caricamento dati</value>
+  </data>
+  <data name="LoadingErrorToastDetails" xml:space="preserve">
+    <value>Si è verificato un errore mentre i dati venivano recuperati. Contatta il personale tecnico.</value>
+  </data>
+  <data name="CreateProgressToastTitle" xml:space="preserve">
+    <value>Creazione in corso</value>
+  </data>
+  <data name="UpdateProgressToastTitle" xml:space="preserve">
+    <value>Modifica in corso</value>
+  </data>
+  <data name="CreateProgressToastDetails" xml:space="preserve">
+    <value>La creazione è in corso. Potrebbe richiedere alcuni minuti.</value>
+  </data>
+  <data name="UpdateProgressToastDetails" xml:space="preserve">
+    <value>La modifica è in corso. Potrebbe richiedere alcuni minuti.</value>
+  </data>
+  <data name="CreateErrorToastTitle" xml:space="preserve">
+    <value>Errore creazione</value>
+  </data>
+  <data name="UpdateErrorToastTitle" xml:space="preserve">
+    <value>Errore modifica</value>
+  </data>
+  <data name="CreateErrorToastDetails" xml:space="preserve">
+    <value>Si è verificato un errore mentre il ticker veniva creato. Riprova.</value>
+  </data>
+  <data name="UpdateErrorToastDetails" xml:space="preserve">
+    <value>Si è verificato un errore mentre il ticker veniva modificato. Riprova.</value>
+  </data>
+  <data name="CreateSuccessToastTitle" xml:space="preserve">
+    <value>Creazione completata</value>
+  </data>
+  <data name="UpdateSuccessToastTitle" xml:space="preserve">
+    <value>Modifica completata</value>
+  </data>
+  <data name="CreateSuccessToastDetails" xml:space="preserve">
+    <value>La creazione è stata completata con successo.</value>
+  </data>
+  <data name="UpdateSuccessToastDetails" xml:space="preserve">
+    <value>La modifica è stata completata con successo.</value>
+  </data>
 </root>

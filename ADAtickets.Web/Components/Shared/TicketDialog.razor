@@ -24,6 +24,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @using ADAtickets.Web.Components.Pages
 @using ADAtickets.Web.Components.Utilities
 @using AutoMapper
+@using System.Net
 @using static ADAtickets.Web.Components.Utilities.Dialogs
 
 @inject IStringLocalizer<TicketDialog> loc
@@ -364,9 +365,94 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     private async Task HandleValidSubmitAsync()
     {
-        // TODO: save/update the ticket and the attachments on the server
+        var progressToastParameters = Toasts.ProgressToastParameters("CreateUpdate",
+            Content.IsEdit ? loc["UpdateProgressToastTitle"] : loc["CreateProgressToastTitle"],
+            Content.IsEdit ? loc["UpdateProgressToastDetails"] : loc["CreateProgressToastDetails"]
+        );
 
-        await Dialog.CloseAsync();
+        toastService.ShowProgressToast(progressToastParameters);
+
+        try
+        {
+            var ticketResponse = Content.IsEdit ?
+                await ticketsClient.PutAsync(Content.InitialTicketData!.Id, TicketRequest) :
+                await ticketsClient.PostAsync(TicketRequest);
+
+            // If the ticket was not created or updated, send an error
+            if (ticketResponse is (HttpStatusCode.Created, not null) or (HttpStatusCode.NoContent, null))
+            {
+                // Update the progress bar and the toast.
+                progressToastParameters.Content.Progress = 50;
+
+                toastService.UpdateToast("CreateUpdate", progressToastParameters);
+
+                // Create the attachments only if the ticket is being created for the first time.
+                if (!Content.IsEdit)
+                {
+                    await CreateAttachmentsAsync(ticketResponse.Item2!, progressToastParameters);
+                }
+
+                toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(
+                    Content.IsEdit ? loc["UpdateSuccessToastTitle"] : loc["CreateSuccessToastTitle"],
+                    Content.IsEdit ? loc["UpdateSuccessToastDetails"] : loc["CreateSuccessToastDetails"]
+                ));
+
+                await Dialog.CloseAsync();
+            }
+            else throw new HttpRequestException(ticketResponse.Item1.ToString(), null, ticketResponse.Item1);
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowCommunicationToast(Toasts.ErrorToastParameters(ex,
+                Content.IsEdit ? loc["UpdateErrorToastTitle"] : loc["CreateErrorToastTitle"],
+                Content.IsEdit ? loc["UpdateErrorToastDetails"] : loc["CreateErrorToastDetails"]
+            ));
+        }
+    }
+
+    private async Task CreateAttachmentsAsync(TicketResponseDto ticketResponse, ToastParameters<ProgressToastContent> progressToastParameters)
+    {
+        if (photoPath is not null)
+        {
+            var photoAttachment = new AttachmentRequestDto
+            {
+                Name = Path.GetFileName(photoPath),
+                TicketId = ticketResponse.Id,
+                Content = await File.ReadAllBytesAsync(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", photoPath)),
+            };
+
+            var photoResponse = await attachmentsClient.PostAsync(photoAttachment);
+
+            if (photoResponse is (HttpStatusCode.Created, not null))
+            {
+                // Update the progress bar and the toast.
+                progressToastParameters.Content.Progress = videoPath is null ? 100 : 75;
+
+                toastService.UpdateToast("Create", progressToastParameters);
+            }
+            else throw new HttpRequestException(photoResponse.Item1.ToString(), null, photoResponse.Item1);
+        }
+
+        if (videoPath is not null)
+        {
+            var videoAttachment = new AttachmentRequestDto
+            {
+                Name = Path.GetFileName(videoPath),
+                TicketId = ticketResponse.Id,
+                Content = await File.ReadAllBytesAsync(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", videoPath)),
+            };
+
+            var videoResponse = await attachmentsClient.PostAsync(videoAttachment);
+
+            if (videoResponse is (HttpStatusCode.Created, not null))
+            {
+                // Update the progress bar and the toast.
+                progressToastParameters.Content.Progress = 100;
+
+                toastService.UpdateToast("Create", progressToastParameters);
+            }
+            else throw new HttpRequestException(videoResponse.Item1.ToString(), null, videoResponse.Item1);
+        }
     }
 
     private async Task HandleCancelClickAsync()
