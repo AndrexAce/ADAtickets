@@ -332,8 +332,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             TicketRequest = mapper.Map<TicketRequestDto>(Content.InitialTicketData);
         }
 
-        FluentInputFile.ResourceLoadingBefore = loc["ResourceLoadingBefore"];
-        FluentInputFile.ResourceLoadingCompleted = loc["ResourceLoadingCompleted"];
+        SetInputFileTexts(loc);
 
         try
         {
@@ -357,6 +356,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         }
     }
 
+    private static void SetInputFileTexts(IStringLocalizer<TicketDialog> loc)
+    {
+        FluentInputFile.ResourceLoadingBefore = loc["ResourceLoadingBefore"];
+        FluentInputFile.ResourceLoadingCompleted = loc["ResourceLoadingCompleted"];
+    }
+
     private async Task<IEnumerable<UserResponseDto>> LoadUsersAsync(IEnumerable<KeyValuePair<string, string>> filters) => (await usersClient.GetAllAsync(filters)).Item2;
 
     private async Task<IEnumerable<PlatformResponseDto>> LoadPlatformsAsync() => (await platformsClient.GetAllAsync()).Item2;
@@ -365,10 +370,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     private async Task HandleValidSubmitAsync()
     {
-        var progressToastParameters = Toasts.ProgressToastParameters("CreateUpdate",
-            Content.IsEdit ? loc["UpdateProgressToastTitle"] : loc["CreateProgressToastTitle"],
-            Content.IsEdit ? loc["UpdateProgressToastDetails"] : loc["CreateProgressToastDetails"]
-        );
+        var progressToastParameters = Content.IsEdit ? 
+        Toasts.ProgressToastParameters("CreateUpdate", loc["UpdateProgressToastTitle"], loc["UpdateProgressToastDetails"]) :
+        Toasts.ProgressToastParameters("CreateUpdate", loc["CreateProgressToastTitle"], loc["CreateProgressToastDetails"]);
 
         toastService.ShowProgressToast(progressToastParameters);
 
@@ -390,12 +394,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 if (!Content.IsEdit)
                 {
                     await CreateAttachmentsAsync(ticketResponse.Item2!, progressToastParameters);
-                }
 
-                toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(
-                    Content.IsEdit ? loc["UpdateSuccessToastTitle"] : loc["CreateSuccessToastTitle"],
-                    Content.IsEdit ? loc["UpdateSuccessToastDetails"] : loc["CreateSuccessToastDetails"]
-                ));
+                    toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["CreateSuccessToastTitle"], loc["CreateSuccessToastDetails"]));
+                }
+                else
+                {
+                    toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["UpdateSuccessToastTitle"], loc["UpdateSuccessToastDetails"]));
+                }
 
                 await Dialog.CloseAsync();
             }
@@ -403,10 +408,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         }
         catch (Exception ex)
         {
-            toastService.ShowCommunicationToast(Toasts.ErrorToastParameters(ex,
-                Content.IsEdit ? loc["UpdateErrorToastTitle"] : loc["CreateErrorToastTitle"],
-                Content.IsEdit ? loc["UpdateErrorToastDetails"] : loc["CreateErrorToastDetails"]
-            ));
+            if (Content.IsEdit)
+            {
+                toastService.ShowCommunicationToast(Toasts.ErrorToastParameters(ex, loc["UpdateErrorToastTitle"], loc["UpdateErrorToastDetails"]));
+            }
+            else
+            {
+                toastService.ShowCommunicationToast(Toasts.ErrorToastParameters(ex, loc["CreateErrorToastTitle"], loc["CreateErrorToastDetails"]));
+            }
         }
     }
 
