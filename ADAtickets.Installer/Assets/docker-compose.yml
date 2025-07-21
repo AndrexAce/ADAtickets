@@ -33,7 +33,7 @@ services:
     networks:
       - network
     ports:
-      - "7214:8081"
+      - "7213:8080"
     volumes:
       - media-data:/app/media
 
@@ -47,7 +47,7 @@ services:
     networks:
       - network
     ports:
-      - "44321:8081"
+      - "44320:8080"
 
 networks:
   network:

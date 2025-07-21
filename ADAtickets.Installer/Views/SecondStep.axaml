@@ -57,14 +57,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 						</ComboBox>
 					</StackPanel>
 				</Grid>
-				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-					<TextBlock Text="{x:Static assets:Resources.SslCertificatePathLabel}" FontFamily="Segoe UI"/>
-					<TextBox Text="{Binding SslCertificatePath}" Watermark="/path/to/certificate.pfx" HorizontalAlignment="Stretch" Width="NaN"/>
-				</StackPanel>
-				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-					<TextBlock Text="{x:Static assets:Resources.SslCertificatePasswordLabel}" FontFamily="Segoe UI"/>
-					<TextBox Text="{Binding SslCertificatePassword}" PasswordChar="•" HorizontalAlignment="Stretch" Width="NaN"/>
-				</StackPanel>
 			</UniformGrid>
 		</StackPanel>
 		<Separator/>

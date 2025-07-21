@@ -147,11 +147,6 @@ internal partial class LastStep : UserControl
         string fileContent = Regex.Replace(templateContent, "^POSTGRESUSER=.*$", $"POSTGRESUSER={viewModel.DbUserName}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
         fileContent = Regex.Replace(fileContent, "^POSTGRESPASSWORD=.*$", $"POSTGRESPASSWORD={viewModel.DbPassword}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
 
-        // SSL certificate configuration
-        fileContent = Regex.Replace(fileContent, "^SSLCERTIFICATEDISKPATH=.*$", $"SSLCERTIFICATEDISKPATH={Path.GetDirectoryName(viewModel.SslCertificatePath)}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
-        fileContent = Regex.Replace(fileContent, "^SSLCERTIFICATENAME=.*$", $"SSLCERTIFICATENAME={Path.GetFileName(viewModel.SslCertificatePath)}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
-        fileContent = Regex.Replace(fileContent, "^SSLCERTIFICATEPASSWORD=.*$", $"SSLCERTIFICATEPASSWORD={viewModel.SslCertificatePassword}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
-
         // App tag
         string? apiTag = await Dispatcher.UIThread.InvokeAsync(() => viewModel.ApiVersion?.Content?.ToString());
         fileContent = Regex.Replace(fileContent, "^APITAG=.*$", $"APITAG={apiTag}", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));

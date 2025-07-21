@@ -24,6 +24,7 @@ using ADAtickets.Shared.Constants;
 using ADAtickets.Shared.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
@@ -176,12 +177,12 @@ namespace ADAtickets.ApiService
                 // Show detailed exception screen during development.
                 _ = app.UseDeveloperExceptionPage();
             }
-            else
+
+            // Configure forwarded headers for reverse proxy scenarios
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
-                // Add HTTPS redirection for production.
-                _ = app.UseHsts();
-                _ = app.UseHttpsRedirection();
-            }
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
 
             // Create an exception handler for APIs.
             _ = app.UseExceptionHandler();

@@ -24,6 +24,7 @@ using ADAtickets.Web.Components.Utilities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
@@ -150,11 +151,13 @@ namespace ADAtickets.Web
             {
                 // Use a more user-friendly error page.
                 _ = app.UseExceptionHandler("/error");
-
-                // Add HTTPS redirection for production.
-                _ = app.UseHsts();
-                _ = app.UseHttpsRedirection();
             }
+
+            // Configure forwarded headers for reverse proxy scenarios
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
 
             // Allows personalized status code pages.
             _ = app.UseStatusCodePagesWithRedirects("/error/{0}");

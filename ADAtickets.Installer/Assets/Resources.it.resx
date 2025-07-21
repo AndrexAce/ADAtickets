@@ -141,12 +141,6 @@
   <data name="Presentation" xml:space="preserve">
     <value>Prima di eseguire questo setup, leggi le istruzioni nel README.</value>
   </data>
-  <data name="SslCertificatePasswordLabel" xml:space="preserve">
-    <value>Password certificato SSL:</value>
-  </data>
-  <data name="SslCertificatePathLabel" xml:space="preserve">
-    <value>Percorso certificato SSL (locale):</value>
-  </data>
   <data name="Next" xml:space="preserve">
     <value>Continua</value>
   </data>

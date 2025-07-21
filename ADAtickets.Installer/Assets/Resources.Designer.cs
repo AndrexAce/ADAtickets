@@ -331,24 +331,6 @@ namespace ADAtickets.Installer.Assets {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SSL certificate password:.
-        /// </summary>
-        public static string SslCertificatePasswordLabel {
-            get {
-                return ResourceManager.GetString("SslCertificatePasswordLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to SSL certificate path (local):.
-        /// </summary>
-        public static string SslCertificatePathLabel {
-            get {
-                return ResourceManager.GetString("SslCertificatePathLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Still waiting for Docker startup. Did you launch it?.
         /// </summary>
         public static string StillWaitingDocker {
