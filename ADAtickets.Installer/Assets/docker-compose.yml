@@ -19,7 +19,7 @@ services:
   adatickets.redis:
     container_name: Cache
     command: redis-server --appendonly yes
-    image: redis:8.0.2
+    image: redis:8.0.3
     networks:
       - network
     volumes:
