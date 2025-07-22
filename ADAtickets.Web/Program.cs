@@ -80,7 +80,12 @@ namespace ADAtickets.Web
             {
                 options.ForwardDefaultSelector = context =>
                 {
-                    string authorization = context.Request.Headers[HeaderNames.Cookie]!;
+                    string? authorization = context.Request.Headers[HeaderNames.Cookie];
+
+                    if (authorization is null)
+                    {
+                        return null;
+                    }
 
                     return authorization.Contains(Scheme.ExternalCookieDefault) ? Scheme.ExternalOpenIdConnectDefault : Scheme.OpenIdConnectDefault;
                 };
