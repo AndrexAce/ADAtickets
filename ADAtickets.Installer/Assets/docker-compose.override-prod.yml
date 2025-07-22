@@ -7,7 +7,7 @@ services:
       # ASP.NET configuration variables
       - DOTNET_GENERATE_ASPNET_CERTIFICATE=false
       - ASPNETCORE_ENVIRONMENT=Production
-      - ASPNETCORE_URLS=http://+:8080
+      - HTTP_PORTS=8080
       # Database connection string
       - ConnectionStrings__PostgreSQL=Host=adatickets.postgresql;Port=5432;Database=adatickets;Username=${POSTGRESUSER:?error};Password=${POSTGRESPASSWORD:?error}
       - ConnectionStrings__Redis=adatickets.redis:6379
@@ -38,7 +38,7 @@ services:
       # ASP.NET configuration variables
       - DOTNET_GENERATE_ASPNET_CERTIFICATE=false
       - ASPNETCORE_ENVIRONMENT=Production
-      - ASPNETCORE_URLS=http://+:8080
+      - HTTP_PORTS=8080
       # Redis connection string
       - ConnectionStrings__Redis=adatickets.redis:6379
       # Entra configuration variables
