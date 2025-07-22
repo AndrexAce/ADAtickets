@@ -24,12 +24,14 @@ using ADAtickets.Shared.Constants;
 using ADAtickets.Shared.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
 using Microsoft.OpenApi.Models;
 using Scalar.AspNetCore;
+using StackExchange.Redis;
 using System.Net.Mime;
 using System.Reflection;
 using System.Text.Json.Serialization;
@@ -147,6 +149,15 @@ namespace ADAtickets.ApiService
 
             // Add automapping of entities.
             _ = builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
+
+            // Add Redis cache and data protection persistance layers
+            _ = builder.Services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = builder.Configuration.GetConnectionString(Service.Cache);
+            });
+
+            _ = builder.Services.AddDataProtection()
+                .PersistKeysToStackExchangeRedis(ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString(Service.Cache)!), "ApiService-DataProtection-Keys");
         }
 
         /// <summary>

@@ -36,7 +36,6 @@ services:
       - "7213:8080"
     volumes:
       - media-data:/app/media
-      - apiservice-keys:/home/app/.aspnet/DataProtection-Keys 
 
   adatickets.web:
     container_name: Web
@@ -49,8 +48,6 @@ services:
       - network
     ports:
       - "44320:8080"
-    volumes:
-      - web-keys:/home/app/.aspnet/DataProtection-Keys
 
 networks:
   network:
@@ -60,5 +57,3 @@ volumes:
   database-data:
   redis-data:
   media-data:
-  apiservice-keys:
-  web-keys:

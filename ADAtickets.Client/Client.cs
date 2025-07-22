@@ -120,18 +120,14 @@ namespace ADAtickets.Client
             // Fetch the logged in user
             ClaimsPrincipal user = (await authenticationStateProvider.GetAuthenticationStateAsync()).User;
 
-            // Build the filters from the query string if provided
-            string query = filters != null
-                ? "?" + string.Join("&", filters.Select(f => $"{Uri.EscapeDataString(f.Key)}={Uri.EscapeDataString(f.Value)}"))
-                : string.Empty;
-
             // Call the APIs with the permissions granted to the user
             HttpResponseMessage response = await downstreamApi.CallApiForUserAsync(
                 serviceName: InferServiceName(user),
                 downstreamApiOptionsOverride: options =>
                 {
                     options.HttpMethod = nameof(HttpMethod.Get);
-                    options.RelativePath = $"{Endpoint}{query}";
+                    options.RelativePath = Endpoint;
+                    options.ExtraQueryParameters = filters?.ToDictionary();
                     options.AcquireTokenOptions.AuthenticationOptionsName = InferAuthenticationScheme(user);
                 },
                 user: user);

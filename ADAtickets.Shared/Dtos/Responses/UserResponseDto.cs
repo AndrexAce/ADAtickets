@@ -65,36 +65,36 @@ namespace ADAtickets.Shared.Dtos.Responses
         /// <summary>
         /// The collection of ids of tickets created by the user (if they are a user, otherwise it must be empty).
         /// </summary>
-        public ICollection<Guid> CreatedTickets { get; init; } = [];
+        public List<Guid> CreatedTickets { get; init; } = [];
 
         /// <summary>
         /// The collection of ids of tickets assigned to the user (if they are an operator, otherwise it must be empty).
         /// </summary>
-        public ICollection<Guid> AssignedTickets { get; init; } = [];
+        public List<Guid> AssignedTickets { get; init; } = [];
 
         /// <summary>
         /// The collection of ids of replies sent by the user to any ticket.
         /// </summary>
-        public ICollection<Guid> Replies { get; init; } = [];
+        public List<Guid> Replies { get; init; } = [];
 
         /// <summary>
         /// The collection of ids of edits made by the user to any ticket.
         /// </summary>
-        public ICollection<Guid> Edits { get; init; } = [];
+        public List<Guid> Edits { get; init; } = [];
 
         /// <summary>
         /// The collection of ids of platforms the user prefers (if they are an operator, otherwise it must be empty).
         /// </summary>
-        public ICollection<Guid> PreferredPlatforms { get; init; } = [];
+        public List<Guid> PreferredPlatforms { get; init; } = [];
 
         /// <summary>
         /// The collection of ids of notifications the user triggered the sending of.
         /// </summary>
-        public ICollection<Guid> SentNotifications { get; init; } = [];
+        public List<Guid> SentNotifications { get; init; } = [];
 
         /// <summary>
         /// The collection of ids of notifications the user received.
         /// </summary>
-        public ICollection<Guid> ReceivedNotifications { get; init; } = [];
+        public List<Guid> ReceivedNotifications { get; init; } = [];
     }
 }

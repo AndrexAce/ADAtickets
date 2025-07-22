@@ -10,6 +10,7 @@ services:
       - ASPNETCORE_URLS=http://+:8080
       # Database connection string
       - ConnectionStrings__PostgreSQL=Host=adatickets.postgresql;Port=5432;Database=adatickets;Username=${POSTGRESUSER:?error};Password=${POSTGRESPASSWORD:?error}
+      - ConnectionStrings__Redis=adatickets.redis:6379
       # Entra configuration variables
       - Entra__Instance=https://login.microsoftonline.com
       - Entra__TenantId=${TENANTID:?error}

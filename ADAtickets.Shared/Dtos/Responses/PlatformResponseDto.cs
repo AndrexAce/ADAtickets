@@ -38,11 +38,11 @@ namespace ADAtickets.Shared.Dtos.Responses
         /// <summary>
         /// The collection of ids of the tickets related to the platform.
         /// </summary>
-        public ICollection<Guid> Tickets { get; init; } = [];
+        public List<Guid> Tickets { get; init; } = [];
 
         /// <summary>
         /// The collection of ids of the users who preferred the platform.
         /// </summary>
-        public ICollection<Guid> UsersPreferred { get; init; } = [];
+        public List<Guid> UsersPreferred { get; init; } = [];
     }
 }

@@ -90,7 +90,7 @@ namespace ADAtickets.Shared.Dtos.Responses
         /// <summary>
         /// The collection of ids of edits made to the ticket.
         /// </summary>
-        public ICollection<Guid> Edits { get; init; } = [];
+        public List<Guid> Edits { get; init; } = [];
 
         /// <summary>
         /// The last update date of the ticket (from related entity <see cref="Edit"/>).
@@ -100,16 +100,17 @@ namespace ADAtickets.Shared.Dtos.Responses
         /// <summary>
         /// The collection of ids of replies sent to the ticket.
         /// </summary>
-        public ICollection<Guid> Replies { get; init; } = [];
+        public List<Guid> Replies { get; init; } = [];
 
         /// <summary>
         /// The collection of ids of attachments attached to the ticket.
         /// </summary>
-        public ICollection<Guid> Attachments { get; init; } = [];
+
+        public List<Guid> Attachments { get; init; } = [];
 
         /// <summary>
         /// The collection of ids of notifications related to the ticket.
         /// </summary>
-        public ICollection<Guid> Notifications { get; init; } = [];
+        public List<Guid> Notifications { get; init; } = [];
     }
 }

@@ -84,7 +84,7 @@ namespace ADAtickets.Web
 
                     if (authorization is null)
                     {
-                        return null;
+                        return Scheme.PolicySchemeDefault;
                     }
 
                     return authorization.Contains(Scheme.ExternalCookieDefault) ? Scheme.ExternalOpenIdConnectDefault : Scheme.OpenIdConnectDefault;
@@ -98,7 +98,7 @@ namespace ADAtickets.Web
             });
 
             _ = builder.Services.AddDataProtection()
-                .PersistKeysToStackExchangeRedis(ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString(Service.Cache)!), "DataProtection-Keys");
+                .PersistKeysToStackExchangeRedis(ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString(Service.Cache)!), "Web-DataProtection-Keys");
 
             _ = builder.Services.AddCascadingAuthenticationState();
 
@@ -151,6 +151,10 @@ namespace ADAtickets.Web
             {
                 // Use a detailed exception page.
                 _ = app.UseDeveloperExceptionPage();
+
+                // Require secure connection to allow EntraID login/logout.
+                _ = app.UseHsts();
+                _ = app.UseHttpsRedirection();
             }
             else
             {

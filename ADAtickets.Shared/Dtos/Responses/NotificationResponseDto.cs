@@ -53,6 +53,6 @@ namespace ADAtickets.Shared.Dtos.Responses
         /// <summary>
         /// The collection of ids of the users the notification was sent to.
         /// </summary>
-        public ICollection<Guid> Recipients { get; init; } = [];
+        public List<Guid> Recipients { get; init; } = [];
     }
 }
