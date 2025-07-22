@@ -91,6 +91,8 @@ jobs:
         run: dotnet build ADAtickets.sln -c Release --no-incremental --property:postgresUsername=$POSTGRES_USERNAME --property:postgresPassword=$POSTGRES_PASSWORD
 
       - name: Run tests
+        env:
+          ASPNETCORE_ENVIRONMENT: Staging
         run: |
           coverlet ./ADAtickets.ApiService.Tests/bin/Release/net9.0/ADAtickets.ApiService.Tests.dll \
           --target "dotnet" \

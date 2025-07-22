@@ -156,8 +156,11 @@ namespace ADAtickets.ApiService
                 options.Configuration = builder.Configuration.GetConnectionString(Service.Cache);
             });
 
-            _ = builder.Services.AddDataProtection()
-                .PersistKeysToStackExchangeRedis(ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString(Service.Cache)!), "ApiService-DataProtection-Keys");
+            if (!builder.Environment.IsStaging())
+            {
+                _ = builder.Services.AddDataProtection()
+                    .PersistKeysToStackExchangeRedis(ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString(Service.Cache)!), "ApiService-DataProtection-Keys");
+            }
         }
 
         /// <summary>
