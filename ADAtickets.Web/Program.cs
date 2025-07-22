@@ -24,6 +24,7 @@ using ADAtickets.Web.Components.Utilities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.Identity.Web;
@@ -84,7 +85,7 @@ namespace ADAtickets.Web
 
                     if (authorization is null)
                     {
-                        return Scheme.PolicySchemeDefault;
+                        return Scheme.OpenIdConnectDefault;
                     }
 
                     return authorization.Contains(Scheme.ExternalCookieDefault) ? Scheme.ExternalOpenIdConnectDefault : Scheme.OpenIdConnectDefault;
@@ -107,6 +108,12 @@ namespace ADAtickets.Web
 
             // Add access to the HTTP context.
             _ = builder.Services.AddHttpContextAccessor();
+
+            // Configure static web assets for production.
+            if (builder.Environment.IsProduction())
+            {
+                StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configuration);
+            }
 
             // Add localization services.
             _ = builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
