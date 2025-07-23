@@ -35,6 +35,8 @@ internal sealed class MainViewModel : ReactiveObject
     private UserControl _currentView;
     private string? _dbUserName;
     private string? _dbPassword;
+    private string? _sslCertificatePath;
+    private string? _sslCertificatePassword;
     private ComboBoxItem? _apiVersion;
     private ComboBoxItem? _webVersion;
     private string? _devOpsOrganizationName;
@@ -72,6 +74,25 @@ internal sealed class MainViewModel : ReactiveObject
     {
         get => _dbPassword;
         set => this.RaiseAndSetIfChanged(ref _dbPassword, value);
+    }
+
+    [Required(ErrorMessageResourceType = typeof(Assets.Resources),
+              ErrorMessageResourceName = "FieldRequired")]
+    [RegularExpression(@"^[a-zA-Z0-9\/\\_.~:-]+$",
+                     ErrorMessageResourceType = typeof(Assets.Resources),
+                     ErrorMessageResourceName = "InvalidPath")]
+    public string? SslCertificatePath
+    {
+        get => _sslCertificatePath;
+        set => this.RaiseAndSetIfChanged(ref _sslCertificatePath, value);
+    }
+
+    [Required(ErrorMessageResourceType = typeof(Assets.Resources),
+              ErrorMessageResourceName = "FieldRequired")]
+    public string? SslCertificatePassword
+    {
+        get => _sslCertificatePassword;
+        set => this.RaiseAndSetIfChanged(ref _sslCertificatePassword, value);
     }
 
     [Required(ErrorMessageResourceType = typeof(Assets.Resources),
@@ -314,6 +335,13 @@ internal sealed class MainViewModel : ReactiveObject
 
         context.MemberName = nameof(DbPassword);
         isValid &= Validator.TryValidateProperty(DbPassword, context, []);
+
+        context.MemberName = nameof(SslCertificatePath);
+        isValid &= Validator.TryValidateProperty(SslCertificatePath, context, []);
+        isValid &= File.Exists(SslCertificatePath);
+
+        context.MemberName = nameof(SslCertificatePassword);
+        isValid &= Validator.TryValidateProperty(SslCertificatePassword, context, []);
 
         context.MemberName = nameof(ApiVersion);
         isValid &= Validator.TryValidateProperty(ApiVersion, context, []);

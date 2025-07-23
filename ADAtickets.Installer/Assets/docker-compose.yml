@@ -47,7 +47,7 @@ services:
     networks:
       - network
     ports:
-      - "44320:8080"
+      - "44321:8081"
 
 networks:
   network:

@@ -38,7 +38,9 @@ services:
       # ASP.NET configuration variables
       - DOTNET_GENERATE_ASPNET_CERTIFICATE=false
       - ASPNETCORE_ENVIRONMENT=Production
-      - HTTP_PORTS=8080
+      - HTTPS_PORTS=8081
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${SSLCERTIFICATEPASSWORD:?error}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/${SSLCERTIFICATENAME:?error}
       # Redis connection string
       - ConnectionStrings__Redis=adatickets.redis:6379
       # Entra configuration variables
@@ -70,4 +72,5 @@ services:
       - ExternalADAticketsAPI__Scopes__0=api://${EXTERNALAPIAPPID:?error}/Read
       - ExternalADAticketsAPI__Scopes__1=api://${EXTERNALAPIAPPID:?error}/Write
     volumes:
+      - ${SSLCERTIFICATEDISKPATH:?error}:/https:ro
       - ${WEBAUTHCERTIFICATEDISKPATH:?error}:/certs:ro
