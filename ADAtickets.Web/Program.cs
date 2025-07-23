@@ -25,7 +25,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
@@ -158,10 +157,6 @@ namespace ADAtickets.Web
             {
                 // Use a detailed exception page.
                 _ = app.UseDeveloperExceptionPage();
-
-                // Require secure connection to allow EntraID login/logout.
-                _ = app.UseHsts();
-                _ = app.UseHttpsRedirection();
             }
             else
             {
@@ -169,11 +164,9 @@ namespace ADAtickets.Web
                 _ = app.UseExceptionHandler("/error");
             }
 
-            // Configure forwarded headers for reverse proxy scenarios
-            app.UseForwardedHeaders(new ForwardedHeadersOptions
-            {
-                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-            });
+            // Require secure connection to allow EntraID login/logout.
+            _ = app.UseHsts();
+            _ = app.UseHttpsRedirection();
 
             // Allows personalized status code pages.
             _ = app.UseStatusCodePagesWithRedirects("/error/{0}");
