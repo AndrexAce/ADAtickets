@@ -66,7 +66,7 @@ namespace ADAtickets.ApiService
         public static void ConfigureServices(WebApplicationBuilder builder)
         {
             // Add the DBContext to execute queries against the database.
-            _ = builder.Services.AddDbContextPool<ADAticketsDbContext>(options =>
+            _ = builder.Services.AddDbContext<ADAticketsDbContext>(options =>
             {
                 // Configure the DBContext to use PostgreSQL.
                 _ = options.UseNpgsql(builder.Configuration.GetConnectionString(Service.Database), options =>

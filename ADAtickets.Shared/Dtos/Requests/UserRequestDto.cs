@@ -49,8 +49,7 @@ namespace ADAtickets.Shared.Dtos.Requests
         /// <summary>
         /// The phone number of the user.
         /// </summary>
-        [Required]
-        public string PhoneNumber { get; set; } = string.Empty;
+        public string? PhoneNumber { get; set; } = null;
 
         /// <summary>
         /// Whether the user enabled the reception of external notifications via email.

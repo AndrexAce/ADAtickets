@@ -26,21 +26,12 @@ namespace ADAtickets.ApiService.Configs
     /// <para>Represents the Entity Framework Core database context for the ADAtickets application.</para>
     /// <para>This context is used to interact with the database and manage the application entities.</para>
     /// </summary>
-    internal class ADAticketsDbContext : DbContext
+    internal class ADAticketsDbContext(DbContextOptions<ADAticketsDbContext> options) : DbContext(options)
     {
         /// <summary>
         /// Paramteless constructor for testing purposes.
         /// </summary>
-        public ADAticketsDbContext() { }
-
-        /// <summary>
-        /// Costructor to use dependency injection with ASP.NET.
-        /// </summary>
-        /// <param name="options">The database configuration options.</param>
-        public ADAticketsDbContext(DbContextOptions<ADAticketsDbContext> options)
-            : base(options)
-        {
-        }
+        public ADAticketsDbContext() : this(new DbContextOptions<ADAticketsDbContext>()) { }
 
         /// <summary>
         /// Gets or sets the DbSet for managing <see cref="Attachment"/> entities.

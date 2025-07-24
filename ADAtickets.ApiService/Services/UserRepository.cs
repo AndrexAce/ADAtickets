@@ -69,7 +69,7 @@ namespace ADAtickets.ApiService.Services
                         break;
 
                     case nameof(User.PhoneNumber):
-                        query = query.Where(u => u.PhoneNumber.Contains(filter.Value));
+                        query = query.Where(u => u.PhoneNumber != null && u.PhoneNumber.Contains(filter.Value));
                         break;
 
                     case nameof(User.AreEmailNotificationsEnabled) when bool.TryParse(filter.Value, out bool outBool):

@@ -66,9 +66,8 @@ namespace ADAtickets.Shared.Models
         /// <summary>
         /// The phone number of the user.
         /// </summary>
-        [Required]
         [Phone]
-        public string PhoneNumber { get; set; } = string.Empty;
+        public string? PhoneNumber { get; set; } = null;
 
         /// <summary>
         /// Whether the user enabled the reception of external notifications via email.
@@ -87,7 +86,6 @@ namespace ADAtickets.Shared.Models
         /// </summary>
         [Required]
         public UserType Type { get; set; } = UserType.User;
-
 
         /// <summary>
         /// The collection of tickets created by the user (if they are a user, otherwise it must be empty).

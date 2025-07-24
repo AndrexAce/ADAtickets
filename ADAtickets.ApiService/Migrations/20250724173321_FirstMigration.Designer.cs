@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ADAtickets.ApiService.Migrations
 {
     [DbContext(typeof(ADAticketsDbContext))]
-    [Migration("20250617195811_FirstMigration")]
+    [Migration("20250724173321_FirstMigration")]
     partial class FirstMigration
     {
         /// <inheritdoc />
@@ -21,7 +21,7 @@ namespace ADAtickets.ApiService.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.6")
+                .HasAnnotation("ProductVersion", "9.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "priority", new[] { "high", "low", "medium" });
@@ -341,7 +341,6 @@ namespace ADAtickets.ApiService.Migrations
                         .HasColumnName("name");
 
                     b.Property<string>("PhoneNumber")
-                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("phone_number");
 
