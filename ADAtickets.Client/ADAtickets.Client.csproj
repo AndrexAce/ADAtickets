@@ -4,7 +4,6 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	<RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
 	<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	<Title>ADAtickets API Client</Title>
 	<Authors>AndrexAce</Authors>
