@@ -19,9 +19,9 @@
  */
 using ADAtickets.Shared.Constants;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI.Areas.MicrosoftIdentity.Controllers;
 using System.Diagnostics.CodeAnalysis;
-using System.Security.Claims;
 using Controller = Microsoft.AspNetCore.Mvc.Controller;
 
 namespace ADAtickets.Web.Controllers
@@ -37,14 +37,14 @@ namespace ADAtickets.Web.Controllers
         /// Signs out the user and redirects to the signed-out page.
         /// </summary>
         /// <remarks>The <see cref="AccountController.SignOut(string)"/> method is not used since it does not allow to specify a custom cookie signout scheme.</remarks>
-        /// <returns></returns>
+        /// <returns>The result of the signout operation.</returns>
         [Experimental("ADAticketsWeb001")]
         [HttpGet]
         public new IActionResult SignOut()
         {
-            Claim? aud = HttpContext.User.FindFirst("http://schemas.microsoft.com/identity/claims/tenantid");
+            string? tid = HttpContext.User.GetHomeTenantId();
 
-            string scheme = aud?.Value == configuration["Entra:TenantId"] ? Scheme.OpenIdConnectDefault : Scheme.ExternalOpenIdConnectDefault;
+            string scheme = tid == configuration["Entra:TenantId"] ? Scheme.OpenIdConnectDefault : Scheme.ExternalOpenIdConnectDefault;
 
             return SignOut(
                  scheme == Scheme.OpenIdConnectDefault ? Scheme.CookieDefault : Scheme.ExternalCookieDefault,

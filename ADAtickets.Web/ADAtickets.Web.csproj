@@ -27,4 +27,8 @@
     <ProjectReference Include="..\ADAtickets.Client\ADAtickets.Client.csproj" />
     <ProjectReference Include="..\ADAtickets.Shared\ADAtickets.Shared.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Extensions\" />
+  </ItemGroup>
 </Project>

@@ -17,12 +17,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @page "/"
 
+@using System.Net
+@using System.Security.Claims
+@using ADAtickets.Client
 @using ADAtickets.Shared.Constants
+@using ADAtickets.Shared.Dtos.Requests
+@using ADAtickets.Shared.Dtos.Responses
+@using ADAtickets.Shared.Extensions
+@using ADAtickets.Shared.Models
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 
 @inject NavigationManager navigationManager
 @inject AuthenticationStateProvider authenticationStateProvider
+@inject UsersClient usersClient
 
 @attribute [AllowAnonymous]
 
@@ -34,13 +42,57 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
-        if (user?.Identity?.IsAuthenticated == true)
+        if (user.IsAuthenticated())
         {
-            navigationManager.NavigateTo("/my-tickets", true);
+            try
+            {
+                await CheckUserAgainstDatabase(authState.User);
+
+                navigationManager.NavigateTo("/my-tickets", true);
+            }
+            catch
+            {
+                navigationManager.NavigateTo("/error", true);
+            }
         }
         else
         {
             navigationManager.NavigateTo("/welcome", true);
         }
+    }
+
+    private async Task CheckUserAgainstDatabase(ClaimsPrincipal user)
+    {
+        var userEmail = user.GetEmail()!;
+
+        var queryParameters = new Dictionary<string, string> { { nameof(UserResponseDto.Email), userEmail } };
+
+        var getResponse = await usersClient.GetAllAsync(queryParameters);
+
+        // If the list of users could not be retrieved, throw an error.
+        if (getResponse is (HttpStatusCode.OK, not null))
+        {
+            // If the user already exists, return. Otherwise, try create the user.
+            if (!getResponse.Item2.Any())
+            {
+
+                var postResponse = await usersClient.PostAsync(new UserRequestDto
+                    {
+                        Email = userEmail,
+                        Name = user.GetName()!,
+                        Surname = user.GetSurname()!,
+                        Type = UserType.User,
+                        AreEmailNotificationsEnabled = false,
+                        ArePhoneNotificationsEnabled = false
+                    });
+
+                // If the user could not be created, throw an error.
+                if (postResponse is not (HttpStatusCode.Created, not null))
+                {
+                    throw new HttpRequestException(postResponse.Item1.ToString(), null, postResponse.Item1);
+                }
+            }
+        }
+        else throw new HttpRequestException(getResponse.Item1.ToString(), null, getResponse.Item1);
     }
 }

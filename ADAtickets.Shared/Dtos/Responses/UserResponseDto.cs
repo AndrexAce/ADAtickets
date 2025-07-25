@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using ADAtickets.Shared.Models;
+using System.Text.Json.Serialization;
 
 namespace ADAtickets.Shared.Dtos.Responses
 {
@@ -60,6 +61,7 @@ namespace ADAtickets.Shared.Dtos.Responses
         /// <summary>
         /// The role of the user in the system.
         /// </summary>
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public UserType Type { get; init; } = UserType.User;
 
         /// <summary>

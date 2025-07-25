@@ -21,6 +21,7 @@ using ADAtickets.ApiService.Configs;
 using ADAtickets.ApiService.Repositories;
 using ADAtickets.ApiService.Services;
 using ADAtickets.Shared.Constants;
+using ADAtickets.Shared.Extensions;
 using ADAtickets.Shared.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -107,7 +108,11 @@ namespace ADAtickets.ApiService
                         };
                 })
                 .AddXmlSerializerFormatters()
-                .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(allowIntegerValues: false));
+                    options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+                });
 
             // Add Swagger documentation for the APIs.
             _ = builder.Services.AddEndpointsApiExplorer();
@@ -212,22 +217,28 @@ namespace ADAtickets.ApiService
             _ = authorizationBuilder.AddDefaultPolicy(Policy.AdminOnly, policy =>
             {
                 _ = policy.RequireAuthenticatedUser()
-                // Directory roles are exposed with the "wids" claim in the ID token.
-                // The value of this claim is the standard ID for the Azure DevOps Administrator Entra directory role.
-                .RequireClaim("wids", "e3973bdf-4987-49ae-837a-ba8e231c7286")
-                .RequireClaim("utid", configuration["Entra:TenantId"]!)
+                .RequireAssertion(context =>
+                {
+                    return context.User.IsDevOpsAdmin() && context.User.GetHomeTenantId() == configuration["Entra:TenantId"];
+                })
                 .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault, Scheme.ExternalOpenIdConnectDefault);
             })
             .AddPolicy(Policy.UserOnly, policy =>
             {
                 _ = policy.RequireAuthenticatedUser()
-                .RequireClaim("utid", configuration["ExternalEntra:TenantId"]!)
+                .RequireAssertion(context =>
+                {
+                    return context.User.GetHomeTenantId() == configuration["ExternalEntra:TenantId"];
+                })
                 .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault, Scheme.ExternalOpenIdConnectDefault);
             })
             .AddPolicy(Policy.OperatorOrAdmin, policy =>
             {
                 _ = policy.RequireAuthenticatedUser()
-                .RequireClaim("utid", configuration["Entra:TenantId"]!)
+                .RequireAssertion(context =>
+                {
+                    return context.User.GetHomeTenantId() == configuration["Entra:TenantId"];
+                })
                 .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault, Scheme.ExternalOpenIdConnectDefault);
             })
             .AddPolicy(Policy.Everyone, policy =>

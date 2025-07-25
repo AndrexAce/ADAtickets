@@ -19,6 +19,7 @@
  */
 using ADAtickets.Shared.Models;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace ADAtickets.Shared.Dtos.Requests
 {
@@ -67,6 +68,7 @@ namespace ADAtickets.Shared.Dtos.Requests
         /// The role of the user in the system.
         /// </summary>
         [Required]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public UserType Type { get; set; } = UserType.User;
     }
 }

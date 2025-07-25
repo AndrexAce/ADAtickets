@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
 @using System.Globalization
 @using ADAtickets.Shared.Constants
+@using ADAtickets.Shared.Extensions
 @using ADAtickets.Web.Components.Layout
 @using ADAtickets.Web.Components.Shared
 @using Microsoft.AspNetCore.Authorization
@@ -72,7 +73,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
-        if (user?.Identity?.IsAuthenticated == true)
+        if (user.IsAuthenticated())
         {
             navigationManager.NavigateTo("/my-tickets", true);
         }

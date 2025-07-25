@@ -18,9 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using ADAtickets.Shared.Models;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace ADAtickets.Shared.Dtos.Requests
 {
@@ -46,14 +45,14 @@ namespace ADAtickets.Shared.Dtos.Requests
         /// The status the ticket was in before the edit.
         /// </summary>
         [Required]
-        [JsonConverter(typeof(StringEnumConverter))]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public Status OldStatus { get; set; } = Status.Unassigned;
 
         /// <summary>
         /// The status the ticket will be after the edit.
         /// </summary>
         [Required]
-        [JsonConverter(typeof(StringEnumConverter))]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public Status NewStatus { get; set; } = Status.Unassigned;
 
         /// <summary>

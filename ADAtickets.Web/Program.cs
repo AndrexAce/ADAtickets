@@ -19,6 +19,7 @@
  */
 using ADAtickets.Client.Extensions;
 using ADAtickets.Shared.Constants;
+using ADAtickets.Shared.Extensions;
 using ADAtickets.Web.Components;
 using ADAtickets.Web.Components.Utilities;
 using Microsoft.AspNetCore.Authentication;
@@ -199,22 +200,28 @@ namespace ADAtickets.Web
             _ = authorizationBuilder.AddDefaultPolicy(Policy.AdminOnly, policy =>
             {
                 _ = policy.RequireAuthenticatedUser()
-                // Directory roles are exposed with the "wids" claim in the ID token.
-                // The value of this claim is the standard ID for the Azure DevOps Administrator Entra directory role.
-                .RequireClaim("wids", "e3973bdf-4987-49ae-837a-ba8e231c7286")
-                .RequireClaim("utid", configuration["Entra:TenantId"]!)
+                .RequireAssertion(context =>
+                {
+                    return context.User.IsDevOpsAdmin() && context.User.GetHomeTenantId() == configuration["Entra:TenantId"];
+                })
                 .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault, Scheme.ExternalOpenIdConnectDefault);
             })
             .AddPolicy(Policy.UserOnly, policy =>
             {
                 _ = policy.RequireAuthenticatedUser()
-                .RequireClaim("utid", configuration["ExternalEntra:TenantId"]!)
+                .RequireAssertion(context =>
+                {
+                    return context.User.GetHomeTenantId() == configuration["ExternalEntra:TenantId"];
+                })
                 .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault, Scheme.ExternalOpenIdConnectDefault);
             })
             .AddPolicy(Policy.OperatorOrAdmin, policy =>
             {
                 _ = policy.RequireAuthenticatedUser()
-                .RequireClaim("utid", configuration["Entra:TenantId"]!)
+                .RequireAssertion(context =>
+                {
+                    return context.User.GetHomeTenantId() == configuration["Entra:TenantId"];
+                })
                 .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault, Scheme.ExternalOpenIdConnectDefault);
             })
             .AddPolicy(Policy.Everyone, policy =>

@@ -18,8 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using ADAtickets.Shared.Models;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+using System.Text.Json.Serialization;
 
 namespace ADAtickets.Shared.Dtos.Responses
 {
@@ -32,7 +31,7 @@ namespace ADAtickets.Shared.Dtos.Responses
         /// <summary>
         /// The type of user request bound to the ticket.
         /// </summary>
-        [JsonConverter(typeof(StringEnumConverter))]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public TicketType Type { get; init; } = TicketType.Bug;
 
         /// <summary>
@@ -53,13 +52,13 @@ namespace ADAtickets.Shared.Dtos.Responses
         /// <summary>
         /// The urgency of the ticket.
         /// </summary>
-        [JsonConverter(typeof(StringEnumConverter))]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public Priority Priority { get; init; } = Priority.Low;
 
         /// <summary>
         /// The status of the ticket.
         /// </summary>
-        [JsonConverter(typeof(StringEnumConverter))]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public Status Status { get; init; } = Status.Unassigned;
 
         /// <summary>

@@ -17,9 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @inherits ComponentBase
 
-@using ADAtickets.Shared.Constants
-@using Microsoft.AspNetCore.Components.Authorization
 @using System.Security.Claims
+@using ADAtickets.Client.Extensions
+@using ADAtickets.Shared.Constants
+@using ADAtickets.Shared.Extensions
+@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.Graph.Models
 @using Microsoft.Identity.Abstractions
 
@@ -65,10 +67,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
             var user = authState.User;
 
-            if (user?.Identity?.IsAuthenticated == true)
+            if (user.IsAuthenticated())
             {
-                accountName = user.FindFirstValue("name") ?? user.Identity.Name;
-                accountEmail = user.Identity.Name;
+                accountName = user.GetFullName();
+                accountEmail = user.GetEmail();
 
                 StateHasChanged();
             }
@@ -80,7 +82,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
-        if (user?.Identity?.IsAuthenticated == true)
+        if (user.IsAuthenticated())
         {
             navigationManager.NavigateTo("CustomAccount/SignOut", true);
         }

@@ -19,10 +19,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @layout MainLayout
 
 @using System.Globalization
+@using System.Net
+@using System.Security.Claims
 @using ADAtickets.Client
 @using ADAtickets.Shared.Constants
 @using ADAtickets.Shared.Dtos.Requests
 @using ADAtickets.Shared.Dtos.Responses
+@using ADAtickets.Shared.Extensions
 @using ADAtickets.Shared.Models
 @using ADAtickets.Web.Components.Layout
 @using ADAtickets.Web.Components.Shared
@@ -31,8 +34,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @using Humanizer
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
-@using System.Net
-@using System.Security.Claims
+@using Microsoft.Identity.Web
 @using static ADAtickets.Web.Components.Utilities.Dialogs
 
 @inject IStringLocalizer<MyTickets> loc
@@ -628,10 +630,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     private IEnumerable<KeyValuePair<string, string>> GetBaseFilterFromUser(ClaimsPrincipal currentUser)
     {
-        if (currentUser?.Identity?.IsAuthenticated == true)
+        if (currentUser.IsAuthenticated())
         {
-            return currentUser.FindFirstValue("tid") == configuration["Entra:TenantId"] ?
-            [] : new Dictionary<string, string> { { nameof(TicketResponseDto.CreatorUserId), currentUser.FindFirstValue("uid") ?? "" } };
+            return currentUser.GetHomeTenantId() == configuration["Entra:TenantId"] ?
+            [] : new Dictionary<string, string> { { nameof(TicketResponseDto.CreatorUserId), currentUser.GetHomeTenantId() ?? "" } };
         }
 
         return [];
@@ -643,10 +645,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         {
             "AllTab" => [],
             "UnassignedTab" => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.Unassigned) } },
-            "ToReply" when currentUser.FindFirstValue("tid") == configuration["Entra:TenantId"] => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingOperator) } },
-            "ToReply" when currentUser.FindFirstValue("tid") != configuration["Entra:TenantId"] => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingUser) } },
-            "WaitingTab" when currentUser.FindFirstValue("tid") == configuration["Entra:TenantId"] => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingUser) } },
-            "WaitingTab" when currentUser.FindFirstValue("tid") != configuration["Entra:TenantId"] => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingOperator) } },
+            "ToReply" when currentUser.GetHomeTenantId() == configuration["Entra:TenantId"] => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingOperator) } },
+            "ToReply" when currentUser.GetHomeTenantId() != configuration["Entra:TenantId"] => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingUser) } },
+            "WaitingTab" when currentUser.GetHomeTenantId() == configuration["Entra:TenantId"] => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingUser) } },
+            "WaitingTab" when currentUser.GetHomeTenantId() != configuration["Entra:TenantId"] => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingOperator) } },
             "ClosedTab" => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.Closed) } },
             _ => []
         };

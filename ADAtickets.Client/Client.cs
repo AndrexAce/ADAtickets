@@ -29,6 +29,8 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Net.Mime;
 using System.Security.Claims;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace ADAtickets.Client
 {
@@ -53,6 +55,12 @@ namespace ADAtickets.Client
         private string Endpoint => $"v{Service.APIVersion}/{ControllerName}";
 
         private event Action<HttpResponseMessage>? OnResponse;
+
+        private readonly JsonSerializerOptions JsonOptions = new()
+        {
+            Converters = { new JsonStringEnumConverter(allowIntegerValues: false) },
+            PropertyNameCaseInsensitive = true
+        };
 
         /// <summary>
         /// Registers an handler to be called when an API request completes.
@@ -102,7 +110,7 @@ namespace ADAtickets.Client
                 },
                 user: user);
 
-            TResponse? responseEntity = response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<TResponse>() : null;
+            TResponse? responseEntity = response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<TResponse>(JsonOptions) : null;
 
             InvokeResponseHandler(response);
 
@@ -132,7 +140,7 @@ namespace ADAtickets.Client
                 },
                 user: user);
 
-            IEnumerable<TResponse> responseEntities = response.IsSuccessStatusCode ? (await response.Content.ReadFromJsonAsync<IEnumerable<TResponse>>() ?? []) : [];
+            IEnumerable<TResponse> responseEntities = response.IsSuccessStatusCode ? (await response.Content.ReadFromJsonAsync<IEnumerable<TResponse>>(JsonOptions) ?? []) : [];
 
             InvokeResponseHandler(response);
 
@@ -161,9 +169,9 @@ namespace ADAtickets.Client
                     options.AcquireTokenOptions.AuthenticationOptionsName = InferAuthenticationScheme(user);
                 },
                 user: user,
-                content: JsonContent.Create(entity));
+                content: JsonContent.Create(entity, options: JsonOptions));
 
-            TResponse? responseEntity = response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<TResponse>() : null;
+            TResponse? responseEntity = response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<TResponse>(JsonOptions) : null;
 
             InvokeResponseHandler(response);
 
@@ -193,9 +201,9 @@ namespace ADAtickets.Client
                     options.AcquireTokenOptions.AuthenticationOptionsName = InferAuthenticationScheme(user);
                 },
                 user: user,
-                content: JsonContent.Create(entity));
+                content: JsonContent.Create(entity, options: JsonOptions));
 
-            TResponse? responseEntity = response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<TResponse>() : null;
+            TResponse? responseEntity = response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<TResponse>(JsonOptions) : null;
 
             InvokeResponseHandler(response);
 
