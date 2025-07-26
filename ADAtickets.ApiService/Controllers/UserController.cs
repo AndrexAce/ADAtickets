@@ -82,13 +82,44 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="403">The client was authenticated but had not enough privileges.</response>
         /// <response code="404">The entity with the given id didn't exist.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
-        [HttpGet("{id}")]
+        [HttpGet("{id:guid}")]
         [Authorize(Policy = Policy.Everyone)]
         [RequiredScope(Scope.Read)]
         public async Task<ActionResult<UserResponseDto>> GetUser(Guid id)
         {
             // Check if the requested entity exists.
             if (await userRepository.GetUserByIdAsync(id) is not User user)
+            {
+                return NotFound();
+            }
+
+            // Insert the entity data into a new DTO and send it to the client.
+            return Ok(mapper.Map<UserResponseDto>(user));
+        }
+
+        /// <summary>
+        /// Fetch a specific <see cref="User"/> entity.
+        /// </summary>
+        /// <param name="email">Email of the <see cref="User"/> entity to fetch.</param>
+        /// <returns>A <see cref="Task"/> returning an <see cref="ActionResult"/>, which wraps the server response and the requested entity.</returns>
+        /// <response code="200">The entity was found.</response>
+        /// <response code="400">The provided email was not valid.</response>
+        /// <response code="401">The client was not authenticated.</response>
+        /// <response code="403">The client was authenticated but had not enough privileges.</response>
+        /// <response code="404">The entity with the given email didn't exist.</response>
+        /// <response code="406">The client asked for an unsupported response format.</response>
+        [HttpGet("{email}")]
+        [Authorize(Policy = Policy.Everyone)]
+        [RequiredScope(Scope.Read)]
+        public async Task<ActionResult<UserResponseDto>> GetUser(string email)
+        {
+            // Check if the requested entity exists.
+            Dictionary<string, string> emailFilter = new()
+            {
+                { nameof(UserResponseDto.Email), email }
+            };
+
+            if ((await userRepository.GetUsersByAsync(emailFilter)).FirstOrDefault() is not User user)
             {
                 return NotFound();
             }
@@ -133,7 +164,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="404">The entity was deleted before the update.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
         /// <response code="409">The entity was updated by another request at the same time.</response>
-        [HttpPut("{id}")]
+        [HttpPut("{id:guid}")]
         [Authorize(Policy = Policy.Everyone)]
         [RequiredScope(Scope.Read, Scope.Write)]
         public async Task<ActionResult<UserResponseDto>> PutUser(Guid id, UserRequestDto userDto)
@@ -153,6 +184,78 @@ namespace ADAtickets.ApiService.Controllers
             {
                 // If the entity is not found in the data source, it was deleted by another user while updating.
                 if (await userRepository.GetUserByIdAsync(id) is null)
+                {
+                    return NotFound();
+                }
+
+                // If the entity is found, it was modified by another at the same time of the update.
+                return Conflict();
+            }
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Update a specific <see cref="User"/> entity.
+        /// </summary>
+        /// <remarks>
+        /// JSON request body example:
+        /// <code>
+        /// {
+        ///     "Email": "john.smith@outlook.com",
+        ///     "Name": "John",
+        ///     "Surname": "Smith",
+        ///     "AreEmailNotificationsEnabled": true,
+        ///     "Type": "User",
+        /// }
+        /// </code>
+        /// XML request body example:
+        /// <code>
+        /// &lt;UserRequestDto&gt;
+        ///     &lt;Email&gt;john.smith@outlook.com&lt;Email&gt;
+        ///     &lt;Name&gt;John&lt;/Name&gt;
+        ///     &lt;Surname&gt;Smith&lt;/Surname&gt;
+        ///     &lt;AreEmailNotificationsEnabled&gt;true&lt;/AreEmailNotificationsEnabled&gt;
+        ///     &lt;Type&gt;User&lt;/Type&gt;
+        /// &lt;/UserRequestDto&gt;
+        /// </code>
+        /// </remarks>
+        /// <param name="email">Email of the <see cref="User"/> entity to update.</param>
+        /// <param name="userDto">Object containing the new values the fields should be updated to.</param>
+        /// <returns>A <see cref="Task"/> returning an <see cref="ActionResult"/>, which wraps the server response and the new or updated entity.</returns>
+        /// <response code="201">The entity didn't exist, it was created.</response>
+        /// <response code="204">The entity existed, it was updated.</response>
+        /// <response code="400">The entity was malformed or the provided email was not valid.</response>
+        /// <response code="401">The client was not authenticated.</response>
+        /// <response code="403">The client was authenticated but had not enough privileges.</response>
+        /// <response code="404">The entity was deleted before the update.</response>
+        /// <response code="406">The client asked for an unsupported response format.</response>
+        /// <response code="409">The entity was updated by another request at the same time.</response>
+        [HttpPut("{email}")]
+        [Authorize(Policy = Policy.Everyone)]
+        [RequiredScope(Scope.Read, Scope.Write)]
+        public async Task<ActionResult<UserResponseDto>> PutUser(string email, UserRequestDto userDto)
+        {
+            // If the requested entity does not exist, create a new one.
+            Dictionary<string, string> emailFilter = new()
+            {
+                { nameof(UserResponseDto.Email), email }
+            };
+
+            if ((await userRepository.GetUsersByAsync(emailFilter)).FirstOrDefault() is not User user)
+            {
+                return await PostUser(userDto);
+            }
+
+            try
+            {
+                // Update the existing entity with the new data.
+                await userRepository.UpdateUserAsync(mapper.Map(userDto, user));
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                // If the entity is not found in the data source, it was deleted by another user while updating.
+                if (await userRepository.GetUserByIdAsync(user.Id) is null)
                 {
                     return NotFound();
                 }
@@ -221,13 +324,45 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="403">The client was authenticated but had not enough privileges.</response>
         /// <response code="404">The entity with the given id didn't exist.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:guid}")]
         [Authorize(Policy = Policy.Everyone)]
         [RequiredScope(Scope.Read, Scope.Write)]
         public async Task<IActionResult> DeleteUser(Guid id)
         {
             // Check if the requested entity exists.
             if (await userRepository.GetUserByIdAsync(id) is not User user)
+            {
+                return NotFound();
+            }
+
+            await userRepository.DeleteUserAsync(user);
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Delete a specific <see cref="User"/> entity.
+        /// </summary>
+        /// <param name="email">Email of the <see cref="User"/> entity to delete.</param>
+        /// <returns>A <see cref="Task"/> returning an <see cref="IActionResult"/>, which wraps the server response.</returns>
+        /// <response code="204">The entity was deleted.</response>
+        /// <response code="400">The provided email was not valid.</response>
+        /// <response code="401">The client was not authenticated.</response>
+        /// <response code="403">The client was authenticated but had not enough privileges.</response>
+        /// <response code="404">The entity with the given email didn't exist.</response>
+        /// <response code="406">The client asked for an unsupported response format.</response>
+        [HttpDelete("{email}")]
+        [Authorize(Policy = Policy.Everyone)]
+        [RequiredScope(Scope.Read, Scope.Write)]
+        public async Task<IActionResult> DeleteUser(string email)
+        {
+            // Check if the requested entity exists.
+            Dictionary<string, string> emailFilter = new()
+            {
+                { nameof(UserResponseDto.Email), email }
+            };
+
+            if ((await userRepository.GetUsersByAsync(emailFilter)).FirstOrDefault() is not User user)
             {
                 return NotFound();
             }

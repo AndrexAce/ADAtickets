@@ -132,6 +132,32 @@ namespace ADAtickets.ApiService.Configs
         }
 
         /// <summary>
+        /// PUT api methods convention.
+        /// </summary>
+        /// <param name="candidateKey">Another possible identifier of the resource to fetch.</param>
+        /// <param name="model">The resource to edit.</param>
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
+        public static void Put(
+            [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Any)]
+            [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.AssignableFrom)]
+            string candidateKey,
+
+            [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Any)]
+            [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.AssignableFrom)]
+            object model)
+        {
+            // This method is intentionally left empty. The attributes above are used to define the convention.
+        }
+
+        /// <summary>
         /// DELETE api methods convention.
         /// </summary>
         /// <param name="id">The identifier of the resource to delete.</param>
@@ -146,6 +172,25 @@ namespace ADAtickets.ApiService.Configs
             [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Exact)]
             [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.AssignableFrom)]
             Guid id)
+        {
+            // This method is intentionally left empty. The attributes above are used to define the convention.
+        }
+
+        /// <summary>
+        /// DELETE api methods convention.
+        /// </summary>
+        /// <param name="candidateKey">Another possible identifier of the resource to fetch.</param>
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
+        [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
+        public static void Delete(
+            [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Any)]
+            [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.AssignableFrom)]
+            string candidateKey)
         {
             // This method is intentionally left empty. The attributes above are used to define the convention.
         }

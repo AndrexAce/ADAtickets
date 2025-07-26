@@ -82,7 +82,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="403">The client was authenticated but had not enough privileges.</response>
         /// <response code="404">The entity with the given id didn't exist.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
-        [HttpGet("{id}")]
+        [HttpGet("{id:guid}")]
         [RequiredScope(Scope.Read)]
         public async Task<ActionResult<AttachmentResponseDto>> GetAttachment(Guid id)
         {
@@ -128,7 +128,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="404">The entity was deleted before the update.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
         /// <response code="409">The entity was updated by another request at the same time.</response>
-        [HttpPut("{id}")]
+        [HttpPut("{id:guid}")]
         [RequiredScope(Scope.Read, Scope.Write)]
         public async Task<ActionResult<AttachmentResponseDto>> PutAttachment(Guid id, AttachmentRequestDto attachmentDto)
         {
@@ -210,7 +210,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="403">The client was authenticated but had not enough privileges.</response>
         /// <response code="404">The entity with the given id didn't exist.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:guid}")]
         [RequiredScope(Scope.Read, Scope.Write)]
         public async Task<IActionResult> DeleteAttachment(Guid id)
         {

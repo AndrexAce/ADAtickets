@@ -24,6 +24,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Identity.Abstractions;
+using Microsoft.Identity.Web;
 using System.ComponentModel;
 using System.Net;
 using System.Net.Http.Json;
@@ -48,19 +49,40 @@ namespace ADAtickets.Client
         where TRequest : RequestDto
     {
         /// <summary>
-        /// The endpoint of the controller to interact with.
+        /// Provides the authentication state of the user to call APIs on his behalf.
+        /// </summary>
+        protected readonly AuthenticationStateProvider authenticationStateProvider = authenticationStateProvider;
+
+        /// <summary>
+        /// Represents an interface to make remote API requests.
+        /// </summary>
+        protected readonly IDownstreamApi downstreamApi = downstreamApi;
+
+        /// <summary>
+        /// Holds the configuration settings for the applications.
+        /// </summary>
+        protected readonly IConfiguration configuration = configuration;
+
+        /// <summary>
+        /// The name of the controller to interact with.
         /// </summary>
         protected abstract string ControllerName { get; }
 
-        private string Endpoint => $"v{Service.APIVersion}/{ControllerName}";
+        /// <summary>
+        /// The endpoint to call, including the API version. 
+        /// </summary>
+        protected string Endpoint => $"v{Service.APIVersion}/{ControllerName}";
 
-        private event Action<HttpResponseMessage>? OnResponse;
-
-        private readonly JsonSerializerOptions JsonOptions = new()
+        /// <summary>
+        /// The serialization options used to serialize and deserialize JSON data.
+        /// </summary>
+        protected readonly JsonSerializerOptions JsonOptions = new()
         {
             Converters = { new JsonStringEnumConverter(allowIntegerValues: false) },
             PropertyNameCaseInsensitive = true
         };
+
+        private event Action<HttpResponseMessage>? OnResponse;
 
         /// <summary>
         /// Registers an handler to be called when an API request completes.
@@ -254,28 +276,47 @@ namespace ADAtickets.Client
                 throw new InvalidOperationException();
             }
 
-            Claim? claim = user.Claims.FirstOrDefault(c => c.Type.Equals("http://schemas.microsoft.com/identity/claims/tenantid"));
+            string? tid = user.GetHomeTenantId();
 
-            return claim is null ? throw new InvalidOperationException() : claim.Value;
+            return tid is null ? throw new InvalidOperationException() : tid;
         }
 
-        private string InferServiceName(ClaimsPrincipal user)
+        /// <summary>
+        /// Infers the appropriate API service to use based on the user's tenant ID.
+        /// </summary>
+        /// <remarks>This method determines which service to use by comparing the user's tenant ID with
+        /// the primary tenant ID configured in the application settings. Ensure that the configuration section for the
+        /// primary tenant ID is correctly set.</remarks>
+        /// <param name="user">The <see cref="ClaimsPrincipal"/> representing the user whose tenant ID is used for inference.</param>
+        /// <returns>The service name as a string. Returns <see cref="Service.API"/> if the user's tenant ID matches the primary
+        /// tenant ID; otherwise, returns <see cref="Service.ExternalAPI"/>.</returns>
+        protected string InferServiceName(ClaimsPrincipal user)
         {
-            string tenantId = Client<TResponse, TRequest>.GetUserTenantId(user);
+            string tenantId = GetUserTenantId(user);
             string? primaryTenantId = configuration.GetSection($"{Scheme.OpenIdConnectDefault}:TenantId").Value;
 
             return tenantId == primaryTenantId ? Service.API : Service.ExternalAPI;
         }
 
-        private string InferAuthenticationScheme(ClaimsPrincipal user)
+        /// <summary>
+        /// Infers the appropriate authentication scheme to use based on the user's tenant ID.
+        /// </summary>
+        /// <param name="user">The <see cref="ClaimsPrincipal"/> representing the user whose tenant ID is used for inference.</param>
+        /// <returns>The authentication scheme as a string. Returns <see cref="Scheme.OpenIdConnectDefault"/> if the user's tenant ID matches the primary
+        /// tenant ID; otherwise, returns <see cref="Scheme.ExternalOpenIdConnectDefault"/>.</returns>
+        protected string InferAuthenticationScheme(ClaimsPrincipal user)
         {
-            string tenantId = Client<TResponse, TRequest>.GetUserTenantId(user);
+            string tenantId = GetUserTenantId(user);
             string? primaryTenantId = configuration.GetSection($"{Scheme.OpenIdConnectDefault}:TenantId").Value;
 
             return tenantId == primaryTenantId ? Scheme.OpenIdConnectDefault : Scheme.ExternalOpenIdConnectDefault;
         }
 
-        private void InvokeResponseHandler(HttpResponseMessage response)
+        /// <summary>
+        /// Calls the registered response handlers with the provided HTTP response message.
+        /// </summary>
+        /// <param name="response">The HTTP response message to process.</param>
+        protected void InvokeResponseHandler(HttpResponseMessage response)
         {
             OnResponse?.Invoke(response);
         }
