@@ -75,7 +75,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
         <FluentStack Orientation="Orientation.Vertical">
             <FluentRadioGroup Name="Type"
-                Label="@loc["TicketType"]"
+                LabelTemplate="@TicketTypeLabel"
                 Orientation="Orientation.Vertical"
                 ReadOnly="@(Content.IsEdit && Content.IsUser)"
                 @bind-Value="TicketRequest.Type"
@@ -131,7 +131,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             </FluentRadioGroup>
             <FluentValidationMessage For="@(() => TicketRequest.Priority)" />
 
-            <FluentInputLabel Label="@loc["Attachments"]" />
+            <FluentStack Orientation="Orientation.Horizontal">
+                <FluentInputLabel Label="@loc["Attachments"]" />
+                @if (!Content.IsEdit)
+                {
+                    <FluentIcon Id="AttachmentsLabelButton" Icon="Icons.Regular.Size20.Info"></FluentIcon>
+                    <FluentTooltip Anchor="AttachmentsLabelButton" Position="TooltipPosition.End">@loc["AttachmentsTooltip"]</FluentTooltip>
+                }
+            </FluentStack>
             @if (photoPath is null)
             {
                 <FluentInputFile Id="photoUploader"
@@ -324,6 +331,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             }
         }
     }
+
+    private RenderFragment TicketTypeLabel => @<FluentStack Orientation="Orientation.Horizontal">
+        <FluentLabel>@loc["TicketType"]</FluentLabel>
+        @if ((!Content.IsEdit && Content.IsUser) || (Content.IsEdit && !Content.IsUser))
+        {
+            <FluentIcon Id="TicketTypeLabelButton" Icon="Icons.Regular.Size20.Info"></FluentIcon>
+            <FluentTooltip Anchor="TicketTypeLabelButton" Position="TooltipPosition.End">@loc["TicketTypeTooltip"]</FluentTooltip>
+        }
+    </FluentStack>;
 
     protected override async Task OnInitializedAsync()
     {

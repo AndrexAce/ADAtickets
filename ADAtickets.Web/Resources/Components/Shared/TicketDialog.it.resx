@@ -243,4 +243,10 @@
   <data name="UpdateSuccessToastDetails" xml:space="preserve">
     <value>La modifica è stata completata con successo.</value>
   </data>
+  <data name="TicketTypeTooltip" xml:space="preserve">
+    <value>Se c'è un errore nel programma, seleziona "problema". Altrimenti, se vuoi semplicemente suggerire una nuova funzionalità da aggiungere, seleziona "suggerimento".</value>
+  </data>
+  <data name="AttachmentsTooltip" xml:space="preserve">
+    <value>Puoi caricare una foto e un video. Ciascun file può essere al massimo di 10 MB.</value>
+  </data>
 </root>
