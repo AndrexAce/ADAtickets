@@ -26,7 +26,7 @@ Check the related [wiki page](https://github.com/AndrexAce/ADAtickets/wiki/Setup
 
 - Automatic deployment of needed resources during setup with Azure SDK.
 - View branches and commits linked to tickets.
-- SMS and email notifications.
+- SMS notifications.
 - Podman support along with Docker.
 
 ## License 📃

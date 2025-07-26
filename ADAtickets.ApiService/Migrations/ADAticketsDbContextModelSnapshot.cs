@@ -322,10 +322,6 @@ namespace ADAtickets.ApiService.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("are_email_notifications_enabled");
 
-                    b.Property<bool>("ArePhoneNotificationsEnabled")
-                        .HasColumnType("boolean")
-                        .HasColumnName("are_phone_notifications_enabled");
-
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("text")
@@ -336,10 +332,6 @@ namespace ADAtickets.ApiService.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
                         .HasColumnName("name");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("text")
-                        .HasColumnName("phone_number");
 
                     b.Property<string>("Surname")
                         .IsRequired()
@@ -363,10 +355,6 @@ namespace ADAtickets.ApiService.Migrations
                     b.HasIndex("Email")
                         .IsUnique()
                         .HasDatabaseName("ix_users_email");
-
-                    b.HasIndex("PhoneNumber")
-                        .IsUnique()
-                        .HasDatabaseName("ix_users_phone_number");
 
                     b.ToTable("users", (string)null);
                 });

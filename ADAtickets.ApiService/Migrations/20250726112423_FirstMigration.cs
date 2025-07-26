@@ -40,9 +40,7 @@ namespace ADAtickets.ApiService.Migrations
                     email = table.Column<string>(type: "text", nullable: false),
                     name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     surname = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    phone_number = table.Column<string>(type: "text", nullable: true),
                     are_email_notifications_enabled = table.Column<bool>(type: "boolean", nullable: false),
-                    are_phone_notifications_enabled = table.Column<bool>(type: "boolean", nullable: false),
                     type = table.Column<UserType>(type: "user_type", nullable: false),
                     xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
                 },
@@ -380,12 +378,6 @@ namespace ADAtickets.ApiService.Migrations
                 name: "ix_users_email",
                 table: "users",
                 column: "email",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "ix_users_phone_number",
-                table: "users",
-                column: "phone_number",
                 unique: true);
         }
 

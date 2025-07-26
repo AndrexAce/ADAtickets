@@ -48,21 +48,10 @@ namespace ADAtickets.Shared.Dtos.Requests
         public string Surname { get; set; } = string.Empty;
 
         /// <summary>
-        /// The phone number of the user.
-        /// </summary>
-        public string? PhoneNumber { get; set; } = null;
-
-        /// <summary>
         /// Whether the user enabled the reception of external notifications via email.
         /// </summary>
         [Required]
         public bool AreEmailNotificationsEnabled { get; set; } = false;
-
-        /// <summary>
-        /// Whether the user enabled the reception of external notifications via SMS.
-        /// </summary>
-        [Required]
-        public bool ArePhoneNotificationsEnabled { get; set; } = false;
 
         /// <summary>
         /// The role of the user in the system.

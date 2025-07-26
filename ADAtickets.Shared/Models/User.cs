@@ -32,7 +32,6 @@ namespace ADAtickets.Shared.Models
     /// <remarks>This class is intended for internal use only; it is public only to allow for testing.</remarks>
     [EditorBrowsable(EditorBrowsableState.Never)]
     [Index(nameof(Email), IsUnique = true)]
-    [Index(nameof(PhoneNumber), IsUnique = true)]
     public sealed class User : Entity
     {
         /// <summary>
@@ -64,22 +63,10 @@ namespace ADAtickets.Shared.Models
         public string Surname { get; set; } = string.Empty;
 
         /// <summary>
-        /// The phone number of the user.
-        /// </summary>
-        [Phone]
-        public string? PhoneNumber { get; set; } = null;
-
-        /// <summary>
         /// Whether the user enabled the reception of external notifications via email.
         /// </summary>
         [Required]
         public bool AreEmailNotificationsEnabled { get; set; } = false;
-
-        /// <summary>
-        /// Whether the user enabled the reception of external notifications via SMS.
-        /// </summary>
-        [Required]
-        public bool ArePhoneNotificationsEnabled { get; set; } = false;
 
         /// <summary>
         /// The role of the user in the system.

@@ -68,16 +68,8 @@ namespace ADAtickets.ApiService.Services
                         query = query.Where(u => u.Surname.ToLower().Contains(filter.Value.ToLower()));
                         break;
 
-                    case nameof(User.PhoneNumber):
-                        query = query.Where(u => u.PhoneNumber != null && u.PhoneNumber.Contains(filter.Value));
-                        break;
-
                     case nameof(User.AreEmailNotificationsEnabled) when bool.TryParse(filter.Value, out bool outBool):
                         query = query.Where(u => u.AreEmailNotificationsEnabled == outBool);
-                        break;
-
-                    case nameof(User.ArePhoneNotificationsEnabled) when bool.TryParse(filter.Value, out bool outBool):
-                        query = query.Where(u => u.ArePhoneNotificationsEnabled == outBool);
                         break;
 
                     case nameof(User.Type) when Enum.TryParse(filter.Value, true, out UserType outUserType):

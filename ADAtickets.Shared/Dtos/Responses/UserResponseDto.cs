@@ -44,19 +44,9 @@ namespace ADAtickets.Shared.Dtos.Responses
         public string Surname { get; init; } = string.Empty;
 
         /// <summary>
-        /// The phone number of the user.
-        /// </summary>
-        public string PhoneNumber { get; init; } = string.Empty;
-
-        /// <summary>
         /// Whether the user enabled the reception of external notifications via email.
         /// </summary>
         public bool AreEmailNotificationsEnabled { get; init; } = false;
-
-        /// <summary>
-        /// Whether the user enabled the reception of external notifications via SMS.
-        /// </summary>
-        public bool ArePhoneNotificationsEnabled { get; init; } = false;
 
         /// <summary>
         /// The role of the user in the system.

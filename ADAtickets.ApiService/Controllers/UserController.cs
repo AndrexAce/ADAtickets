@@ -104,28 +104,21 @@ namespace ADAtickets.ApiService.Controllers
         /// JSON request body example:
         /// <code>
         /// {
+        ///     "Email": "john.smith@outlook.com",
         ///     "Name": "John",
         ///     "Surname": "Smith",
-        ///     "IsEmail2FAEnabled": true,
-        ///     "IsPhone2FAEnabled": true,
         ///     "AreEmailNotificationsEnabled": true,
-        ///     "ArePhoneNotificationsEnabled": true,
         ///     "Type": "User",
-        ///     "MicrosoftAccountId": null,
-        ///     "IdentityUserId": "123e4567-e89b-12d3-a456-426614174000"
         /// }
         /// </code>
         /// XML request body example:
         /// <code>
         /// &lt;UserRequestDto&gt;
+        ///     &lt;Email&gt;john.smith@outlook.com&lt;Email&gt;
         ///     &lt;Name&gt;John&lt;/Name&gt;
         ///     &lt;Surname&gt;Smith&lt;/Surname&gt;
-        ///     &lt;IsEmail2FAEnabled&gt;true&lt;/IsEmail2FAEnabled&gt;
-        ///     &lt;IsPhone2FAEnabled&gt;true&lt;/IsPhone2FAEnabled&gt;
         ///     &lt;AreEmailNotificationsEnabled&gt;true&lt;/AreEmailNotificationsEnabled&gt;
-        ///     &lt;ArePhoneNotificationsEnabled&gt;true&lt;/ArePhoneNotificationsEnabled&gt;
         ///     &lt;Type&gt;User&lt;/Type&gt;
-        ///     &lt;IdentityUserId&gt;123e4567-e89b-12d3-a456-426614174000&lt;/IdentityUserId&gt;
         /// &lt;/UserRequestDto&gt;
         /// </code>
         /// </remarks>
@@ -178,28 +171,21 @@ namespace ADAtickets.ApiService.Controllers
         /// JSON request body example:
         /// <code>
         /// {
+        ///     "Email": "john.smith@outlook.com",
         ///     "Name": "John",
         ///     "Surname": "Smith",
-        ///     "IsEmail2FAEnabled": true,
-        ///     "IsPhone2FAEnabled": true,
         ///     "AreEmailNotificationsEnabled": true,
-        ///     "ArePhoneNotificationsEnabled": true,
         ///     "Type": "User",
-        ///     "MicrosoftAccountId": null,
-        ///     "IdentityUserId": "123e4567-e89b-12d3-a456-426614174000"
         /// }
         /// </code>
         /// XML request body example:
         /// <code>
         /// &lt;UserRequestDto&gt;
+        ///     &lt;Email&gt;john.smith@outlook.com&lt;Email&gt;
         ///     &lt;Name&gt;John&lt;/Name&gt;
         ///     &lt;Surname&gt;Smith&lt;/Surname&gt;
-        ///     &lt;IsEmail2FAEnabled&gt;true&lt;/IsEmail2FAEnabled&gt;
-        ///     &lt;IsPhone2FAEnabled&gt;true&lt;/IsPhone2FAEnabled&gt;
         ///     &lt;AreEmailNotificationsEnabled&gt;true&lt;/AreEmailNotificationsEnabled&gt;
-        ///     &lt;ArePhoneNotificationsEnabled&gt;true&lt;/ArePhoneNotificationsEnabled&gt;
         ///     &lt;Type&gt;User&lt;/Type&gt;
-        ///     &lt;IdentityUserId&gt;123e4567-e89b-12d3-a456-426614174000&lt;/IdentityUserId&gt;
         /// &lt;/UserRequestDto&gt;
         /// </code>
         /// </remarks>
