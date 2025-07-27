@@ -1,0 +1,17 @@
+{
+  "profiles": {
+    "Docker Compose": {
+      "commandName": "DockerCompose",
+      "commandVersion": "1.0",
+      "composeLaunchAction": "LaunchBrowser",
+      "composeLaunchServiceName": "adatickets.web",
+      "composeLaunchUrl": "{Scheme}://localhost:{ServicePort}",
+      "serviceActions": {
+        "adatickets.apiservice": "StartDebugging",
+        "adatickets.web": "StartDebugging",
+        "adatickets.postgresql": "StartWithoutDebugging",
+        "adatickets.redis": "StartWithoutDebugging"
+      }
+    }
+  }
+}

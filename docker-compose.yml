@@ -1,0 +1,77 @@
+services:
+  adatickets.postgresql:
+    container_name: Dev-Database
+    environment:
+      - POSTGRES_USER=${POSTGRESUSER:?error}
+      - POSTGRES_PASSWORD=${POSTGRESPASSWORD:?error}
+      - POSTGRES_DB=adatickets
+    healthcheck:
+      test: pg_isready -U postgres -d adatickets
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    image: postgres:17.5
+    networks:
+      - dev-network
+    volumes:
+      - dev-database-data:/var/lib/postgresql/data
+
+  adatickets.pgadmin:
+    container_name: Dev-DatabaseAdmin
+    depends_on:
+      adatickets.postgresql:
+        condition: service_healthy
+    networks:
+      - dev-network
+    ports:
+      - "5433:80"
+    image: dpage/pgadmin4:9.6.0
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMINDEFAULTEMAIL:?error}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMINDEFAULTPASSWORD:?error}
+    volumes:
+      - dev-pgadmin-data:/var/lib/pgadmin
+
+  adatickets.redis:
+    container_name: Dev-Cache
+    command: redis-server --appendonly yes
+    image: redis:8.0.3
+    networks:
+      - dev-network
+    volumes:
+      - dev-redis-data:/data
+
+  adatickets.apiservice:
+    container_name: Dev-Api
+    depends_on:
+      adatickets.postgresql:
+        condition: service_healthy
+    networks:
+      - dev-network
+    ports:
+      - "7213:8080"
+    volumes:
+      - dev-media-data:/app/media
+
+  adatickets.web:
+    container_name: Dev-Web
+    depends_on:
+      adatickets.apiservice:
+        condition: service_started
+      adatickets.redis:
+        condition: service_started
+    networks:
+      - dev-network
+    ports:
+      - "44321:8081"
+
+networks:
+  dev-network:
+    driver: bridge
+
+volumes:
+  dev-database-data:
+  dev-pgadmin-data:
+  dev-redis-data:
+  dev-media-data:
+

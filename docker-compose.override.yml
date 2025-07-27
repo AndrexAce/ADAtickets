@@ -1,12 +1,14 @@
-name: ADAtickets
+name: Dev-ADAtickets
 
 services:
   adatickets.apiservice:
-    image: ghcr.io/andrexace/adatickets-api:${APITAG:-latest}
+    image: adatickets-api
+    build:
+      context: .
+      dockerfile: ADAtickets.ApiService/Dockerfile
     environment:
       # ASP.NET configuration variables
-      - DOTNET_GENERATE_ASPNET_CERTIFICATE=false
-      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
       # Database connection string
       - ConnectionStrings__PostgreSQL=Host=adatickets.postgresql;Port=5432;Database=adatickets;Username=${POSTGRESUSER:?error};Password=${POSTGRESPASSWORD:?error}
@@ -33,14 +35,14 @@ services:
       - ${APIAUTHCERTIFICATEDISKPATH:?error}:/certs:ro
 
   adatickets.web:
-    image: ghcr.io/andrexace/adatickets-web:${WEBTAG:-latest}
+    image: adatickets-web
+    build:
+      context: .
+      dockerfile: ADAtickets.Web/Dockerfile
     environment:
       # ASP.NET configuration variables
-      - DOTNET_GENERATE_ASPNET_CERTIFICATE=false
-      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTPS_PORTS=8081
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=${SSLCERTIFICATEPASSWORD:?error}
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/${SSLCERTIFICATENAME:?error}
       # Redis connection string
       - ConnectionStrings__Redis=adatickets.redis:6379
       # Entra configuration variables
@@ -72,5 +74,4 @@ services:
       - ExternalADAticketsAPI__Scopes__0=api://${EXTERNALAPIAPPID:?error}/Read
       - ExternalADAticketsAPI__Scopes__1=api://${EXTERNALAPIAPPID:?error}/Write
     volumes:
-      - ${SSLCERTIFICATEDISKPATH:?error}:/https:ro
       - ${WEBAUTHCERTIFICATEDISKPATH:?error}:/certs:ro
