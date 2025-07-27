@@ -132,7 +132,8 @@ namespace ADAtickets.Client
                 },
                 user: user);
 
-            TResponse? responseEntity = response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<TResponse>(JsonOptions) : null;
+            TResponse? responseEntity = response.StatusCode is HttpStatusCode.OK ?
+                await response.Content.ReadFromJsonAsync<TResponse>(JsonOptions) : null;
 
             InvokeResponseHandler(response);
 
@@ -162,7 +163,8 @@ namespace ADAtickets.Client
                 },
                 user: user);
 
-            IEnumerable<TResponse> responseEntities = response.IsSuccessStatusCode ? (await response.Content.ReadFromJsonAsync<IEnumerable<TResponse>>(JsonOptions) ?? []) : [];
+            IEnumerable<TResponse> responseEntities = response.StatusCode is HttpStatusCode.OK ?
+                (await response.Content.ReadFromJsonAsync<IEnumerable<TResponse>>(JsonOptions) ?? []) : [];
 
             InvokeResponseHandler(response);
 
@@ -193,7 +195,8 @@ namespace ADAtickets.Client
                 user: user,
                 content: JsonContent.Create(entity, options: JsonOptions));
 
-            TResponse? responseEntity = response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<TResponse>(JsonOptions) : null;
+            TResponse? responseEntity = response.StatusCode is HttpStatusCode.Created ?
+                await response.Content.ReadFromJsonAsync<TResponse>(JsonOptions) : null;
 
             InvokeResponseHandler(response);
 
@@ -225,7 +228,8 @@ namespace ADAtickets.Client
                 user: user,
                 content: JsonContent.Create(entity, options: JsonOptions));
 
-            TResponse? responseEntity = response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<TResponse>(JsonOptions) : null;
+            TResponse? responseEntity = response.StatusCode is HttpStatusCode.Created ?
+                await response.Content.ReadFromJsonAsync<TResponse>(JsonOptions) : null;
 
             InvokeResponseHandler(response);
 

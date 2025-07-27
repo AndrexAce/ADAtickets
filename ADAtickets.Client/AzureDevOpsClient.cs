@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Identity.Abstractions;
 using System.Net;
 using System.Net.Http.Json;
+using System.Security.Claims;
 
 namespace ADAtickets.Client
 {
@@ -25,18 +26,24 @@ namespace ADAtickets.Client
         /// <exception cref="OperationCanceledException">When the operation is canceled.</exception>
         public async Task<(HttpStatusCode, ValueWrapper<bool>?)> GetUserDevOpsAccessAsync(string email)
         {
-            // Use the downstream API to call the backend endpoint
+            // Fetch the logged in user
+            ClaimsPrincipal user = (await authenticationStateProvider.GetAuthenticationStateAsync()).User;
+
+            // Call the APIs with the permissions granted to the user
             HttpResponseMessage response = await downstreamApi.CallApiForUserAsync(
                 serviceName: Service.API,
-                options =>
+                downstreamApiOptionsOverride: options =>
                 {
                     options.HttpMethod = nameof(HttpMethod.Get);
                     options.RelativePath = $"{endpoint}/{email}/has-access";
                     options.AcquireTokenOptions.AuthenticationOptionsName = Scheme.OpenIdConnectDefault;
-                }, (await authenticationStateProvider.GetAuthenticationStateAsync()).User);
+                },
+                user: user);
 
-            // Deserialize the response as ValueWrapper<bool>
-            return (response.StatusCode, response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<ValueWrapper<bool>>() : null);
+            ValueWrapper<bool>? responseEntity = response.StatusCode is HttpStatusCode.OK ?
+                await response.Content.ReadFromJsonAsync<ValueWrapper<bool>>() : null;
+
+            return (response.StatusCode, responseEntity);
         }
 
     }
