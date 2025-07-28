@@ -32,7 +32,7 @@ namespace ADAtickets.Client
     /// <param name="authenticationStateProvider">The provider of the signed in user's data.</param>
     /// <param name="downstreamApi">The downstream API service to make requests.</param>
     /// <param name="configuration">The configuration settings.</param>
-    public sealed class UserPlatformssClient(AuthenticationStateProvider authenticationStateProvider, IDownstreamApi downstreamApi, IConfiguration configuration)
+    public sealed class UserPlatformsClient(AuthenticationStateProvider authenticationStateProvider, IDownstreamApi downstreamApi, IConfiguration configuration)
         : Client<UserPlatformResponseDto, UserPlatformRequestDto>(authenticationStateProvider, downstreamApi, configuration)
     {
         /// <inheritdoc cref="Client{TResponse, TRequest}.ControllerName"/>

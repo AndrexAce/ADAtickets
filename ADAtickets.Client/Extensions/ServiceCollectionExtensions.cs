@@ -39,6 +39,7 @@ namespace ADAtickets.Client.Extensions
             _ = services.AddScoped<RepliesClient>();
             _ = services.AddScoped<TicketsClient>();
             _ = services.AddScoped<UsersClient>();
+            _ = services.AddScoped<UserPlatformsClient>();
 
             return services;
         }
