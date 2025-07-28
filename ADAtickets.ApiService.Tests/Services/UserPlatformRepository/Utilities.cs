@@ -19,18 +19,18 @@
  */
 using ADAtickets.Shared.Models;
 
-namespace ADAtickets.ApiService.Tests.Services.AttachmentRepository
+namespace ADAtickets.ApiService.Tests.Services.UserPlatformRepository
 {
     internal static class Utilities
     {
-        public static Attachment CreateAttachment(
-        string path = "",
-        Guid ticketId = default)
+        public static UserPlatform CreateUserPlatform(
+               Guid userId = default,
+               Guid platformId = default)
         {
-            return new Attachment
+            return new UserPlatform
             {
-                Path = path,
-                TicketId = ticketId,
+                UserId = userId,
+                PlatformId = platformId
             };
         }
     }
