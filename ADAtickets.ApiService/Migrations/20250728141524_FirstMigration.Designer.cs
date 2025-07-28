@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ADAtickets.ApiService.Migrations
 {
     [DbContext(typeof(ADAticketsDbContext))]
-    [Migration("20250726112423_FirstMigration")]
+    [Migration("20250728141524_FirstMigration")]
     partial class FirstMigration
     {
         /// <inheritdoc />
@@ -389,20 +389,29 @@ namespace ADAtickets.ApiService.Migrations
 
             modelBuilder.Entity("ADAtickets.Shared.Models.UserPlatform", b =>
                 {
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
-                        .HasColumnName("user_id");
+                        .HasColumnName("id");
 
                     b.Property<Guid>("PlatformId")
                         .HasMaxLength(50)
                         .HasColumnType("uuid")
                         .HasColumnName("platform_id");
 
-                    b.HasKey("UserId", "PlatformId")
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
                         .HasName("pk_user_platforms");
 
                     b.HasIndex("PlatformId")
                         .HasDatabaseName("ix_user_platforms_platform_id");
+
+                    b.HasIndex("UserId", "PlatformId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_user_platforms_user_id_platform_id");
 
                     b.ToTable("user_platforms", (string)null);
                 });

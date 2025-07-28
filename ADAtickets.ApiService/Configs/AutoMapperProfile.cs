@@ -73,6 +73,9 @@ namespace ADAtickets.ApiService.Configs
             _ = CreateMap<AttachmentRequestDto, Attachment>(MemberList.Source)
                 .ForMember(attachment => attachment.Path, opt => opt.MapFrom(src => src.Name))
                 .ForSourceMember(attachmentDto => attachmentDto.Content, opt => opt.DoNotValidate());
+
+            _ = CreateMap<UserPlatform, UserPlatformResponseDto>(MemberList.Destination);
+            _ = CreateMap<UserPlatformRequestDto, UserPlatform>(MemberList.Source);
         }
     }
 }
