@@ -80,10 +80,13 @@ namespace ADAtickets.Client
 
             if (response.StatusCode is HttpStatusCode.OK)
             {
-                var responseEntity = await response.Content.ReadFromJsonAsync<ValueWrapper<bool>>(JsonOptions) ?? throw new JsonException("Could not parse the JSON response object.");
+                ValueWrapper<bool> responseEntity = await response.Content.ReadFromJsonAsync<ValueWrapper<bool>>(JsonOptions) ?? throw new JsonException("Could not parse the JSON response object.");
                 return responseEntity.Value;
             }
-            else throw new HttpRequestException(response.ReasonPhrase, null, response.StatusCode);
+            else
+            {
+                throw new HttpRequestException(response.ReasonPhrase, null, response.StatusCode);
+            }
         }
     }
 }

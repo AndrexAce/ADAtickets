@@ -238,7 +238,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             var requestDto = mapper.Map<TicketRequestDto>(getResponse);
             requestDto.Status = Status.Closed;
 
-            var putResponse = await ticketsClient.PutAsync(Ticket.Id, requestDto);
+            await ticketsClient.PutAsync(Ticket.Id, requestDto);
 
             toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["CloseSuccessToastTitle"], loc["CloseSuccessToastDetails"]));
 
@@ -261,7 +261,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             var requestDto = mapper.Map<TicketRequestDto>(getResponse);
             requestDto.OperatorUserId = operatorId;
 
-            var putResponse = await ticketsClient.PutAsync(Ticket.Id, requestDto);
+            await ticketsClient.PutAsync(Ticket.Id, requestDto);
 
             toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["AssignSuccessToastTitle"], loc["AssignSuccessToastDetails"]));
 

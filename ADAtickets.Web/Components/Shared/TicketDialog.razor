@@ -441,7 +441,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 Content = await File.ReadAllBytesAsync(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", photoPath)),
             };
 
-            var photoResponse = await attachmentsClient.PostAsync(photoAttachment);
+            await attachmentsClient.PostAsync(photoAttachment);
 
             // Update the progress bar and the toast.
             progressToastParameters.Content.Progress = videoPath is null ? 100 : 75;
@@ -458,7 +458,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 Content = await File.ReadAllBytesAsync(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", videoPath)),
             };
 
-            var videoResponse = await attachmentsClient.PostAsync(videoAttachment);
+            await attachmentsClient.PostAsync(videoAttachment);
 
             // Update the progress bar and the toast.
             progressToastParameters.Content.Progress = 100;

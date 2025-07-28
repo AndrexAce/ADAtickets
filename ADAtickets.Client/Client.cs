@@ -111,11 +111,9 @@ namespace ADAtickets.Client
                 },
                 user: user);
 
-            if (response.StatusCode is HttpStatusCode.OK)
-            {
-                return await response.Content.ReadFromJsonAsync<TResponse>(JsonOptions) ?? throw new JsonException(JsonExceptionMessage);
-            }
-            else throw new HttpRequestException(response.ReasonPhrase, null, response.StatusCode);
+            return response.StatusCode is HttpStatusCode.OK
+                ? await response.Content.ReadFromJsonAsync<TResponse>(JsonOptions) ?? throw new JsonException(JsonExceptionMessage)
+                : throw new HttpRequestException(response.ReasonPhrase, null, response.StatusCode);
         }
 
         /// <summary>
@@ -143,11 +141,9 @@ namespace ADAtickets.Client
                 },
                 user: user);
 
-            if (response.StatusCode is HttpStatusCode.OK)
-            {
-                return await response.Content.ReadFromJsonAsync<IEnumerable<TResponse>>(JsonOptions) ?? throw new JsonException(JsonExceptionMessage);
-            }
-            else throw new HttpRequestException(response.ReasonPhrase, null, response.StatusCode);
+            return response.StatusCode is HttpStatusCode.OK
+                ? await response.Content.ReadFromJsonAsync<IEnumerable<TResponse>>(JsonOptions) ?? throw new JsonException(JsonExceptionMessage)
+                : throw new HttpRequestException(response.ReasonPhrase, null, response.StatusCode);
         }
 
         /// <summary>
@@ -176,11 +172,9 @@ namespace ADAtickets.Client
                 user: user,
                 content: JsonContent.Create(entity, options: JsonOptions));
 
-            if (response.StatusCode is HttpStatusCode.Created)
-            {
-                return await response.Content.ReadFromJsonAsync<TResponse>(JsonOptions) ?? throw new JsonException(JsonExceptionMessage);
-            }
-            else throw new HttpRequestException(response.ReasonPhrase, null, response.StatusCode);
+            return response.StatusCode is HttpStatusCode.Created
+                ? await response.Content.ReadFromJsonAsync<TResponse>(JsonOptions) ?? throw new JsonException(JsonExceptionMessage)
+                : throw new HttpRequestException(response.ReasonPhrase, null, response.StatusCode);
         }
 
         /// <summary>
@@ -214,11 +208,12 @@ namespace ADAtickets.Client
             {
                 return await response.Content.ReadFromJsonAsync<TResponse>(JsonOptions) ?? throw new JsonException(JsonExceptionMessage);
             }
-            else if (response.StatusCode is HttpStatusCode.NoContent)
+            else
             {
-                return null;
+                return response.StatusCode is HttpStatusCode.NoContent
+                    ? null
+                    : throw new HttpRequestException(response.ReasonPhrase, null, response.StatusCode);
             }
-            else throw new HttpRequestException(response.ReasonPhrase, null, response.StatusCode);
         }
 
         /// <summary>
