@@ -27,6 +27,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Net.Mime;
 using System.Security.Claims;
+using System.Text.Json;
 
 namespace ADAtickets.Client
 {
@@ -46,10 +47,12 @@ namespace ADAtickets.Client
         /// Fetch a specific entity.
         /// </summary>
         /// <param name="email">Email of the entity to fetch.</param>
-        /// <returns>A tuple containing the <see cref="HttpStatusCode"/> and the requested entity if it exists.</returns>
+        /// <returns>The requested entity.</returns>
         /// <exception cref="InvalidOperationException">When the method is used when no user is logged in.</exception>
+        /// <exception cref="HttpRequestException">When the API call fails.</exception>
+        /// <exception cref="JsonException">When the JSON response cannot be parsed.</exception>
         /// <seealso cref="Client{TResponse, TRequest}.GetAsync(Guid)"/>
-        public async Task<(HttpStatusCode, UserResponseDto?)> GetAsync(string email)
+        public async Task<UserResponseDto> GetAsync(string email)
         {
             // Fetch the logged in user
             ClaimsPrincipal user = (await authenticationStateProvider.GetAuthenticationStateAsync()).User;
@@ -65,11 +68,11 @@ namespace ADAtickets.Client
                 },
                 user: user);
 
-            UserResponseDto? responseEntity = response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<UserResponseDto>(JsonOptions) : null;
-
-            InvokeResponseHandler(response);
-
-            return (response.StatusCode, responseEntity);
+            if (response.StatusCode is HttpStatusCode.OK)
+            {
+                return await response.Content.ReadFromJsonAsync<UserResponseDto>(JsonOptions) ?? throw new JsonException(JsonExceptionMessage);
+            }
+            else throw new HttpRequestException(response.ReasonPhrase, null, response.StatusCode);
         }
 
         /// <summary>
@@ -77,10 +80,12 @@ namespace ADAtickets.Client
         /// </summary>
         /// <param name="email">Email of the entity to update.</param>
         /// <param name="entity">Object containing the new values the fields should be updated to.</param>
-        /// <returns>A tuple containing the <see cref="HttpStatusCode"/> and the updated entity if it was updated.</returns>
+        /// <returns>The entity if it was created; otherwise, <see langword="null"/> if the entity was updated.</returns>
         /// <exception cref="InvalidOperationException">When the method is used when no user is logged in.</exception>
+        /// <exception cref="HttpRequestException">When the API call fails.</exception>
+        /// <exception cref="JsonException">When the JSON response cannot be parsed.</exception>
         /// <seealso cref="Client{TResponse, TRequest}.PutAsync(Guid, TRequest)"/>
-        public async Task<(HttpStatusCode, UserResponseDto?)> PutAsync(string email, UserRequestDto entity)
+        public async Task<UserResponseDto?> PutAsync(string email, UserRequestDto entity)
         {
             // Fetch the logged in user
             ClaimsPrincipal user = (await authenticationStateProvider.GetAuthenticationStateAsync()).User;
@@ -98,21 +103,26 @@ namespace ADAtickets.Client
                 user: user,
                 content: JsonContent.Create(entity, options: JsonOptions));
 
-            UserResponseDto? responseEntity = response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<UserResponseDto>(JsonOptions) : null;
-
-            InvokeResponseHandler(response);
-
-            return (response.StatusCode, responseEntity);
+            if (response.StatusCode is HttpStatusCode.OK)
+            {
+                return await response.Content.ReadFromJsonAsync<UserResponseDto>(JsonOptions) ?? throw new JsonException(JsonExceptionMessage);
+            }
+            else if (response.StatusCode is HttpStatusCode.NoContent)
+            {
+                return null;
+            }
+            else throw new HttpRequestException(response.ReasonPhrase, null, response.StatusCode);
         }
 
         /// <summary>
         /// Delete a specific entity.
         /// </summary>
         /// <param name="email">Email of the entity to delete.</param>
-        /// <returns>A <see cref="HttpStatusCode"/> indicating the status of the deletion.</returns>
+        /// <returns>A task representing the asynchronous operation.</returns>
         /// <exception cref="InvalidOperationException">When the method is used when no user is logged in.</exception>
+        /// <exception cref="HttpRequestException">When the API call fails.</exception>
         /// <seealso cref="Client{TResponse, TRequest}.DeleteAsync(Guid)"/>
-        public async Task<HttpStatusCode> DeleteAsync(string email)
+        public async Task DeleteAsync(string email)
         {
             // Fetch the logged in user
             ClaimsPrincipal user = (await authenticationStateProvider.GetAuthenticationStateAsync()).User;
@@ -128,9 +138,10 @@ namespace ADAtickets.Client
                 },
                 user: user);
 
-            InvokeResponseHandler(response);
-
-            return response.StatusCode;
+            if (response.StatusCode is not HttpStatusCode.NoContent)
+            {
+                throw new HttpRequestException(response.ReasonPhrase, null, response.StatusCode);
+            }
         }
     }
 }
