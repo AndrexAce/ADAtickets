@@ -202,7 +202,7 @@ namespace ADAtickets.Web
                 _ = policy.RequireAuthenticatedUser()
                 .RequireAssertion(context =>
                 {
-                    return context.User.IsDevOpsAdmin() && context.User.GetHomeTenantId() == configuration["Entra:TenantId"];
+                    return context.User.IsDevOpsAdmin() && context.User.GetTenantId() == configuration["Entra:TenantId"];
                 })
                 .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault, Scheme.ExternalOpenIdConnectDefault);
             })
@@ -211,7 +211,7 @@ namespace ADAtickets.Web
                 _ = policy.RequireAuthenticatedUser()
                 .RequireAssertion(context =>
                 {
-                    return context.User.GetHomeTenantId() == configuration["ExternalEntra:TenantId"];
+                    return context.User.GetTenantId() == configuration["ExternalEntra:TenantId"];
                 })
                 .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault, Scheme.ExternalOpenIdConnectDefault);
             })
@@ -220,7 +220,7 @@ namespace ADAtickets.Web
                 _ = policy.RequireAuthenticatedUser()
                 .RequireAssertion(context =>
                 {
-                    return context.User.GetHomeTenantId() == configuration["Entra:TenantId"];
+                    return context.User.GetTenantId() == configuration["Entra:TenantId"];
                 })
                 .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault, Scheme.ExternalOpenIdConnectDefault);
             })

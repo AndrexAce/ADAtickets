@@ -292,15 +292,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     private async Task LoadUsersAsync()
     {
-        var result = await usersClient.GetAllAsync();
-        Users = result.Item2;
+        Users = await usersClient.GetAllAsync();
     }
 
     private async Task LoadTicketsAsync(IEnumerable<KeyValuePair<string, string>> filters)
     {
         var result = await ticketsClient.GetAllAsync(filters);
 
-        originalTickets = result.Item2.OrderByDescending(t => t.CreationDateTime);
+        originalTickets = result.OrderByDescending(t => t.CreationDateTime);
         tickets = originalTickets;
 
         // After the tickets are retrieved, sort and filter based on the user preferences.
@@ -309,8 +308,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     private async Task LoadPlatformsAsync()
     {
-        var result = await platformsClient.GetAllAsync();
-        platforms = result.Item2;
+        platforms = await platformsClient.GetAllAsync();
     }
 #endregion
 
@@ -403,18 +401,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         {
             foreach (var ticketId in selectedTickets)
             {
-                var deleteResponse = await ticketsClient.DeleteAsync(ticketId);
+                await ticketsClient.DeleteAsync(ticketId);
 
-                // If the ticket could not be deleted, send an error.
-                if (deleteResponse is HttpStatusCode.NoContent)
-                {
-                    // Update the progress bar and the toast.
-                    progressToastParameters.Content.Progress += 100 / selectedTickets.Count;
-                    if (progressToastParameters.Content.Progress > 100) progressToastParameters.Content.Progress = 100;
+                // Update the progress bar and the toast.
+                progressToastParameters.Content.Progress += 100 / selectedTickets.Count;
+                if (progressToastParameters.Content.Progress > 100) progressToastParameters.Content.Progress = 100;
 
-                    toastService.UpdateToast("Delete", progressToastParameters);
-                }
-                else throw new HttpRequestException(deleteResponse.ToString(), null, deleteResponse);
+                toastService.UpdateToast("Delete", progressToastParameters);
             }
 
             toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["DeleteSuccessToastTitle"], loc["DeleteSuccessToastDetails"]));
@@ -447,27 +440,17 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             {
                 var getResponse = await ticketsClient.GetAsync(ticketId);
 
-                // // If the ticket could not be retrieved, send an error.
-                if (getResponse is (HttpStatusCode.OK, not null))
-                {
-                    // Update the ticket status to Closed.
-                    var requestDto = mapper.Map<TicketRequestDto>(getResponse);
-                    requestDto.Status = Status.Closed;
+                // Update the ticket status to Closed.
+                var requestDto = mapper.Map<TicketRequestDto>(getResponse);
+                requestDto.Status = Status.Closed;
 
-                    var putResponse = await ticketsClient.PutAsync(ticketId, requestDto);
+                var putResponse = await ticketsClient.PutAsync(ticketId, requestDto);
 
-                    // If the ticket could not be closed, send an error.
-                    if (putResponse is (HttpStatusCode.OK, not null))
-                    {
-                        // Update the progress bar and the toast.
-                        progressToastParameters.Content.Progress += 100 / selectedTickets.Count;
-                        if (progressToastParameters.Content.Progress > 100) progressToastParameters.Content.Progress = 100;
-
-                        toastService.UpdateToast("Close", progressToastParameters);
-                    }
-                    else throw new HttpRequestException(putResponse.Item1.ToString(), null, putResponse.Item1);
-                }
-                else throw new HttpRequestException(getResponse.Item1.ToString(), null, getResponse.Item1);
+                // Update the progress bar and the toast.
+                progressToastParameters.Content.Progress += 100 / selectedTickets.Count;
+                if (progressToastParameters.Content.Progress > 100) progressToastParameters.Content.Progress = 100;
+                
+                toastService.UpdateToast("Close", progressToastParameters);
             }
 
             toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["CloseSuccessToastTitle"], loc["CloseSuccessToastDetails"]));
@@ -500,27 +483,17 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             {
                 var getResponse = await ticketsClient.GetAsync(ticketId);
 
-                // If the ticket could not be retrieved, send an error.
-                if (getResponse is (HttpStatusCode.OK, not null))
-                {
-                    // Update the ticket assignee.
-                    var requestDto = mapper.Map<TicketRequestDto>(getResponse);
-                    requestDto.OperatorUserId = operatorId;
+                // Update the ticket assignee.
+                var requestDto = mapper.Map<TicketRequestDto>(getResponse);
+                requestDto.OperatorUserId = operatorId;
 
-                    var putResponse = await ticketsClient.PutAsync(ticketId, requestDto);
+                var putResponse = await ticketsClient.PutAsync(ticketId, requestDto);
 
-                    // If the ticket could not be assigned, send an error.
-                    if (putResponse is (HttpStatusCode.OK, not null))
-                    {
-                        // Update the progress bar and the toast.
-                        progressToastParameters.Content.Progress += 100 / selectedTickets.Count;
-                        if (progressToastParameters.Content.Progress > 100) progressToastParameters.Content.Progress = 100;
+                // Update the progress bar and the toast.
+                progressToastParameters.Content.Progress += 100 / selectedTickets.Count;
+                if (progressToastParameters.Content.Progress > 100) progressToastParameters.Content.Progress = 100;
 
-                        toastService.UpdateToast("Assign", progressToastParameters);
-                    }
-                    else throw new HttpRequestException(putResponse.Item1.ToString(), null, putResponse.Item1);
-                }
-                else throw new HttpRequestException(getResponse.Item1.ToString(), null, getResponse.Item1);
+                toastService.UpdateToast("Assign", progressToastParameters);
             }
 
             toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["AssignSuccessToastTitle"], loc["AssignSuccessToastDetails"]));
@@ -632,8 +605,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     {
         if (currentUser.IsAuthenticated())
         {
-            return currentUser.GetHomeTenantId() == configuration["Entra:TenantId"] ?
-            [] : new Dictionary<string, string> { { nameof(TicketResponseDto.CreatorUserId), currentUser.GetHomeTenantId() ?? "" } };
+            return currentUser.GetTenantId() == configuration["Entra:TenantId"] ?
+            [] : new Dictionary<string, string> { { nameof(TicketResponseDto.CreatorUserId), currentUser.GetTenantId() ?? "" } };
         }
 
         return [];
@@ -645,10 +618,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         {
             "AllTab" => [],
             "UnassignedTab" => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.Unassigned) } },
-            "ToReply" when currentUser.GetHomeTenantId() == configuration["Entra:TenantId"] => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingOperator) } },
-            "ToReply" when currentUser.GetHomeTenantId() != configuration["Entra:TenantId"] => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingUser) } },
-            "WaitingTab" when currentUser.GetHomeTenantId() == configuration["Entra:TenantId"] => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingUser) } },
-            "WaitingTab" when currentUser.GetHomeTenantId() != configuration["Entra:TenantId"] => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingOperator) } },
+            "ToReply" when currentUser.GetTenantId() == configuration["Entra:TenantId"] => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingOperator) } },
+            "ToReply" when currentUser.GetTenantId() != configuration["Entra:TenantId"] => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingUser) } },
+            "WaitingTab" when currentUser.GetTenantId() == configuration["Entra:TenantId"] => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingUser) } },
+            "WaitingTab" when currentUser.GetTenantId() != configuration["Entra:TenantId"] => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingOperator) } },
             "ClosedTab" => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.Closed) } },
             _ => []
         };

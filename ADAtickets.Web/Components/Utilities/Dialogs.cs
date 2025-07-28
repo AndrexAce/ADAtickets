@@ -39,6 +39,7 @@ namespace ADAtickets.Web.Components.Utilities
         {
             return new()
             {
+                DialogType = DialogType.MessageBox,
                 Title = title,
                 PrimaryAction = okButtonText,
                 SecondaryAction = cancelButtonText,
@@ -71,7 +72,7 @@ namespace ADAtickets.Web.Components.Utilities
         }
 
         /// <summary>
-        /// Contains data to show in the <c>SimpleDialog.razor</c> component.
+        /// Contains data to show in the <c>TicketDialog.razor</c> component.
         /// </summary>
         public record TicketDialogContent
         {

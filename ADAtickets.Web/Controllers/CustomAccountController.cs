@@ -42,7 +42,7 @@ namespace ADAtickets.Web.Controllers
         [HttpGet]
         public new IActionResult SignOut()
         {
-            string? tid = HttpContext.User.GetHomeTenantId();
+            string? tid = HttpContext.User.GetTenantId();
 
             string scheme = tid == configuration["Entra:TenantId"] ? Scheme.OpenIdConnectDefault : Scheme.ExternalOpenIdConnectDefault;
 

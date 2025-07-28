@@ -58,22 +58,22 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         <DataAnnotationsValidator />
         <FluentValidationSummary Model="@TicketRequest"/>
 
-        @if (Content.IsEdit && !Content.IsUser)
-        {
-            <FluentSelect TOption="UserResponseDto"
-                          Label="@loc["AssignedOperator"]"
-                          Name="OperatorUserId"
-                          Items="users"
-                          OptionText="@(u => u.Name)"
-                          OptionValue="@(u => u.Id.ToString())"
-                          ReadOnly="@(Content.IsEdit && Content.IsUser)"
-                          @bind-Value="operatorUserIdString"
-                          Required>
-                <FluentIcon Value="@(new Icons.Regular.Size20.Person())" Color="@Color.Neutral" Slot="indicator" />
-            </FluentSelect>
-        }
-
         <FluentStack Orientation="Orientation.Vertical">
+            @if (Content.IsEdit && !Content.IsUser)
+            {
+                <FluentSelect TOption="UserResponseDto"
+                              Label="@loc["AssignedOperator"]"
+                              Name="OperatorUserId"
+                              Items="users"
+                              OptionText="@(u => u.Name)"
+                              OptionValue="@(u => u.Id.ToString())"
+                              ReadOnly="@(Content.IsEdit && Content.IsUser)"
+                              @bind-Value="operatorUserIdString"
+                              Required>
+                    <FluentIcon Value="@(new Icons.Regular.Size20.Person())" Color="@Color.Neutral" Slot="indicator" />
+                </FluentSelect>
+            }
+
             <FluentRadioGroup Name="Type"
                 LabelTemplate="@TicketTypeLabel"
                 Orientation="Orientation.Vertical"
@@ -378,11 +378,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         FluentInputFile.ResourceLoadingCompleted = loc["ResourceLoadingCompleted"];
     }
 
-    private async Task<IEnumerable<UserResponseDto>> LoadUsersAsync(IEnumerable<KeyValuePair<string, string>> filters) => (await usersClient.GetAllAsync(filters)).Item2;
+    private async Task<IEnumerable<UserResponseDto>> LoadUsersAsync(IEnumerable<KeyValuePair<string, string>> filters) => await usersClient.GetAllAsync(filters);
 
-    private async Task<IEnumerable<PlatformResponseDto>> LoadPlatformsAsync() => (await platformsClient.GetAllAsync()).Item2;
+    private async Task<IEnumerable<PlatformResponseDto>> LoadPlatformsAsync() => await platformsClient.GetAllAsync();
 
-    private async Task<IEnumerable<AttachmentResponseDto>> LoadAttachmentsAsync(IEnumerable<KeyValuePair<string, string>> filters) => (await attachmentsClient.GetAllAsync(filters)).Item2;
+    private async Task<IEnumerable<AttachmentResponseDto>> LoadAttachmentsAsync(IEnumerable<KeyValuePair<string, string>> filters) => await attachmentsClient.GetAllAsync(filters);
 
     private async Task HandleValidSubmitAsync()
     {
@@ -398,29 +398,24 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 await ticketsClient.PutAsync(Content.InitialTicketData!.Id, TicketRequest) :
                 await ticketsClient.PostAsync(TicketRequest);
 
-            // If the ticket was not created or updated, send an error
-            if (ticketResponse is (HttpStatusCode.Created, not null) or (HttpStatusCode.NoContent, null))
+            // Update the progress bar and the toast.
+            progressToastParameters.Content.Progress = 50;
+
+            toastService.UpdateToast("CreateUpdate", progressToastParameters);
+
+            // Create the attachments only if the ticket is being created for the first time.
+            if (!Content.IsEdit)
             {
-                // Update the progress bar and the toast.
-                progressToastParameters.Content.Progress = 50;
+                await CreateAttachmentsAsync(ticketResponse!, progressToastParameters);
 
-                toastService.UpdateToast("CreateUpdate", progressToastParameters);
-
-                // Create the attachments only if the ticket is being created for the first time.
-                if (!Content.IsEdit)
-                {
-                    await CreateAttachmentsAsync(ticketResponse.Item2!, progressToastParameters);
-
-                    toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["CreateSuccessToastTitle"], loc["CreateSuccessToastDetails"]));
-                }
-                else
-                {
-                    toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["UpdateSuccessToastTitle"], loc["UpdateSuccessToastDetails"]));
-                }
-
-                await Dialog.CloseAsync();
+                toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["CreateSuccessToastTitle"], loc["CreateSuccessToastDetails"]));
             }
-            else throw new HttpRequestException(ticketResponse.Item1.ToString(), null, ticketResponse.Item1);
+            else
+            {
+                toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["UpdateSuccessToastTitle"], loc["UpdateSuccessToastDetails"]));
+            }
+
+            await Dialog.CloseAsync();
         }
         catch (Exception ex)
         {
@@ -448,14 +443,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
             var photoResponse = await attachmentsClient.PostAsync(photoAttachment);
 
-            if (photoResponse is (HttpStatusCode.Created, not null))
-            {
-                // Update the progress bar and the toast.
-                progressToastParameters.Content.Progress = videoPath is null ? 100 : 75;
+            // Update the progress bar and the toast.
+            progressToastParameters.Content.Progress = videoPath is null ? 100 : 75;
 
-                toastService.UpdateToast("Create", progressToastParameters);
-            }
-            else throw new HttpRequestException(photoResponse.Item1.ToString(), null, photoResponse.Item1);
+            toastService.UpdateToast("Create", progressToastParameters);
         }
 
         if (videoPath is not null)
@@ -469,14 +460,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
             var videoResponse = await attachmentsClient.PostAsync(videoAttachment);
 
-            if (videoResponse is (HttpStatusCode.Created, not null))
-            {
-                // Update the progress bar and the toast.
-                progressToastParameters.Content.Progress = 100;
+            // Update the progress bar and the toast.
+            progressToastParameters.Content.Progress = 100;
 
-                toastService.UpdateToast("Create", progressToastParameters);
-            }
-            else throw new HttpRequestException(videoResponse.Item1.ToString(), null, videoResponse.Item1);
+            toastService.UpdateToast("Create", progressToastParameters);
         }
     }
 

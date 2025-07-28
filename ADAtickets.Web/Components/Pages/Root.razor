@@ -65,33 +65,20 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     {
         var userEmail = user.GetEmail()!;
 
-        var queryParameters = new Dictionary<string, string> { { nameof(UserResponseDto.Email), userEmail } };
-
-        var getResponse = await usersClient.GetAllAsync(queryParameters);
-
-        // If the list of users could not be retrieved, throw an error.
-        if (getResponse is (HttpStatusCode.OK, not null))
+        try
         {
-            // If the user already exists, return. Otherwise, try create the user.
-            if (!getResponse.Item2.Any())
-            {
-
-                var postResponse = await usersClient.PostAsync(new UserRequestDto
-                    {
-                        Email = userEmail,
-                        Name = user.GetName()!,
-                        Surname = user.GetSurname()!,
-                        Type = UserType.User,
-                        AreEmailNotificationsEnabled = false
-                    });
-
-                // If the user could not be created, throw an error.
-                if (postResponse is not (HttpStatusCode.Created, not null))
-                {
-                    throw new HttpRequestException(postResponse.Item1.ToString(), null, postResponse.Item1);
-                }
-            }
+            await usersClient.GetAsync(userEmail);
         }
-        else throw new HttpRequestException(getResponse.Item1.ToString(), null, getResponse.Item1);
+        catch (HttpRequestException ex) when (ex.StatusCode is HttpStatusCode.NotFound)
+        {
+            await usersClient.PostAsync(new UserRequestDto
+            {
+                Email = userEmail,
+                Name = user.GetName()!,
+                Surname = user.GetSurname()!,
+                Type = UserType.User,
+                AreEmailNotificationsEnabled = false
+            });
+        }
     }
 }

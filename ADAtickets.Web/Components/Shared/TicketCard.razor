@@ -215,17 +215,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     {
         try
         {
-            var deleteResponse = await ticketsClient.DeleteAsync(Ticket.Id);
+            await ticketsClient.DeleteAsync(Ticket.Id);
 
-            // If the ticket could not be deleted, send an error.
-            if (deleteResponse is HttpStatusCode.NoContent)
-            {
-                toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["DeleteSuccessToastTitle"], loc["DeleteSuccessToastDetails"]));
+            toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["DeleteSuccessToastTitle"], loc["DeleteSuccessToastDetails"]));
 
-                // Notify the parent component that the ticket has been deleted.
-                await StateChanged.InvokeAsync();
-            }
-            else throw new HttpRequestException(deleteResponse.ToString(), null, deleteResponse);
+            // Notify the parent component that the ticket has been deleted.
+            await StateChanged.InvokeAsync();
         }
         catch (Exception ex)
         {
@@ -239,26 +234,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         {
             var getResponse = await ticketsClient.GetAsync(Ticket.Id);
 
-            // If the ticket could not be retrieved, send an error.
-            if (getResponse is (HttpStatusCode.OK, not null))
-            {
-                // Update the ticket status to Closed.
-                var requestDto = mapper.Map<TicketRequestDto>(getResponse);
-                requestDto.Status = Status.Closed;
+            // Update the ticket status to Closed.
+            var requestDto = mapper.Map<TicketRequestDto>(getResponse);
+            requestDto.Status = Status.Closed;
 
-                var putResponse = await ticketsClient.PutAsync(Ticket.Id, requestDto);
+            var putResponse = await ticketsClient.PutAsync(Ticket.Id, requestDto);
 
-                // If the ticket could not be closed, send an error.
-                if (putResponse is (HttpStatusCode.OK, not null))
-                {
-                    toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["CloseSuccessToastTitle"], loc["CloseSuccessToastDetails"]));
+            toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["CloseSuccessToastTitle"], loc["CloseSuccessToastDetails"]));
 
-                    // Notify the parent component that the ticket has been closed.
-                    await StateChanged.InvokeAsync();
-                }
-                else throw new HttpRequestException(putResponse.Item1.ToString(), null, putResponse.Item1);
-            }
-            else throw new HttpRequestException(getResponse.Item1.ToString(), null, getResponse.Item1);
+            // Notify the parent component that the ticket has been closed.
+            await StateChanged.InvokeAsync();
         }
         catch (Exception ex)
         {
@@ -272,26 +257,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         {
             var getResponse = await ticketsClient.GetAsync(Ticket.Id);
 
-            // If the ticket could not be found, skip it.
-            if (getResponse is (HttpStatusCode.OK, not null))
-            {
-                // Update the ticket assignee.
-                var requestDto = mapper.Map<TicketRequestDto>(getResponse);
-                requestDto.OperatorUserId = operatorId;
+            // Update the ticket assignee.
+            var requestDto = mapper.Map<TicketRequestDto>(getResponse);
+            requestDto.OperatorUserId = operatorId;
 
-                var putResponse = await ticketsClient.PutAsync(Ticket.Id, requestDto);
+            var putResponse = await ticketsClient.PutAsync(Ticket.Id, requestDto);
 
-                // If the ticket could not be assigned, send an error.
-                if (putResponse is (HttpStatusCode.OK, not null))
-                {
-                    toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["AssignSuccessToastTitle"], loc["AssignSuccessToastDetails"]));
+            toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["AssignSuccessToastTitle"], loc["AssignSuccessToastDetails"]));
 
-                    // Notify the parent component that the ticket has been assigned.
-                    await StateChanged.InvokeAsync();
-                }
-                else throw new HttpRequestException(putResponse.Item1.ToString(), null, putResponse.Item1);
-            }
-            else throw new HttpRequestException(getResponse.Item1.ToString(), null, getResponse.Item1);
+            // Notify the parent component that the ticket has been assigned.
+            await StateChanged.InvokeAsync();
         }
         catch (Exception ex)
         {
