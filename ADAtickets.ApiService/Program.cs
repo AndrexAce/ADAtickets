@@ -150,6 +150,7 @@ namespace ADAtickets.ApiService
             _ = builder.Services.AddScoped<IReplyRepository, ReplyRepository>();
             _ = builder.Services.AddScoped<ITicketRepository, TicketRepository>();
             _ = builder.Services.AddScoped<IUserRepository, UserRepository>();
+            _ = builder.Services.AddScoped<IUserPlatformRepository, UserPlatformRepository>();
 
             // Add automapping of entities.
             _ = builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
@@ -219,7 +220,7 @@ namespace ADAtickets.ApiService
                 _ = policy.RequireAuthenticatedUser()
                 .RequireAssertion(context =>
                 {
-                    return context.User.IsDevOpsAdmin() && context.User.GetHomeTenantId() == configuration["Entra:TenantId"];
+                    return context.User.IsDevOpsAdmin() && context.User.GetTenantId() == configuration["Entra:TenantId"];
                 })
                 .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault, Scheme.ExternalOpenIdConnectDefault);
             })
@@ -228,7 +229,7 @@ namespace ADAtickets.ApiService
                 _ = policy.RequireAuthenticatedUser()
                 .RequireAssertion(context =>
                 {
-                    return context.User.GetHomeTenantId() == configuration["ExternalEntra:TenantId"];
+                    return context.User.GetTenantId() == configuration["ExternalEntra:TenantId"];
                 })
                 .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault, Scheme.ExternalOpenIdConnectDefault);
             })
@@ -237,7 +238,7 @@ namespace ADAtickets.ApiService
                 _ = policy.RequireAuthenticatedUser()
                 .RequireAssertion(context =>
                 {
-                    return context.User.GetHomeTenantId() == configuration["Entra:TenantId"];
+                    return context.User.GetTenantId() == configuration["Entra:TenantId"];
                 })
                 .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault, Scheme.ExternalOpenIdConnectDefault);
             })

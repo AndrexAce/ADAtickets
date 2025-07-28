@@ -44,7 +44,6 @@ namespace ADAtickets.ApiService.Controllers
     [Produces(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
     [FormatFilter]
     [ApiConventionType(typeof(ApiConventions))]
-    [Authorize(Policy = Policy.AdminOnly)]
     public sealed class PlatformsController(IPlatformRepository platformRepository, IMapper mapper) : ControllerBase
     {
         /// <summary>
@@ -64,6 +63,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpGet]
         [RequiredScope(Scope.Read)]
+        [Authorize(Policy = Policy.Everyone)]
         public async Task<ActionResult<IEnumerable<PlatformResponseDto>>> GetPlatforms([FromQuery] Dictionary<string, string>? filters)
         {
             IEnumerable<Platform> platforms = await (filters != null ? platformRepository.GetPlatformsByAsync(filters) : platformRepository.GetPlatformsAsync());
@@ -84,6 +84,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpGet("{id:guid}")]
         [RequiredScope(Scope.Read)]
+        [Authorize(Policy = Policy.AdminOnly)]
         public async Task<ActionResult<PlatformResponseDto>> GetPlatform(Guid id)
         {
             // Check if the requested entity exists.
@@ -128,6 +129,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="409">The entity was updated by another request at the same time.</response>
         [HttpPut("{id:guid}")]
         [RequiredScope(Scope.Read, Scope.Write)]
+        [Authorize(Policy = Policy.AdminOnly)]
         public async Task<ActionResult<PlatformResponseDto>> PutPlatform(Guid id, PlatformRequestDto platformDto)
         {
             // If the requested entity does not exist, create a new one.
@@ -184,6 +186,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpPost]
         [RequiredScope(Scope.Read, Scope.Write)]
+        [Authorize(Policy = Policy.AdminOnly)]
         public async Task<ActionResult<PlatformResponseDto>> PostPlatform(PlatformRequestDto platformDto)
         {
             Platform platform = mapper.Map<Platform>(platformDto);
@@ -208,6 +211,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpDelete("{id:guid}")]
         [RequiredScope(Scope.Read, Scope.Write)]
+        [Authorize(Policy = Policy.AdminOnly)]
         public async Task<IActionResult> DeletePlatform(Guid id)
         {
             // Check if the requested entity exists.

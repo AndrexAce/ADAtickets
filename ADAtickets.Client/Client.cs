@@ -262,7 +262,7 @@ namespace ADAtickets.Client
                 throw new InvalidOperationException("The user is not authenticated.");
             }
 
-            string? tid = user.GetHomeTenantId();
+            string? tid = user.GetTenantId();
 
             return tid is null ? throw new InvalidOperationException("The user is not authenticated.") : tid;
         }
