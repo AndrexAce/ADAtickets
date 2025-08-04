@@ -27,10 +27,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @using ADAtickets.Shared.Models
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.Identity.Web
 
+@inject IConfiguration configuration
 @inject NavigationManager navigationManager
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject UsersClient usersClient
+@inject AzureDevOpsClient azureDevOpsClient
 
 @attribute [AllowAnonymous]
 
@@ -46,9 +49,23 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         {
             try
             {
-                await CheckUserAgainstDatabase(authState.User);
+                var loggedInUser = await CheckUserAgainstDatabase(authState.User);
 
-                navigationManager.NavigateTo("/my-tickets", true);
+                if (loggedInUser.Type is UserType.User)
+                {
+                    navigationManager.NavigateTo("/my-tickets", true);
+                }
+                else
+                {
+                    if (await HasUserAzureDevOpsPermissions(loggedInUser))
+                    {
+                        navigationManager.NavigateTo("/my-tickets", true);
+                    }
+                    else
+                    {
+                        navigationManager.NavigateTo("/azure-devops-noaccess", true);
+                    }
+                }
             }
             catch
             {
@@ -61,24 +78,39 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         }
     }
 
-    private async Task CheckUserAgainstDatabase(ClaimsPrincipal user)
+    private async Task<UserResponseDto> CheckUserAgainstDatabase(ClaimsPrincipal user)
     {
         var userEmail = user.GetEmail()!;
 
         try
         {
-            await usersClient.GetAsync(userEmail);
+            return await usersClient.GetAsync(userEmail);
         }
         catch (HttpRequestException ex) when (ex.StatusCode is HttpStatusCode.NotFound)
         {
-            await usersClient.PostAsync(new UserRequestDto
+            return await usersClient.PostAsync(new UserRequestDto
             {
                 Email = userEmail,
                 Name = user.GetName()!,
                 Surname = user.GetSurname()!,
-                Type = UserType.User,
+                Type = InferUserType(user),
                 AreEmailNotificationsEnabled = false
             });
         }
+    }
+
+    private UserType InferUserType(ClaimsPrincipal user)
+    {
+        if (user.GetTenantId() == configuration["Entra:TenantId"])
+        {
+            return user.IsDevOpsAdmin() ? UserType.Admin : UserType.Operator;
+        }
+
+        return UserType.User;
+    }
+
+    private async Task<bool> HasUserAzureDevOpsPermissions(UserResponseDto loggedInUser)
+    {
+        return await azureDevOpsClient.GetUserDevOpsAccessAsync(loggedInUser.Email);
     }
 }

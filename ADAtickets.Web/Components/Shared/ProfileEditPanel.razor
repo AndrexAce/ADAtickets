@@ -1,0 +1,291 @@
+﻿<!-- ADAtickets is a simple, lightweight, open source ticketing system
+interacting with your enterprise repositories on Azure DevOps
+with a two-way synchronization.
+Copyright (C) 2025  Andrea Lucchese
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
+@implements IDialogContentComponent<ClaimsPrincipal>
+
+@using ADAtickets.Client
+@using ADAtickets.Shared.Constants
+@using ADAtickets.Shared.Extensions
+@using ADAtickets.Shared.Dtos.Requests
+@using ADAtickets.Shared.Dtos.Responses
+@using ADAtickets.Web.Components.Utilities
+@using AutoMapper
+@using System.Net
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.Identity.Web
+@using static ADAtickets.Web.Components.Utilities.Dialogs
+
+@inject IStringLocalizer<ProfileEditPanel> loc
+@inject IToastService toastService
+@inject IDialogService dialogService
+@inject IMapper mapper
+@inject IConfiguration configuration
+@inject UsersClient usersClient
+@inject UserPlatformsClient userPlatformsClient
+@inject PlatformsClient platformsClient
+
+<FluentDialogHeader ShowDismiss="false" ShowDismissTooltip="false">
+    <FluentStack Orientation="Orientation.Vertical" HorizontalAlignment="HorizontalAlignment.Center">
+        <FluentStack Orientation="Orientation.Horizontal" HorizontalAlignment="HorizontalAlignment.Right">
+            @if (!isEdit)
+            {
+                <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Edit())" OnClick="HandleEditClick">@loc["Edit"]</FluentButton>
+            }
+            else
+            {
+                <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Save())" OnClick="HandleSaveClickAsync">@loc["Save"]</FluentButton>
+            }
+            <FluentButton Appearance="Appearance.Lightweight" IconStart="@(new Icons.Regular.Size20.Dismiss())" OnClick="HandleCancelClickAsync" />
+        </FluentStack>
+        <FluentLabel Typo="Typography.PaneHeader">@loc["ProfileEditPanelTitle"]</FluentLabel>
+    </FluentStack>
+</FluentDialogHeader>
+
+<FluentDialogBody>
+    @if (!isEdit)
+    {
+        <FluentStack Orientation="Orientation.Vertical" HorizontalAlignment="HorizontalAlignment.Start">
+            <FluentLabel Typo="Typography.Body" Weight="FontWeight.Bold">@loc["ProfilePictureLabel"]</FluentLabel>
+            <FluentPersona ImageSize="7.5rem" Initials="@GetInitials(Content.GetFullName())" Style="align-self: center"/>
+
+            <FluentLabel Typo="Typography.Body" Weight="FontWeight.Bold">@loc["EmailLabel"]</FluentLabel>
+            <FluentLabel Typo="Typography.Body">@Content.GetEmail()</FluentLabel>
+
+            <FluentLabel Typo="Typography.Body" Weight="FontWeight.Bold">@loc["NameLabel"]</FluentLabel>
+            <FluentLabel Typo="Typography.Body">@Content.GetName()</FluentLabel>
+
+            <FluentLabel Typo="Typography.Body" Weight="FontWeight.Bold">@loc["SurnameLabel"]</FluentLabel>
+            <FluentLabel Typo="Typography.Body">@Content.GetSurname()</FluentLabel>
+
+            <AuthorizeView Policy="@Policy.OperatorOrAdmin">
+                <FluentLabel Typo="Typography.Body" Weight="FontWeight.Bold">@loc["FavouriteAppsLabel"]</FluentLabel>
+                <FluentLabel Typo="Typography.Body">@favouritePlatformNames</FluentLabel>
+            </AuthorizeView>
+        </FluentStack>
+    }
+    else
+    {
+        <EditForm id="user_form" Model="@UserRequest" OnValidSubmit="HandleValidSubmitAsync" FormName="user_form">
+            <DataAnnotationsValidator />
+            <FluentValidationSummary Model="@UserRequest"/>
+
+            <FluentStack Orientation="Orientation.Vertical" HorizontalAlignment="HorizontalAlignment.Start">
+                <FluentLabel Typo="Typography.Body" Weight="FontWeight.Bold">@loc["ProfilePictureLabel"]</FluentLabel>
+                <FluentPersona ImageSize="7.5rem" Initials="@GetInitials(Content.GetFullName())" Style="align-self: center" />
+
+                <FluentTextField Name="Email"
+                                Label="@loc["EmailLabel"]"
+                                Spellcheck="true"
+                                Style="width: 100%"
+                                ReadOnly="true"
+                                @bind-Value="UserRequest.Email">
+                    <FluentIcon Value="@(new Icons.Regular.Size20.Mention())" Color="@Color.Neutral" Slot="start" />
+                </FluentTextField>
+                <FluentValidationMessage For="@(() => UserRequest.Email)" />
+
+                <FluentTextField Name="Email"
+                                 Label="@loc["NameLabel"]"
+                                 Spellcheck="false"
+                                 Style="width: 100%"
+                                 @bind-Value="UserRequest.Name"
+                                 Required>
+                    <FluentIcon Value="@(new Icons.Regular.Size20.PersonNote())" Color="@Color.Neutral" Slot="start" />
+                </FluentTextField>
+                <FluentValidationMessage For="@(() => UserRequest.Name)" />
+
+                <FluentTextField Name="Email"
+                                 Label="@loc["SurnameLabel"]"
+                                 Spellcheck="false"
+                                 Style="width: 100%"
+                                 @bind-Value="UserRequest.Surname"
+                                 Required>
+                    <FluentIcon Value="@(new Icons.Regular.Size20.PersonNote())" Color="@Color.Neutral" Slot="start" />
+                </FluentTextField>
+                <FluentValidationMessage For="@(() => UserRequest.Surname)" />
+
+                <AuthorizeView Policy="@Policy.OperatorOrAdmin">
+                    <ChildContent Context="selectContext">
+                        <FluentSelect TOption="PlatformResponseDto"
+                                      Label="@loc["Platform"]"
+                                      Name="PlatformId"
+                                      Items="platforms"
+                                      Multiple="true"
+                                      OptionText="@(p => p.Name)"
+                                      OptionValue="@(p => p.Id.ToString())"
+                                      @bind-SelectedOptions="favouritePlatforms">
+                            <FluentIcon Value="@(new Icons.Regular.Size20.Apps())" Color="@Color.Neutral" Slot="indicator" />
+                        </FluentSelect>
+                    </ChildContent> 
+                </AuthorizeView>
+            </FluentStack>
+        </EditForm>
+    }
+</FluentDialogBody>
+
+<FluentDialogFooter Visible="false"/>
+
+@code {
+    /// <summary>
+    /// The dialog object bound to this component.
+    /// </summary>
+    [CascadingParameter]
+    public FluentDialog Dialog { get; set; } = default!;
+
+    /// <summary>
+    /// Necessary data to display the dialog.
+    /// </summary>
+    [Parameter]
+    public required ClaimsPrincipal Content { get; set; }
+
+    [SupplyParameterFromForm]
+    private UserRequestDto UserRequest { get; set; } = new();
+
+    private bool isEdit = false;
+    private IEnumerable<PlatformResponseDto>? platforms = null;
+    private IEnumerable<PlatformResponseDto>? favouritePlatforms = null;
+    private string? favouritePlatformNames = null;
+    private Guid? currentUserId = null;
+
+    override protected async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (!await IsDbUserConsistentWithEntra())
+            {
+                await AlignDbUserWithEntra();
+            }
+
+            // Initialize the UserRequest with data from the Content ClaimsPrincipal
+            if (Content.Identity is not null && Content.Identity.IsAuthenticated)
+            {
+                UserRequest.Email = Content.GetEmail() ?? string.Empty;
+                UserRequest.Name = Content.GetName() ?? string.Empty;
+                UserRequest.Surname = Content.GetSurname() ?? string.Empty;
+            }
+
+            if (Content.GetTenantId() == configuration["Entra:TenantId"])
+            {
+                await GetPlatforms();
+                await GetFavouritePlatforms();
+                GetFavouritePlatformsName();
+            }
+
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowCommunicationToast(Toasts.ErrorToastParameters(ex, loc["LoadingErrorToastTitle"], loc["LoadingErrorToastDetails"]));
+
+            await Dialog.CloseAsync();
+        }
+    }
+
+    private async Task<bool> IsDbUserConsistentWithEntra()
+    {
+        var getResponse = await usersClient.GetAsync(Content.GetEmail()!);
+
+        return getResponse.Email == Content.GetEmail() && getResponse.Name == Content.GetName() && getResponse.Surname == Content.GetSurname();
+    }
+
+    private async Task AlignDbUserWithEntra()
+    {
+        var newData = new UserRequestDto
+        {
+            Email = Content.GetEmail() ?? string.Empty,
+            Name = Content.GetName() ?? string.Empty,
+            Surname = Content.GetSurname() ?? string.Empty
+        };
+
+        await usersClient.PutAsync(Content.GetEmail() ?? string.Empty, newData);
+    }
+
+    private async Task GetPlatforms() => platforms = await platformsClient.GetAllAsync();
+
+    private async Task GetFavouritePlatforms()
+    {
+        var getResponse = await userPlatformsClient.GetAllAsync(new Dictionary<string, string> { { nameof(UserPlatformRequestDto.UserId), await GetCurrentUserId() } });
+
+        favouritePlatforms = platforms!.Where(p => getResponse.Any(up => up.PlatformId == p.Id));
+    }
+
+    private void GetFavouritePlatformsName()
+    {
+        var favouritePlatformsJoinedString = String.Join(",", favouritePlatforms!.Select(p => p.Name));
+
+        favouritePlatformNames = string.IsNullOrWhiteSpace(favouritePlatformsJoinedString) 
+            ? loc["NoFavouritePlatformLabel"] 
+            : favouritePlatformsJoinedString;
+    }
+
+    private async Task<string> GetCurrentUserId()
+    {
+        currentUserId = (await usersClient.GetAsync(Content.GetEmail()!)).Id;
+
+        return currentUserId.ToString()!;
+    }
+
+    private void HandleEditClick() => isEdit = !isEdit;
+
+    private async Task HandleSaveClickAsync()
+    {
+        // TODO
+    }
+
+    private async Task HandleCancelClickAsync()
+    {
+        if (isEdit)
+        {
+            await dialogService.ShowDialogAsync<SimpleDialog>(
+                new SimpleDialogContent
+                {
+                    Message = loc["CancelConfirmDialogMessage"],
+                    ConfirmAction = HandleConfirmCancel,
+                    ConfirmButtonIcon = new Icons.Regular.Size20.EditOff(),
+                },
+                Dialogs.ConfirmDialogParameters(loc["CancelConfirmDialogTitle"], loc["CancelConfirmDialogConfirmButton"], loc["CancelConfirmDialogCancelButton"]));
+        }
+        else
+        {
+            await Dialog.CloseAsync();
+        }
+    }
+
+    private Task HandleConfirmCancel()
+    {
+        isEdit = false;
+
+        return Task.CompletedTask;
+    }
+
+    private async Task HandleValidSubmitAsync()
+    {
+        // TODO
+    }
+
+    private static string GetInitials(string? fullName)
+    {
+        if (string.IsNullOrWhiteSpace(fullName))
+        {
+            return string.Empty;
+        }
+
+        return fullName.Split(' ')
+            .Where(part => !string.IsNullOrWhiteSpace(part))
+            .Select(part => part[0])
+            .Aggregate(string.Empty, (acc, initial) => acc + initial);
+    }
+}

@@ -21,8 +21,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @using ADAtickets.Client.Extensions
 @using ADAtickets.Shared.Constants
 @using ADAtickets.Shared.Extensions
+@using ADAtickets.Web.Components.Utilities
 @using Microsoft.AspNetCore.Components.Authorization
-@using Microsoft.Graph.Models
 @using Microsoft.Identity.Abstractions
 
 @inject IDialogService dialogService
@@ -47,7 +47,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     }
     <FluentLabel Typo="Typography.Header" Color="Color.Fill">ADAtickets</FluentLabel>
     <FluentSpacer />
-    <FluentProfileMenu FullName="@accountName" ImageSize="5rem" EMail="@accountEmail" HeaderLabel="@loc["HeaderLabel"]" OnHeaderButtonClick="SignOutAsync" HeaderButton="@loc["HeaderButton"]" FooterLink="@loc["FooterLink"]">
+    <FluentProfileMenu FullName="@accountName" ImageSize="5rem" EMail="@accountEmail" HeaderLabel="@loc["HeaderLabel"]" OnHeaderButtonClick="SignOutAsync" HeaderButton="@loc["HeaderButton"]" FooterLink="@loc["FooterLink"]" OnFooterLinkClick="OpenEditProfilePanel">
         <StartTemplate>@accountName</StartTemplate>
     </FluentProfileMenu>
     <FluentButton Appearance="Appearance.Neutral" IconStart="@(new Icons.Regular.Size20.Alert())"/>
@@ -86,5 +86,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         {
             navigationManager.NavigateTo("CustomAccount/SignOut", true);
         }
+    }
+
+    private async Task OpenEditProfilePanel()
+    {
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        await dialogService.ShowPanelAsync<ProfileEditPanel>(user, Dialogs.PanelParameters());
     }
 }

@@ -50,6 +50,22 @@ namespace ADAtickets.Web.Components.Utilities
         }
 
         /// <summary>
+        /// Creates a set of dialog parameters to configure a panel dialog.
+        /// </summary>
+        /// <returns>A <see cref="DialogParameters"/> object with the specified behaviour settings.</returns>
+        public static DialogParameters PanelParameters()
+        {
+            return new()
+            {
+                DialogType = DialogType.Panel,
+                Alignment = HorizontalAlignment.Right,
+                TrapFocus = true,
+                PreventScroll = true,
+                PreventDismissOnOverlayClick = true
+            };
+        }
+
+        /// <summary>
         /// Contains data to show in the <c>SimpleDialog.razor</c> component.
         /// </summary>
         public record SimpleDialogContent
