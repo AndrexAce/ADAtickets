@@ -50,7 +50,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     <FluentProfileMenu FullName="@accountName" ImageSize="5rem" EMail="@accountEmail" HeaderLabel="@loc["HeaderLabel"]" OnHeaderButtonClick="SignOutAsync" HeaderButton="@loc["HeaderButton"]" FooterLink="@loc["FooterLink"]" OnFooterLinkClick="OpenEditProfilePanel">
         <StartTemplate>@accountName</StartTemplate>
     </FluentProfileMenu>
-    <FluentButton Appearance="Appearance.Neutral" IconStart="@(new Icons.Regular.Size20.Alert())"/>
+    <FluentButton Appearance="Appearance.Neutral" OnClick="OpenNotificationsPanel" IconStart="@(new Icons.Regular.Size20.Alert())"/>
 </FluentStack>
 
 @code {
@@ -94,5 +94,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         var user = authState.User;
 
         await dialogService.ShowPanelAsync<ProfileEditPanel>(user, Dialogs.PanelParameters());
+    }
+
+    private async Task OpenNotificationsPanel()
+    {
+        // TODO
     }
 }

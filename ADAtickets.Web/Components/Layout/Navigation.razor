@@ -41,9 +41,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         </AuthorizeView>
 
         <FluentNavGroup Icon="@(new Icons.Regular.Size20.Settings())" Title="@loc["Settings"]" Expanded="true">
-            <FluentNavLink Href="/theme-and-personalization">@loc["ThemeAndPersonalization"]</FluentNavLink>
-            <FluentNavLink Href="/notifications">@loc["Notifications"]</FluentNavLink>
-            <FluentNavLink Href="/access-and-security">@loc["AccessAndSecurity"]</FluentNavLink>
+            <FluentNavLink OnClick="ShowThemeAndPersonalizationDialogAsync">@loc["ThemeAndPersonalization"]</FluentNavLink>
+            <FluentNavLink OnClick="ShowNotificationsDialogAsync">@loc["Notifications"]</FluentNavLink>
+            <FluentNavLink OnClick="ShowAccessAndSecurityDialogAsync">@loc["AccessAndSecurity"]</FluentNavLink>
         </FluentNavGroup>
 
         <FluentNavGroup Icon="@(new Icons.Regular.Size20.Question())" Title="@loc["Help"]" Expanded="true">
@@ -70,5 +70,20 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 PreventDismissOnOverlayClick = true
             }
         );
+    }
+
+    private async Task ShowThemeAndPersonalizationDialogAsync()
+    {
+        // TODO
+    }
+
+    private async Task ShowNotificationsDialogAsync()
+    {
+        // TODO
+    }
+
+    private async Task ShowAccessAndSecurityDialogAsync()
+    {
+        // TODO
     }
 }

@@ -48,7 +48,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             }
             else
             {
-                <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Save())" OnClick="HandleSaveClickAsync">@loc["Save"]</FluentButton>
+                <FluentButton Id="SubmitEdit"
+                    Type="ButtonType.Submit"
+                    Appearance="Appearance.Accent"
+                    IconStart="@(new Icons.Regular.Size20.Save())"
+                    FormId="user_form">@loc["Save"]</FluentButton>
             }
             <FluentButton Appearance="Appearance.Lightweight" IconStart="@(new Icons.Regular.Size20.Dismiss())" OnClick="HandleCancelClickAsync" />
         </FluentStack>
@@ -239,11 +243,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     }
 
     private void HandleEditClick() => isEdit = !isEdit;
-
-    private async Task HandleSaveClickAsync()
-    {
-        // TODO
-    }
 
     private async Task HandleCancelClickAsync()
     {
