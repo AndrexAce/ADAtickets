@@ -62,5 +62,9 @@ namespace ADAtickets.Shared.Constants
         /// Path to the API controller for <see cref="UserPlatform"/> entities.
         /// </summary>
         public const string UserPlatforms = "UserPlatforms";
+        /// <summary>
+        /// Path to the API controller for <see cref="UserNotification"/> entities.
+        /// </summary>
+        public const string UserNotifications = "UserNotifications";
     }
 }

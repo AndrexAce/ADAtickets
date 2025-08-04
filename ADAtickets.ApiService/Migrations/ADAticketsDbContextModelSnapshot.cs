@@ -361,13 +361,18 @@ namespace ADAtickets.ApiService.Migrations
 
             modelBuilder.Entity("ADAtickets.Shared.Models.UserNotification", b =>
                 {
-                    b.Property<Guid>("ReceiverUserId")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
-                        .HasColumnName("receiver_user_id");
+                        .HasColumnName("id");
 
                     b.Property<Guid>("NotificationId")
                         .HasColumnType("uuid")
                         .HasColumnName("notification_id");
+
+                    b.Property<Guid>("ReceiverUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("receiver_user_id");
 
                     b.Property<uint>("Version")
                         .IsConcurrencyToken()
@@ -375,11 +380,15 @@ namespace ADAtickets.ApiService.Migrations
                         .HasColumnType("xid")
                         .HasColumnName("xmin");
 
-                    b.HasKey("ReceiverUserId", "NotificationId")
+                    b.HasKey("Id")
                         .HasName("pk_user_notifications");
 
                     b.HasIndex("NotificationId")
                         .HasDatabaseName("ix_user_notifications_notification_id");
+
+                    b.HasIndex("ReceiverUserId", "NotificationId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_user_notifications_receiver_user_id_notification_id");
 
                     b.ToTable("user_notifications", (string)null);
                 });
@@ -399,6 +408,12 @@ namespace ADAtickets.ApiService.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
+
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
                     b.HasKey("Id")
                         .HasName("pk_user_platforms");

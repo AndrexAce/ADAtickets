@@ -32,15 +32,8 @@ namespace ADAtickets.Shared.Models
     /// <remarks>This class is intended for internal use only; it is public only to allow for testing.</remarks>
     [EditorBrowsable(EditorBrowsableState.Never)]
     [Index(nameof(UserId), nameof(PlatformId), IsUnique = true)]
-    public sealed class UserPlatform
+    public sealed class UserPlatform : Entity
     {
-        /// <summary>
-        /// The unique identifier of the link.
-        /// </summary>
-        [Key]
-        [Required]
-        public Guid Id { get; set; } = Guid.NewGuid();
-
         /// <summary>
         /// The unique identifier of the user who marked the platform as preferred.
         /// </summary>

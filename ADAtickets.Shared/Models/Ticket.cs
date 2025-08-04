@@ -33,13 +33,6 @@ namespace ADAtickets.Shared.Models
     public sealed class Ticket : Entity
     {
         /// <summary>
-        /// The unique identifier of the ticket.
-        /// </summary>
-        [Key]
-        [Required]
-        public Guid Id { get; set; } = Guid.NewGuid();
-
-        /// <summary>
         /// The type of user request bound to the ticket.
         /// </summary>
         [Required]

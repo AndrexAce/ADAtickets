@@ -76,6 +76,9 @@ namespace ADAtickets.ApiService.Configs
 
             _ = CreateMap<UserPlatform, UserPlatformResponseDto>(MemberList.Destination);
             _ = CreateMap<UserPlatformRequestDto, UserPlatform>(MemberList.Source);
+
+            _ = CreateMap<UserNotification, UserNotificationResponseDto>(MemberList.Destination);
+            _ = CreateMap<UserNotificationRequestDto, UserNotification>(MemberList.Source);
         }
     }
 }

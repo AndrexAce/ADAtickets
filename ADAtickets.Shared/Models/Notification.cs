@@ -33,13 +33,6 @@ namespace ADAtickets.Shared.Models
     public sealed class Notification : Entity
     {
         /// <summary>
-        /// The unique identifier of the notification.
-        /// </summary>
-        [Key]
-        [Required]
-        public Guid Id { get; set; } = Guid.NewGuid();
-
-        /// <summary>
         /// The date and time when the notification was sent.
         /// </summary>
         [Required]

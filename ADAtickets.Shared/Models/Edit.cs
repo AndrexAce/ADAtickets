@@ -33,13 +33,6 @@ namespace ADAtickets.Shared.Models
     public sealed class Edit : Entity
     {
         /// <summary>
-        /// The unique identifier of the edit.
-        /// </summary>
-        [Key]
-        [Required]
-        public Guid Id { get; set; } = Guid.NewGuid();
-
-        /// <summary>
         /// The date and time when the edit was made.
         /// </summary>
         [Required]

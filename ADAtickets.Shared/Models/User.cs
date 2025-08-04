@@ -35,13 +35,6 @@ namespace ADAtickets.Shared.Models
     public sealed class User : Entity
     {
         /// <summary>
-        /// The unique identifier of the user.
-        /// </summary>
-        [Key]
-        [Required]
-        public Guid Id { get; set; } = Guid.NewGuid();
-
-        /// <summary>
         /// The email address of the user.
         /// </summary>
         [Required]

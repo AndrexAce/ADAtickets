@@ -40,6 +40,7 @@ namespace ADAtickets.Client.Extensions
             _ = services.AddScoped<TicketsClient>();
             _ = services.AddScoped<UsersClient>();
             _ = services.AddScoped<UserPlatformsClient>();
+            _ = services.AddScoped<UserNotificationsClient>();
 
             return services;
         }

@@ -35,13 +35,6 @@ namespace ADAtickets.Shared.Models
     public sealed class Platform : Entity
     {
         /// <summary>
-        /// The unique identifier of the platform.
-        /// </summary>
-        [Key]
-        [Required]
-        public Guid Id { get; set; } = Guid.NewGuid();
-
-        /// <summary>
         /// The name of the platform.
         /// </summary>
         [Required]

@@ -35,13 +35,6 @@ namespace ADAtickets.Shared.Models
     public sealed class Attachment : Entity
     {
         /// <summary>
-        /// The unique identifier of the attachment.
-        /// </summary>
-        [Key]
-        [Required]
-        public Guid Id { get; set; } = Guid.NewGuid();
-
-        /// <summary>
         /// The path of the attachment on the server.
         /// </summary>
         [Required]

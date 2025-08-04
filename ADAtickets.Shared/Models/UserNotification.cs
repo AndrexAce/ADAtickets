@@ -31,7 +31,7 @@ namespace ADAtickets.Shared.Models
     /// </summary>
     /// <remarks>This class is intended for internal use only; it is public only to allow for testing.</remarks>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    [PrimaryKey(nameof(ReceiverUserId), nameof(NotificationId))]
+    [Index(nameof(ReceiverUserId), nameof(NotificationId), IsUnique = true)]
     public sealed class UserNotification : Entity
     {
         /// <summary>

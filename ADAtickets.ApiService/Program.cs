@@ -151,6 +151,7 @@ namespace ADAtickets.ApiService
             _ = builder.Services.AddScoped<ITicketRepository, TicketRepository>();
             _ = builder.Services.AddScoped<IUserRepository, UserRepository>();
             _ = builder.Services.AddScoped<IUserPlatformRepository, UserPlatformRepository>();
+            _ = builder.Services.AddScoped<IUserNotificationRepository, UserNotificationRepository>();
 
             // Add automapping of entities.
             _ = builder.Services.AddAutoMapper(typeof(AutoMapperProfile));

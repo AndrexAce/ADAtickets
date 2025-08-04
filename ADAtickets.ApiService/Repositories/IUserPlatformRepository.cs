@@ -46,7 +46,6 @@ namespace ADAtickets.ApiService.Repositories
         /// <returns>A <see cref="Task"/> returning all the <see cref="UserPlatform"/> entities, or an empty collection if there are none.</returns>
         Task<IEnumerable<UserPlatform>> GetUserPlatformsByAsync(IEnumerable<KeyValuePair<string, string>> filters);
 
-
         /// <summary>
         /// Adds a new <see cref="UserPlatform"/> entity to the data source asynchronously.
         /// </summary>

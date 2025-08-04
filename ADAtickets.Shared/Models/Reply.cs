@@ -33,13 +33,6 @@ namespace ADAtickets.Shared.Models
     public sealed class Reply : Entity
     {
         /// <summary>
-        /// The unique identifier of the reply.
-        /// </summary>
-        [Key]
-        [Required]
-        public Guid Id { get; set; } = Guid.NewGuid();
-
-        /// <summary>
         /// The date and time when the reply was sent.
         /// </summary>
         [Required]

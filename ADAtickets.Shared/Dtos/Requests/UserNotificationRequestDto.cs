@@ -17,34 +17,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-using AutoMapper.Configuration.Annotations;
-using System.ComponentModel;
+using ADAtickets.Shared.Models;
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
-namespace ADAtickets.Shared.Models
+namespace ADAtickets.Shared.Dtos.Requests
 {
     /// <summary>
-    /// <para>Base class for all entities in the ADAtickets model.</para>
-    /// <para>Contains common properties and methods.</para>
+    /// <para>Represents the link between a user and their received notification.</para>
+    /// <para>It is a simplified version of the <see cref="UserNotification"/> class, used for data transfer to the server.</para>
     /// </summary>
-    /// <remarks>This class is intended for internal use only; it is public only to allow for testing.</remarks>
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public abstract class Entity
+    public sealed class UserNotificationRequestDto : RequestDto
     {
         /// <summary>
-        /// The unique identifier of the entity.
+        /// The unique identifier of the user.
         /// </summary>
-        [Key]
         [Required]
-        public Guid Id { get; set; } = Guid.NewGuid();
+        public Guid ReceiverUserId { get; set; } = Guid.Empty;
 
         /// <summary>
-        /// Reserved field used to detect concurrent modification to the entity.
+        /// The unique identifier of the notification.
         /// </summary>
-        [Timestamp]
-        [Ignore]
-        [JsonIgnore]
-        public uint Version { get; set; } = 0;
+        [Required]
+        public Guid NotificationId { get; set; } = Guid.Empty;
     }
 }
