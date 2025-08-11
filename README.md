@@ -1,11 +1,11 @@
 [![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=AndrexAce_ADAtickets&token=5e4556b655d4ea59dadb70371521d437de829163)](https://sonarcloud.io/summary/overall?id=AndrexAce_ADAtickets&branch=master)
 
-![Static Badge](https://img.shields.io/badge/Framework-.NET%209.0.7%20%28STS%29-512BD4)
+![Static Badge](https://img.shields.io/badge/Framework-.NET%209.0.8%20%28STS%29-512BD4)
 ![Static Badge](https://img.shields.io/badge/Language-C%2313-8A2BE2)
 ![Static Badge](https://img.shields.io/badge/API-ASP.NET%20MVC%209-00A4EF)
 ![Static Badge](https://img.shields.io/badge/Web%20app-ASP.NET%20Blazor%209-244FFF)
 ![Static Badge](https://img.shields.io/badge/Database-PostgreSQL%2017.5-CC2927)
-![Static Badge](https://img.shields.io/badge/Cache-Redis%208.0.3-FFF927)
+![Static Badge](https://img.shields.io/badge/Cache-Redis%208.2.0-FFF927)
 ![Static Badge](https://img.shields.io/badge/License-GPL%20v3-FF0000)
 ![Static Badge](https://img.shields.io/badge/Status-Active-32CD32)
 
