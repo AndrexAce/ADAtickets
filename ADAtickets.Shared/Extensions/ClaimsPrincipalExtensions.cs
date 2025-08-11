@@ -56,7 +56,7 @@ namespace ADAtickets.Shared.Extensions
             string? name = user.GetName();
             string? surname = user.GetSurname();
 
-            return string.IsNullOrEmpty(name) && string.IsNullOrEmpty(surname) ? null : $"{name} {surname}";
+            return string.IsNullOrEmpty(name) && string.IsNullOrEmpty(surname) ? user.GetUsername() : $"{name} {surname}";
         }
 
         /// <summary>
@@ -77,6 +77,16 @@ namespace ADAtickets.Shared.Extensions
         public static string? GetSurname(this ClaimsPrincipal user)
         {
             return user.FindFirst(ClaimTypes.Surname)?.Value;
+        }
+
+        /// <summary>
+        /// Gets the user id associated with the <see cref="ClaimsPrincipal"/>.
+        /// </summary>
+        /// <param name="user">The <see cref="ClaimsPrincipal"/> from which to retrieve the claim.</param>
+        /// <returns>Id of the identity, or <see langword="null"/> if it cannot be found.</returns>
+        public static string? GetUserId(this ClaimsPrincipal user)
+        {
+            return user.FindFirst("uid")?.Value;
         }
 
         /// <summary>

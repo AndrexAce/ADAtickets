@@ -27,7 +27,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @using System.Net
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.Graph.Models
+@using Microsoft.Identity.Abstractions
 @using Microsoft.Identity.Web
+@using System.Text
+@using System.Text.Json
+@using System.Dynamic
 @using static ADAtickets.Web.Components.Utilities.Dialogs
 
 @inject IStringLocalizer<ProfileEditPanel> loc
@@ -35,6 +40,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @inject IDialogService dialogService
 @inject IMapper mapper
 @inject IConfiguration configuration
+@inject IDownstreamApi downstreamApi
+@inject AuthenticationStateProvider authenticationStateProvider
 @inject UsersClient usersClient
 @inject UserPlatformsClient userPlatformsClient
 @inject PlatformsClient platformsClient
@@ -70,6 +77,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             <FluentLabel Typo="Typography.Body" Weight="FontWeight.Bold">@loc["EmailLabel"]</FluentLabel>
             <FluentLabel Typo="Typography.Body">@Content.GetEmail()</FluentLabel>
 
+            <FluentLabel Typo="Typography.Body" Weight="FontWeight.Bold">@loc["UsernameLabel"]</FluentLabel>
+            <FluentLabel Typo="Typography.Body">@Content.GetUsername()</FluentLabel>
+
             <FluentLabel Typo="Typography.Body" Weight="FontWeight.Bold">@loc["NameLabel"]</FluentLabel>
             <FluentLabel Typo="Typography.Body">@Content.GetName()</FluentLabel>
 
@@ -102,6 +112,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 </FluentTextField>
                 <FluentValidationMessage For="@(() => UserRequest.Email)" />
 
+                <FluentTextField Name="Username"
+                                 Label="@loc["UsernameLabel"]"
+                                 Spellcheck="true"
+                                 Style="width: 100%"
+                                 @bind-Value="username"
+                                 Required>
+                    <FluentIcon Value="@(new Icons.Regular.Size20.Person())" Color="@Color.Neutral" Slot="start" />
+                </FluentTextField>
+                <FluentValidationMessage For="@(() => UserRequest.Email)" />
+
                 <FluentTextField Name="Email"
                                  Label="@loc["NameLabel"]"
                                  Spellcheck="false"
@@ -125,7 +145,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 <AuthorizeView Policy="@Policy.OperatorOrAdmin">
                     <ChildContent Context="selectContext">
                         <FluentSelect TOption="PlatformResponseDto"
-                                      Label="@loc["Platform"]"
+                                      Label="@loc["FavouriteAppsLabel"]"
                                       Name="PlatformId"
                                       Items="platforms"
                                       Multiple="true"
@@ -164,6 +184,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     private IEnumerable<PlatformResponseDto>? favouritePlatforms = null;
     private string? favouritePlatformNames = null;
     private Guid? currentUserId = null;
+    private string? username = null;
 
     override protected async Task OnInitializedAsync()
     {
@@ -180,6 +201,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 UserRequest.Email = Content.GetEmail() ?? string.Empty;
                 UserRequest.Name = Content.GetName() ?? string.Empty;
                 UserRequest.Surname = Content.GetSurname() ?? string.Empty;
+                username = Content.GetUsername() ?? string.Empty;
             }
 
             if (Content.GetTenantId() == configuration["Entra:TenantId"])
@@ -272,7 +294,39 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     private async Task HandleValidSubmitAsync()
     {
-        // TODO
+        try
+        {
+            // Prepare data to update the user
+            HttpContent patchContent = new StringContent(PrepareJsonPatchContent(), Encoding.UTF8, "application/json");
+
+            // Update the user with Microsoft Graph
+            HttpResponseMessage response = await downstreamApi.CallApiForUserAsync(
+                    serviceName: InferServiceName(Content),
+                    downstreamApiOptionsOverride: options =>
+                    {
+                        options.HttpMethod = nameof(HttpMethod.Patch);
+                        options.RelativePath = $"users/{Content.GetUserId()}";
+                        options.AcquireTokenOptions.AuthenticationOptionsName = InferAuthenticationScheme(Content);
+                    },
+                    user: Content,
+                    content: patchContent);
+
+            // If the user was successfully updated in Microsoft Graph, update the user in the database
+            if (response.IsSuccessStatusCode)
+            {
+                await usersClient.PutAsync(Content.GetEmail()!, UserRequest);
+
+                toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["ProfileEditSuccessToastTitle"], loc["ProfileEditSuccessToastDetails"]));
+
+                await Dialog.CloseAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowCommunicationToast(Toasts.ErrorToastParameters(ex, loc["ProfileEditErrorToastTitle"], loc["ProfileEditErrorToastDetails"]));
+
+            await Dialog.CloseAsync();
+        }
     }
 
     private static string GetInitials(string? fullName)
@@ -286,5 +340,49 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             .Where(part => !string.IsNullOrWhiteSpace(part))
             .Select(part => part[0])
             .Aggregate(string.Empty, (acc, initial) => acc + initial);
+    }
+
+    private static string GetUserTenantId(ClaimsPrincipal user)
+    {
+        if (user.Identity is null)
+        {
+            throw new InvalidOperationException("The user is not authenticated.");
+        }
+
+        if (!user.Identity.IsAuthenticated)
+        {
+            throw new InvalidOperationException("The user is not authenticated.");
+        }
+
+        string? tid = user.GetTenantId();
+
+        return tid is null ? throw new InvalidOperationException("The user is not authenticated.") : tid;
+    }
+
+    private string InferServiceName(ClaimsPrincipal user)
+    {
+        string tenantId = GetUserTenantId(user);
+        string? primaryTenantId = configuration.GetSection($"{Scheme.OpenIdConnectDefault}:TenantId").Value;
+
+        return tenantId == primaryTenantId ? Service.Graph : Service.ExternalGraph;
+    }
+
+    private string InferAuthenticationScheme(ClaimsPrincipal user)
+    {
+        string tenantId = GetUserTenantId(user);
+        string? primaryTenantId = configuration.GetSection($"{Scheme.OpenIdConnectDefault}:TenantId").Value;
+
+        return tenantId == primaryTenantId ? Scheme.OpenIdConnectDefault : Scheme.ExternalOpenIdConnectDefault;
+    }
+
+    private string PrepareJsonPatchContent()
+    {
+        dynamic jsonContent = new ExpandoObject();
+
+        jsonContent.DisplayName = username;
+        jsonContent.GivenName = UserRequest.Name;
+        jsonContent.Surname = UserRequest.Surname;
+
+        return JsonSerializer.Serialize(jsonContent);
     }
 }

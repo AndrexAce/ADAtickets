@@ -48,7 +48,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     <FluentLabel Typo="Typography.Header" Color="Color.Fill">ADAtickets</FluentLabel>
     <FluentSpacer />
     <FluentProfileMenu FullName="@accountName" ImageSize="5rem" EMail="@accountEmail" HeaderLabel="@loc["HeaderLabel"]" OnHeaderButtonClick="SignOutAsync" HeaderButton="@loc["HeaderButton"]" FooterLink="@loc["FooterLink"]" OnFooterLinkClick="OpenEditProfilePanel">
-        <StartTemplate>@accountName</StartTemplate>
+        <StartTemplate>@accountUsername</StartTemplate>
     </FluentProfileMenu>
     <FluentButton Appearance="Appearance.Neutral" OnClick="OpenNotificationsPanel" IconStart="@(new Icons.Regular.Size20.Alert())"/>
 </FluentStack>
@@ -59,6 +59,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     private string? accountName;
     private string? accountEmail;
+    private string? accountUsername;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -71,6 +72,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             {
                 accountName = user.GetFullName();
                 accountEmail = user.GetEmail();
+                accountUsername = user.GetUsername();
 
                 StateHasChanged();
             }

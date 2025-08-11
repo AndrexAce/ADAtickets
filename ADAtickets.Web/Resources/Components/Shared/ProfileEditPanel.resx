@@ -153,6 +153,18 @@
   <data name="ProfileEditPanelTitle" xml:space="preserve">
     <value>My profile</value>
   </data>
+  <data name="ProfileEditErrorToastDetails" xml:space="preserve">
+    <value>An error occurred while trying to update your profile. Retry.</value>
+  </data>
+  <data name="ProfileEditErrorToastTitle" xml:space="preserve">
+    <value>Update error</value>
+  </data>
+  <data name="ProfileEditSuccessToastDetails" xml:space="preserve">
+    <value>The update was completed successfully. Sign out and then sign in again to see the changes.</value>
+  </data>
+  <data name="ProfileEditSuccessToastTitle" xml:space="preserve">
+    <value>Update completed</value>
+  </data>
   <data name="ProfilePictureLabel" xml:space="preserve">
     <value>Profile picture</value>
   </data>
@@ -161,5 +173,8 @@
   </data>
   <data name="SurnameLabel" xml:space="preserve">
     <value>Surname</value>
+  </data>
+  <data name="UsernameLabel" xml:space="preserve">
+    <value>Username</value>
   </data>
 </root>
