@@ -38,10 +38,6 @@ namespace ADAtickets.Client
     {
         private const string endpoint = $"v{Service.APIVersion}/{Controller.AzureDevOps}";
 
-        private readonly AuthenticationStateProvider authenticationStateProvider = authenticationStateProvider;
-
-        private readonly IDownstreamApi downstreamApi = downstreamApi;
-
         private readonly JsonSerializerOptions JsonOptions = new()
         {
             Converters = { new JsonStringEnumConverter(allowIntegerValues: false) },
@@ -82,6 +78,46 @@ namespace ADAtickets.Client
             {
                 ValueWrapper<bool> responseEntity = await response.Content.ReadFromJsonAsync<ValueWrapper<bool>>(JsonOptions) ?? throw new JsonException("Could not parse the JSON response object.");
                 return responseEntity.Value;
+            }
+            else
+            {
+                throw new HttpRequestException(response.ReasonPhrase, null, response.StatusCode);
+            }
+        }
+
+        /// <summary>
+        /// Fetches all the platforms available in the Azure DevOps organization.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> that returns an enumerable of platforms.</returns>
+        /// <exception cref="InvalidOperationException">When the method is used when no user is logged in.</exception>
+        /// <exception cref="HttpRequestException">When the API call fails.</exception>
+        /// <exception cref="JsonException">When the JSON response cannot be parsed.</exception>
+        public async Task<IEnumerable<PlatformResponseDto>> GetAllPlatformNamesAsync()
+        {
+            // Fetch the logged in user
+            ClaimsPrincipal user = (await authenticationStateProvider.GetAuthenticationStateAsync()).User;
+
+            // Validate user authentication
+            if (user.Identity is null || !user.Identity.IsAuthenticated)
+            {
+                throw new InvalidOperationException("The user is not authenticated.");
+            }
+
+            // Call the APIs with the permissions granted to the user
+            HttpResponseMessage response = await downstreamApi.CallApiForUserAsync(
+                serviceName: Service.API,
+                downstreamApiOptionsOverride: options =>
+                {
+                    options.HttpMethod = nameof(HttpMethod.Get);
+                    options.RelativePath = $"{endpoint}/projects";
+                    options.AcquireTokenOptions.AuthenticationOptionsName = Scheme.OpenIdConnectDefault;
+                },
+                user: user);
+
+            if (response.StatusCode is HttpStatusCode.OK)
+            {
+                IEnumerable<PlatformResponseDto> responseEntity = await response.Content.ReadFromJsonAsync<IEnumerable<PlatformResponseDto>>(JsonOptions) ?? throw new JsonException("Could not parse the JSON response object.");
+                return responseEntity;
             }
             else
             {

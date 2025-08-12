@@ -61,9 +61,5 @@ namespace ADAtickets.Shared.Constants
         /// The version of the API service.
         /// </summary>
         public const string APIVersion = "1";
-        /// <summary>
-        /// The version of the Azure DevOps API service used to interact with Azure DevOps repositories.
-        /// </summary>
-        public const string AzureDevOpsAPIVersion = "7.2-preview";
     }
 }

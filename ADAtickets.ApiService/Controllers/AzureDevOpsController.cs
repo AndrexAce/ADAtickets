@@ -27,6 +27,7 @@ using Azure.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Web.Resource;
+using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.VisualStudio.Services.Client;
 using Microsoft.VisualStudio.Services.Identity;
 using Microsoft.VisualStudio.Services.Identity.Client;
@@ -42,13 +43,14 @@ namespace ADAtickets.ApiService.Controllers
     /// </summary>
     /// <param name="userRepository">Object defining the operations allowed on the entity type.</param>
     /// <param name="configuration">Configuration object containing the application settings.</param>
+    /// <param name="platformRepository">Object defining the operations allowed on the <see cref="Platform"/> entity type.</param>
     [Route($"v{Service.APIVersion}/{Controller.AzureDevOps}")]
     [ApiController]
     [Consumes(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
     [Produces(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
     [FormatFilter]
     [ApiConventionType(typeof(ApiConventions))]
-    public sealed class AzureDevOpsController(IUserRepository userRepository, IConfiguration configuration) : ControllerBase
+    public sealed class AzureDevOpsController(IUserRepository userRepository, IConfiguration configuration, IPlatformRepository platformRepository) : ControllerBase
     {
         /// <summary>
         /// Determines if a specific <see cref="User"/> entity with <paramref name="email"/> has access to the Azure DevOps organization.
@@ -74,6 +76,24 @@ namespace ADAtickets.ApiService.Controllers
 
             // Insert the entity data into a new DTO and send it to the client.
             return Ok(await CheckAzureDevOpsAccessAsync(email));
+        }
+
+        /// <summary>
+        /// Fetches all the platforms available in the Azure DevOps organization.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> returning an <see cref="ActionResult"/>, which wraps the server response and the list of entities.</returns>
+        /// <response code="200">The entity was found.</response>
+        /// <response code="401">The client was not authenticated.</response>
+        /// <response code="403">The client was authenticated but had not enough privileges.</response>
+        /// <response code="406">The client asked for an unsupported response format.</response>
+        [HttpGet("projects")]
+        [Authorize(Policy = Policy.OperatorOrAdmin)]
+        [RequiredScope(Scope.Read)]
+        public async Task<ActionResult<IEnumerable<PlatformResponseDto>>> GetAllPlatformNamesAsync()
+        {
+            IEnumerable<PlatformResponseDto> devOpsPlatforms = await GetAzureDevOpsPlatformsAsync();
+
+            return Ok(devOpsPlatforms);
         }
 
         private async Task<VssConnection> ConnectToAzureDevOpsAsync()
@@ -119,5 +139,21 @@ namespace ADAtickets.ApiService.Controllers
 
             return new(identities?.Any() ?? false);
         }
+
+        private async Task<IEnumerable<PlatformResponseDto>> GetAzureDevOpsPlatformsAsync()
+        {
+            VssConnection connection = await ConnectToAzureDevOpsAsync();
+
+            ProjectHttpClient projectClient = await connection.GetClientAsync<ProjectHttpClient>();
+
+            // Fetches all projects in the Azure DevOps organization
+            IEnumerable<TeamProjectReference> projects = await projectClient.GetProjects();
+
+            return projects.Select(project => new PlatformResponseDto
+            {
+                Id = project.Id,
+                Name = project.Name,
+                RepositoryUrl = project.Url
+            });
     }
 }
