@@ -27,6 +27,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Microsoft.Identity.Web.Resource;
 using System.Net.Mime;
 using Controller = ADAtickets.Shared.Constants.Controller;
@@ -38,13 +39,14 @@ namespace ADAtickets.ApiService.Controllers
     /// </summary>
     /// <param name="editRepository">Object defining the operations allowed on the entity type.</param>
     /// <param name="mapper">Object definining the mappings of fields between the <see cref="Edit"/> entity and its <see cref="EditRequestDto"/> or <see cref="EditResponseDto"/> correspondant.</param>
+    /// <param name="stringLocalizer">Object used to translate strings.</param>
     [Route($"v{Service.APIVersion}/{Controller.Edits}")]
     [ApiController]
     [Consumes(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
     [Produces(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
     [FormatFilter]
     [ApiConventionType(typeof(ApiConventions))]
-    public sealed class EditsController(IEditRepository editRepository, IMapper mapper) : ControllerBase
+    public sealed class EditsController(IEditRepository editRepository, IMapper mapper, IStringLocalizer<EditsController> stringLocalizer) : ControllerBase
     {
         /// <summary>
         /// Fetch all the <see cref="Edit"/> entities or all the entities respecting the given criteria.
@@ -239,6 +241,37 @@ namespace ADAtickets.ApiService.Controllers
             await editRepository.DeleteEditAsync(edit);
 
             return NoContent();
+        }
+
+        internal async Task CreateFirstEdit(Ticket ticket, Guid? chosenOperatorId)
+        {
+            Edit edit = new()
+            {
+                EditDateTime = DateTime.UtcNow,
+                Description = stringLocalizer["TicketCreatedEdit"],
+                OldStatus = Status.Unassigned,
+                NewStatus = Status.Unassigned,
+                TicketId = ticket.Id,
+                UserId = ticket.CreatorUserId
+            };
+
+            await editRepository.AddEditAsync(edit);
+
+            // If there is a chosen operator, create the edit of ticket assignment too.
+            if (chosenOperatorId.HasValue)
+            {
+                Edit assignmentEdit = new()
+                {
+                    EditDateTime = DateTime.UtcNow,
+                    Description = stringLocalizer["TicketAutoAssignedEdit"],
+                    OldStatus = Status.Unassigned,
+                    NewStatus = Status.WaitingOperator,
+                    TicketId = ticket.Id,
+                    UserId = chosenOperatorId.Value
+                };
+
+                await editRepository.AddEditAsync(assignmentEdit);
+            }
         }
     }
 }

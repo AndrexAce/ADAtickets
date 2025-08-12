@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using ADAtickets.ApiService.Configs;
+using ADAtickets.ApiService.Controllers;
 using ADAtickets.ApiService.Repositories;
 using ADAtickets.ApiService.Services;
 using ADAtickets.Shared.Constants;
@@ -152,6 +153,9 @@ namespace ADAtickets.ApiService
             _ = builder.Services.AddScoped<IUserRepository, UserRepository>();
             _ = builder.Services.AddScoped<IUserPlatformRepository, UserPlatformRepository>();
             _ = builder.Services.AddScoped<IUserNotificationRepository, UserNotificationRepository>();
+            _ = builder.Services.AddScoped<NotificationsController>();
+            _ = builder.Services.AddScoped<EditsController>();
+            _ = builder.Services.AddScoped<AzureDevOpsController>();
 
             // Add automapping of entities.
             _ = builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
@@ -167,6 +171,9 @@ namespace ADAtickets.ApiService
                 _ = builder.Services.AddDataProtection()
                     .PersistKeysToStackExchangeRedis(ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString(Service.Cache)!), "ApiService-DataProtection-Keys");
             }
+
+            // Add localization services.
+            _ = builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
         }
 
         /// <summary>

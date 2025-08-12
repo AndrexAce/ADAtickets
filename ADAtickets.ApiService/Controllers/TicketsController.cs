@@ -1,22 +1,22 @@
 ﻿/*
- * ADAtickets is a simple, lightweight, open source ticketing system
- * interacting with your enterprise repositories on Azure DevOps 
- * with a two-way synchronization.
- * Copyright (C) 2025  Andrea Lucchese
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+* ADAtickets is a simple, lightweight, open source ticketing system
+* interacting with your enterprise repositories on Azure DevOps 
+* with a two-way synchronization.
+* Copyright (C) 2025  Andrea Lucchese
+* 
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+* 
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+* 
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
 using ADAtickets.ApiService.Configs;
 using ADAtickets.ApiService.Repositories;
 using ADAtickets.Shared.Constants;
@@ -38,13 +38,22 @@ namespace ADAtickets.ApiService.Controllers
     /// </summary>
     /// <param name="ticketRepository">Object defining the operations allowed on the entity type.</param>
     /// <param name="mapper">Object definining the mappings of fields between the <see cref="Ticket"/> entity and its <see cref="TicketRequestDto"/> or <see cref="TicketResponseDto"/> correspondant.</param>
+    /// <param name="notificationsController">Controller managing the notifications.</param>
+    /// <param name="editsController">Controller managing the edits.</param>
+    /// <param name="azureDevOpsController">Controller managing the interaction with Azure DevOps.</param>
     [Route($"v{Service.APIVersion}/{Controller.Tickets}")]
     [ApiController]
     [Consumes(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
     [Produces(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
     [FormatFilter]
     [ApiConventionType(typeof(ApiConventions))]
-    public sealed class TicketsController(ITicketRepository ticketRepository, IMapper mapper) : ControllerBase
+    public sealed class TicketsController(
+        ITicketRepository ticketRepository,
+        IMapper mapper,
+        NotificationsController notificationsController,
+        EditsController editsController,
+        AzureDevOpsController azureDevOpsController
+        ) : ControllerBase
     {
         /// <summary>
         /// Fetch all the <see cref="Ticket"/> entities or all the entities respecting the given criteria.
@@ -224,6 +233,9 @@ namespace ADAtickets.ApiService.Controllers
             // Insert the DTO info into a new entity and add it to the data source.
             await ticketRepository.AddTicketAsync(ticket);
 
+            // Create notifications, assign the ticket and create the first edits.
+            await ProcessTicketCreationAsync(ticket);
+
             // Return the created entity and its location to the client.
             return CreatedAtAction(nameof(GetTicket), new { id = ticket.Id }, mapper.Map<TicketResponseDto>(ticket));
         }
@@ -253,6 +265,27 @@ namespace ADAtickets.ApiService.Controllers
             await ticketRepository.DeleteTicketAsync(ticket);
 
             return NoContent();
+        }
+
+        private async Task ProcessTicketCreationAsync(Ticket ticket)
+        {
+            var chosenOperatorId = await notificationsController.CreateNotificationsAsync(ticket);
+
+            await AssignTicketAsync(ticket, chosenOperatorId);
+
+            await editsController.CreateFirstEdit(ticket, chosenOperatorId);
+
+            await azureDevOpsController.CreateAzureDevOpsWorkItem(ticket, ticket.PlatformId);
+        }
+
+        private async Task AssignTicketAsync(Ticket ticket, Guid? chosenOperatorId)
+        {
+            // If there is an operator that must be assigned to the ticket, assign the ticket to them.
+            if (chosenOperatorId.HasValue)
+            {
+                ticket.OperatorUserId = chosenOperatorId.Value;
+                await ticketRepository.UpdateTicketAsync(ticket);
+            }
         }
     }
 }

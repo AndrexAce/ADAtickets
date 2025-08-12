@@ -28,10 +28,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Web.Resource;
 using Microsoft.TeamFoundation.Core.WebApi;
+using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.VisualStudio.Services.Client;
 using Microsoft.VisualStudio.Services.Identity;
 using Microsoft.VisualStudio.Services.Identity.Client;
 using Microsoft.VisualStudio.Services.WebApi;
+using Microsoft.VisualStudio.Services.WebApi.Patch;
+using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
 using System.Net.Mime;
 using System.Security.Cryptography.X509Certificates;
 using Controller = ADAtickets.Shared.Constants.Controller;
@@ -155,5 +158,64 @@ namespace ADAtickets.ApiService.Controllers
                 Name = project.Name,
                 RepositoryUrl = project.Url
             });
+        }
+
+        internal async Task<ValueWrapper<bool>> CreateAzureDevOpsWorkItem(Ticket ticket, Guid platformId)
+        {
+            var platform = await platformRepository.GetPlatformByIdAsync(platformId);
+            var platformName = platform?.Name;
+
+            if (platformName is not null)
+            {
+                VssConnection connection = await ConnectToAzureDevOpsAsync();
+
+                try
+                {
+                    WorkItemTrackingHttpClient workItemClient = await connection.GetClientAsync<WorkItemTrackingHttpClient>();
+
+                    var patchDocument = new JsonPatchDocument
+                    {
+                        new JsonPatchOperation
+                        {
+                            Operation = Operation.Add,
+                            Path = "/fields/System.Title",
+                            Value = ticket.Title
+                        },
+                        new JsonPatchOperation
+                        {
+                            Operation = Operation.Add,
+                            Path = "/fields/System.Description",
+                            Value = ticket.Description
+                        },
+                        new JsonPatchOperation
+                        {
+                            Operation = Operation.Add,
+                            Path = "/fields/Microsoft.VSTS.Common.Priority",
+                            Value = (int)ticket.Priority
+                        },
+                        new JsonPatchOperation
+                        {
+                            Operation = Operation.Add,
+                            Path = "/fields/System.CreatedDate",
+                            Value = ticket.CreationDateTime
+                        },
+                        new JsonPatchOperation
+                        {
+                            Operation = Operation.Add,
+                            Path = "/fields/System.State",
+                            Value = "New"
+                        }
+                    };
+
+                    await workItemClient.CreateWorkItemAsync(patchDocument, platformName, ticket.Type == TicketType.Bug ? "Issue" : "Task");
+                }
+                catch
+                {
+                    return new(false);
+                }
+            }
+
+            return new(true);
+        }
     }
 }

@@ -27,6 +27,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Microsoft.Identity.Web.Resource;
 using System.Net.Mime;
 using Controller = ADAtickets.Shared.Constants.Controller;
@@ -36,15 +37,26 @@ namespace ADAtickets.ApiService.Controllers
     /// <summary>
     /// Web API controller managing requests involving <see cref="Notification"/> etities.
     /// </summary>
-    /// <param name="notificationRepository">Object defining the operations allowed on the entity type.</param>
+    /// <param name="notificationRepository">Object defining the operations allowed on the <see cref="Notification"/> entity type.</param>
     /// <param name="mapper">Object definining the mappings of fields between the <see cref="Notification"/> entity and its <see cref="NotificationRequestDto"/> or <see cref="NotificationResponseDto"/> correspondant.</param>
+    /// <param name="userNotificationRepository">Object defining the operations allowed on the <see cref="UserNotification"/> entity type.</param>
+    /// <param name="userPlatformRepository">Object defining the operations allowed on the <see cref="UserPlatform"/> entity type.</param>
+    /// <param name="userRepository">Object defining the operations allowed on the <see cref="User"/> entity type.</param>
+    /// <param name="stringLocalizer">Object used to translate strings.</param>
     [Route($"v{Service.APIVersion}/{Controller.Notifications}")]
     [ApiController]
     [Consumes(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
     [Produces(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
     [FormatFilter]
     [ApiConventionType(typeof(ApiConventions))]
-    public sealed class NotificationsController(INotificationRepository notificationRepository, IMapper mapper) : ControllerBase
+    public sealed class NotificationsController(
+        INotificationRepository notificationRepository,
+        IMapper mapper,
+        IUserNotificationRepository userNotificationRepository,
+        IUserPlatformRepository userPlatformRepository,
+        IUserRepository userRepository,
+        IStringLocalizer<NotificationsController> stringLocalizer
+        ) : ControllerBase
     {
         /// <summary>
         /// Fetch all the <see cref="Notification"/> entities or all the entities respecting the given criteria.
@@ -236,5 +248,81 @@ namespace ADAtickets.ApiService.Controllers
 
             return NoContent();
         }
+
+        internal async Task<Guid?> CreateNotificationsAsync(Ticket ticket)
+        {
+            // Create the creation notification
+            var ticketCreatedNotification = CreateNotification(ticket.Id, stringLocalizer["TicketCreatedNotification"], ticket.CreatorUserId);
+            await notificationRepository.AddNotificationAsync(ticketCreatedNotification);
+
+            // Find users who have the ticket platform as their preferred platform
+            var userPlatforms = await userPlatformRepository.GetUserPlatformsByAsync(
+            [
+                new KeyValuePair<string, string>(nameof(UserPlatform.PlatformId), ticket.PlatformId.ToString())
+            ]);
+
+            // If there is any user who prefer this platform, notify the first one with the least assigned tickets or the only one if that is the case.
+            if (userPlatforms.Any())
+            {
+                var sortedOperators = from userPlatform in userPlatforms
+                                      join user in await userRepository.GetUsersAsync()
+                                      on userPlatform.UserId equals user.Id
+                                      orderby user.AssignedTickets.Count ascending
+                                      select user.Id;
+
+                // Create the creation notification link
+                var userNotificationCreation = CreateUserNotification(ticketCreatedNotification.Id, sortedOperators.FirstOrDefault());
+                await userNotificationRepository.AddUserNotificationAsync(userNotificationCreation);
+
+                // Create the assignment notification for the operator
+                var ticketAssignedNotificationOperator = CreateNotification(ticket.Id, stringLocalizer["TicketAssignedToYouNotification"], sortedOperators.FirstOrDefault());
+                await notificationRepository.AddNotificationAsync(ticketAssignedNotificationOperator);
+
+                // Create the assignment notification link for the operator
+                var userNotificationAssignmentOperator = CreateUserNotification(ticketAssignedNotificationOperator.Id, sortedOperators.FirstOrDefault());
+                await userNotificationRepository.AddUserNotificationAsync(userNotificationAssignmentOperator);
+
+                // Create the assignment notification for the user
+                var ticketAssignedNotificationUser = CreateNotification(ticket.Id, stringLocalizer["TicketAssignedNotification"], ticket.CreatorUserId);
+                await notificationRepository.AddNotificationAsync(ticketAssignedNotificationUser);
+
+                // Create the assignment notification link for the user
+                var userNotificationAssignmentUser = CreateUserNotification(ticketAssignedNotificationUser.Id, ticket.CreatorUserId);
+                await userNotificationRepository.AddUserNotificationAsync(userNotificationAssignmentUser);
+
+                return sortedOperators.FirstOrDefault();
+            }
+            else
+            {
+                var operators = from user in await userRepository.GetUsersAsync()
+                                where user.Type == UserType.Admin || user.Type == UserType.Operator
+                                select user.Id;
+
+                // If there is no user who prefers this platform, notify every operator of the new ticket.
+                foreach (Guid userId in operators)
+                {
+                    // Create the creation notification link
+                    var userNotificationCreation = CreateUserNotification(ticketCreatedNotification.Id, userId);
+                    await userNotificationRepository.AddUserNotificationAsync(userNotificationCreation);
+                }
+
+                return null;
+            }
+        }
+
+        private static Notification CreateNotification(Guid ticketId, string message, Guid userId) => new()
+        {
+            TicketId = ticketId,
+            Message = message,
+            SendDateTime = DateTimeOffset.UtcNow,
+            IsRead = false,
+            UserId = userId
+        };
+
+        private static UserNotification CreateUserNotification(Guid notificationId, Guid receiverUserId) => new()
+        {
+            NotificationId = notificationId,
+            ReceiverUserId = receiverUserId
+        };
     }
 }
