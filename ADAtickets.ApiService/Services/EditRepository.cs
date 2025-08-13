@@ -53,28 +53,28 @@ namespace ADAtickets.ApiService.Services
             {
                 switch (filter.Key.Pascalize())
                 {
-                    case nameof(Edit.Id) when Guid.TryParse(filter.Value, out Guid outGuid):
-                        query = query.Where(edit => edit.Id == outGuid);
+                    case nameof(Edit.Id) when Guid.TryParse(filter.Value, out Guid outId):
+                        query = query.Where(edit => edit.Id == outId);
                         break;
 
-                    case nameof(Edit.TicketId) when Guid.TryParse(filter.Value, out Guid outGuid):
-                        query = query.Where(edit => edit.TicketId == outGuid);
+                    case nameof(Edit.TicketId) when Guid.TryParse(filter.Value, out Guid outTicketGuid):
+                        query = query.Where(edit => edit.TicketId == outTicketGuid);
                         break;
 
-                    case nameof(Edit.UserId) when Guid.TryParse(filter.Value, out Guid outGuid):
-                        query = query.Where(edit => edit.UserId == outGuid);
+                    case nameof(Edit.UserId) when Guid.TryParse(filter.Value, out Guid outUserGuid):
+                        query = query.Where(edit => edit.UserId == outUserGuid);
                         break;
 
-                    case nameof(Edit.OldStatus) when Enum.TryParse(filter.Value, true, out Status outStatus):
-                        query = query.Where(edit => edit.OldStatus == outStatus);
+                    case nameof(Edit.OldStatus) when Enum.TryParse(filter.Value, true, out Status outOldStatus):
+                        query = query.Where(edit => edit.OldStatus == outOldStatus);
                         break;
 
-                    case nameof(Edit.NewStatus) when Enum.TryParse(filter.Value, true, out Status outStatus):
-                        query = query.Where(edit => edit.NewStatus == outStatus);
+                    case nameof(Edit.NewStatus) when Enum.TryParse(filter.Value, true, out Status outNewStatus):
+                        query = query.Where(edit => edit.NewStatus == outNewStatus);
                         break;
 
-                    case nameof(Edit.EditDateTime) when DateTimeOffset.TryParse(filter.Value, CultureInfo.InvariantCulture, out DateTimeOffset outDateTimeOffset):
-                        query = query.Where(edit => edit.EditDateTime.Date == outDateTimeOffset.Date);
+                    case nameof(Edit.EditDateTime) when DateTimeOffset.TryParse(filter.Value, CultureInfo.InvariantCulture, out DateTimeOffset outEditDateTime):
+                        query = query.Where(edit => edit.EditDateTime.Date == outEditDateTime.Date);
                         break;
 
                     case nameof(Edit.Description):
@@ -82,7 +82,7 @@ namespace ADAtickets.ApiService.Services
                         break;
 
                     default:
-                        return [];
+                        break;
                 }
             }
 

@@ -52,12 +52,12 @@ namespace ADAtickets.ApiService.Services
             {
                 switch (filter.Key.Pascalize())
                 {
-                    case nameof(Attachment.Id) when Guid.TryParse(filter.Value, out Guid outGuid):
-                        query = query.Where(attachment => attachment.Id == outGuid);
+                    case nameof(Attachment.Id) when Guid.TryParse(filter.Value, out Guid outId):
+                        query = query.Where(attachment => attachment.Id == outId);
                         break;
 
-                    case nameof(Attachment.TicketId) when Guid.TryParse(filter.Value, out Guid outGuid):
-                        query = query.Where(attachment => attachment.TicketId == outGuid);
+                    case nameof(Attachment.TicketId) when Guid.TryParse(filter.Value, out Guid outTicketId):
+                        query = query.Where(attachment => attachment.TicketId == outTicketId);
                         break;
 
                     case nameof(Attachment.Path):
@@ -65,7 +65,7 @@ namespace ADAtickets.ApiService.Services
                         break;
 
                     default:
-                        return [];
+                        break;
                 }
             }
 

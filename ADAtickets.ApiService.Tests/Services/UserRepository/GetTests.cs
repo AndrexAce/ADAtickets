@@ -252,7 +252,7 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
         }
 
         [Fact]
-        public async Task GetAttachmentsBy_InvalidFilter_ReturnsNothing()
+        public async Task GetAttachmentsBy_InvalidFilter_ReturnsAll()
         {
             // Arrange
             List<User> users =
@@ -273,7 +273,7 @@ namespace ADAtickets.ApiService.Tests.Services.UserRepository
             IEnumerable<User> result = await service.GetUsersByAsync([new KeyValuePair<string, string>("SomeName", "value")]);
 
             // Assert
-            Assert.Empty(result);
+            Assert.Equal(3, result.Count());
         }
         #endregion
     }

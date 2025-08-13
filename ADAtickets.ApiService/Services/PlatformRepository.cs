@@ -52,8 +52,8 @@ namespace ADAtickets.ApiService.Services
             {
                 switch (filter.Key.Pascalize())
                 {
-                    case nameof(Platform.Id) when Guid.TryParse(filter.Value, out Guid outGuid):
-                        query = query.Where(platform => platform.Id == outGuid);
+                    case nameof(Platform.Id) when Guid.TryParse(filter.Value, out Guid outId):
+                        query = query.Where(platform => platform.Id == outId);
                         break;
 
                     case nameof(Platform.Name):
@@ -65,7 +65,7 @@ namespace ADAtickets.ApiService.Services
                         break;
 
                     default:
-                        return [];
+                        break;
                 }
             }
 

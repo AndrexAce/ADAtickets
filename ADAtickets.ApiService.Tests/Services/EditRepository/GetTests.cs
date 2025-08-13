@@ -252,7 +252,7 @@ namespace ADAtickets.ApiService.Tests.Services.EditRepository
         }
 
         [Fact]
-        public async Task GetAttachmentsBy_InvalidFilter_ReturnsNothing()
+        public async Task GetAttachmentsBy_InvalidFilter_ReturnsAll()
         {
             // Arrange
             List<Edit> edits =
@@ -273,7 +273,7 @@ namespace ADAtickets.ApiService.Tests.Services.EditRepository
             IEnumerable<Edit> result = await service.GetEditsByAsync([new KeyValuePair<string, string>("SomeName", "value")]);
 
             // Assert
-            Assert.Empty(result);
+            Assert.Equal(3, result.Count());
         }
         #endregion
     }

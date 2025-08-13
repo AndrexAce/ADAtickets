@@ -53,24 +53,24 @@ namespace ADAtickets.ApiService.Services
             {
                 switch (filter.Key.Pascalize())
                 {
-                    case nameof(Notification.Id) when Guid.TryParse(filter.Value, out Guid outGuid):
-                        query = query.Where(notification => notification.Id == outGuid);
+                    case nameof(Notification.Id) when Guid.TryParse(filter.Value, out Guid outId):
+                        query = query.Where(notification => notification.Id == outId);
                         break;
 
-                    case nameof(Notification.TicketId) when Guid.TryParse(filter.Value, out Guid outGuid):
-                        query = query.Where(notification => notification.TicketId == outGuid);
+                    case nameof(Notification.TicketId) when Guid.TryParse(filter.Value, out Guid outTicketId):
+                        query = query.Where(notification => notification.TicketId == outTicketId);
                         break;
 
-                    case nameof(Notification.UserId) when Guid.TryParse(filter.Value, out Guid outGuid):
-                        query = query.Where(notification => notification.UserId == outGuid);
+                    case nameof(Notification.UserId) when Guid.TryParse(filter.Value, out Guid outUserId):
+                        query = query.Where(notification => notification.UserId == outUserId);
                         break;
 
-                    case nameof(Notification.IsRead) when bool.TryParse(filter.Value, out bool outBool):
-                        query = query.Where(notification => notification.IsRead == outBool);
+                    case nameof(Notification.IsRead) when bool.TryParse(filter.Value, out bool outIsRead):
+                        query = query.Where(notification => notification.IsRead == outIsRead);
                         break;
 
-                    case nameof(Notification.SendDateTime) when DateTimeOffset.TryParse(filter.Value, CultureInfo.InvariantCulture, out DateTimeOffset outDateTimeOffset):
-                        query = query.Where(notification => notification.SendDateTime.Date == outDateTimeOffset.Date);
+                    case nameof(Notification.SendDateTime) when DateTimeOffset.TryParse(filter.Value, CultureInfo.InvariantCulture, out DateTimeOffset outSendDateTime):
+                        query = query.Where(notification => notification.SendDateTime.Date == outSendDateTime.Date);
                         break;
 
                     case nameof(Notification.Message):
@@ -78,7 +78,7 @@ namespace ADAtickets.ApiService.Services
                         break;
 
                     default:
-                        return [];
+                        break;
                 }
             }
 

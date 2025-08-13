@@ -51,20 +51,20 @@ namespace ADAtickets.ApiService.Services
             {
                 switch (filter.Key.Pascalize())
                 {
-                    case nameof(UserNotification.Id) when Guid.TryParse(filter.Value, out Guid outGuid):
-                        query = query.Where(u => u.Id == outGuid);
+                    case nameof(UserNotification.Id) when Guid.TryParse(filter.Value, out Guid outId):
+                        query = query.Where(u => u.Id == outId);
                         break;
 
-                    case nameof(UserNotification.ReceiverUserId) when Guid.TryParse(filter.Value, out Guid outGuid):
-                        query = query.Where(u => u.ReceiverUserId == outGuid);
+                    case nameof(UserNotification.ReceiverUserId) when Guid.TryParse(filter.Value, out Guid outReceiverUserId):
+                        query = query.Where(u => u.ReceiverUserId == outReceiverUserId);
                         break;
 
-                    case nameof(UserNotification.NotificationId) when Guid.TryParse(filter.Value, out Guid outGuid):
-                        query = query.Where(u => u.NotificationId == outGuid);
+                    case nameof(UserNotification.NotificationId) when Guid.TryParse(filter.Value, out Guid outNotificationId):
+                        query = query.Where(u => u.NotificationId == outNotificationId);
                         break;
 
                     default:
-                        return [];
+                        break;
                 }
             }
 

@@ -53,16 +53,16 @@ namespace ADAtickets.ApiService.Services
             {
                 switch (filter.Key.Pascalize())
                 {
-                    case nameof(Ticket.Id) when Guid.TryParse(filter.Value, out Guid outGuid):
-                        query = query.Where(ticket => ticket.Id == outGuid);
+                    case nameof(Ticket.Id) when Guid.TryParse(filter.Value, out Guid outId):
+                        query = query.Where(ticket => ticket.Id == outId);
                         break;
 
-                    case nameof(Ticket.Type) when Enum.TryParse(filter.Value, true, out TicketType outTicketType):
-                        query = query.Where(ticket => ticket.Type == outTicketType);
+                    case nameof(Ticket.Type) when Enum.TryParse(filter.Value, true, out TicketType outType):
+                        query = query.Where(ticket => ticket.Type == outType);
                         break;
 
-                    case nameof(Ticket.CreationDateTime) when DateTimeOffset.TryParse(filter.Value, CultureInfo.InvariantCulture, out DateTimeOffset outDateTimeOffset):
-                        query = query.Where(ticket => ticket.CreationDateTime.Date == outDateTimeOffset.Date);
+                    case nameof(Ticket.CreationDateTime) when DateTimeOffset.TryParse(filter.Value, CultureInfo.InvariantCulture, out DateTimeOffset outCreationDateTime):
+                        query = query.Where(ticket => ticket.CreationDateTime.Date == outCreationDateTime.Date);
                         break;
 
                     case nameof(Ticket.Title):
@@ -81,24 +81,24 @@ namespace ADAtickets.ApiService.Services
                         query = query.Where(ticket => ticket.Status == outStatus);
                         break;
 
-                    case nameof(Ticket.WorkItemId) when int.TryParse(filter.Value, out int outInt):
-                        query = query.Where(ticket => ticket.WorkItemId == outInt);
+                    case nameof(Ticket.WorkItemId) when int.TryParse(filter.Value, out int outWorkItemId):
+                        query = query.Where(ticket => ticket.WorkItemId == outWorkItemId);
                         break;
 
-                    case nameof(Ticket.PlatformId) when Guid.TryParse(filter.Value, out Guid outGuid):
-                        query = query.Where(ticket => ticket.PlatformId == outGuid);
+                    case nameof(Ticket.PlatformId) when Guid.TryParse(filter.Value, out Guid outPlatformId):
+                        query = query.Where(ticket => ticket.PlatformId == outPlatformId);
                         break;
 
-                    case nameof(Ticket.CreatorUserId) when Guid.TryParse(filter.Value, out Guid outGuid):
-                        query = query.Where(ticket => ticket.CreatorUserId == outGuid);
+                    case nameof(Ticket.CreatorUserId) when Guid.TryParse(filter.Value, out Guid outCreatorUserId):
+                        query = query.Where(ticket => ticket.CreatorUserId == outCreatorUserId);
                         break;
 
-                    case nameof(Ticket.OperatorUserId) when Guid.TryParse(filter.Value, out Guid outGuid):
-                        query = query.Where(ticket => ticket.OperatorUserId == outGuid);
+                    case nameof(Ticket.OperatorUserId) when Guid.TryParse(filter.Value, out Guid outOperatorUserId):
+                        query = query.Where(ticket => ticket.OperatorUserId == outOperatorUserId);
                         break;
 
                     default:
-                        return [];
+                        break;
                 }
             }
 

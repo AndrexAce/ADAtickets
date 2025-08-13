@@ -254,7 +254,7 @@ namespace ADAtickets.ApiService.Tests.Services.UserNotificationRepository
         }
 
         [Fact]
-        public async Task GetAttachmentsBy_InvalidFilter_ReturnsNothing()
+        public async Task GetAttachmentsBy_InvalidFilter_ReturnsAll()
         {
             // Arrange
             List<UserNotification> userNotifications =
@@ -275,7 +275,7 @@ namespace ADAtickets.ApiService.Tests.Services.UserNotificationRepository
             IEnumerable<UserNotification> result = await service.GetUserNotificationsByAsync([new KeyValuePair<string, string>("SomeName", "value")]);
 
             // Assert
-            Assert.Empty(result);
+            Assert.Equal(3, result.Count());
         }
         #endregion
     }

@@ -252,7 +252,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 </FluentStack>
 
 @code {
-#region Fields
+    #region Fields
     // Datasets
     private IEnumerable<UserResponseDto>? Users { get; set; }
 
@@ -272,9 +272,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     private Priority? activePriorityFilter;
     private TicketType? activeTypeFilter;
     private DateTimeOffset? activeDateFilter;
-#endregion
+    #endregion
 
-#region Loading data
+    #region Loading data
     protected override async Task OnInitializedAsync()
     {  
         try
@@ -310,9 +310,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     {
         platforms = await platformsClient.GetAllAsync();
     }
-#endregion
+    #endregion
 
-#region Event handlers
+    #region Event handlers
     private void HandleSortDismissClick()
     {
         currentSort = null;
@@ -449,7 +449,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 // Update the progress bar and the toast.
                 progressToastParameters.Content.Progress += 100 / selectedTickets.Count;
                 if (progressToastParameters.Content.Progress > 100) progressToastParameters.Content.Progress = 100;
-                
+
                 toastService.UpdateToast("Close", progressToastParameters);
             }
 
@@ -569,9 +569,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         activePriorityFilter = priority;
         ApplySelectedFiltersAndSort();
     }
-#endregion
+    #endregion
 
-#region Auxiliary functions
+    #region Auxiliary functions
     private string GetPriorityFilterBadgeText()
     {
         return activePriorityFilter switch
@@ -595,33 +595,44 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     private async Task<IEnumerable<KeyValuePair<string, string>>> GetBaseFiltersAsync()
     {
+        IEnumerable<KeyValuePair<string, string>> filters = [];
+
         var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
+        var entraUser = authState.User;
 
-        return GetBaseFilterFromUser(user).Union(GetBaseFilterFromTab(user));
-    }
-
-    private IEnumerable<KeyValuePair<string, string>> GetBaseFilterFromUser(ClaimsPrincipal currentUser)
-    {
-        if (currentUser.IsAuthenticated())
+        if (entraUser.IsAuthenticated())
         {
-            return currentUser.GetTenantId() == configuration["Entra:TenantId"] ?
-            [] : new Dictionary<string, string> { { nameof(TicketResponseDto.CreatorUserId), currentUser.GetTenantId() ?? "" } };
+            var dbUser = await usersClient.GetAsync(entraUser.GetEmail()!);
+
+            filters = filters.Union(GetFiltersFromUserType(entraUser, dbUser));
+            filters = filters.Union(GetFilterFromSelectedTab(entraUser));
         }
 
-        return [];
+        return filters;
     }
 
-    private IEnumerable<KeyValuePair<string, string>> GetBaseFilterFromTab(ClaimsPrincipal currentUser)
+    private IEnumerable<KeyValuePair<string, string>> GetFiltersFromUserType(ClaimsPrincipal entraUser, UserResponseDto dbUser)
+    {
+        if (entraUser.GetTenantId() == configuration["Entra:TenantId"])
+        {
+            return [];
+        }
+        else
+        {
+            return new Dictionary<string, string> { { nameof(TicketResponseDto.CreatorUserId), dbUser.Id.ToString() } };
+        }
+    }
+
+    private IEnumerable<KeyValuePair<string, string>> GetFilterFromSelectedTab(ClaimsPrincipal entraUser)
     {
         return currentTab switch
         {
             "AllTab" => [],
             "UnassignedTab" => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.Unassigned) } },
-            "ToReply" when currentUser.GetTenantId() == configuration["Entra:TenantId"] => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingOperator) } },
-            "ToReply" when currentUser.GetTenantId() != configuration["Entra:TenantId"] => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingUser) } },
-            "WaitingTab" when currentUser.GetTenantId() == configuration["Entra:TenantId"] => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingUser) } },
-            "WaitingTab" when currentUser.GetTenantId() != configuration["Entra:TenantId"] => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingOperator) } },
+            "ToReplyTab" when entraUser.GetTenantId() == configuration["Entra:TenantId"] => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingOperator) } },
+            "ToReplyTab" when entraUser.GetTenantId() != configuration["Entra:TenantId"] => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingUser) } },
+            "WaitingTab" when entraUser.GetTenantId() == configuration["Entra:TenantId"] => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingUser) } },
+            "WaitingTab" when entraUser.GetTenantId() != configuration["Entra:TenantId"] => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.WaitingOperator) } },
             "ClosedTab" => new Dictionary<string, string> { { nameof(TicketResponseDto.Status), nameof(Status.Closed) } },
             _ => []
         };

@@ -53,28 +53,28 @@ namespace ADAtickets.ApiService.Services
             {
                 switch (filter.Key.Pascalize())
                 {
-                    case nameof(Platform.Id) when Guid.TryParse(filter.Value, out Guid outGuid):
-                        query = query.Where(platform => platform.Id == outGuid);
+                    case nameof(Reply.Id) when Guid.TryParse(filter.Value, out Guid outId):
+                        query = query.Where(reply => reply.Id == outId);
                         break;
 
-                    case nameof(Reply.ReplyDateTime) when DateTimeOffset.TryParse(filter.Value, CultureInfo.InvariantCulture, out DateTimeOffset outDateTimeOffset):
-                        query = query.Where(reply => reply.ReplyDateTime.Date == outDateTimeOffset.Date);
+                    case nameof(Reply.ReplyDateTime) when DateTimeOffset.TryParse(filter.Value, CultureInfo.InvariantCulture, out DateTimeOffset outReplyDateTime):
+                        query = query.Where(reply => reply.ReplyDateTime.Date == outReplyDateTime.Date);
                         break;
 
                     case nameof(Reply.Message):
                         query = query.Where(reply => reply.Message.ToLower().Contains(filter.Value.ToLower()));
                         break;
 
-                    case nameof(Reply.AuthorUserId) when Guid.TryParse(filter.Value, out Guid outGuid):
-                        query = query.Where(reply => reply.AuthorUserId == outGuid);
+                    case nameof(Reply.AuthorUserId) when Guid.TryParse(filter.Value, out Guid outAuthorUserId):
+                        query = query.Where(reply => reply.AuthorUserId == outAuthorUserId);
                         break;
 
-                    case nameof(Reply.TicketId) when Guid.TryParse(filter.Value, out Guid outGuid):
-                        query = query.Where(reply => reply.TicketId == outGuid);
+                    case nameof(Reply.TicketId) when Guid.TryParse(filter.Value, out Guid outTicketId):
+                        query = query.Where(reply => reply.TicketId == outTicketId);
                         break;
 
                     default:
-                        return [];
+                        break;
                 }
             }
 

@@ -252,7 +252,7 @@ namespace ADAtickets.ApiService.Tests.Services.NotificationRepository
         }
 
         [Fact]
-        public async Task GetAttachmentsBy_InvalidFilter_ReturnsNothing()
+        public async Task GetAttachmentsBy_InvalidFilter_ReturnsAll()
         {
             // Arrange
             List<Notification> notifications =
@@ -273,7 +273,7 @@ namespace ADAtickets.ApiService.Tests.Services.NotificationRepository
             IEnumerable<Notification> result = await service.GetNotificationsByAsync([new KeyValuePair<string, string>("SomeName", "value")]);
 
             // Assert
-            Assert.Empty(result);
+            Assert.Equal(3, result.Count());
         }
         #endregion
     }

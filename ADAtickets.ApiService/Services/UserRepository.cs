@@ -52,8 +52,8 @@ namespace ADAtickets.ApiService.Services
             {
                 switch (filter.Key.Pascalize())
                 {
-                    case nameof(User.Id) when Guid.TryParse(filter.Value, out Guid outGuid):
-                        query = query.Where(u => u.Id == outGuid);
+                    case nameof(User.Id) when Guid.TryParse(filter.Value, out Guid outId):
+                        query = query.Where(u => u.Id == outId);
                         break;
 
                     case nameof(User.Email):
@@ -68,16 +68,16 @@ namespace ADAtickets.ApiService.Services
                         query = query.Where(u => u.Surname.ToLower().Contains(filter.Value.ToLower()));
                         break;
 
-                    case nameof(User.AreEmailNotificationsEnabled) when bool.TryParse(filter.Value, out bool outBool):
-                        query = query.Where(u => u.AreEmailNotificationsEnabled == outBool);
+                    case nameof(User.AreEmailNotificationsEnabled) when bool.TryParse(filter.Value, out bool outAreEmailNotificationsEnabled):
+                        query = query.Where(u => u.AreEmailNotificationsEnabled == outAreEmailNotificationsEnabled);
                         break;
 
-                    case nameof(User.Type) when Enum.TryParse(filter.Value, true, out UserType outUserType):
-                        query = query.Where(u => u.Type == outUserType);
+                    case nameof(User.Type) when Enum.TryParse(filter.Value, true, out UserType outType):
+                        query = query.Where(u => u.Type == outType);
                         break;
 
                     default:
-                        return [];
+                        break;
                 }
             }
 

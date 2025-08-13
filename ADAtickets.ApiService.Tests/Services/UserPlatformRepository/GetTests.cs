@@ -254,7 +254,7 @@ namespace ADAtickets.ApiService.Tests.Services.UserPlatformRepository
         }
 
         [Fact]
-        public async Task GetAttachmentsBy_InvalidFilter_ReturnsNothing()
+        public async Task GetAttachmentsBy_InvalidFilter_ReturnsAll()
         {
             // Arrange
             List<UserPlatform> userPlatforms =
@@ -275,7 +275,7 @@ namespace ADAtickets.ApiService.Tests.Services.UserPlatformRepository
             IEnumerable<UserPlatform> result = await service.GetUserPlatformsByAsync([new KeyValuePair<string, string>("SomeName", "value")]);
 
             // Assert
-            Assert.Empty(result);
+            Assert.Equal(3, result.Count());
         }
         #endregion
     }

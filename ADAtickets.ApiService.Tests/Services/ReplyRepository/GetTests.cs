@@ -252,7 +252,7 @@ namespace ADAtickets.ApiService.Tests.Services.ReplyRepository
         }
 
         [Fact]
-        public async Task GetAttachmentsBy_InvalidFilter_ReturnsNothing()
+        public async Task GetAttachmentsBy_InvalidFilter_ReturnsAll()
         {
             // Arrange
             List<Reply> replies =
@@ -273,7 +273,7 @@ namespace ADAtickets.ApiService.Tests.Services.ReplyRepository
             IEnumerable<Reply> result = await service.GetRepliesByAsync([new KeyValuePair<string, string>("SomeName", "value")]);
 
             // Assert
-            Assert.Empty(result);
+            Assert.Equal(3, result.Count());
         }
         #endregion
     }
