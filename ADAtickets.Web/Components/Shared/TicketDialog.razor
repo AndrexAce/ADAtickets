@@ -20,11 +20,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @using ADAtickets.Client
 @using ADAtickets.Shared.Dtos.Requests
 @using ADAtickets.Shared.Dtos.Responses
+@using ADAtickets.Shared.Extensions
 @using ADAtickets.Shared.Models
 @using ADAtickets.Web.Components.Pages
 @using ADAtickets.Web.Components.Utilities
 @using AutoMapper
 @using System.Net
+@using Microsoft.AspNetCore.Components.Authorization
 @using static ADAtickets.Web.Components.Utilities.Dialogs
 
 @inject IStringLocalizer<TicketDialog> loc
@@ -32,6 +34,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @inject UsersClient usersClient
 @inject PlatformsClient platformsClient
 @inject AttachmentsClient attachmentsClient
+@inject AuthenticationStateProvider authenticationStateProvider
 @inject IToastService toastService
 @inject IDialogService dialogService
 @inject IMapper mapper
@@ -62,15 +65,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             @if (Content.IsEdit && !Content.IsUser)
             {
                 <FluentSelect TOption="UserResponseDto"
-                              Label="@loc["AssignedOperator"]"
-                              Name="OperatorUserId"
-                              Items="users"
-                              OptionText="@(u => u.Name)"
-                              OptionValue="@(u => u.Id.ToString())"
-                              ReadOnly="@(Content.IsEdit && Content.IsUser)"
-                              @bind-Value="operatorUserIdString"
-                              Required>
-                    <FluentIcon Value="@(new Icons.Regular.Size20.Person())" Color="@Color.Neutral" Slot="indicator" />
+                    Label="@loc["AssignedOperator"]"
+                    Name="OperatorUserId"
+                    Items="users"
+                    OptionText="@(u => u.Name)"
+                    OptionValue="@(u => u.Id.ToString())"
+                    ReadOnly="@(Content.IsEdit && Content.IsUser)"
+                    Placeholder="@loc["PleaseSelectAnOption"]"
+                    @bind-Value="OperatorIdString"
+                    Required>
                 </FluentSelect>
             }
 
@@ -92,9 +95,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 OptionText="@(p => p.Name)"
                 OptionValue="@(p => p.Id.ToString())"
                 ReadOnly="@(Content.IsEdit && Content.IsUser)"
-                @bind-Value="platformIdString"
+                Placeholder="@loc["PleaseSelectAnOption"]"
+                @bind-Value="PlatformIdString"
                 Required>
-                <FluentIcon Value="@(new Icons.Regular.Size20.Apps())" Color="@Color.Neutral" Slot="indicator" />
             </FluentSelect>
             <FluentValidationMessage For="@(() => TicketRequest.PlatformId)" />
 
@@ -300,36 +303,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     private bool showPhoto = false;
     private bool showVideo = false;
 
-    private string platformIdString
+    private string PlatformIdString
     {
         get => TicketRequest.PlatformId.ToString();
-        set
-        {
-            if (Guid.TryParse(value, out var id))
-            {
-                TicketRequest.PlatformId = id;
-            }
-            else
-            {
-                TicketRequest.PlatformId = Guid.Empty;
-            }
-        }
+        set => TicketRequest.PlatformId = Guid.TryParse(value, out var guid) ? guid : Guid.Empty;
     }
 
-    private string operatorUserIdString
+    private string OperatorIdString
     {
-        get => TicketRequest.OperatorUserId.ToString() ?? string.Empty;
-        set
-        {
-            if (Guid.TryParse(value, out var id))
-            {
-                TicketRequest.OperatorUserId = id;
-            }
-            else
-            {
-                TicketRequest.OperatorUserId = null;
-            }
-        }
+        get => TicketRequest.OperatorUserId?.ToString() ?? string.Empty;
+        set => TicketRequest.OperatorUserId = Guid.TryParse(value, out var guid) ? guid : null;
     }
 
     private RenderFragment TicketTypeLabel => @<FluentStack Orientation="Orientation.Horizontal">
@@ -343,11 +326,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     protected override async Task OnInitializedAsync()
     {
-        if (Content.InitialTicketData is not null)
-        {
-            TicketRequest = mapper.Map<TicketRequestDto>(Content.InitialTicketData);
-        }
-
         SetInputFileTexts(loc);
 
         try
@@ -359,12 +337,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
             if (Content.InitialTicketData is TicketResponseDto initialTicketData)
             {
+                TicketRequest = mapper.Map<TicketRequestDto>(Content.InitialTicketData);
+
                 IEnumerable<AttachmentResponseDto> attachments = await LoadAttachmentsAsync(new[] { new KeyValuePair<string, string>("TicketId", initialTicketData.Id.ToString()) });
 
                 photoPath = attachments.ElementAtOrDefault(0)?.Path;
                 videoPath = attachments.ElementAtOrDefault(1)?.Path;
             }
-
         }
         catch (Exception ex)
         {
@@ -394,6 +373,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
         try
         {
+            // Set the ticket creator to the current user before creating or updating the ticket.
+            var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            if (user.IsAuthenticated())
+            {
+                var loggedInUser = await usersClient.GetAsync(user.GetEmail()!);
+                TicketRequest.CreatorUserId = loggedInUser.Id;
+            }
+
             var ticketResponse = Content.IsEdit ?
                 await ticketsClient.PutAsync(Content.InitialTicketData!.Id, TicketRequest) :
                 await ticketsClient.PostAsync(TicketRequest);

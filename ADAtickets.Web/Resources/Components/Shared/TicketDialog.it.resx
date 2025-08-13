@@ -249,4 +249,7 @@
   <data name="AttachmentsTooltip" xml:space="preserve">
     <value>Puoi caricare una foto e un video. Ciascun file può essere al massimo di 10 MB.</value>
   </data>
+  <data name="PleaseSelectAnOption" xml:space="preserve">
+    <value>Seleziona un'opzione</value>
+  </data>
 </root>
