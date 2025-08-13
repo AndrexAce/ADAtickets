@@ -191,7 +191,7 @@ namespace ADAtickets.ApiService.Controllers
                         {
                             Operation = Operation.Add,
                             Path = "/fields/Microsoft.VSTS.Common.Priority",
-                            Value = (int)ticket.Priority
+                            Value = 3 - (int)ticket.Priority
                         },
                         new JsonPatchOperation
                         {
@@ -203,7 +203,7 @@ namespace ADAtickets.ApiService.Controllers
                         {
                             Operation = Operation.Add,
                             Path = "/fields/System.State",
-                            Value = "New"
+                            Value = "To Do"
                         }
                     };
 
