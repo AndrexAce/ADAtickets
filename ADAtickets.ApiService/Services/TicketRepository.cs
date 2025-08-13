@@ -47,7 +47,7 @@ namespace ADAtickets.ApiService.Services
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1862:Use the 'StringComparison' method overloads to perform case-insensitive string comparisons", Justification = "The comparison with the StringComparison overload is not translatable by Entity Framework and the EF.Function.ILike method is not standard SQL but PostgreSQL dialect.")]
         public async Task<IEnumerable<Ticket>> GetTicketsByAsync(IEnumerable<KeyValuePair<string, string>> filters)
         {
-            IQueryable<Ticket> query = context.Tickets;
+            IQueryable<Ticket> query = context.Tickets.Include(t => t.CreatorUser);
 
             foreach (KeyValuePair<string, string> filter in filters)
             {

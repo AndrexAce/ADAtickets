@@ -54,7 +54,7 @@ namespace ADAtickets.ApiService.Configs
                 .ForMember(ticketDto => ticketDto.Replies, opt => opt.MapFrom(src => src.Replies.Select(reply => reply.Id)))
                 .ForMember(ticketDto => ticketDto.Attachments, opt => opt.MapFrom(src => src.Attachments.Select(attachment => attachment.Id)))
                 .ForMember(ticketDto => ticketDto.Notifications, opt => opt.MapFrom(src => src.Notifications.Select(notifications => notifications.Id)))
-                .ForMember(ticketDto => ticketDto.CreatorName, opt => opt.MapFrom(src => src.CreatorUser.Name))
+                .ForMember(ticketDto => ticketDto.CreatorName, opt => opt.MapFrom(src => $"{src.CreatorUser.Name} {src.CreatorUser.Surname}"))
                 .ForMember(ticketDto => ticketDto.LastUpdateDateTime, opt => opt.MapFrom(src => src.Edits.Any() ? src.Edits.MaxBy(edit => edit.EditDateTime)!.EditDateTime : src.CreationDateTime));
             _ = CreateMap<TicketRequestDto, Ticket>(MemberList.Source);
 

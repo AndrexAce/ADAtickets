@@ -73,12 +73,14 @@ body {
 
 .tickets-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
     width: 100%;
+    max-width: 80rem;
     padding: 1rem 0;
     align-items: start;
-    justify-content: space-evenly;
+    justify-items: center;
+    margin: 0 auto;
 }
 
 @media (max-width: 768px) {
@@ -86,13 +88,14 @@ body {
         grid-template-columns: 1fr;
         gap: 1rem;
         padding: 0.5rem 0;
+        max-width: none;
     }
 }
 
-@media (min-width: 1600px) {
+@media (max-width: 1200px) and (min-width: 769px) {
     .tickets-grid {
-        grid-template-columns: repeat(auto-fit, minmax(20rem, 22rem));
-        justify-content: space-evenly;
+        grid-template-columns: repeat(2, 1fr);
+        max-width: 50rem;
     }
 }
 

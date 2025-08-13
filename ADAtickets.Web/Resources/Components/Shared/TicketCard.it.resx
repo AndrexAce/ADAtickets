@@ -135,7 +135,7 @@
   <data name="EditStatusMenuLabel" xml:space="preserve">
     <value>Modifica stato</value>
   </data>
-  <data name="AssignMenuLabel" xml:space="preserve">
+  <data name="AssignmentMenuLabel" xml:space="preserve">
     <value>Assegnazione</value>
   </data>
   <data name="DeleteConfirmDialogTitle" xml:space="preserve">

@@ -317,31 +317,37 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     {
         currentSort = null;
         currentSortDirection = null;
+        ApplySelectedFiltersAndSort();
     }
 
     private void HandleFilterUserDismissClick()
     {
         activeUserFilter = null;
+        ApplySelectedFiltersAndSort();
     }
 
     private void HandleFilterPlatformDismissClick()
     {
         activePlatformFilter = null;
+        ApplySelectedFiltersAndSort();
     }
 
     private void HandleFilterPriorityDismissClick()
     {
         activePriorityFilter = null;
+        ApplySelectedFiltersAndSort();
     }
 
     private void HandleFilterTypeDismissClick()
     {
         activeTypeFilter = null;
+        ApplySelectedFiltersAndSort();
     }
 
     private void HandleFilterDateDismissClick()
     {
         activeDateFilter = null;
+        ApplySelectedFiltersAndSort();
     }
 
     private async Task HandleTabChangeAsync(FluentTab fluentTab)

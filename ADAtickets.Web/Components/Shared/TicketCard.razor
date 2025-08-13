@@ -45,7 +45,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             }
             else
             {
-                <FluentPersona ImageSize="3rem">
+                <FluentPersona ImageSize="3rem" Initials="@GetInitials(Ticket.CreatorName)">
                     <FluentStack Orientation="Orientation.Vertical">
                         <p>@Ticket.CreatorName</p>
                         <FluentStack Orientation="Orientation.Horizontal">
@@ -272,5 +272,18 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         {
             toastService.ShowCommunicationToast(Toasts.ErrorToastParameters(ex, loc["AssignErrorToastTitle"], loc["AssignErrorToastDetails"]));
         }
+    }
+
+    private static string GetInitials(string? fullName)
+    {
+        if (string.IsNullOrWhiteSpace(fullName))
+        {
+            return string.Empty;
+        }
+
+        return fullName.Split(' ')
+            .Where(part => !string.IsNullOrWhiteSpace(part))
+            .Select(part => part[0])
+            .Aggregate(string.Empty, (acc, initial) => acc + initial);
     }
 }
