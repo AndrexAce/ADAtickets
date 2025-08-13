@@ -55,6 +55,6 @@ namespace ADAtickets.Shared.Models
         [Required]
         [Ignore]
         [JsonIgnore]
-        public Ticket Ticket { get; set; } = new Ticket();
+        public Ticket Ticket { get; set; } = null!;
     }
 }

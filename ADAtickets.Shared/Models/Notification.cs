@@ -64,7 +64,7 @@ namespace ADAtickets.Shared.Models
         [Required]
         [Ignore]
         [JsonIgnore]
-        public Ticket Ticket { get; set; } = new Ticket();
+        public Ticket Ticket { get; set; } = null!;
 
         /// <summary>
         /// The id of the user this notification is related to.
@@ -79,7 +79,7 @@ namespace ADAtickets.Shared.Models
         [Required]
         [Ignore]
         [JsonIgnore]
-        public User User { get; set; } = new User();
+        public User User { get; set; } = null!;
 
         /// <summary>
         /// The collection of the users the notification was sent to.

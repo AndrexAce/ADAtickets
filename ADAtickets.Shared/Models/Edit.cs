@@ -70,7 +70,7 @@ namespace ADAtickets.Shared.Models
         [Required]
         [Ignore]
         [JsonIgnore]
-        public Ticket Ticket { get; set; } = new Ticket();
+        public Ticket Ticket { get; set; } = null!;
 
         /// <summary>
         /// The id of the user who made the edit.
@@ -85,6 +85,6 @@ namespace ADAtickets.Shared.Models
         [Required]
         [Ignore]
         [JsonIgnore]
-        public User User { get; set; } = new User();
+        public User User { get; set; } = null!;
     }
 }

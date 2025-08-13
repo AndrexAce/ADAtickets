@@ -47,7 +47,7 @@ namespace ADAtickets.Shared.Models
         [Required]
         [Ignore]
         [JsonIgnore]
-        public User User { get; set; } = new User();
+        public User User { get; set; } = null!;
 
         /// <summary>
         /// The unique identifier of the platform that was marked as preferred.
@@ -62,6 +62,6 @@ namespace ADAtickets.Shared.Models
         [Required]
         [Ignore]
         [JsonIgnore]
-        public Platform Platform { get; set; } = new Platform();
+        public Platform Platform { get; set; } = null!;
     }
 }

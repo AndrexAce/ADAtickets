@@ -47,7 +47,7 @@ namespace ADAtickets.Shared.Models
         [Required]
         [Ignore]
         [JsonIgnore]
-        public User ReceiverUser { get; set; } = new User();
+        public User ReceiverUser { get; set; } = null!;
 
         /// <summary>
         /// The unique identifier of the sent notification.
@@ -62,6 +62,6 @@ namespace ADAtickets.Shared.Models
         [Required]
         [Ignore]
         [JsonIgnore]
-        public Notification Notification { get; set; } = new Notification();
+        public Notification Notification { get; set; } = null!;
     }
 }

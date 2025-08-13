@@ -58,7 +58,7 @@ namespace ADAtickets.Shared.Models
         [Required]
         [Ignore]
         [JsonIgnore]
-        public User AuthorUser { get; set; } = new User();
+        public User AuthorUser { get; set; } = null!;
 
         /// <summary>
         /// The id of the ticket this reply was sent to.
@@ -73,6 +73,6 @@ namespace ADAtickets.Shared.Models
         [Required]
         [Ignore]
         [JsonIgnore]
-        public Ticket Ticket { get; set; } = new Ticket();
+        public Ticket Ticket { get; set; } = null!;
     }
 }

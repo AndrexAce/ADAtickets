@@ -89,7 +89,7 @@ namespace ADAtickets.Shared.Models
         [Required]
         [Ignore]
         [JsonIgnore]
-        public Platform Platform { get; set; } = new Platform();
+        public Platform Platform { get; set; } = null!;
 
         /// <summary>
         /// The id of the user who created the ticket.
@@ -104,7 +104,7 @@ namespace ADAtickets.Shared.Models
         [Required]
         [Ignore]
         [JsonIgnore]
-        public User CreatorUser { get; set; } = new User();
+        public User CreatorUser { get; set; } = null!;
 
         /// <summary>
         /// The id of the operator assigned to the ticket.
