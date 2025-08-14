@@ -301,7 +301,7 @@ namespace ADAtickets.ApiService.Controllers
             return null;
         }
 
-        internal async Task CreateEditNotificationAsync(Ticket ticket, Guid editor)
+        internal async Task CreateEditNotificationsAsync(Ticket ticket, Guid editor)
         {
             // The user or operator has edited the ticket; create a notification with the editor as responsible.
             var ticketEditedByUserNotification = CreateNotification(ticket.Id, Notifications.TicketEdited, editor);
@@ -344,6 +344,49 @@ namespace ADAtickets.ApiService.Controllers
                 else
                 {
                     await SendNotificationToAllOperators(ticketEditedByUserNotification);
+                }
+            }
+        }
+
+        internal async Task CreateOperatorEditNotificationsAsync(Ticket ticket, Guid? oldAssignedOperator, Guid editor)
+        {
+            // Check if the operator has been unassigned or assigned/changed.
+            if (ticket.OperatorUserId is null)
+            {
+                // The operator has been unassigned; create a notification with the editor as responsible.
+                var ticketUnassignmentNotificationByEditor = CreateNotification(ticket.Id, Notifications.TicketUnassigned, editor);
+                await notificationRepository.AddNotificationAsync(ticketUnassignmentNotificationByEditor);
+
+                // Notify the ticket creator that the operator has been unassigned.
+                var notificationLinkForCreatorAboutUnassignment = CreateUserNotification(ticketUnassignmentNotificationByEditor.Id, ticket.CreatorUserId);
+                await userNotificationRepository.AddUserNotificationAsync(notificationLinkForCreatorAboutUnassignment);
+
+                // Notify all the operators that the ticket has been unassigned.
+                await SendNotificationToAllOperators(ticketUnassignmentNotificationByEditor);
+            }
+            else
+            {
+                // The operator has been assigned or changed; create a notification with new operator as responsible to inform them.
+                var ticketAssignmentNotificationForNewOperator = CreateNotification(ticket.Id, Notifications.TicketAssignedToYou, ticket.OperatorUserId.Value);
+                await notificationRepository.AddNotificationAsync(ticketAssignmentNotificationForNewOperator);
+
+                // Notify the new operator that they have been assigned to the ticket.
+                var notificationLinkForNewOperatorAboutAssignment = CreateUserNotification(ticketAssignmentNotificationForNewOperator.Id, ticket.OperatorUserId.Value);
+                await userNotificationRepository.AddUserNotificationAsync(notificationLinkForNewOperatorAboutAssignment);
+
+                // The operator has been assigned or changed; create a notification with new operator as responsible to inform the creator and the old operator (if any).
+                var ticketAssignmentNotificationForCreatorAndOldOperator = CreateNotification(ticket.Id, Notifications.TicketAssigned, ticket.OperatorUserId.Value);
+                await notificationRepository.AddNotificationAsync(ticketAssignmentNotificationForCreatorAndOldOperator);
+
+                // Notify the ticket creator that the operator has been assigned or changed.
+                var notificationLinkForCreatorAboutAssignment = CreateUserNotification(ticketAssignmentNotificationForCreatorAndOldOperator.Id, ticket.CreatorUserId);
+                await userNotificationRepository.AddUserNotificationAsync(notificationLinkForCreatorAboutAssignment);
+
+                if (oldAssignedOperator.HasValue)
+                {
+                    // Notify the old operator that they have been unassigned from the ticket.
+                    var notificationLinkForOldOperatorAboutReassignment = CreateUserNotification(ticketAssignmentNotificationForCreatorAndOldOperator.Id, oldAssignedOperator.Value);
+                    await userNotificationRepository.AddUserNotificationAsync(notificationLinkForOldOperatorAboutReassignment);
                 }
             }
         }

@@ -241,7 +241,7 @@ namespace ADAtickets.ApiService.Controllers
             return NoContent();
         }
 
-        internal async Task CreateCreationEditsAsync(Ticket ticket, Guid? chosenOperatorId)
+        internal async Task CreateCreationEntriesAsync(Ticket ticket, Guid? chosenOperatorId)
         {
             // Create the edit about the ticket creation by the creator.
             Edit edit = new()
@@ -273,7 +273,7 @@ namespace ADAtickets.ApiService.Controllers
             }
         }
 
-        internal async Task CreateEditEditAsync(Ticket ticket, Guid editor)
+        internal async Task CreateEditEntryAsync(Ticket ticket, Guid editor)
         {
             // Create the edit about the ticket edit by the editor.
             Edit edit = new()
@@ -285,6 +285,40 @@ namespace ADAtickets.ApiService.Controllers
                 TicketId = ticket.Id,
                 UserId = editor
             };
+
+            await editRepository.AddEditAsync(edit);
+        }
+
+        internal async Task CreateOperatorEditEntryAsync(Ticket ticket, Guid? oldAssignedOperator, Guid editor)
+        {
+            Edit edit;
+
+            if (ticket.OperatorUserId is null)
+            {
+                // If the ticket is unassigned, switch to the unassigned status.
+                edit = new Edit
+                {
+                    EditDateTime = DateTime.UtcNow,
+                    Description = Edits.TicketUnassigned,
+                    OldStatus = ticket.Status,
+                    NewStatus = Status.Unassigned,
+                    TicketId = ticket.Id,
+                    UserId = editor
+                };
+            }
+            else
+            {
+                // If the ticket is assigned to another operator, switch to waiting if it was unassigned before, otherwise keep the current status.
+                edit = new Edit
+                {
+                    EditDateTime = DateTime.UtcNow,
+                    Description = Edits.TicketAssigned,
+                    OldStatus = ticket.Status,
+                    NewStatus = oldAssignedOperator.HasValue ? ticket.Status : Status.WaitingOperator,
+                    TicketId = ticket.Id,
+                    UserId = ticket.OperatorUserId.Value
+                };
+            }
 
             await editRepository.AddEditAsync(edit);
         }

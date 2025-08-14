@@ -169,11 +169,20 @@ namespace ADAtickets.ApiService.Controllers
 
             try
             {
+                // Keep the old operator for notification purposes.
+                var oldAssignedOperator = ticket.OperatorUserId;
+
                 // Update the existing entity with the new data.
                 await ticketRepository.UpdateTicketAsync(mapper.Map(ticketDto, ticket));
 
                 // Create notification and create the edit.
                 await ProcessTicketUpdateAsync(ticket, ticketDto.Requester.Value);
+
+                // If the operator was changed, create a notification and an edit.
+                if (oldAssignedOperator != ticket.OperatorUserId)
+                {
+                    await ProcessTicketOperatorUpdateAsync(ticket, oldAssignedOperator, ticketDto.Requester.Value);
+                }
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -281,7 +290,7 @@ namespace ADAtickets.ApiService.Controllers
 
             await AutoAssignTicketAsync(ticket, chosenOperatorId);
 
-            await editsController.CreateCreationEditsAsync(ticket, chosenOperatorId);
+            await editsController.CreateCreationEntriesAsync(ticket, chosenOperatorId);
 
             await azureDevOpsController.CreateAzureDevOpsWorkItemAsync(ticket, ticket.PlatformId);
         }
@@ -298,9 +307,16 @@ namespace ADAtickets.ApiService.Controllers
 
         private async Task ProcessTicketUpdateAsync(Ticket ticket, Guid editor)
         {
-            await notificationsController.CreateEditNotificationAsync(ticket, editor);
+            await notificationsController.CreateEditNotificationsAsync(ticket, editor);
 
-            await editsController.CreateEditEditAsync(ticket, editor);
+            await editsController.CreateEditEntryAsync(ticket, editor);
+        }
+
+        private async Task ProcessTicketOperatorUpdateAsync(Ticket ticket, Guid? oldAssignedOperator, Guid editor)
+        {
+            await notificationsController.CreateOperatorEditNotificationsAsync(ticket, oldAssignedOperator, editor);
+
+            await editsController.CreateOperatorEditEntryAsync(ticket, oldAssignedOperator, editor);
         }
     }
 }

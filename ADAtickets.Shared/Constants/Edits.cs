@@ -43,5 +43,10 @@ namespace ADAtickets.Shared.Constants
         /// The message used when the ticket is assigned to an operator.
         /// </summary>
         public const string TicketAssigned = "TICKET_ASSIGNED_EDIT";
+
+        /// <summary>
+        /// The message used when the ticket is unassigned from an operator.
+        /// </summary>
+        public const string TicketUnassigned = "TICKET_UNASSIGNED_EDIT";
     }
 }
