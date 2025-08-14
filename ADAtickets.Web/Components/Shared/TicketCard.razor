@@ -49,7 +49,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                     <FluentStack Orientation="Orientation.Vertical">
                         <p>@Ticket.CreatorName</p>
                         <FluentStack Orientation="Orientation.Horizontal">
-                            <FluentIcon Value="@(new Icons.Filled.Size20.Bug())" />
+                            @if (Ticket.Type == TicketType.Bug)
+                            {
+                                <FluentIcon Value="@(new Icons.Filled.Size20.Bug())" />
+                            }
+                            else if (Ticket.Type == TicketType.Feature)
+                            {
+                                <FluentIcon Value="@(new Icons.Filled.Size20.Sparkle())" />
+                            }
                             <p>@(Ticket.CreationDateTime.ToLocalTime().Humanize())</p>
                         </FluentStack>
                     </FluentStack>

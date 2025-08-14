@@ -365,6 +365,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     private async Task HandleValidSubmitAsync()
     {
+        await Dialog.CloseAsync();
+
         var progressToastParameters = Content.IsEdit ? 
         Toasts.ProgressToastParameters("CreateUpdate", loc["UpdateProgressToastTitle"], loc["UpdateProgressToastDetails"]) :
         Toasts.ProgressToastParameters("CreateUpdate", loc["CreateProgressToastTitle"], loc["CreateProgressToastDetails"]);
@@ -388,7 +390,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 await ticketsClient.PostAsync(TicketRequest);
 
             // Update the progress bar and the toast.
-            progressToastParameters.Content.Progress = 50;
+            progressToastParameters.Content.Progress = Content.IsEdit ? 100 : 50;
 
             toastService.UpdateToast("CreateUpdate", progressToastParameters);
 
@@ -397,14 +399,17 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             {
                 await CreateAttachmentsAsync(ticketResponse!, progressToastParameters);
 
+                // Update the progress bar and the toast.
+                progressToastParameters.Content.Progress = 100;
+
+                toastService.UpdateToast("CreateUpdate", progressToastParameters);
+
                 toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["CreateSuccessToastTitle"], loc["CreateSuccessToastDetails"]));
             }
             else
             {
                 toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["UpdateSuccessToastTitle"], loc["UpdateSuccessToastDetails"]));
             }
-
-            await Dialog.CloseAsync();
         }
         catch (Exception ex)
         {
@@ -416,6 +421,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             {
                 toastService.ShowCommunicationToast(Toasts.ErrorToastParameters(ex, loc["CreateErrorToastTitle"], loc["CreateErrorToastDetails"]));
             }
+        }
+        finally
+        {
+            toastService.ClearProgressToasts();
         }
     }
 
@@ -470,9 +479,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     private async Task HandleConfirmCancelAsync()
     {
+        await Dialog.CancelAsync();
+        
         DeleteTempFiles();
-
-        await Dialog.CloseAsync();
     }
 
     private async Task HandleUploadPhotoCompletedAsync(IEnumerable<FluentInputFileEventArgs> args)

@@ -27,7 +27,6 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Localization;
 using Microsoft.Identity.Web.Resource;
 using System.Net.Mime;
 using Controller = ADAtickets.Shared.Constants.Controller;
@@ -42,7 +41,6 @@ namespace ADAtickets.ApiService.Controllers
     /// <param name="userNotificationRepository">Object defining the operations allowed on the <see cref="UserNotification"/> entity type.</param>
     /// <param name="userPlatformRepository">Object defining the operations allowed on the <see cref="UserPlatform"/> entity type.</param>
     /// <param name="userRepository">Object defining the operations allowed on the <see cref="User"/> entity type.</param>
-    /// <param name="stringLocalizer">Object used to translate strings.</param>
     [Route($"v{Service.APIVersion}/{Controller.Notifications}")]
     [ApiController]
     [Consumes(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
@@ -54,8 +52,7 @@ namespace ADAtickets.ApiService.Controllers
         IMapper mapper,
         IUserNotificationRepository userNotificationRepository,
         IUserPlatformRepository userPlatformRepository,
-        IUserRepository userRepository,
-        IStringLocalizer<NotificationsController> stringLocalizer
+        IUserRepository userRepository
         ) : ControllerBase
     {
         /// <summary>
@@ -252,7 +249,7 @@ namespace ADAtickets.ApiService.Controllers
         internal async Task<Guid?> CreateNotificationsAsync(Ticket ticket)
         {
             // Create the creation notification
-            var ticketCreatedNotification = CreateNotification(ticket.Id, stringLocalizer["TicketCreatedNotification"], ticket.CreatorUserId);
+            var ticketCreatedNotification = CreateNotification(ticket.Id, Notifications.TicketCreated, ticket.CreatorUserId);
             await notificationRepository.AddNotificationAsync(ticketCreatedNotification);
 
             // Find users who have the ticket platform as their preferred platform
@@ -275,7 +272,7 @@ namespace ADAtickets.ApiService.Controllers
                 await userNotificationRepository.AddUserNotificationAsync(userNotificationCreation);
 
                 // Create the assignment notification for the operator
-                var ticketAssignedNotificationOperator = CreateNotification(ticket.Id, stringLocalizer["TicketAssignedToYouNotification"], sortedOperators.FirstOrDefault());
+                var ticketAssignedNotificationOperator = CreateNotification(ticket.Id, Notifications.TicketAssignedToYouBySystem, sortedOperators.FirstOrDefault());
                 await notificationRepository.AddNotificationAsync(ticketAssignedNotificationOperator);
 
                 // Create the assignment notification link for the operator
@@ -283,7 +280,7 @@ namespace ADAtickets.ApiService.Controllers
                 await userNotificationRepository.AddUserNotificationAsync(userNotificationAssignmentOperator);
 
                 // Create the assignment notification for the user
-                var ticketAssignedNotificationUser = CreateNotification(ticket.Id, stringLocalizer["TicketAssignedNotification"], ticket.CreatorUserId);
+                var ticketAssignedNotificationUser = CreateNotification(ticket.Id, Notifications.TicketAssigned, ticket.CreatorUserId);
                 await notificationRepository.AddNotificationAsync(ticketAssignedNotificationUser);
 
                 // Create the assignment notification link for the user

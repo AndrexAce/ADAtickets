@@ -27,7 +27,6 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Localization;
 using Microsoft.Identity.Web.Resource;
 using System.Net.Mime;
 using Controller = ADAtickets.Shared.Constants.Controller;
@@ -39,14 +38,13 @@ namespace ADAtickets.ApiService.Controllers
     /// </summary>
     /// <param name="editRepository">Object defining the operations allowed on the entity type.</param>
     /// <param name="mapper">Object definining the mappings of fields between the <see cref="Edit"/> entity and its <see cref="EditRequestDto"/> or <see cref="EditResponseDto"/> correspondant.</param>
-    /// <param name="stringLocalizer">Object used to translate strings.</param>
     [Route($"v{Service.APIVersion}/{Controller.Edits}")]
     [ApiController]
     [Consumes(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
     [Produces(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
     [FormatFilter]
     [ApiConventionType(typeof(ApiConventions))]
-    public sealed class EditsController(IEditRepository editRepository, IMapper mapper, IStringLocalizer<EditsController> stringLocalizer) : ControllerBase
+    public sealed class EditsController(IEditRepository editRepository, IMapper mapper) : ControllerBase
     {
         /// <summary>
         /// Fetch all the <see cref="Edit"/> entities or all the entities respecting the given criteria.
@@ -248,7 +246,7 @@ namespace ADAtickets.ApiService.Controllers
             Edit edit = new()
             {
                 EditDateTime = DateTime.UtcNow,
-                Description = stringLocalizer["TicketCreatedEdit"],
+                Description = Edits.TicketCreated,
                 OldStatus = Status.Unassigned,
                 NewStatus = Status.Unassigned,
                 TicketId = ticket.Id,
@@ -263,7 +261,7 @@ namespace ADAtickets.ApiService.Controllers
                 Edit assignmentEdit = new()
                 {
                     EditDateTime = DateTime.UtcNow,
-                    Description = stringLocalizer["TicketAutoAssignedEdit"],
+                    Description = Edits.TicketAutoAssigned,
                     OldStatus = Status.Unassigned,
                     NewStatus = Status.WaitingOperator,
                     TicketId = ticket.Id,

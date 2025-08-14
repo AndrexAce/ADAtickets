@@ -171,9 +171,6 @@ namespace ADAtickets.ApiService
                 _ = builder.Services.AddDataProtection()
                     .PersistKeysToStackExchangeRedis(ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString(Service.Cache)!), "ApiService-DataProtection-Keys");
             }
-
-            // Add localization services.
-            _ = builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
         }
 
         /// <summary>

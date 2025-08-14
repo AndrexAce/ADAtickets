@@ -146,7 +146,7 @@ namespace ADAtickets.Web
         public static void ConfigureApplication(WebApplication app)
         {
             // Configure localization.
-            string[] supportedCultures = ["en-US", "it-IT"];
+            string[] supportedCultures = ["en", "it"];
             RequestLocalizationOptions localizationOptions = new RequestLocalizationOptions()
                 .SetDefaultCulture(supportedCultures[0])
                 .AddSupportedCultures(supportedCultures)

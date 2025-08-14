@@ -216,7 +216,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         {
             toastService.ShowCommunicationToast(Toasts.ErrorToastParameters(ex, loc["LoadingErrorToastTitle"], loc["LoadingErrorToastDetails"]));
 
-            await Dialog.CloseAsync();
+            await Dialog.CancelAsync();
         }
     }
 
@@ -281,7 +281,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         }
         else
         {
-            await Dialog.CloseAsync();
+            await Dialog.CancelAsync();
         }
     }
 
@@ -294,6 +294,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     private async Task HandleValidSubmitAsync()
     {
+        await Dialog.CloseAsync();
+
         try
         {
             // Prepare data to update the user
@@ -317,15 +319,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 await usersClient.PutAsync(Content.GetEmail()!, UserRequest);
 
                 toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["ProfileEditSuccessToastTitle"], loc["ProfileEditSuccessToastDetails"]));
-
-                await Dialog.CloseAsync();
             }
         }
         catch (Exception ex)
         {
             toastService.ShowCommunicationToast(Toasts.ErrorToastParameters(ex, loc["ProfileEditErrorToastTitle"], loc["ProfileEditErrorToastDetails"]));
-
-            await Dialog.CloseAsync();
         }
     }
 
