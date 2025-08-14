@@ -246,7 +246,7 @@ namespace ADAtickets.ApiService.Controllers
             return NoContent();
         }
 
-        internal async Task<Guid?> CreateNotificationsAsync(Ticket ticket)
+        internal async Task<Guid?> CreateCreationNotificationsAsync(Ticket ticket)
         {
             // Create the creation notification
             var ticketCreatedNotification = CreateNotification(ticket.Id, Notifications.TicketCreated, ticket.CreatorUserId);
@@ -291,11 +291,11 @@ namespace ADAtickets.ApiService.Controllers
             }
             else
             {
+                // If there is no user who prefers this platform, notify every operator of the new ticket.
                 var operators = from user in await userRepository.GetUsersAsync()
                                 where user.Type == UserType.Admin || user.Type == UserType.Operator
                                 select user.Id;
 
-                // If there is no user who prefers this platform, notify every operator of the new ticket.
                 foreach (Guid userId in operators)
                 {
                     // Create the creation notification link

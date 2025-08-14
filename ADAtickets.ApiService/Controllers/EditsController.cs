@@ -241,7 +241,7 @@ namespace ADAtickets.ApiService.Controllers
             return NoContent();
         }
 
-        internal async Task CreateFirstEdit(Ticket ticket, Guid? chosenOperatorId)
+        internal async Task CreateCreationEditsAsync(Ticket ticket, Guid? chosenOperatorId)
         {
             Edit edit = new()
             {

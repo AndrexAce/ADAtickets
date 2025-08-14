@@ -269,16 +269,16 @@ namespace ADAtickets.ApiService.Controllers
 
         private async Task ProcessTicketCreationAsync(Ticket ticket)
         {
-            var chosenOperatorId = await notificationsController.CreateNotificationsAsync(ticket);
+            var chosenOperatorId = await notificationsController.CreateCreationNotificationsAsync(ticket);
 
-            await AssignTicketAsync(ticket, chosenOperatorId);
+            await AutoAssignTicketAsync(ticket, chosenOperatorId);
 
-            await editsController.CreateFirstEdit(ticket, chosenOperatorId);
+            await editsController.CreateCreationEditsAsync(ticket, chosenOperatorId);
 
-            await azureDevOpsController.CreateAzureDevOpsWorkItem(ticket, ticket.PlatformId);
+            await azureDevOpsController.CreateAzureDevOpsWorkItemAsync(ticket, ticket.PlatformId);
         }
 
-        private async Task AssignTicketAsync(Ticket ticket, Guid? chosenOperatorId)
+        private async Task AutoAssignTicketAsync(Ticket ticket, Guid? chosenOperatorId)
         {
             // If there is an operator that must be assigned to the ticket, assign the ticket to them.
             if (chosenOperatorId.HasValue)

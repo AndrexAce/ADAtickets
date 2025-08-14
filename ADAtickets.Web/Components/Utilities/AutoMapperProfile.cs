@@ -45,11 +45,13 @@ namespace ADAtickets.Web.Components.Utilities
 
             _ = CreateMap<UserResponseDto, UserRequestDto>(MemberList.Destination);
 
-            _ = CreateMap<AttachmentResponseDto, AttachmentRequestDto>(MemberList.Destination);
-
             _ = CreateMap<AttachmentResponseDto, AttachmentRequestDto>(MemberList.Destination)
                 .ForMember(attachmentRequest => attachmentRequest.Name, opt => opt.MapFrom(src => src.Path))
-                .ForMember(AttachmentRequest => AttachmentRequest.Content, opt => opt.Ignore());
+                .ForMember(attachmentRequest => attachmentRequest.Content, opt => opt.Ignore());
+
+            _ = CreateMap<UserPlatformResponseDto, UserPlatformRequestDto>(MemberList.Destination);
+
+            _ = CreateMap<UserNotificationResponseDto, UserNotificationRequestDto>(MemberList.Destination);
         }
     }
 }

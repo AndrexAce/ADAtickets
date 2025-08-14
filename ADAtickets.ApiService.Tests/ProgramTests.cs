@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using ADAtickets.ApiService.Configs;
+using ADAtickets.ApiService.Controllers;
 using ADAtickets.ApiService.Repositories;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication;
@@ -26,6 +27,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
 
@@ -43,14 +45,20 @@ namespace ADAtickets.ApiService.Tests
             // Act
             ServiceProvider services = builder.Services.BuildServiceProvider();
 
-            // Assert: Database context and repositories
+            // Assert: Dependency injections
             Assert.NotNull(services.GetService<ADAticketsDbContext>());
+            Assert.NotNull(services.GetService<IAttachmentRepository>());
             Assert.NotNull(services.GetService<IEditRepository>());
             Assert.NotNull(services.GetService<INotificationRepository>());
             Assert.NotNull(services.GetService<IPlatformRepository>());
             Assert.NotNull(services.GetService<IReplyRepository>());
             Assert.NotNull(services.GetService<ITicketRepository>());
             Assert.NotNull(services.GetService<IUserRepository>());
+            Assert.NotNull(services.GetService<IUserPlatformRepository>());
+            Assert.NotNull(services.GetService<IUserNotificationRepository>());
+            Assert.NotNull(services.GetService<NotificationsController>());
+            Assert.NotNull(services.GetService<EditsController>());
+            Assert.NotNull(services.GetService<AzureDevOpsController>());
 
             // Assert: AutoMapper
             Assert.NotNull(services.GetService<IMapper>());
@@ -76,6 +84,9 @@ namespace ADAtickets.ApiService.Tests
 
             // Assert: Identity authentication API
             Assert.NotNull(services.GetService<IAuthenticationService>());
+
+            // Assert: Redis cache
+            Assert.NotNull(services.GetService<IDistributedCache>());
         }
 
         [Fact]

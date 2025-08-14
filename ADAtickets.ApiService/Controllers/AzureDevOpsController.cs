@@ -92,7 +92,7 @@ namespace ADAtickets.ApiService.Controllers
         [HttpGet("projects")]
         [Authorize(Policy = Policy.OperatorOrAdmin)]
         [RequiredScope(Scope.Read)]
-        public async Task<ActionResult<IEnumerable<PlatformResponseDto>>> GetAllPlatformNamesAsync()
+        public async Task<ActionResult<IEnumerable<PlatformResponseDto>>> GetAllPlatformNames()
         {
             IEnumerable<PlatformResponseDto> devOpsPlatforms = await GetAzureDevOpsPlatformsAsync();
 
@@ -160,7 +160,7 @@ namespace ADAtickets.ApiService.Controllers
             });
         }
 
-        internal async Task<ValueWrapper<bool>> CreateAzureDevOpsWorkItem(Ticket ticket, Guid platformId)
+        internal async Task<ValueWrapper<bool>> CreateAzureDevOpsWorkItemAsync(Ticket ticket, Guid platformId)
         {
             var platform = await platformRepository.GetPlatformByIdAsync(platformId);
             var platformName = platform?.Name;
