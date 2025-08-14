@@ -38,5 +38,15 @@ namespace ADAtickets.Shared.Constants
         /// The message sent to the user when a ticket is assigned to an operator.
         /// </summary>
         public const string TicketAssigned = "TICKET_ASSIGNED_NOTIFICATION";
+
+        /// <summary>
+        /// The message sent to the user when the operator edits the ticket or sent to the operator when the user edits the ticket.
+        /// </summary>
+        public const string TicketEdited = "TICKET_EDITED_NOTIFICATION";
+
+        /// <summary>
+        /// The message sent to the operator when a ticket is assigned to them.
+        /// </summary>
+        public const string TicketAssignedToYou = "TICKET_ASSIGNED_TO_YOU_NOTIFICATION";
     }
 }

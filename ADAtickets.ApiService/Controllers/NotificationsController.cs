@@ -248,62 +248,117 @@ namespace ADAtickets.ApiService.Controllers
 
         internal async Task<Guid?> CreateCreationNotificationsAsync(Ticket ticket)
         {
-            // Create the creation notification
-            var ticketCreatedNotification = CreateNotification(ticket.Id, Notifications.TicketCreated, ticket.CreatorUserId);
-            await notificationRepository.AddNotificationAsync(ticketCreatedNotification);
+            // User has created a new ticket; create a notification with the creator as responsible.
+            var newTicketCreatedNotification = CreateNotification(ticket.Id, Notifications.TicketCreated, ticket.CreatorUserId);
+            await notificationRepository.AddNotificationAsync(newTicketCreatedNotification);
 
-            // Find users who have the ticket platform as their preferred platform
-            var userPlatforms = await userPlatformRepository.GetUserPlatformsByAsync(
+            // Find users who have the ticket platform as their preferred platform.
+            var operatorsWithPreferredPlatform = await userPlatformRepository.GetUserPlatformsByAsync(
             [
                 new KeyValuePair<string, string>(nameof(UserPlatform.PlatformId), ticket.PlatformId.ToString())
             ]);
 
-            // If there is any user who prefer this platform, notify the first one with the least assigned tickets or the only one if that is the case.
-            if (userPlatforms.Any())
+            // If there is any user who prefer this platform, notify the first one with the least assigned tickets.
+            if (operatorsWithPreferredPlatform.Any())
             {
-                var sortedOperators = from userPlatform in userPlatforms
-                                      join user in await userRepository.GetUsersAsync()
-                                      on userPlatform.UserId equals user.Id
-                                      orderby user.AssignedTickets.Count ascending
-                                      select user.Id;
+                var operatorsSortedByWorkload = from userPlatform in operatorsWithPreferredPlatform
+                                                join user in await userRepository.GetUsersAsync()
+                                                on userPlatform.UserId equals user.Id
+                                                orderby user.AssignedTickets.Count ascending
+                                                select user.Id;
 
-                // Create the creation notification link
-                var userNotificationCreation = CreateUserNotification(ticketCreatedNotification.Id, sortedOperators.FirstOrDefault());
-                await userNotificationRepository.AddUserNotificationAsync(userNotificationCreation);
+                var operatorWithLeastWorkload = operatorsSortedByWorkload.FirstOrDefault();
 
-                // Create the assignment notification for the operator
-                var ticketAssignedNotificationOperator = CreateNotification(ticket.Id, Notifications.TicketAssignedToYouBySystem, sortedOperators.FirstOrDefault());
-                await notificationRepository.AddNotificationAsync(ticketAssignedNotificationOperator);
+                // If there is at least one operator, proceed.
+                if (operatorWithLeastWorkload != Guid.Empty)
+                {
+                    // Notify the selected operator that the user has created the ticket.
+                    var notificationLinkForOperatorAboutCreation = CreateUserNotification(newTicketCreatedNotification.Id, operatorWithLeastWorkload);
+                    await userNotificationRepository.AddUserNotificationAsync(notificationLinkForOperatorAboutCreation);
 
-                // Create the assignment notification link for the operator
-                var userNotificationAssignmentOperator = CreateUserNotification(ticketAssignedNotificationOperator.Id, sortedOperators.FirstOrDefault());
-                await userNotificationRepository.AddUserNotificationAsync(userNotificationAssignmentOperator);
+                    // The system will be assigning the ticket to the operator; create a notification with the operator as responsible.
+                    var systemAssignmentNotificationForOperator = CreateNotification(ticket.Id, Notifications.TicketAssignedToYouBySystem, operatorWithLeastWorkload);
+                    await notificationRepository.AddNotificationAsync(systemAssignmentNotificationForOperator);
 
-                // Create the assignment notification for the user
-                var ticketAssignedNotificationUser = CreateNotification(ticket.Id, Notifications.TicketAssigned, ticket.CreatorUserId);
-                await notificationRepository.AddNotificationAsync(ticketAssignedNotificationUser);
+                    // Notify the selected operator that they have been assigned to the ticket.
+                    var notificationLinkForOperatorAboutAssignment = CreateUserNotification(systemAssignmentNotificationForOperator.Id, operatorWithLeastWorkload);
+                    await userNotificationRepository.AddUserNotificationAsync(notificationLinkForOperatorAboutAssignment);
 
-                // Create the assignment notification link for the user
-                var userNotificationAssignmentUser = CreateUserNotification(ticketAssignedNotificationUser.Id, ticket.CreatorUserId);
-                await userNotificationRepository.AddUserNotificationAsync(userNotificationAssignmentUser);
+                    // The system has assigned the ticket to the operator; create a notification with the operator as responsible.
+                    var ticketAssignmentNotificationForCreator = CreateNotification(ticket.Id, Notifications.TicketAssigned, operatorWithLeastWorkload);
+                    await notificationRepository.AddNotificationAsync(ticketAssignmentNotificationForCreator);
 
-                return sortedOperators.FirstOrDefault();
+                    // Notify the ticket creator that the ticket has been assigned to an operator.
+                    var notificationLinkForCreatorAboutAssignment = CreateUserNotification(ticketAssignmentNotificationForCreator.Id, ticket.CreatorUserId);
+                    await userNotificationRepository.AddUserNotificationAsync(notificationLinkForCreatorAboutAssignment);
+
+                    return operatorWithLeastWorkload;
+                }
+            }
+
+            // If there is no user who prefers this platform, notify every operator of the new ticket.
+            await SendNotificationToAllOperators(newTicketCreatedNotification);
+            return null;
+        }
+
+        internal async Task CreateEditNotificationAsync(Ticket ticket, Guid editor)
+        {
+            // The user or operator has edited the ticket; create a notification with the editor as responsible.
+            var ticketEditedByUserNotification = CreateNotification(ticket.Id, Notifications.TicketEdited, editor);
+            await notificationRepository.AddNotificationAsync(ticketEditedByUserNotification);
+
+            // Check who requested the ticket editing.
+            if (editor == ticket.CreatorUserId)
+            {
+                // If the ticket has been edited by the creator, notify the assigned operator (if any) or all operators.
+                if (ticket.OperatorUserId.HasValue)
+                {
+                    // Notify the assigned operator that the ticket has been edited by the creator.
+                    var notificationLinkForOperatorAboutCreatorEdit = CreateUserNotification(ticketEditedByUserNotification.Id, ticket.OperatorUserId.Value);
+                    await userNotificationRepository.AddUserNotificationAsync(notificationLinkForOperatorAboutCreatorEdit);
+                }
+                else
+                {
+                    // Notify all the operators that the ticket has been edited by the creator.
+                    await SendNotificationToAllOperators(ticketEditedByUserNotification);
+                }
+            }
+            else if (editor == ticket.OperatorUserId)
+            {
+                // If the ticket has been edited by the operator, notify the creator.
+                var notificationLinkForCreatorAboutOperatorEdit = CreateUserNotification(ticketEditedByUserNotification.Id, ticket.CreatorUserId);
+                await userNotificationRepository.AddUserNotificationAsync(notificationLinkForCreatorAboutOperatorEdit);
             }
             else
             {
-                // If there is no user who prefers this platform, notify every operator of the new ticket.
-                var operators = from user in await userRepository.GetUsersAsync()
-                                where user.Type == UserType.Admin || user.Type == UserType.Operator
-                                select user.Id;
+                // If the ticket has been edited by someone else (admin), notify both the creator and the operator(s).
+                var notificationLinkForCreatorAboutThirdPartyEdit = CreateUserNotification(ticketEditedByUserNotification.Id, ticket.CreatorUserId);
+                await userNotificationRepository.AddUserNotificationAsync(notificationLinkForCreatorAboutThirdPartyEdit);
 
-                foreach (Guid userId in operators)
+                // If the ticket has an assigned operator, notify them; otherwise notify all operators.
+                if (ticket.OperatorUserId.HasValue)
                 {
-                    // Create the creation notification link
-                    var userNotificationCreation = CreateUserNotification(ticketCreatedNotification.Id, userId);
-                    await userNotificationRepository.AddUserNotificationAsync(userNotificationCreation);
+                    var notificationLinkForOperatorAboutThirdPartyEdit = CreateUserNotification(ticketEditedByUserNotification.Id, ticket.OperatorUserId.Value);
+                    await userNotificationRepository.AddUserNotificationAsync(notificationLinkForOperatorAboutThirdPartyEdit);
                 }
+                else
+                {
+                    await SendNotificationToAllOperators(ticketEditedByUserNotification);
+                }
+            }
+        }
 
-                return null;
+        private async Task SendNotificationToAllOperators(Notification notification)
+        {
+            var operators = from user in await userRepository.GetUsersAsync()
+                            where user.Type == UserType.Admin || user.Type == UserType.Operator
+                            select user.Id;
+
+            foreach (Guid userId in operators)
+            {
+                // Notify the operator(s).
+                var userNotificationCreation = CreateUserNotification(notification.Id, userId);
+                await userNotificationRepository.AddUserNotificationAsync(userNotificationCreation);
             }
         }
 

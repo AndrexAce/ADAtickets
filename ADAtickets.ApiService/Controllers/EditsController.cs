@@ -243,6 +243,7 @@ namespace ADAtickets.ApiService.Controllers
 
         internal async Task CreateCreationEditsAsync(Ticket ticket, Guid? chosenOperatorId)
         {
+            // Create the edit about the ticket creation by the creator.
             Edit edit = new()
             {
                 EditDateTime = DateTime.UtcNow,
@@ -255,7 +256,7 @@ namespace ADAtickets.ApiService.Controllers
 
             await editRepository.AddEditAsync(edit);
 
-            // If there is a chosen operator, create the edit of ticket assignment too.
+            // If there is an automatically assigned operator, create the edit of the ticket assignment to the operator too.
             if (chosenOperatorId.HasValue)
             {
                 Edit assignmentEdit = new()
@@ -270,6 +271,22 @@ namespace ADAtickets.ApiService.Controllers
 
                 await editRepository.AddEditAsync(assignmentEdit);
             }
+        }
+
+        internal async Task CreateEditEditAsync(Ticket ticket, Guid editor)
+        {
+            // Create the edit about the ticket edit by the editor.
+            Edit edit = new()
+            {
+                EditDateTime = DateTime.UtcNow,
+                Description = Edits.TicketEdited,
+                OldStatus = ticket.Status,
+                NewStatus = ticket.Status,
+                TicketId = ticket.Id,
+                UserId = editor
+            };
+
+            await editRepository.AddEditAsync(edit);
         }
     }
 }

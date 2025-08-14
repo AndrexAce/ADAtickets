@@ -91,5 +91,10 @@ namespace ADAtickets.Shared.Dtos.Requests
         /// The id of the operator assigned to the ticket.
         /// </summary>
         public Guid? OperatorUserId { get; set; } = null;
+
+        /// <summary>
+        /// Identifier of the <see cref="User"/> making the request.
+        /// </summary>
+        public Guid? Requester { get; set; } = null;
     }
 }

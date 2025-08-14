@@ -56,7 +56,8 @@ namespace ADAtickets.ApiService.Configs
                 .ForMember(ticketDto => ticketDto.Notifications, opt => opt.MapFrom(src => src.Notifications.Select(notifications => notifications.Id)))
                 .ForMember(ticketDto => ticketDto.CreatorName, opt => opt.MapFrom(src => $"{src.CreatorUser.Name} {src.CreatorUser.Surname}"))
                 .ForMember(ticketDto => ticketDto.LastUpdateDateTime, opt => opt.MapFrom(src => src.Edits.Any() ? src.Edits.MaxBy(edit => edit.EditDateTime)!.EditDateTime : src.CreationDateTime));
-            _ = CreateMap<TicketRequestDto, Ticket>(MemberList.Source);
+            _ = CreateMap<TicketRequestDto, Ticket>(MemberList.Source)
+                .ForSourceMember(ticketDto => ticketDto.Requester, opt => opt.DoNotValidate());
 
             _ = CreateMap<User, UserResponseDto>(MemberList.Destination)
                 .ForMember(userDto => userDto.CreatedTickets, opt => opt.MapFrom(src => src.CreatedTickets.Select(ticket => ticket.Id)))

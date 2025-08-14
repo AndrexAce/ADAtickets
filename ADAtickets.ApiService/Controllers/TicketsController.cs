@@ -156,6 +156,11 @@ namespace ADAtickets.ApiService.Controllers
         [RequiredScope(Scope.Read, Scope.Write)]
         public async Task<ActionResult<TicketResponseDto>> PutTicket(Guid id, TicketRequestDto ticketDto)
         {
+            if (!ticketDto.Requester.HasValue)
+            {
+                throw new ArgumentException("Including the Requester field in the request object is mandatory when calling this endpoint.");
+            }
+
             // If the requested entity does not exist, create a new one.
             if (await ticketRepository.GetTicketByIdAsync(id) is not Ticket ticket)
             {
@@ -166,6 +171,9 @@ namespace ADAtickets.ApiService.Controllers
             {
                 // Update the existing entity with the new data.
                 await ticketRepository.UpdateTicketAsync(mapper.Map(ticketDto, ticket));
+
+                // Create notification and create the edit.
+                await ProcessTicketUpdateAsync(ticket, ticketDto.Requester.Value);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -286,6 +294,13 @@ namespace ADAtickets.ApiService.Controllers
                 ticket.OperatorUserId = chosenOperatorId.Value;
                 await ticketRepository.UpdateTicketAsync(ticket);
             }
+        }
+
+        private async Task ProcessTicketUpdateAsync(Ticket ticket, Guid editor)
+        {
+            await notificationsController.CreateEditNotificationAsync(ticket, editor);
+
+            await editsController.CreateEditEditAsync(ticket, editor);
         }
     }
 }

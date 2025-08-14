@@ -41,7 +41,8 @@ namespace ADAtickets.Web.Components.Utilities
 
             _ = CreateMap<PlatformResponseDto, PlatformRequestDto>(MemberList.Destination);
 
-            _ = CreateMap<TicketResponseDto, TicketRequestDto>(MemberList.Destination);
+            _ = CreateMap<TicketResponseDto, TicketRequestDto>(MemberList.Destination)
+                .ForMember(ticketRequest => ticketRequest.Requester, opt => opt.Ignore());
 
             _ = CreateMap<UserResponseDto, UserRequestDto>(MemberList.Destination);
 
