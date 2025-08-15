@@ -24,77 +24,84 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
              mc:Ignorable="d"
              x:Class="ADAtickets.Installer.Views.SecondStep"
              x:DataType="vm:MainViewModel">
-	<Design.DataContext>
-		<vm:MainViewModel />
-	</Design.DataContext>
+    <Design.DataContext>
+        <vm:MainViewModel />
+    </Design.DataContext>
 
-	<StackPanel Orientation="Vertical" Margin="20 20 20 20" Spacing="20" HorizontalAlignment="Stretch">
-		<TextBlock Text="{x:Static assets:Resources.PleaseInsert}"
+    <StackPanel Orientation="Vertical" Margin="20 20 20 20" Spacing="20" HorizontalAlignment="Stretch">
+        <TextBlock Text="{x:Static assets:Resources.PleaseInsert}"
                    FontFamily="Segoe UI"
-                   HorizontalAlignment="Center"/>
-		<StackPanel Orientation="Horizontal" Spacing="20" HorizontalAlignment="Stretch">
-			<Image Source="/Assets/Docker.png" Width="100"/>
-			<UniformGrid Columns="3" HorizontalAlignment="Stretch" ColumnSpacing="20" RowSpacing="20" Width="760">
-				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-					<TextBlock Text="{x:Static assets:Resources.DbUserNameLabel}" FontFamily="Segoe UI"/>
-					<TextBox Text="{Binding DbUserName}" Watermark="postgres" HorizontalAlignment="Stretch" Width="NaN"/>
-				</StackPanel>
-				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-					<TextBlock Text="{x:Static assets:Resources.DbPasswordLabel}" FontFamily="Segoe UI"/>
-					<TextBox Text="{Binding DbPassword}" PasswordChar="•" Watermark="postgres" HorizontalAlignment="Stretch" Width="NaN"/>
-				</StackPanel>
-				<Grid ColumnDefinitions="*,*" HorizontalAlignment="Stretch" ColumnSpacing="20">
-					<StackPanel Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Stretch">
-						<TextBlock Text="{x:Static assets:Resources.ApiVersionLabel}" FontFamily="Segoe UI"/>
-						<ComboBox SelectedItem="{Binding ApiVersion}" HorizontalAlignment="Stretch" Width="NaN">
-							<ComboBoxItem Content="v1.0.0"/>
-						</ComboBox>
-					</StackPanel>
-					<StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Stretch">
-						<TextBlock Text="{x:Static assets:Resources.WebVersionLabel}" FontFamily="Segoe UI"/>
-						<ComboBox SelectedItem="{Binding WebVersion}" HorizontalAlignment="Stretch" Width="NaN">
-							<ComboBoxItem Content="v1.0.0"/>
-						</ComboBox>
-					</StackPanel>
-				</Grid>
-				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-					<TextBlock Text="{x:Static assets:Resources.SslCertificatePathLabel}" FontFamily="Segoe UI"/>
-					<TextBox Text="{Binding SslCertificatePath}" Watermark="/path/to/certificate.pfx" HorizontalAlignment="Stretch" Width="NaN"/>
-				</StackPanel>
-				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-					<TextBlock Text="{x:Static assets:Resources.SslCertificatePasswordLabel}" FontFamily="Segoe UI"/>
-					<TextBox Text="{Binding SslCertificatePassword}" PasswordChar="•" HorizontalAlignment="Stretch" Width="NaN"/>
-				</StackPanel>
-			</UniformGrid>
-		</StackPanel>
-		<Separator/>
-		<StackPanel Orientation="Horizontal" Spacing="20">
-			<Image Source="/Assets/AzureDevOps.png" Width="100"/>
-			<UniformGrid Columns="2" HorizontalAlignment="Stretch" ColumnSpacing="20" RowSpacing="20" Width="760">
-				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-					<TextBlock Text="{x:Static assets:Resources.DevOpsOrganizationNameLabel}" FontFamily="Segoe UI"/>
-					<TextBox Text="{Binding DevOpsOrganizationName}" Watermark="{x:Static assets:Resources.ExampleNameWatermark}" HorizontalAlignment="Stretch" Width="NaN"/>
-				</StackPanel>
-			</UniformGrid>
-		</StackPanel>
-		<Separator/>
-		<StackPanel Orientation="Horizontal" Spacing="20">
-			<Image Source="/Assets/Azure.png" Width="100"/>
-			<UniformGrid Columns="2" HorizontalAlignment="Stretch" ColumnSpacing="20" RowSpacing="20" Width="760">
-				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-					<TextBlock Text="{x:Static assets:Resources.TenantIdLabel}" FontFamily="Segoe UI"/>
-					<TextBox Text="{Binding TenantId}" Watermark="00000000-0000-0000-0000-000000000000" HorizontalAlignment="Stretch" Width="NaN"/>
-				</StackPanel>
-				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-					<TextBlock Text="{x:Static assets:Resources.ExternalTenantIdLabel}" FontFamily="Segoe UI"/>
-					<TextBox Text="{Binding ExternalTenantId}" Watermark="00000000-0000-0000-0000-000000000000" HorizontalAlignment="Stretch" Width="NaN"/>
-				</StackPanel>
-			</UniformGrid>
-		</StackPanel>
-		<Button Content="{x:Static assets:Resources.Next}"
-				HorizontalAlignment="Center"
-				FontFamily="Segoe UI"
-				Classes="accent"
-				Command="{Binding GoToThirdStepCommand}"/>
-	</StackPanel>
+                   HorizontalAlignment="Center" />
+        <StackPanel Orientation="Horizontal" Spacing="20" HorizontalAlignment="Stretch">
+            <Image Source="/Assets/Docker.png" Width="100" />
+            <UniformGrid Columns="3" HorizontalAlignment="Stretch" ColumnSpacing="20" RowSpacing="20" Width="760">
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+                    <TextBlock Text="{x:Static assets:Resources.DbUserNameLabel}" FontFamily="Segoe UI" />
+                    <TextBox Text="{Binding DbUserName}" Watermark="postgres" HorizontalAlignment="Stretch" Width="NaN" />
+                </StackPanel>
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+                    <TextBlock Text="{x:Static assets:Resources.DbPasswordLabel}" FontFamily="Segoe UI" />
+                    <TextBox Text="{Binding DbPassword}" PasswordChar="•" Watermark="postgres"
+                             HorizontalAlignment="Stretch" Width="NaN" />
+                </StackPanel>
+                <Grid ColumnDefinitions="*,*" HorizontalAlignment="Stretch" ColumnSpacing="20">
+                    <StackPanel Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Stretch">
+                        <TextBlock Text="{x:Static assets:Resources.ApiVersionLabel}" FontFamily="Segoe UI" />
+                        <ComboBox SelectedItem="{Binding ApiVersion}" HorizontalAlignment="Stretch" Width="NaN">
+                            <ComboBoxItem Content="v1.0.0" />
+                        </ComboBox>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Stretch">
+                        <TextBlock Text="{x:Static assets:Resources.WebVersionLabel}" FontFamily="Segoe UI" />
+                        <ComboBox SelectedItem="{Binding WebVersion}" HorizontalAlignment="Stretch" Width="NaN">
+                            <ComboBoxItem Content="v1.0.0" />
+                        </ComboBox>
+                    </StackPanel>
+                </Grid>
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+                    <TextBlock Text="{x:Static assets:Resources.SslCertificatePathLabel}" FontFamily="Segoe UI" />
+                    <TextBox Text="{Binding SslCertificatePath}" Watermark="/path/to/certificate.pfx"
+                             HorizontalAlignment="Stretch" Width="NaN" />
+                </StackPanel>
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+                    <TextBlock Text="{x:Static assets:Resources.SslCertificatePasswordLabel}" FontFamily="Segoe UI" />
+                    <TextBox Text="{Binding SslCertificatePassword}" PasswordChar="•" HorizontalAlignment="Stretch"
+                             Width="NaN" />
+                </StackPanel>
+            </UniformGrid>
+        </StackPanel>
+        <Separator />
+        <StackPanel Orientation="Horizontal" Spacing="20">
+            <Image Source="/Assets/AzureDevOps.png" Width="100" />
+            <UniformGrid Columns="2" HorizontalAlignment="Stretch" ColumnSpacing="20" RowSpacing="20" Width="760">
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+                    <TextBlock Text="{x:Static assets:Resources.DevOpsOrganizationNameLabel}" FontFamily="Segoe UI" />
+                    <TextBox Text="{Binding DevOpsOrganizationName}"
+                             Watermark="{x:Static assets:Resources.ExampleNameWatermark}" HorizontalAlignment="Stretch"
+                             Width="NaN" />
+                </StackPanel>
+            </UniformGrid>
+        </StackPanel>
+        <Separator />
+        <StackPanel Orientation="Horizontal" Spacing="20">
+            <Image Source="/Assets/Azure.png" Width="100" />
+            <UniformGrid Columns="2" HorizontalAlignment="Stretch" ColumnSpacing="20" RowSpacing="20" Width="760">
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+                    <TextBlock Text="{x:Static assets:Resources.TenantIdLabel}" FontFamily="Segoe UI" />
+                    <TextBox Text="{Binding TenantId}" Watermark="00000000-0000-0000-0000-000000000000"
+                             HorizontalAlignment="Stretch" Width="NaN" />
+                </StackPanel>
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+                    <TextBlock Text="{x:Static assets:Resources.ExternalTenantIdLabel}" FontFamily="Segoe UI" />
+                    <TextBox Text="{Binding ExternalTenantId}" Watermark="00000000-0000-0000-0000-000000000000"
+                             HorizontalAlignment="Stretch" Width="NaN" />
+                </StackPanel>
+            </UniformGrid>
+        </StackPanel>
+        <Button Content="{x:Static assets:Resources.Next}"
+                HorizontalAlignment="Center"
+                FontFamily="Segoe UI"
+                Classes="accent"
+                Command="{Binding GoToThirdStepCommand}" />
+    </StackPanel>
 </UserControl>

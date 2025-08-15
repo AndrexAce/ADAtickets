@@ -1,9 +1,9 @@
 name: Tag, containerize and update
 on:
   workflow_run:
-    workflows: ["Build, test and analyze"]
-    types: 
-    - completed
+    workflows: [ "Build, test and analyze" ]
+    types:
+      - completed
 
 jobs:
   update:
@@ -15,7 +15,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
-      
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -35,7 +35,7 @@ jobs:
         run: |
           git config user.name "Andrea Lucchese"
           git config user.email "andrylook14@gmail.com"
-      
+
       - name: Get Installer version
         run: echo "INSTALLER_VERSION=v$(cat ADAtickets.Installer/VERSION)" >> $GITHUB_ENV
 
@@ -48,24 +48,24 @@ jobs:
           else
             echo "Tag ${{ env.INSTALLER_VERSION }} already exists. Skipping tag creation."
           fi
-      
+
       - name: Build and pack NuGet package
         run: |
           dotnet build "ADAtickets.Client" --configuration Release
           dotnet pack "ADAtickets.Client" --configuration Release --no-build --output ./nupkg
-      
+
       - name: Publish NuGet package to GitHub Packages
         run: |
           dotnet nuget add source --username ${{ github.actor }} --password ${{ secrets.PAT }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
           dotnet nuget push "./nupkg/*.nupkg" --source "github" --api-key ${{ secrets.PAT }} --skip-duplicate
-      
+
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.PAT }}
-      
+
       - name: Get API version
         run: echo "API_VERSION=v$(cat ADAtickets.ApiService/VERSION)" >> $GITHUB_ENV
 

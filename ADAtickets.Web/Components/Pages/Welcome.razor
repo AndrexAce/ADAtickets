@@ -16,19 +16,15 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @page "/welcome"
-
-@using System.Globalization
-@using ADAtickets.Shared.Constants
 @using ADAtickets.Shared.Extensions
-@using ADAtickets.Web.Components.Layout
 @using ADAtickets.Web.Components.Shared
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.FluentUI.AspNetCore.Components.Icons.Regular
 
 @inject IStringLocalizer<Welcome> loc
 @inject NavigationManager navigationManager
 @inject AuthenticationStateProvider authenticationStateProvider
-@inject IConfiguration configuration
 
 @attribute [AllowAnonymous]
 
@@ -39,35 +35,40 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     }
 </style>
 <FluentStack Orientation="Orientation.Vertical">
-    <FluentSpacer />
+    <FluentSpacer/>
     <LogoCard Title="@loc["Greeting1"]" Text="@loc["Greeting2"]" Style="align-self: center">
         <FluentStack Orientation="Orientation.Vertical" VerticalGap="10">
-            <FluentStack Orientation="Orientation.Horizontal" HorizontalGap="10" VerticalAlignment="VerticalAlignment.Center">
-                <FluentButton Appearance="Appearance.Accent" 
-                                IconStart="@(new Icons.Regular.Size20.Person())" 
-                                Style="width: 100%;" 
-                                OnClick="@(() => navigationManager.NavigateTo("MicrosoftIdentity/Account/SignIn/ExternalEntra", true))">
+            <FluentStack Orientation="Orientation.Horizontal" HorizontalGap="10"
+                         VerticalAlignment="VerticalAlignment.Center">
+                <FluentButton Appearance="Appearance.Accent"
+                              IconStart="@(new Size20.Person())"
+                              Style="width: 100%;"
+                              OnClick="@(() => navigationManager.NavigateTo("MicrosoftIdentity/Account/SignIn/ExternalEntra", true))">
                     @loc["UserButton"]
                 </FluentButton>
-                <FluentIcon Id="UserButton" Icon="Icons.Regular.Size20.Info"></FluentIcon>
-                <FluentTooltip Anchor="UserButton" Position="TooltipPosition.End">@loc["UserButtonTooltip"]</FluentTooltip>
+                <FluentIcon Id="UserButton" Icon="Size20.Info"></FluentIcon>
+                <FluentTooltip Anchor="UserButton"
+                               Position="TooltipPosition.End">@loc["UserButtonTooltip"]</FluentTooltip>
             </FluentStack>
-            <FluentStack Orientation="Orientation.Horizontal" HorizontalGap="10" VerticalAlignment="VerticalAlignment.Center">
-                <FluentButton Appearance="Appearance.Accent" 
-                                IconStart="@(new Icons.Regular.Size20.Wrench())" 
-                                Style="width: 100%;" 
-                                OnClick="@(() => navigationManager.NavigateTo("MicrosoftIdentity/Account/SignIn/Entra", true))">
+            <FluentStack Orientation="Orientation.Horizontal" HorizontalGap="10"
+                         VerticalAlignment="VerticalAlignment.Center">
+                <FluentButton Appearance="Appearance.Accent"
+                              IconStart="@(new Size20.Wrench())"
+                              Style="width: 100%;"
+                              OnClick="@(() => navigationManager.NavigateTo("MicrosoftIdentity/Account/SignIn/Entra", true))">
                     @loc["AdminButton"]
                 </FluentButton>
-                <FluentIcon Id="AdminButton" Icon="Icons.Regular.Size20.Info"></FluentIcon>
-                <FluentTooltip Anchor="AdminButton" Position="TooltipPosition.End">@loc["AdminButtonTooltip"]</FluentTooltip>
+                <FluentIcon Id="AdminButton" Icon="Size20.Info"></FluentIcon>
+                <FluentTooltip Anchor="AdminButton"
+                               Position="TooltipPosition.End">@loc["AdminButtonTooltip"]</FluentTooltip>
             </FluentStack>
         </FluentStack>
     </LogoCard>
-    <FluentSpacer />
+    <FluentSpacer/>
 </FluentStack>
 
 @code {
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
@@ -78,4 +79,5 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             navigationManager.NavigateTo("/", true);
         }
     }
+
 }

@@ -24,7 +24,7 @@ services:
       - network
     volumes:
       - redis-data:/data
- 
+  
   adatickets.apiservice:
     container_name: Api
     depends_on:

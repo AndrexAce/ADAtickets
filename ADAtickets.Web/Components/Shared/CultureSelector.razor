@@ -1,4 +1,5 @@
-﻿<!-- ADAtickets is a simple, lightweight, open source ticketing system
+﻿@using System.Globalization
+<!-- ADAtickets is a simple, lightweight, open source ticketing system
 interacting with your enterprise repositories on Azure DevOps
 with a two-way synchronization.
 Copyright (C) 2025  Andrea Lucchese
@@ -15,24 +16,23 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
-@using System.Globalization
 
 @inject NavigationManager navigationManager
 
 <FluentSelect TOption="CultureInfo"
-    Items="supportedCultures"
-    OptionText="@(c => c.DisplayName)"
-    OptionValue="@(c => c.Name)"
-    OptionSelected="@(c => c == selectedCulture)"
-    @bind-SelectedOption="@selectedCulture"
-    @bind-SelectedOption:after="ApplySelectedCulture" />
+              Items="supportedCultures"
+              OptionText="@(c => c.DisplayName)"
+              OptionValue="@(c => c.Name)"
+              OptionSelected="@(c => c == selectedCulture)"
+              @bind-SelectedOption="@selectedCulture"
+              @bind-SelectedOption:after="ApplySelectedCulture"/>
 
 @code
 {
     private readonly CultureInfo[] supportedCultures =
     [
-        new CultureInfo("en"),
-        new CultureInfo("it")
+        new("en"),
+        new("it")
     ];
 
     private CultureInfo selectedCulture = CultureInfo.CurrentCulture;
@@ -48,7 +48,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
             navigationManager.NavigateTo(
                 $"Culture/Set?culture={cultureEscaped}&redirectUri={uriEscaped}",
-                forceLoad: true);
+                true);
         }
     }
 }

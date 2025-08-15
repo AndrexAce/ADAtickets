@@ -24,62 +24,70 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
              mc:Ignorable="d"
              x:Class="ADAtickets.Installer.Views.ThirdStep"
              x:DataType="vm:MainViewModel">
-	<Design.DataContext>
-		<vm:MainViewModel />
-	</Design.DataContext>
+    <Design.DataContext>
+        <vm:MainViewModel />
+    </Design.DataContext>
 
-	<StackPanel Orientation="Vertical" Margin="20 20 20 20" Spacing="20" HorizontalAlignment="Stretch">
-		<Grid ColumnDefinitions="Auto,*" >
-			<Button Grid.Column="1" Content="{x:Static assets:Resources.Previous}"
-				HorizontalAlignment="Left"
-				FontFamily="Segoe UI"
-				Classes="accent"
-				Command="{Binding GoToPreviousStepCommand}"/>
-			<TextBlock Grid.Column="2" Text="{x:Static assets:Resources.PleaseInsert}"
-                   FontFamily="Segoe UI"
-                   HorizontalAlignment="Center"/>
-		</Grid>
-		<StackPanel Orientation="Horizontal" Spacing="20">
-			<Image Source="/Assets/Azure.png" Width="100"/>
-			<UniformGrid Columns="2" HorizontalAlignment="Stretch" ColumnSpacing="20" RowSpacing="20" Width="760">
-				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-					<TextBlock Text="{x:Static assets:Resources.WebAppIdLabel}" FontFamily="Segoe UI"/>
-					<TextBox Text="{Binding WebAppId}" Watermark="00000000-0000-0000-0000-000000000000" HorizontalAlignment="Stretch" Width="NaN"/>
-				</StackPanel>
-				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-					<TextBlock Text="{x:Static assets:Resources.ExternalWebAppIdLabel}" FontFamily="Segoe UI"/>
-					<TextBox Text="{Binding ExternalWebAppId}" Watermark="00000000-0000-0000-0000-000000000000" HorizontalAlignment="Stretch" Width="NaN"/>
-				</StackPanel>
-				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-					<TextBlock Text="{x:Static assets:Resources.ApiAppIdLabel}" FontFamily="Segoe UI"/>
-					<TextBox Text="{Binding ApiAppId}" Watermark="00000000-0000-0000-0000-000000000000" HorizontalAlignment="Stretch" Width="NaN"/>
-				</StackPanel>
-				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-					<TextBlock Text="{x:Static assets:Resources.ExternalApiAppIdLabel}" FontFamily="Segoe UI"/>
-					<TextBox Text="{Binding ExternalApiAppId}" Watermark="00000000-0000-0000-0000-000000000000" HorizontalAlignment="Stretch" Width="NaN"/>
-				</StackPanel>
-				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-					<TextBlock Text="{x:Static assets:Resources.WebAuthCertificatePathLabel}" FontFamily="Segoe UI"/>
-					<TextBox Text="{Binding WebAuthCertificatePath}" Watermark="/path/to/certificate.pfx" HorizontalAlignment="Stretch" Width="NaN"/>
-				</StackPanel>
-				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-					<TextBlock Text="{x:Static assets:Resources.WebAuthCertificatePasswordLabel}" FontFamily="Segoe UI"/>
-					<TextBox Text="{Binding WebAuthCertificatePassword}" PasswordChar="•" HorizontalAlignment="Stretch" Width="NaN"/>
-				</StackPanel>
-				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-					<TextBlock Text="{x:Static assets:Resources.ApiAuthCertificatePathLabel}" FontFamily="Segoe UI"/>
-					<TextBox Text="{Binding ApiAuthCertificatePath}" Watermark="/path/to/certificate.pfx" HorizontalAlignment="Stretch" Width="NaN"/>
-				</StackPanel>
-				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-					<TextBlock Text="{x:Static assets:Resources.ApiAuthCertificatePasswordLabel}" FontFamily="Segoe UI"/>
-					<TextBox Text="{Binding ApiAuthCertificatePassword}" PasswordChar="•" HorizontalAlignment="Stretch" Width="NaN"/>
-				</StackPanel>
-			</UniformGrid>
-		</StackPanel>
-		<Button Content="{x:Static assets:Resources.Next}"
-				HorizontalAlignment="Center"
-				FontFamily="Segoe UI"
-				Classes="accent"
-				Command="{Binding GoToLastStepCommand}"/>
-	</StackPanel>
+    <StackPanel Orientation="Vertical" Margin="20 20 20 20" Spacing="20" HorizontalAlignment="Stretch">
+        <Grid ColumnDefinitions="Auto,*">
+            <Button Grid.Column="1" Content="{x:Static assets:Resources.Previous}"
+                    HorizontalAlignment="Left"
+                    FontFamily="Segoe UI"
+                    Classes="accent"
+                    Command="{Binding GoToPreviousStepCommand}" />
+            <TextBlock Grid.Column="2" Text="{x:Static assets:Resources.PleaseInsert}"
+                       FontFamily="Segoe UI"
+                       HorizontalAlignment="Center" />
+        </Grid>
+        <StackPanel Orientation="Horizontal" Spacing="20">
+            <Image Source="/Assets/Azure.png" Width="100" />
+            <UniformGrid Columns="2" HorizontalAlignment="Stretch" ColumnSpacing="20" RowSpacing="20" Width="760">
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+                    <TextBlock Text="{x:Static assets:Resources.WebAppIdLabel}" FontFamily="Segoe UI" />
+                    <TextBox Text="{Binding WebAppId}" Watermark="00000000-0000-0000-0000-000000000000"
+                             HorizontalAlignment="Stretch" Width="NaN" />
+                </StackPanel>
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+                    <TextBlock Text="{x:Static assets:Resources.ExternalWebAppIdLabel}" FontFamily="Segoe UI" />
+                    <TextBox Text="{Binding ExternalWebAppId}" Watermark="00000000-0000-0000-0000-000000000000"
+                             HorizontalAlignment="Stretch" Width="NaN" />
+                </StackPanel>
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+                    <TextBlock Text="{x:Static assets:Resources.ApiAppIdLabel}" FontFamily="Segoe UI" />
+                    <TextBox Text="{Binding ApiAppId}" Watermark="00000000-0000-0000-0000-000000000000"
+                             HorizontalAlignment="Stretch" Width="NaN" />
+                </StackPanel>
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+                    <TextBlock Text="{x:Static assets:Resources.ExternalApiAppIdLabel}" FontFamily="Segoe UI" />
+                    <TextBox Text="{Binding ExternalApiAppId}" Watermark="00000000-0000-0000-0000-000000000000"
+                             HorizontalAlignment="Stretch" Width="NaN" />
+                </StackPanel>
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+                    <TextBlock Text="{x:Static assets:Resources.WebAuthCertificatePathLabel}" FontFamily="Segoe UI" />
+                    <TextBox Text="{Binding WebAuthCertificatePath}" Watermark="/path/to/certificate.pfx"
+                             HorizontalAlignment="Stretch" Width="NaN" />
+                </StackPanel>
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+                    <TextBlock Text="{x:Static assets:Resources.WebAuthCertificatePasswordLabel}" FontFamily="Segoe UI" />
+                    <TextBox Text="{Binding WebAuthCertificatePassword}" PasswordChar="•" HorizontalAlignment="Stretch"
+                             Width="NaN" />
+                </StackPanel>
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+                    <TextBlock Text="{x:Static assets:Resources.ApiAuthCertificatePathLabel}" FontFamily="Segoe UI" />
+                    <TextBox Text="{Binding ApiAuthCertificatePath}" Watermark="/path/to/certificate.pfx"
+                             HorizontalAlignment="Stretch" Width="NaN" />
+                </StackPanel>
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+                    <TextBlock Text="{x:Static assets:Resources.ApiAuthCertificatePasswordLabel}" FontFamily="Segoe UI" />
+                    <TextBox Text="{Binding ApiAuthCertificatePassword}" PasswordChar="•" HorizontalAlignment="Stretch"
+                             Width="NaN" />
+                </StackPanel>
+            </UniformGrid>
+        </StackPanel>
+        <Button Content="{x:Static assets:Resources.Next}"
+                HorizontalAlignment="Center"
+                FontFamily="Segoe UI"
+                Classes="accent"
+                Command="{Binding GoToLastStepCommand}" />
+    </StackPanel>
 </UserControl>

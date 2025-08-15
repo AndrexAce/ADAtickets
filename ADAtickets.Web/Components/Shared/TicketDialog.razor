@@ -16,18 +16,16 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @implements IDialogContentComponent<TicketDialogContent>
-
 @using ADAtickets.Client
 @using ADAtickets.Shared.Dtos.Requests
 @using ADAtickets.Shared.Dtos.Responses
 @using ADAtickets.Shared.Extensions
 @using ADAtickets.Shared.Models
-@using ADAtickets.Web.Components.Pages
 @using ADAtickets.Web.Components.Utilities
 @using AutoMapper
-@using System.Net
 @using Microsoft.AspNetCore.Components.Authorization
-@using static ADAtickets.Web.Components.Utilities.Dialogs
+@using Microsoft.FluentUI.AspNetCore.Components.Icons.Regular
+@using static Utilities.Dialogs
 
 @inject IStringLocalizer<TicketDialog> loc
 @inject TicketsClient ticketsClient
@@ -58,7 +56,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
 <FluentDialogBody>
     <EditForm id="ticket_form" Model="@TicketRequest" OnValidSubmit="HandleValidSubmitAsync" FormName="ticket_form">
-        <DataAnnotationsValidator />
+        <DataAnnotationsValidator/>
         <FluentValidationSummary Model="@TicketRequest"/>
 
         <FluentStack Orientation="Orientation.Vertical">
@@ -67,13 +65,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 @if (Content.IsEdit)
                 {
                     <FluentSelect TOption="UserResponseDto"
-                        Label="@loc["AssignedOperator"]"
-                        Name="OperatorUserId"
-                        Items="users"
-                        OptionText="@(u => $"{u.Name} {u.Surname}")"
-                        OptionValue="@(u => u.Id.ToString())"
-                        Placeholder="@loc["PleaseSelectAnOption"]"
-                        @bind-Value="OperatorIdString">
+                                  Label="@loc["AssignedOperator"]"
+                                  Name="OperatorUserId"
+                                  Items="users"
+                                  OptionText="@(u => $"{u.Name} {u.Surname}")"
+                                  OptionValue="@(u => u.Id.ToString())"
+                                  Placeholder="@loc["PleaseSelectAnOption"]"
+                                  @bind-Value="OperatorIdString">
                     </FluentSelect>
                 }
                 else
@@ -94,26 +92,26 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             else
             {
                 <FluentRadioGroup Name="Type"
-                    LabelTemplate="@TicketTypeLabel"
-                    Orientation="Orientation.Vertical"
-                    @bind-Value="TicketRequest.Type"
-                    Required>
+                                  LabelTemplate="@TicketTypeLabel"
+                                  Orientation="Orientation.Vertical"
+                                  @bind-Value="TicketRequest.Type"
+                                  Required>
                     <FluentRadio Value="TicketType.Bug">@loc["Problem"]</FluentRadio>
                     <FluentRadio Value="TicketType.Feature">@loc["Suggestion"]</FluentRadio>
                 </FluentRadioGroup>
-                <FluentValidationMessage For="@(() => TicketRequest.Type)" />
+                <FluentValidationMessage For="@(() => TicketRequest.Type)"/>
 
                 <FluentSelect TOption="PlatformResponseDto"
-                    Label="@loc["Platform"]"
-                    Name="PlatformId"
-                    Items="platforms"
-                    OptionText="@(p => p.Name)"
-                    OptionValue="@(p => p.Id.ToString())"
-                    Placeholder="@loc["PleaseSelectAnOption"]"
-                    @bind-Value="PlatformIdString"
-                    Required>
+                              Label="@loc["Platform"]"
+                              Name="PlatformId"
+                              Items="platforms"
+                              OptionText="@(p => p.Name)"
+                              OptionValue="@(p => p.Id.ToString())"
+                              Placeholder="@loc["PleaseSelectAnOption"]"
+                              @bind-Value="PlatformIdString"
+                              Required>
                 </FluentSelect>
-                <FluentValidationMessage For="@(() => TicketRequest.PlatformId)" />
+                <FluentValidationMessage For="@(() => TicketRequest.PlatformId)"/>
             }
 
             @if (Content.IsEdit && !Content.IsUser)
@@ -127,25 +125,25 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             else
             {
                 <FluentTextField Name="Title"
-                    Label="@loc["Title"]"
-                    Spellcheck="true"
-                    Style="width: 75%"
-                    ReadOnly="@(Content.IsEdit && !Content.IsUser)"
-                    @bind-Value="TicketRequest.Title"
-                    Required>
-                    <FluentIcon Value="@(new Icons.Regular.Size20.TextT())" Color="@Color.Neutral" Slot="start" />
+                                 Label="@loc["Title"]"
+                                 Spellcheck="true"
+                                 Style="width: 75%"
+                                 ReadOnly="@(Content.IsEdit && !Content.IsUser)"
+                                 @bind-Value="TicketRequest.Title"
+                                 Required>
+                    <FluentIcon Value="@(new Size20.TextT())" Color="@Color.Neutral" Slot="start"/>
                 </FluentTextField>
-                <FluentValidationMessage For="@(() => TicketRequest.Title)" />
+                <FluentValidationMessage For="@(() => TicketRequest.Title)"/>
 
                 <FluentTextArea Name="Description"
-                    Label="@loc["Description"]"
-                    Maxlength="5000"
-                    Spellcheck="true"
-                    Style="width: 100%"
-                    ReadOnly="@(Content.IsEdit && !Content.IsUser)"
-                    @bind-Value="TicketRequest.Description"
-                    Required />
-                <FluentValidationMessage For="@(() => TicketRequest.Description)" />
+                                Label="@loc["Description"]"
+                                Maxlength="5000"
+                                Spellcheck="true"
+                                Style="width: 100%"
+                                ReadOnly="@(Content.IsEdit && !Content.IsUser)"
+                                @bind-Value="TicketRequest.Description"
+                                Required/>
+                <FluentValidationMessage For="@(() => TicketRequest.Description)"/>
             }
 
             @if (Content.IsEdit && Content.IsUser)
@@ -156,15 +154,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             else
             {
                 <FluentRadioGroup Name="Priority"
-                    Label="@loc["Priority"]"
-                    Orientation="Orientation.Vertical"
-                    @bind-Value="TicketRequest.Priority"
-                    Required>
+                                  Label="@loc["Priority"]"
+                                  Orientation="Orientation.Vertical"
+                                  @bind-Value="TicketRequest.Priority"
+                                  Required>
                     <FluentRadio Value="Priority.Low">@loc["Low"]</FluentRadio>
                     <FluentRadio Value="Priority.Medium">@loc["Medium"]</FluentRadio>
                     <FluentRadio Value="Priority.High">@loc["High"]</FluentRadio>
                 </FluentRadioGroup>
-                <FluentValidationMessage For="@(() => TicketRequest.Priority)" />
+                <FluentValidationMessage For="@(() => TicketRequest.Priority)"/>
             }
 
             @if (!Content.IsEdit || photoPath is not null || videoPath is not null)
@@ -173,8 +171,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                     <FluentLabel Weight="FontWeight.Bold">@loc["Attachments"]</FluentLabel>
                     @if (!Content.IsEdit)
                     {
-                        <FluentIcon Id="AttachmentsLabelButton" Icon="Icons.Regular.Size20.Info"></FluentIcon>
-                        <FluentTooltip Anchor="AttachmentsLabelButton" Position="TooltipPosition.End">@loc["AttachmentsTooltip"]</FluentTooltip>
+                        <FluentIcon Id="AttachmentsLabelButton" Icon="Size20.Info"></FluentIcon>
+                        <FluentTooltip Anchor="AttachmentsLabelButton"
+                                       Position="TooltipPosition.End">@loc["AttachmentsTooltip"]</FluentTooltip>
                     }
                 </FluentStack>
                 @if (!Content.IsEdit && photoPath is null)
@@ -185,7 +184,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                                      OnCompleted="HandleUploadPhotoCompletedAsync">
                         <ChildContent>
                             <label for="photoUploader" style="margin-top: 0.3rem;">
-                                <FluentIcon Value="@(new @Icons.Regular.Size20.ArrowUpload())" />
+                                <FluentIcon Value="@(new Size20.ArrowUpload())"/>
                             </label>
                             <div>
                                 @loc["UploadImage"]
@@ -196,12 +195,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 else if (photoPath is not null)
                 {
                     <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center">
-                        <span style="overflow: hidden; text-overflow: ellipsis; max-width: 15rem">@Path.GetFileName(photoPath)</span>
-                        <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Open())" OnClick="HandleViewPhotoClick">@loc["View"]</FluentButton>
+                        <span
+                            style="overflow: hidden; text-overflow: ellipsis; max-width: 15rem">@Path.GetFileName(photoPath)</span>
+                        <FluentButton Appearance="Appearance.Accent" IconStart="@(new Size20.Open())"
+                                      OnClick="HandleViewPhotoClick">@loc["View"]</FluentButton>
 
                         @if (!Content.IsEdit)
                         {
-                            <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Delete())" OnClick="HandleDeletePhotoClick">@loc["Delete"]</FluentButton>
+                            <FluentButton Appearance="Appearance.Accent"
+                                          IconStart="@(new Size20.Delete())"
+                                          OnClick="HandleDeletePhotoClick">@loc["Delete"]</FluentButton>
                         }
                     </FluentStack>
                 }
@@ -214,7 +217,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                                      OnCompleted="HandleUploadVideoCompletedAsync">
                         <ChildContent>
                             <label for="videoUploader" style="margin-top: 0.3rem;">
-                                <FluentIcon Value="@(new @Icons.Regular.Size20.ArrowUpload())" />
+                                <FluentIcon Value="@(new Size20.ArrowUpload())"/>
                             </label>
                             <div>
                                 @loc["UploadVideo"]
@@ -226,11 +229,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 {
                     <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center">
                         <p style="overflow: hidden; text-overflow: ellipsis; max-width: 15rem">@Path.GetFileName(videoPath)</p>
-                        <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Open())" OnClick="HandleViewVideoClick">@loc["View"]</FluentButton>
+                        <FluentButton Appearance="Appearance.Accent" IconStart="@(new Size20.Open())"
+                                      OnClick="HandleViewVideoClick">@loc["View"]</FluentButton>
 
                         @if (!Content.IsEdit)
                         {
-                            <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Delete())" OnClick="HandleDeleteVideoClick">@loc["Delete"]</FluentButton>
+                            <FluentButton Appearance="Appearance.Accent"
+                                          IconStart="@(new Size20.Delete())"
+                                          OnClick="HandleDeleteVideoClick">@loc["Delete"]</FluentButton>
                         }
                     </FluentStack>
                 }
@@ -244,18 +250,18 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         @if (Content.IsEdit)
         {
             <FluentButton Id="SubmitEdit"
-                Type="ButtonType.Submit"
-                Appearance="Appearance.Accent"
-                IconStart="@(new Icons.Regular.Size20.Edit())"
-                FormId="ticket_form">@loc["Edit"]</FluentButton>
+                          Type="ButtonType.Submit"
+                          Appearance="Appearance.Accent"
+                          IconStart="@(new Size20.Edit())"
+                          FormId="ticket_form">@loc["Edit"]</FluentButton>
         }
         else
         {
             <FluentButton Id="SubmitCreate"
-                Type="ButtonType.Submit"
-                Appearance="Appearance.Accent"
-                IconStart="@(new Icons.Regular.Size20.Send())"
-                FormId="ticket_form">@loc["Create"]</FluentButton>
+                          Type="ButtonType.Submit"
+                          Appearance="Appearance.Accent"
+                          IconStart="@(new Size20.Send())"
+                          FormId="ticket_form">@loc["Create"]</FluentButton>
         }
         <FluentButton Appearance="Appearance.Neutral" OnClick="HandleCancelClickAsync">@loc["Cancel"]</FluentButton>
     </FluentStack>
@@ -264,24 +270,25 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @if (photoPath is not null)
 {
     <FluentOverlay @bind-Visible=@showPhoto
-               Opacity="0.4"
-               FullScreen="true"
-               PreventScroll="true"
-               Dismissable="false">
+                   Opacity="0.4"
+                   FullScreen="true"
+                   PreventScroll="true"
+                   Dismissable="false">
         <FluentCard>
             <FluentStack Orientation="Orientation.Vertical">
                 <FluentStack Orientation="Orientation.Horizontal">
                     <FluentLabel Typo="Typography.PaneHeader">Anteprima foto</FluentLabel>
-                    <FluentSpacer />
-                    <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.DismissCircle())" OnClick="HandleViewPhotoClose">@loc["ClosePreview"]</FluentButton>
+                    <FluentSpacer/>
+                    <FluentButton Appearance="Appearance.Accent" IconStart="@(new Size20.DismissCircle())"
+                                  OnClick="HandleViewPhotoClose">@loc["ClosePreview"]</FluentButton>
                 </FluentStack>
                 @if (!Content.IsEdit)
                 {
-                    <img src="@($"/{photoPath}")" style="max-width: 75vw; max-height: 75vh;" />
+                    <img src="@($"/{photoPath}")" style="max-width: 75vw; max-height: 75vh;"/>
                 }
                 else
                 {
-                    <img src="@($"http://localhost:7213/{photoPath}")" style="max-width: 75vw; max-height: 75vh;" />
+                    <img src="@($"http://localhost:7213/{photoPath}")" style="max-width: 75vw; max-height: 75vh;"/>
                 }
             </FluentStack>
         </FluentCard>
@@ -290,16 +297,17 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @if (videoPath is not null)
 {
     <FluentOverlay @bind-Visible=@showVideo
-               Opacity="0.4"
-               FullScreen="true"
-               PreventScroll="true"
-               Dismissable="false">
+                   Opacity="0.4"
+                   FullScreen="true"
+                   PreventScroll="true"
+                   Dismissable="false">
         <FluentCard>
             <FluentStack Orientation="Orientation.Vertical">
                 <FluentStack Orientation="Orientation.Horizontal">
                     <FluentLabel Typo="Typography.PaneHeader">Anteprima video</FluentLabel>
-                    <FluentSpacer />
-                    <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.DismissCircle())" OnClick="HandleViewVideoClose">@loc["ClosePreview"]</FluentButton>
+                    <FluentSpacer/>
+                    <FluentButton Appearance="Appearance.Accent" IconStart="@(new Size20.DismissCircle())"
+                                  OnClick="HandleViewVideoClose">@loc["ClosePreview"]</FluentButton>
                 </FluentStack>
                 @if (!Content.IsEdit)
                 {
@@ -307,7 +315,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 }
                 else
                 {
-                    <video src="@($"http://localhost:7213/{videoPath}")" style="max-width: 75vw; max-height: 75vh;" controls></video>
+                    <video src="@($"http://localhost:7213/{videoPath}")" style="max-width: 75vw; max-height: 75vh;"
+                           controls></video>
                 }
             </FluentStack>
         </FluentCard>
@@ -315,20 +324,20 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 }
 
 @code {
+
     /// <summary>
-    /// The dialog object bound to this component.
+    ///     The dialog object bound to this component.
     /// </summary>
     [CascadingParameter]
     public FluentDialog Dialog { get; set; } = default!;
 
     /// <summary>
-    /// Necessary data to display the dialog.
+    ///     Necessary data to display the dialog.
     /// </summary>
     [Parameter]
     public TicketDialogContent Content { get; set; } = default!;
 
-    [SupplyParameterFromForm]
-    private TicketRequestDto TicketRequest { get; set; } = new();
+    [SupplyParameterFromForm] private TicketRequestDto TicketRequest { get; set; } = new();
 
     private IEnumerable<PlatformResponseDto>? platforms;
     private IEnumerable<UserResponseDto>? users;
@@ -336,8 +345,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     private string? photoPath;
     private string? videoPath;
 
-    private bool showPhoto = false;
-    private bool showVideo = false;
+    private bool showPhoto;
+    private bool showVideo;
 
     private string PlatformIdString
     {
@@ -352,13 +361,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     }
 
     private RenderFragment TicketTypeLabel => @<FluentStack Orientation="Orientation.Horizontal">
-        <FluentLabel>@loc["TicketType"]</FluentLabel>
-        @if ((!Content.IsEdit && Content.IsUser) || (Content.IsEdit && !Content.IsUser))
-        {
-            <FluentIcon Id="TicketTypeLabelButton" Icon="Icons.Regular.Size20.Info"></FluentIcon>
-            <FluentTooltip Anchor="TicketTypeLabelButton" Position="TooltipPosition.End">@loc["TicketTypeTooltip"]</FluentTooltip>
-        }
-    </FluentStack>;
+                                                  <FluentLabel>@loc["TicketType"]</FluentLabel>
+                                                  @if ((!Content.IsEdit && Content.IsUser) || (Content.IsEdit && !Content.IsUser))
+                                                  {
+                                                      <FluentIcon Id="TicketTypeLabelButton"
+                                                                  Icon="Size20.Info"></FluentIcon>
+                                                      <FluentTooltip Anchor="TicketTypeLabelButton"
+                                                                     Position="TooltipPosition.End">@loc["TicketTypeTooltip"]</FluentTooltip>
+                                                  }
+                                              </FluentStack>;
 
     protected override async Task OnInitializedAsync()
     {
@@ -375,7 +386,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             {
                 TicketRequest = mapper.Map<TicketRequestDto>(Content.InitialTicketData);
 
-                IEnumerable<AttachmentResponseDto> attachments = await LoadAttachmentsAsync(new Dictionary<string, string> { { nameof(AttachmentRequestDto.TicketId), initialTicketData.Id.ToString() } });
+                var attachments = await LoadAttachmentsAsync(new Dictionary<string, string> { { nameof(AttachmentRequestDto.TicketId), initialTicketData.Id.ToString() } });
 
                 photoPath = attachments.ElementAtOrDefault(0)?.Path;
                 videoPath = attachments.ElementAtOrDefault(1)?.Path;
@@ -393,19 +404,26 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         FluentInputFile.ResourceLoadingCompleted = loc["ResourceLoadingCompleted"];
     }
 
-    private async Task<IEnumerable<UserResponseDto>> LoadUsersAsync(IEnumerable<KeyValuePair<string, string>> filters) => await usersClient.GetAllAsync(filters);
+    private async Task<IEnumerable<UserResponseDto>> LoadUsersAsync(IEnumerable<KeyValuePair<string, string>> filters)
+    {
+        return await usersClient.GetAllAsync(filters);
+    }
 
-    private async Task<IEnumerable<PlatformResponseDto>> LoadPlatformsAsync() => await platformsClient.GetAllAsync();
+    private async Task<IEnumerable<PlatformResponseDto>> LoadPlatformsAsync()
+    {
+        return await platformsClient.GetAllAsync();
+    }
 
-    private async Task<IEnumerable<AttachmentResponseDto>> LoadAttachmentsAsync(IEnumerable<KeyValuePair<string, string>> filters) => await attachmentsClient.GetAllAsync(filters);
+    private async Task<IEnumerable<AttachmentResponseDto>> LoadAttachmentsAsync(IEnumerable<KeyValuePair<string, string>> filters)
+    {
+        return await attachmentsClient.GetAllAsync(filters);
+    }
 
     private async Task HandleValidSubmitAsync()
     {
         await Dialog.CloseAsync();
 
-        var progressToastParameters = Content.IsEdit ? 
-        Toasts.ProgressToastParameters("CreateUpdate", loc["UpdateProgressToastTitle"], loc["UpdateProgressToastDetails"]) :
-        Toasts.ProgressToastParameters("CreateUpdate", loc["CreateProgressToastTitle"], loc["CreateProgressToastDetails"]);
+        var progressToastParameters = Content.IsEdit ? Toasts.ProgressToastParameters("CreateUpdate", loc["UpdateProgressToastTitle"], loc["UpdateProgressToastDetails"]) : Toasts.ProgressToastParameters("CreateUpdate", loc["CreateProgressToastTitle"], loc["CreateProgressToastDetails"]);
 
         toastService.ShowProgressToast(progressToastParameters);
 
@@ -422,9 +440,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 TicketRequest.Requester = loggedInUser.Id;
             }
 
-            var ticketResponse = Content.IsEdit ?
-                await ticketsClient.PutAsync(Content.InitialTicketData!.Id, TicketRequest) :
-                await ticketsClient.PostAsync(TicketRequest);
+            var ticketResponse = Content.IsEdit ? await ticketsClient.PutAsync(Content.InitialTicketData!.Id, TicketRequest) : await ticketsClient.PostAsync(TicketRequest);
 
             // Update the progress bar and the toast.
             progressToastParameters.Content.Progress = Content.IsEdit ? 100 : 50;
@@ -473,7 +489,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             {
                 Name = Path.GetFileName(photoPath),
                 TicketId = ticketResponse.Id,
-                Content = await File.ReadAllBytesAsync(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", photoPath)),
+                Content = await File.ReadAllBytesAsync(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", photoPath))
             };
 
             await attachmentsClient.PostAsync(photoAttachment);
@@ -490,7 +506,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             {
                 Name = Path.GetFileName(videoPath),
                 TicketId = ticketResponse.Id,
-                Content = await File.ReadAllBytesAsync(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", videoPath)),
+                Content = await File.ReadAllBytesAsync(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", videoPath))
             };
 
             await attachmentsClient.PostAsync(videoAttachment);
@@ -509,9 +525,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             {
                 Message = loc["CancelConfirmDialogMessage"],
                 ConfirmAction = HandleConfirmCancelAsync,
-                ConfirmButtonIcon = new Icons.Regular.Size20.DismissCircle(),
+                ConfirmButtonIcon = new Size20.DismissCircle()
             },
-            Dialogs.ConfirmDialogParameters(loc["CancelConfirmDialogTitle"], loc["CancelConfirmDialogConfirmButton"], loc["CancelConfirmDialogCancelButton"]));
+            ConfirmDialogParameters(loc["CancelConfirmDialogTitle"], loc["CancelConfirmDialogConfirmButton"], loc["CancelConfirmDialogCancelButton"]));
     }
 
     private async Task HandleConfirmCancelAsync()
@@ -527,7 +543,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         {
             var file = args.First();
 
-            string uploadsDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "temp");
+            var uploadsDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "temp");
             Directory.CreateDirectory(uploadsDir);
 
             var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.Name)}";
@@ -547,7 +563,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         {
             var file = args.First();
 
-            string uploadsDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "temp");
+            var uploadsDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "temp");
             Directory.CreateDirectory(uploadsDir);
 
             var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.Name)}";
@@ -573,19 +589,31 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         videoPath = null;
     }
 
-    private void HandleViewPhotoClick() => showPhoto = true;
+    private void HandleViewPhotoClick()
+    {
+        showPhoto = true;
+    }
 
-    private void HandleViewVideoClick() => showVideo = true;
+    private void HandleViewVideoClick()
+    {
+        showVideo = true;
+    }
 
-    private void HandleViewPhotoClose() => showPhoto = false;
+    private void HandleViewPhotoClose()
+    {
+        showPhoto = false;
+    }
 
-    private void HandleViewVideoClose() => showVideo = false;
+    private void HandleViewVideoClose()
+    {
+        showVideo = false;
+    }
 
     private void DeleteTempFiles()
     {
         if (photoPath is not null)
         {
-            string fullPhotoPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", photoPath);
+            var fullPhotoPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", photoPath);
 
             if (File.Exists(fullPhotoPath))
             {
@@ -595,7 +623,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
         if (videoPath is not null)
         {
-            string fullVideoPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", videoPath);
+            var fullVideoPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", videoPath);
 
             if (File.Exists(fullVideoPath))
             {
@@ -604,18 +632,25 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         }
     }
 
-    private string GetTypeText(TicketType ticketType) => ticketType switch
+    private string GetTypeText(TicketType ticketType)
     {
-        TicketType.Bug => loc["Problem"],
-        TicketType.Feature => loc["Suggestion"],
-        _ => ""
-    };
+        return ticketType switch
+        {
+            TicketType.Bug => loc["Problem"],
+            TicketType.Feature => loc["Suggestion"],
+            _ => ""
+        };
+    }
 
-    private string GetPriorityText(Priority priority) => priority switch
+    private string GetPriorityText(Priority priority)
     {
-        Priority.Low => loc["Low"],
-        Priority.Medium => loc["Medium"],
-        Priority.High => loc["High"],
-        _ => ""
-    };
+        return priority switch
+        {
+            Priority.Low => loc["Low"],
+            Priority.Medium => loc["Medium"],
+            Priority.High => loc["High"],
+            _ => ""
+        };
+    }
+
 }

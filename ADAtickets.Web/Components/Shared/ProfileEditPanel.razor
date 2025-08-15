@@ -16,32 +16,27 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @implements IDialogContentComponent<ClaimsPrincipal>
-
-@using ADAtickets.Client
-@using ADAtickets.Shared.Constants
-@using ADAtickets.Shared.Extensions
-@using ADAtickets.Shared.Dtos.Requests
-@using ADAtickets.Shared.Dtos.Responses
-@using ADAtickets.Web.Components.Utilities
-@using AutoMapper
-@using System.Net
+@using System.Dynamic
 @using System.Security.Claims
-@using Microsoft.AspNetCore.Components.Authorization
-@using Microsoft.Graph.Models
-@using Microsoft.Identity.Abstractions
-@using Microsoft.Identity.Web
 @using System.Text
 @using System.Text.Json
-@using System.Dynamic
-@using static ADAtickets.Web.Components.Utilities.Dialogs
+@using ADAtickets.Client
+@using ADAtickets.Shared.Constants
+@using ADAtickets.Shared.Dtos.Requests
+@using ADAtickets.Shared.Dtos.Responses
+@using ADAtickets.Shared.Extensions
+@using ADAtickets.Web.Components.Utilities
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.FluentUI.AspNetCore.Components.Icons.Regular
+@using Microsoft.Identity.Abstractions
+@using Microsoft.Identity.Web
+@using static Utilities.Dialogs
 
 @inject IStringLocalizer<ProfileEditPanel> loc
 @inject IToastService toastService
 @inject IDialogService dialogService
-@inject IMapper mapper
 @inject IConfiguration configuration
 @inject IDownstreamApi downstreamApi
-@inject AuthenticationStateProvider authenticationStateProvider
 @inject UsersClient usersClient
 @inject UserPlatformsClient userPlatformsClient
 @inject PlatformsClient platformsClient
@@ -51,17 +46,19 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         <FluentStack Orientation="Orientation.Horizontal" HorizontalAlignment="HorizontalAlignment.Right">
             @if (!isEdit)
             {
-                <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Edit())" OnClick="HandleEditClick">@loc["Edit"]</FluentButton>
+                <FluentButton Appearance="Appearance.Accent" IconStart="@(new Size20.Edit())"
+                              OnClick="HandleEditClick">@loc["Edit"]</FluentButton>
             }
             else
             {
                 <FluentButton Id="SubmitEdit"
-                    Type="ButtonType.Submit"
-                    Appearance="Appearance.Accent"
-                    IconStart="@(new Icons.Regular.Size20.Save())"
-                    FormId="user_form">@loc["Save"]</FluentButton>
+                              Type="ButtonType.Submit"
+                              Appearance="Appearance.Accent"
+                              IconStart="@(new Size20.Save())"
+                              FormId="user_form">@loc["Save"]</FluentButton>
             }
-            <FluentButton Appearance="Appearance.Lightweight" IconStart="@(new Icons.Regular.Size20.Dismiss())" OnClick="HandleCancelClickAsync" />
+            <FluentButton Appearance="Appearance.Lightweight" IconStart="@(new Size20.Dismiss())"
+                          OnClick="HandleCancelClickAsync"/>
         </FluentStack>
         <FluentLabel Typo="Typography.PaneHeader">@loc["ProfileEditPanelTitle"]</FluentLabel>
     </FluentStack>
@@ -72,7 +69,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     {
         <FluentStack Orientation="Orientation.Vertical" HorizontalAlignment="HorizontalAlignment.Start">
             <FluentLabel Typo="Typography.Body" Weight="FontWeight.Bold">@loc["ProfilePictureLabel"]</FluentLabel>
-            <FluentPersona ImageSize="7.5rem" Initials="@GetInitials(Content.GetFullName())" Style="align-self: center"/>
+            <FluentPersona ImageSize="7.5rem" Initials="@GetInitials(Content.GetFullName())"
+                           Style="align-self: center"/>
 
             <FluentLabel Typo="Typography.Body" Weight="FontWeight.Bold">@loc["EmailLabel"]</FluentLabel>
             <FluentLabel Typo="Typography.Body">@Content.GetEmail()</FluentLabel>
@@ -95,22 +93,23 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     else
     {
         <EditForm id="user_form" Model="@UserRequest" OnValidSubmit="HandleValidSubmitAsync" FormName="user_form">
-            <DataAnnotationsValidator />
+            <DataAnnotationsValidator/>
             <FluentValidationSummary Model="@UserRequest"/>
 
             <FluentStack Orientation="Orientation.Vertical" HorizontalAlignment="HorizontalAlignment.Start">
                 <FluentLabel Typo="Typography.Body" Weight="FontWeight.Bold">@loc["ProfilePictureLabel"]</FluentLabel>
-                <FluentPersona ImageSize="7.5rem" Initials="@GetInitials(Content.GetFullName())" Style="align-self: center" />
+                <FluentPersona ImageSize="7.5rem" Initials="@GetInitials(Content.GetFullName())"
+                               Style="align-self: center"/>
 
                 <FluentTextField Name="Email"
-                                Label="@loc["EmailLabel"]"
-                                Spellcheck="true"
-                                Style="width: 100%"
-                                ReadOnly="true"
-                                @bind-Value="UserRequest.Email">
-                    <FluentIcon Value="@(new Icons.Regular.Size20.Mention())" Color="@Color.Neutral" Slot="start" />
+                                 Label="@loc["EmailLabel"]"
+                                 Spellcheck="true"
+                                 Style="width: 100%"
+                                 ReadOnly="true"
+                                 @bind-Value="UserRequest.Email">
+                    <FluentIcon Value="@(new Size20.Mention())" Color="@Color.Neutral" Slot="start"/>
                 </FluentTextField>
-                <FluentValidationMessage For="@(() => UserRequest.Email)" />
+                <FluentValidationMessage For="@(() => UserRequest.Email)"/>
 
                 <FluentTextField Name="Username"
                                  Label="@loc["UsernameLabel"]"
@@ -118,9 +117,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                                  Style="width: 100%"
                                  @bind-Value="username"
                                  Required>
-                    <FluentIcon Value="@(new Icons.Regular.Size20.Person())" Color="@Color.Neutral" Slot="start" />
+                    <FluentIcon Value="@(new Size20.Person())" Color="@Color.Neutral" Slot="start"/>
                 </FluentTextField>
-                <FluentValidationMessage For="@(() => UserRequest.Email)" />
+                <FluentValidationMessage For="@(() => UserRequest.Email)"/>
 
                 <FluentTextField Name="Email"
                                  Label="@loc["NameLabel"]"
@@ -128,9 +127,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                                  Style="width: 100%"
                                  @bind-Value="UserRequest.Name"
                                  Required>
-                    <FluentIcon Value="@(new Icons.Regular.Size20.PersonNote())" Color="@Color.Neutral" Slot="start" />
+                    <FluentIcon Value="@(new Size20.PersonNote())" Color="@Color.Neutral" Slot="start"/>
                 </FluentTextField>
-                <FluentValidationMessage For="@(() => UserRequest.Name)" />
+                <FluentValidationMessage For="@(() => UserRequest.Name)"/>
 
                 <FluentTextField Name="Email"
                                  Label="@loc["SurnameLabel"]"
@@ -138,9 +137,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                                  Style="width: 100%"
                                  @bind-Value="UserRequest.Surname"
                                  Required>
-                    <FluentIcon Value="@(new Icons.Regular.Size20.PersonNote())" Color="@Color.Neutral" Slot="start" />
+                    <FluentIcon Value="@(new Size20.PersonNote())" Color="@Color.Neutral" Slot="start"/>
                 </FluentTextField>
-                <FluentValidationMessage For="@(() => UserRequest.Surname)" />
+                <FluentValidationMessage For="@(() => UserRequest.Surname)"/>
 
                 <AuthorizeView Policy="@Policy.OperatorOrAdmin">
                     <ChildContent Context="selectContext">
@@ -152,9 +151,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                                       OptionText="@(p => p.Name)"
                                       OptionValue="@(p => p.Id.ToString())"
                                       @bind-SelectedOptions="favouritePlatforms">
-                            <FluentIcon Value="@(new Icons.Regular.Size20.Apps())" Color="@Color.Neutral" Slot="indicator" />
+                            <FluentIcon Value="@(new Size20.Apps())" Color="@Color.Neutral"
+                                        Slot="indicator"/>
                         </FluentSelect>
-                    </ChildContent> 
+                    </ChildContent>
                 </AuthorizeView>
             </FluentStack>
         </EditForm>
@@ -164,29 +164,29 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 <FluentDialogFooter Visible="false"/>
 
 @code {
+
     /// <summary>
-    /// The dialog object bound to this component.
+    ///     The dialog object bound to this component.
     /// </summary>
     [CascadingParameter]
     public FluentDialog Dialog { get; set; } = default!;
 
     /// <summary>
-    /// Necessary data to display the dialog.
+    ///     Necessary data to display the dialog.
     /// </summary>
     [Parameter]
     public required ClaimsPrincipal Content { get; set; }
 
-    [SupplyParameterFromForm]
-    private UserRequestDto UserRequest { get; set; } = new();
+    [SupplyParameterFromForm] private UserRequestDto UserRequest { get; } = new();
 
-    private bool isEdit = false;
-    private IEnumerable<PlatformResponseDto>? platforms = null;
-    private IEnumerable<PlatformResponseDto>? favouritePlatforms = null;
-    private string? favouritePlatformNames = null;
-    private Guid? currentUserId = null;
-    private string? username = null;
+    private bool isEdit;
+    private IEnumerable<PlatformResponseDto>? platforms;
+    private IEnumerable<PlatformResponseDto>? favouritePlatforms;
+    private string? favouritePlatformNames;
+    private Guid? currentUserId;
+    private string? username;
 
-    override protected async Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
         try
         {
@@ -210,7 +210,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 await GetFavouritePlatforms();
                 GetFavouritePlatformsName();
             }
-
         }
         catch (Exception ex)
         {
@@ -239,7 +238,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         await usersClient.PutAsync(Content.GetEmail() ?? string.Empty, newData);
     }
 
-    private async Task GetPlatforms() => platforms = await platformsClient.GetAllAsync();
+    private async Task GetPlatforms()
+    {
+        platforms = await platformsClient.GetAllAsync();
+    }
 
     private async Task GetFavouritePlatforms()
     {
@@ -250,10 +252,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     private void GetFavouritePlatformsName()
     {
-        var favouritePlatformsJoinedString = String.Join(",", favouritePlatforms!.Select(p => p.Name));
+        var favouritePlatformsJoinedString = string.Join(",", favouritePlatforms!.Select(p => p.Name));
 
-        favouritePlatformNames = string.IsNullOrWhiteSpace(favouritePlatformsJoinedString) 
-            ? loc["NoFavouritePlatformLabel"] 
+        favouritePlatformNames = string.IsNullOrWhiteSpace(favouritePlatformsJoinedString)
+            ? loc["NoFavouritePlatformLabel"]
             : favouritePlatformsJoinedString;
     }
 
@@ -264,7 +266,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         return currentUserId.ToString()!;
     }
 
-    private void HandleEditClick() => isEdit = !isEdit;
+    private void HandleEditClick()
+    {
+        isEdit = !isEdit;
+    }
 
     private async Task HandleCancelClickAsync()
     {
@@ -275,9 +280,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 {
                     Message = loc["CancelConfirmDialogMessage"],
                     ConfirmAction = HandleConfirmCancel,
-                    ConfirmButtonIcon = new Icons.Regular.Size20.EditOff(),
+                    ConfirmButtonIcon = new Size20.EditOff()
                 },
-                Dialogs.ConfirmDialogParameters(loc["CancelConfirmDialogTitle"], loc["CancelConfirmDialogConfirmButton"], loc["CancelConfirmDialogCancelButton"]));
+                ConfirmDialogParameters(loc["CancelConfirmDialogTitle"], loc["CancelConfirmDialogConfirmButton"], loc["CancelConfirmDialogCancelButton"]));
         }
         else
         {
@@ -302,16 +307,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             HttpContent patchContent = new StringContent(PrepareJsonPatchContent(), Encoding.UTF8, "application/json");
 
             // Update the user with Microsoft Graph
-            HttpResponseMessage response = await downstreamApi.CallApiForUserAsync(
-                    serviceName: InferServiceName(Content),
-                    downstreamApiOptionsOverride: options =>
-                    {
-                        options.HttpMethod = nameof(HttpMethod.Patch);
-                        options.RelativePath = $"users/{Content.GetUserId()}";
-                        options.AcquireTokenOptions.AuthenticationOptionsName = InferAuthenticationScheme(Content);
-                    },
-                    user: Content,
-                    content: patchContent);
+            var response = await downstreamApi.CallApiForUserAsync(
+                InferServiceName(Content),
+                options =>
+                {
+                    options.HttpMethod = nameof(HttpMethod.Patch);
+                    options.RelativePath = $"users/{Content.GetUserId()}";
+                    options.AcquireTokenOptions.AuthenticationOptionsName = InferAuthenticationScheme(Content);
+                },
+                Content,
+                patchContent);
 
             // If the user was successfully updated in Microsoft Graph, update the user in the database
             if (response.IsSuccessStatusCode)
@@ -352,23 +357,23 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             throw new InvalidOperationException("The user is not authenticated.");
         }
 
-        string? tid = user.GetTenantId();
+        var tid = user.GetTenantId();
 
         return tid is null ? throw new InvalidOperationException("The user is not authenticated.") : tid;
     }
 
     private string InferServiceName(ClaimsPrincipal user)
     {
-        string tenantId = GetUserTenantId(user);
-        string? primaryTenantId = configuration.GetSection($"{Scheme.OpenIdConnectDefault}:TenantId").Value;
+        var tenantId = GetUserTenantId(user);
+        var primaryTenantId = configuration.GetSection($"{Scheme.OpenIdConnectDefault}:TenantId").Value;
 
         return tenantId == primaryTenantId ? Service.Graph : Service.ExternalGraph;
     }
 
     private string InferAuthenticationScheme(ClaimsPrincipal user)
     {
-        string tenantId = GetUserTenantId(user);
-        string? primaryTenantId = configuration.GetSection($"{Scheme.OpenIdConnectDefault}:TenantId").Value;
+        var tenantId = GetUserTenantId(user);
+        var primaryTenantId = configuration.GetSection($"{Scheme.OpenIdConnectDefault}:TenantId").Value;
 
         return tenantId == primaryTenantId ? Scheme.OpenIdConnectDefault : Scheme.ExternalOpenIdConnectDefault;
     }
@@ -383,4 +388,5 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
         return JsonSerializer.Serialize(jsonContent);
     }
+
 }

@@ -16,11 +16,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @page "/"
-
 @using System.Net
 @using System.Security.Claims
 @using ADAtickets.Client
-@using ADAtickets.Shared.Constants
 @using ADAtickets.Shared.Dtos.Requests
 @using ADAtickets.Shared.Dtos.Responses
 @using ADAtickets.Shared.Extensions
@@ -40,6 +38,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 <PageTitle>ADAtickets</PageTitle>
 
 @code {
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
@@ -113,4 +112,5 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     {
         return await azureDevOpsClient.GetUserDevOpsAccessAsync(loggedInUser.Email);
     }
+
 }

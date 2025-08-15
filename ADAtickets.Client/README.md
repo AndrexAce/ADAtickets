@@ -6,15 +6,19 @@
 # ADAtickets API Client 📦
 
 ## What is ADAtickets API Client❓
-ADAtickets API client is the official library that allows to interact programmatically with the ADAtickets API hosted on your server.
+
+ADAtickets API client is the official library that allows to interact programmatically with the ADAtickets API hosted on
+your server.
 
 It is based on .NET and other Microsoft technologies.
 
-It was thought to be used in conjunction with Microsoft Entra ID (formerly Azure Active Directory) for authentication and authorization, as well as Azure DevOps.
+It was thought to be used in conjunction with Microsoft Entra ID (formerly Azure Active Directory) for authentication
+and authorization, as well as Azure DevOps.
 
 ## Configuring ADAtickets API client ⚙️
 
-Check the related [wiki page](https://github.com/AndrexAce/ADAtickets/wiki/API%20Client%20setup) if you want to know how to configure your library.
+Check the related [wiki page](https://github.com/AndrexAce/ADAtickets/wiki/API%20Client%20setup) if you want to know how
+to configure your library.
 
 ## Versioning ❗
 
@@ -36,4 +40,6 @@ A patch happens when there are bug fixes or other minor changes.
 - API rate limiting features.
 
 ## License 📃
-This project is licensed under the GPL v3 License — see the [LICENSE](https://github.com/AndrexAce/ADAtickets/blob/master/LICENSE.txt) file for details.
+
+This project is licensed under the GPL v3 License — see
+the [LICENSE](https://github.com/AndrexAce/ADAtickets/blob/master/LICENSE.txt) file for details.

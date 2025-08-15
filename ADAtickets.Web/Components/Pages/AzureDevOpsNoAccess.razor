@@ -16,18 +16,13 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @page "/azure-devops-noaccess"
-
-@using System.Globalization
-@using ADAtickets.Shared.Constants
 @using ADAtickets.Shared.Extensions
-@using ADAtickets.Web.Components.Layout
 @using ADAtickets.Web.Components.Shared
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
-@using Microsoft.AspNetCore.Diagnostics
+@using Microsoft.FluentUI.AspNetCore.Components.Icons.Regular
 
 @inject IStringLocalizer<AzureDevOpsNoAccess> loc
-@inject IHttpContextAccessor httpContextAccessor
 @inject NavigationManager navigationManager
 @inject AuthenticationStateProvider authenticationStateProvider
 
@@ -40,14 +35,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     }
 </style>
 <FluentStack Orientation="Orientation.Vertical">
-    <FluentSpacer />
+    <FluentSpacer/>
     <LogoCard Title="@loc["CardTitle"]" Text="@loc["CardText"]" Style="align-self: center">
-        <FluentButton IconStart="@(new Icons.Regular.Size20.Checkmark())" OnClick="SignOutAsync">@loc["OkButton"]</FluentButton>
+        <FluentButton IconStart="@(new Size20.Checkmark())"
+                      OnClick="SignOutAsync">@loc["OkButton"]</FluentButton>
     </LogoCard>
-    <FluentSpacer />
+    <FluentSpacer/>
 </FluentStack>
 
 @code {
+
     private async Task SignOutAsync()
     {
         var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
@@ -58,4 +55,5 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             navigationManager.NavigateTo("CustomAccount/SignOut", true);
         }
     }
+
 }

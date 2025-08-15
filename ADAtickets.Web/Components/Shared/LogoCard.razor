@@ -26,50 +26,51 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     }
     else
     {
-        <img src="Images/Logos/LogoDark.svg" alt="@loc["ADAticketsLogoAlt"]" />
+        <img src="Images/Logos/LogoDark.svg" alt="@loc["ADAticketsLogoAlt"]"/>
     }
-    <FluentLabel Typo="Typography.H1" Weight="FontWeight.Bold" Alignment="HorizontalAlignment.Center" MarginBlock="0.5rem">@Title</FluentLabel>
+    <FluentLabel Typo="Typography.H1" Weight="FontWeight.Bold" Alignment="HorizontalAlignment.Center"
+                 MarginBlock="0.5rem">@Title</FluentLabel>
     <FluentLabel Typo="Typography.Body" Alignment="HorizontalAlignment.Center" MarginBlock="0.5rem">@Text</FluentLabel>
     @ChildContent
 </FluentCard>
 
 @code {
-    [CascadingParameter]
-    private bool IsDarkThemeActive { get; set; }
+    [CascadingParameter] private bool IsDarkThemeActive { get; set; }
 
     /// <summary>
-    /// The title of the card.
+    ///     The title of the card.
     /// </summary>
     [Parameter]
     public string Title { get; set; } = "";
 
     /// <summary>
-    /// The text of the card.
+    ///     The text of the card.
     /// </summary>
     [Parameter]
     public string Text { get; set; } = "";
 
     /// <summary>
-    /// The width of the card. Default is <c>fit-content</c>.
+    ///     The width of the card. Default is <c>fit-content</c>.
     /// </summary>
     [Parameter]
     public string Width { get; set; } = "fit-content";
 
     /// <summary>
-    /// The height of the card. Default is <c>fit-content</c>.
+    ///     The height of the card. Default is <c>fit-content</c>.
     /// </summary>
     [Parameter]
     public string Height { get; set; } = "fit-content";
 
     /// <summary>
-    /// Additional CSS styles to apply to the card.
+    ///     Additional CSS styles to apply to the card.
     /// </summary>
     [Parameter]
     public string Style { get; set; } = "";
 
     /// <summary>
-    /// Child content to be rendered inside the card.
+    ///     Child content to be rendered inside the card.
     /// </summary>
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
+
 }

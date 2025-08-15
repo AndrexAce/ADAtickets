@@ -1,79 +1,79 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <LangVersion>latest</LangVersion>
-    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-	<NeutralLanguage>en</NeutralLanguage>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
+        <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+        <NeutralLanguage>en</NeutralLanguage>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <AvaloniaResource Include="Assets\**" />
-  </ItemGroup>
+    <ItemGroup>
+        <AvaloniaResource Include="Assets\**"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="Assets\docker-compose.override-prod.yml" />
-    <EmbeddedResource Include="Assets\docker-compose.yml" />
-    <EmbeddedResource Include="Assets\example.env" />
-  </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Include="Assets\docker-compose.override-prod.yml"/>
+        <EmbeddedResource Include="Assets\docker-compose.yml"/>
+        <EmbeddedResource Include="Assets\example.env"/>
+    </ItemGroup>
 
-  <ItemGroup>
-  	<ProjectCapability Include="Avalonia" />
-  	<TrimmerRootAssembly Include="Avalonia.Themes.Fluent" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectCapability Include="Avalonia"/>
+        <TrimmerRootAssembly Include="Avalonia.Themes.Fluent"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.3" />
-    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.3" />
-    <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.3" />
-    <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.3" />
-	<PackageReference Include="Docker.DotNet" Version="3.125.15" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.3"/>
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.3"/>
+        <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.3"/>
+        <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.3"/>
+        <PackageReference Include="Docker.DotNet" Version="3.125.15"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <AvaloniaResource Update="Assets\favicon.ico">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </AvaloniaResource>
-    <AvaloniaResource Update="Assets\Resources.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </AvaloniaResource>
-  </ItemGroup>
+    <ItemGroup>
+        <AvaloniaResource Update="Assets\favicon.ico">
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </AvaloniaResource>
+        <AvaloniaResource Update="Assets\Resources.resx">
+            <Generator>PublicResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+        </AvaloniaResource>
+    </ItemGroup>
 
-   <ItemGroup>
-     <EmbeddedResource Update="Assets\Resources.resx">
-       <Generator>PublicResXFileCodeGenerator</Generator>
-       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-     </EmbeddedResource>
-   </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Update="Assets\Resources.resx">
+            <Generator>PublicResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+    </ItemGroup>
 
-   <ItemGroup>
-     <Compile Update="Assets\Resources.Designer.cs">
-       <DesignTime>True</DesignTime>
-       <AutoGen>True</AutoGen>
-       <DependentUpon>Resources.resx</DependentUpon>
-     </Compile>
-     <Compile Update="Views\LastStep.axaml.cs">
-       <DependentUpon>LastStep.axaml</DependentUpon>
-     </Compile>
-     <Compile Update="Views\ThirdStep.axaml.cs">
-       <DependentUpon>ThirdStep.axaml</DependentUpon>
-     </Compile>
-     <Compile Update="Views\SecondStep.axaml.cs">
-       <DependentUpon>SecondStep.axaml</DependentUpon>
-     </Compile>
-     <Compile Update="Views\FirstStep.axaml.cs">
-       <DependentUpon>FirstStep.axaml</DependentUpon>
-     </Compile>
-   </ItemGroup>
+    <ItemGroup>
+        <Compile Update="Assets\Resources.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Resources.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Views\LastStep.axaml.cs">
+            <DependentUpon>LastStep.axaml</DependentUpon>
+        </Compile>
+        <Compile Update="Views\ThirdStep.axaml.cs">
+            <DependentUpon>ThirdStep.axaml</DependentUpon>
+        </Compile>
+        <Compile Update="Views\SecondStep.axaml.cs">
+            <DependentUpon>SecondStep.axaml</DependentUpon>
+        </Compile>
+        <Compile Update="Views\FirstStep.axaml.cs">
+            <DependentUpon>FirstStep.axaml</DependentUpon>
+        </Compile>
+    </ItemGroup>
 
-	<ItemGroup>
-		<InternalsVisibleTo Include="ADAtickets.Installer.Desktop" />
-	</ItemGroup>
+    <ItemGroup>
+        <InternalsVisibleTo Include="ADAtickets.Installer.Desktop"/>
+    </ItemGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\ADAtickets.Shared\ADAtickets.Shared.csproj" />
-	</ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\ADAtickets.Shared\ADAtickets.Shared.csproj"/>
+    </ItemGroup>
 </Project>

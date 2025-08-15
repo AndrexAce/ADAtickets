@@ -1,4 +1,5 @@
-﻿<!-- ADAtickets is a simple, lightweight, open source ticketing system
+﻿@using ADAtickets.Web.Components.Layout
+<!-- ADAtickets is a simple, lightweight, open source ticketing system
 interacting with your enterprise repositories on Azure DevOps
 with a two-way synchronization.
 Copyright (C) 2025  Andrea Lucchese
@@ -15,10 +16,9 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
-@using Microsoft.AspNetCore.Components.Authorization
 
 <Router AppAssembly="typeof(Program).Assembly">
     <Found Context="routeData">
-        <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.SimpleLayout)" />
+        <RouteView RouteData="routeData" DefaultLayout="typeof(SimpleLayout)"/>
     </Found>
 </Router>

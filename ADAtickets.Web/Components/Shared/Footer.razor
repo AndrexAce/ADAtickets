@@ -15,27 +15,27 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
+@using Microsoft.FluentUI.AspNetCore.Components.Icons.Regular
 @inherits ComponentBase
 
-@inject IDialogService dialogService
-@inject IStringLocalizer<Footer> loc
-
 <FluentButton Appearance="Appearance.Accent" IconStart="@themeIcon" OnClick="UpdateTheme"></FluentButton>
-<FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.LockClosed())"></FluentButton>
-<FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Cookies())"></FluentButton>
-<CultureSelector />
+<FluentButton Appearance="Appearance.Accent" IconStart="@(new Size20.LockClosed())"></FluentButton>
+<FluentButton Appearance="Appearance.Accent" IconStart="@(new Size20.Cookies())"></FluentButton>
+<CultureSelector/>
 
-<FluentDesignTheme @bind-Mode="@mode" CustomColor="#7A6040" StorageName="theme" OnLuminanceChanged="UpdateTheme" />
+<FluentDesignTheme @bind-Mode="@mode" CustomColor="#7A6040" StorageName="theme" OnLuminanceChanged="UpdateTheme"/>
 
 @code {
+
+
     /// <summary>
-    /// Represent whether the current theme has a dark luminance.
+    ///     Represent whether the current theme has a dark luminance.
     /// </summary>
     [Parameter]
     public bool IsDarkThemeActive { get; set; }
 
     /// <summary>
-    /// Propagates the modification of the <see cref="IsDarkThemeActive"/> parameter to the parent components.
+    ///     Propagates the modification of the <see cref="IsDarkThemeActive" /> parameter to the parent components.
     /// </summary>
     [Parameter]
     public EventCallback<bool> IsDarkThemeActiveChanged { get; set; }
@@ -48,13 +48,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         switch (mode)
         {
             case DesignThemeModes.Light:
-                themeIcon = new Icons.Regular.Size20.WeatherSunny();
+                themeIcon = new Size20.WeatherSunny();
                 break;
             case DesignThemeModes.Dark:
-                themeIcon = new Icons.Regular.Size20.WeatherMoon();
+                themeIcon = new Size20.WeatherMoon();
                 break;
             case DesignThemeModes.System:
-                themeIcon = new Icons.Regular.Size20.Color();
+                themeIcon = new Size20.Color();
                 break;
         }
     }
@@ -65,15 +65,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         {
             case DesignThemeModes.Light:
                 mode = DesignThemeModes.Dark;
-                themeIcon = new Icons.Regular.Size20.WeatherMoon();
+                themeIcon = new Size20.WeatherMoon();
                 break;
             case DesignThemeModes.Dark:
                 mode = DesignThemeModes.System;
-                themeIcon = new Icons.Regular.Size20.Color();
+                themeIcon = new Size20.Color();
                 break;
             case DesignThemeModes.System:
                 mode = DesignThemeModes.Light;
-                themeIcon = new Icons.Regular.Size20.WeatherSunny();
+                themeIcon = new Size20.WeatherSunny();
                 break;
         }
     }
@@ -83,4 +83,5 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         IsDarkThemeActive = e.IsDark;
         IsDarkThemeActiveChanged.InvokeAsync(e.IsDark);
     }
+
 }

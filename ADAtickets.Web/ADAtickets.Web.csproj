@@ -1,36 +1,36 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-	<UserSecretsId>098503a7-3070-41b6-9731-3d2205cad8dc</UserSecretsId>
-	<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-	<NeutralLanguage>en</NeutralLanguage>
-	<DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>098503a7-3070-41b6-9731-3d2205cad8dc</UserSecretsId>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <NeutralLanguage>en</NeutralLanguage>
+        <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
+    </PropertyGroup>
 
-  <ItemGroup>
-	<PackageReference Include="AutoMapper" Version="14.0.0" />
-	<PackageReference Include="Humanizer" Version="2.14.1" />
-	<PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="9.0.8" />
-	<PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.8" />
-	<PackageReference Include="Microsoft.Extensions.Localization" Version="9.0.8" />
-	<PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Emoji" Version="4.12.1" />
-	<PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.12.1" />
-	<PackageReference Include="Microsoft.Graph" Version="5.90.0" />
-	<PackageReference Include="Microsoft.Identity.Web.DownstreamApi" Version="3.13.0" />
-	<PackageReference Include="Microsoft.Identity.Web.UI" Version="3.13.0" />
-	<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="AutoMapper" Version="14.0.0"/>
+        <PackageReference Include="Humanizer" Version="2.14.1"/>
+        <PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="9.0.8"/>
+        <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.8"/>
+        <PackageReference Include="Microsoft.Extensions.Localization" Version="9.0.8"/>
+        <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Emoji" Version="4.12.1"/>
+        <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.12.1"/>
+        <PackageReference Include="Microsoft.Graph" Version="5.90.0"/>
+        <PackageReference Include="Microsoft.Identity.Web.DownstreamApi" Version="3.13.0"/>
+        <PackageReference Include="Microsoft.Identity.Web.UI" Version="3.13.0"/>
+        <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1"/>
+    </ItemGroup>
 
-  <ItemGroup>
-  	<InternalsVisibleTo Include="ADAtickets.Tests" />
-  	<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
-  </ItemGroup>
-	
-  <ItemGroup>
-    <ProjectReference Include="..\ADAtickets.Client\ADAtickets.Client.csproj" />
-    <ProjectReference Include="..\ADAtickets.Shared\ADAtickets.Shared.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <InternalsVisibleTo Include="ADAtickets.Tests"/>
+        <InternalsVisibleTo Include="DynamicProxyGenAssembly2"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\ADAtickets.Client\ADAtickets.Client.csproj"/>
+        <ProjectReference Include="..\ADAtickets.Shared\ADAtickets.Shared.csproj"/>
+    </ItemGroup>
 </Project>

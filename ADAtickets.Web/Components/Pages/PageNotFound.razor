@@ -16,13 +16,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @page "/error/404"
-
-@using System.Globalization
-@using ADAtickets.Shared.Constants
-@using ADAtickets.Web.Components.Layout
 @using ADAtickets.Web.Components.Shared
 @using Microsoft.AspNetCore.Authorization
-@using Microsoft.AspNetCore.Components.Authorization
 
 @inject IStringLocalizer<PageNotFound> loc
 
@@ -35,7 +30,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     }
 </style>
 <FluentStack Orientation="Orientation.Vertical">
-    <FluentSpacer />
+    <FluentSpacer/>
     <LogoCard Title="@loc["CardTitle"]" Text="@loc["CardText"]" Style="align-self: center"/>
-    <FluentSpacer />
+    <FluentSpacer/>
 </FluentStack>

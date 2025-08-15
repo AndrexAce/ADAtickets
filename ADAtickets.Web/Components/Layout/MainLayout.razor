@@ -15,17 +15,16 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
+@using ADAtickets.Web.Components.Shared
 @inherits LayoutComponentBase
 
-@using ADAtickets.Web.Components.Shared
-
-<FluentDesignTheme CustomColor="#7A6040" StorageName="theme" />
+<FluentDesignTheme CustomColor="#7A6040" StorageName="theme"/>
 <FluentLayout>
     <FluentHeader>
-        <Header />
+        <Header/>
     </FluentHeader>
     <FluentStack Class="main" Orientation="Orientation.Horizontal" HorizontalGap="0">
-        <Navigation />
+        <Navigation/>
         <FluentBodyContent>
             <div class="content">
                 @Body
@@ -35,6 +34,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 </FluentLayout>
 
 <FluentToastProvider Position="ToastPosition.BottomRight"/>
-<FluentDialogProvider />
-<FluentTooltipProvider />
-<FluentMenuProvider />
+<FluentDialogProvider/>
+<FluentTooltipProvider/>
+<FluentMenuProvider/>

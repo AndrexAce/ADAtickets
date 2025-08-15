@@ -16,7 +16,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @inherits ComponentBase
-
 @using ADAtickets.Client
 @using ADAtickets.Shared.Constants
 @using ADAtickets.Shared.Dtos.Requests
@@ -26,10 +25,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @using ADAtickets.Web.Components.Utilities
 @using AutoMapper
 @using Humanizer
-@using System.Net
 @using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.FluentUI.AspNetCore.Components.Icons.Regular
 @using Microsoft.Identity.Web
-@using static ADAtickets.Web.Components.Utilities.Dialogs
+@using static Utilities.Dialogs
 
 @inject IStringLocalizer<TicketCard> loc
 @inject UsersClient usersClient
@@ -45,9 +44,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         <FluentStack Orientation="Orientation.Horizontal">
             @if (Users is null)
             {
-                <FluentSkeleton Shape="SkeletonShape.Circle" Shimmer="true" />
-                <FluentSkeleton Height="3.5rem" Width="4rem" Shimmer="true" />
-                <FluentSpacer />
+                <FluentSkeleton Shape="SkeletonShape.Circle" Shimmer="true"/>
+                <FluentSkeleton Height="3.5rem" Width="4rem" Shimmer="true"/>
+                <FluentSpacer/>
             }
             else
             {
@@ -57,25 +56,25 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                         <FluentStack Orientation="Orientation.Horizontal">
                             @if (Ticket.Type == TicketType.Bug)
                             {
-                                <FluentIcon Value="@(new Icons.Filled.Size20.Bug())" />
+                                <FluentIcon Value="@(new Icons.Filled.Size20.Bug())"/>
                             }
                             else if (Ticket.Type == TicketType.Feature)
                             {
-                                <FluentIcon Value="@(new Icons.Filled.Size20.Sparkle())" />
+                                <FluentIcon Value="@(new Icons.Filled.Size20.Sparkle())"/>
                             }
                             <p>@(Ticket.CreationDateTime.ToLocalTime().Humanize())</p>
                         </FluentStack>
                     </FluentStack>
                 </FluentPersona>
-                <FluentSpacer />
-                <FluentCheckbox Class="hover-hide" CheckStateChanged="HandleCheckStateChangedAsync" />
+                <FluentSpacer/>
+                <FluentCheckbox Class="hover-hide" CheckStateChanged="HandleCheckStateChangedAsync"/>
             }
         </FluentStack>
         @if (Users is null)
         {
-            <FluentSkeleton Height="1rem" Width="100%" Shimmer="true" />
-            <FluentSkeleton Height="1rem" Width="100%" Shimmer="true" />
-            <FluentSkeleton Height="2.5rem" Width="100%" Shimmer="true" />
+            <FluentSkeleton Height="1rem" Width="100%" Shimmer="true"/>
+            <FluentSkeleton Height="1rem" Width="100%" Shimmer="true"/>
+            <FluentSkeleton Height="2.5rem" Width="100%" Shimmer="true"/>
         }
         else
         {
@@ -84,10 +83,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 @GetPriorityBadge(Ticket.Priority)
                 @GetStatusBadge(Ticket.Status)
             </FluentStack>
-            <FluentSpacer />
+            <FluentSpacer/>
             <FluentStack Orientation="Orientation.Horizontal" HorizontalAlignment="HorizontalAlignment.SpaceBetween">
-                <FluentButton Appearance="Appearance.Neutral" IconStart="@(new Icons.Regular.Size20.Open())">Apri</FluentButton>
-                <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Edit())" OnClick="ShowEditTicketDialogAsync">Modifica</FluentButton>
+                <FluentButton Appearance="Appearance.Neutral" IconStart="@(new Size20.Open())">Apri
+                </FluentButton>
+                <FluentButton Appearance="Appearance.Accent" IconStart="@(new Size20.Edit())"
+                              OnClick="ShowEditTicketDialogAsync">Modifica
+                </FluentButton>
             </FluentStack>
         }
     </FluentStack>
@@ -99,21 +101,25 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         <FluentMenu Anchor="@(Ticket.Id.ToString())" Trigger="MouseButton.Right" Anchored="false">
             <FluentLabel Typo="Typography.H6">@loc["EditStatusMenuLabel"]</FluentLabel>
             <FluentMenuItem Label="@loc["DeleteMenuItem"]" OnClick="HandleDeleteClickAsync">
-                <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.DeleteDismiss())" Color="Color.Neutral" Slot="start" /></span>
+                <span slot="start"><FluentIcon Value="@(new Size20.DeleteDismiss())" Color="Color.Neutral"
+                                               Slot="start"/></span>
             </FluentMenuItem>
             <FluentMenuItem Label="@loc["CloseMenuItem"]" OnClick="HandleCloseClickAsync">
-                <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Checkmark())" Color="Color.Neutral" Slot="start" /></span>
+                <span slot="start"><FluentIcon Value="@(new Size20.Checkmark())" Color="Color.Neutral"
+                                               Slot="start"/></span>
             </FluentMenuItem>
-            <FluentDivider />
+            <FluentDivider/>
             <FluentLabel Typo="Typography.H6">@loc["AssignmentMenuLabel"]</FluentLabel>
             <FluentMenuItem Label="@loc["AssignMenuItem"]">
                 <ChildContent>
-                    <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Person())" Color="Color.Neutral" Slot="start" /></span>
+                    <span slot="start"><FluentIcon Value="@(new Size20.Person())" Color="Color.Neutral"
+                                                   Slot="start"/></span>
                 </ChildContent>
                 <MenuItems>
                     @foreach (var user in Users ?? [])
                     {
-                        <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@($"{user.Name} {user.Surname}")" OnClick="args => HandleAssignClickAsync(user.Id)" />
+                        <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@($"{user.Name} {user.Surname}")"
+                                        OnClick="args => HandleAssignClickAsync(user.Id)"/>
                     }
                 </MenuItems>
             </FluentMenuItem>
@@ -122,39 +128,42 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 </AuthorizeView>
 
 @code {
-    [CascadingParameter]
-    private IEnumerable<UserResponseDto>? Users { get; set; }
+    [CascadingParameter] private IEnumerable<UserResponseDto>? Users { get; set; }
 
     /// <summary>
-    /// The ticket the card is bound to.
+    ///     The ticket the card is bound to.
     /// </summary>
     [Parameter]
     public required TicketResponseDto Ticket { get; set; }
 
     /// <summary>
-    /// Indicates whether the card is selected.
+    ///     Indicates whether the card is selected.
     /// </summary>
     [Parameter]
     public bool Selected { get; set; } = false;
 
     /// <summary>
-    /// Event callback that is triggered when the selected state changes.
+    ///     Event callback that is triggered when the selected state changes.
     /// </summary>
     [Parameter]
     public EventCallback<SelectedChangedEventArgs> SelectedChanged { get; set; }
 
     /// <summary>
-    /// Event callback that is triggered when the ticket state has changed.
+    ///     Event callback that is triggered when the ticket state has changed.
     /// </summary>
     [Parameter]
     public EventCallback StateChanged { get; set; }
 
-    private RenderFragment GetPriorityBadge(Priority priority) => @<FluentBadge Fill="highlight" BackgroundColor="@GetPriorityAppearance(priority)" Circular="true">
-    @GetPriorityText(priority)
-    </FluentBadge>;
+    private RenderFragment GetPriorityBadge(Priority priority) => @<FluentBadge Fill="highlight"
+                                                                                BackgroundColor="@GetPriorityAppearance(priority)"
+                                                                                Circular="true">
+                                                                      @GetPriorityText(priority)
+                                                                  </FluentBadge>;
 
-    private RenderFragment GetStatusBadge(Status status) => @<FluentBadge Fill="highlight" BackgroundColor="@GetStatusAppearance(status)" Circular="true">
-    @GetStatusText(status)
+    private RenderFragment GetStatusBadge(Status status) => @<FluentBadge Fill="highlight"
+                                                                          BackgroundColor="@GetStatusAppearance(status)"
+                                                                          Circular="true">
+        @GetStatusText(status)
     </FluentBadge>;
 
     private static string GetPriorityAppearance(Priority priority) => priority switch
@@ -194,7 +203,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     private async Task HandleCheckStateChangedAsync(bool? checkState)
     {
         Selected = checkState ?? false;
-        await SelectedChanged.InvokeAsync(new() { TicketId = Ticket.Id, IsSelected = Selected });
+        await SelectedChanged.InvokeAsync(new SelectedChangedEventArgs { TicketId = Ticket.Id, IsSelected = Selected });
     }
 
     private async Task HandleDeleteClickAsync()
@@ -204,9 +213,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             {
                 Message = loc["DeleteConfirmDialogMessage"],
                 ConfirmAction = HandleConfirmDeleteAsync,
-                ConfirmButtonIcon = new Icons.Regular.Size20.DeleteDismiss(),
+                ConfirmButtonIcon = new Size20.DeleteDismiss()
             },
-            Dialogs.ConfirmDialogParameters(loc["DeleteConfirmDialogTitle"], loc["DeleteConfirmDialogConfirmButton"], loc["DeleteConfirmDialogCancelButton"]));
+            ConfirmDialogParameters(loc["DeleteConfirmDialogTitle"], loc["DeleteConfirmDialogConfirmButton"], loc["DeleteConfirmDialogCancelButton"]));
     }
 
     private async Task HandleCloseClickAsync()
@@ -216,9 +225,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             {
                 Message = loc["CloseConfirmDialogMessage"],
                 ConfirmAction = HandleConfirmCloseAsync,
-                ConfirmButtonIcon = new Icons.Regular.Size20.Checkmark(),
+                ConfirmButtonIcon = new Size20.Checkmark()
             },
-            Dialogs.ConfirmDialogParameters(loc["CloseConfirmDialogTitle"], loc["CloseConfirmDialogConfirmButton"], loc["CloseConfirmDialogCancelButton"]));
+            ConfirmDialogParameters(loc["CloseConfirmDialogTitle"], loc["CloseConfirmDialogConfirmButton"], loc["CloseConfirmDialogCancelButton"]));
     }
 
     private async Task HandleAssignClickAsync(Guid operatorId)
@@ -344,4 +353,5 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
         return user.GetTenantId() == configuration["ExternalEntra:TenantId"];
     }
+
 }

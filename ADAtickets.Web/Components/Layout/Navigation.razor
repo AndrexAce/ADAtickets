@@ -17,16 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @using ADAtickets.Shared.Constants
 @using ADAtickets.Web.Components.Shared
-@using ADAtickets.Web.Components.Utilities
 @using Microsoft.AspNetCore.Components.Authorization
-@using static ADAtickets.Web.Components.Utilities.Dialogs
+@using Microsoft.FluentUI.AspNetCore.Components.Icons.Regular
+@using static Utilities.Dialogs
 
 @inject IStringLocalizer<Navigation> loc
 @inject IDialogService dialogService
 
 <div class="nav-menu">
     <FluentNavMenu Width="250" Collapsible="true" CollapsedChildNavigation="true">
-        <FluentNavGroup Icon="@(new Icons.Regular.Size20.TicketDiagonal())" Title="@loc["Tickets"]" Expanded="true">
+        <FluentNavGroup Icon="@(new Size20.TicketDiagonal())" Title="@loc["Tickets"]" Expanded="true">
             <FluentNavLink Href="/my-tickets">@loc["MyTickets"]</FluentNavLink>
             <AuthorizeView Policy="@Policy.UserOnly">
                 <FluentNavLink OnClick="ShowNewTicketDialogAsync">@loc["NewTicket"]</FluentNavLink>
@@ -34,19 +34,21 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         </FluentNavGroup>
 
         <AuthorizeView Policy="@Policy.AdminOnly">
-            <FluentNavGroup Icon="@(new Icons.Regular.Size20.Database())" Title="@loc["DatabaseManagement"]" Expanded="true">
+            <FluentNavGroup Icon="@(new Size20.Database())" Title="@loc["DatabaseManagement"]"
+                            Expanded="true">
                 <FluentNavLink Href="/users">@loc["Users"]</FluentNavLink>
                 <FluentNavLink Href="/platforms">@loc["Platforms"]</FluentNavLink>
             </FluentNavGroup>
         </AuthorizeView>
 
-        <FluentNavGroup Icon="@(new Icons.Regular.Size20.Settings())" Title="@loc["Settings"]" Expanded="true">
-            <FluentNavLink OnClick="ShowThemeAndPersonalizationDialogAsync">@loc["ThemeAndPersonalization"]</FluentNavLink>
+        <FluentNavGroup Icon="@(new Size20.Settings())" Title="@loc["Settings"]" Expanded="true">
+            <FluentNavLink
+                OnClick="ShowThemeAndPersonalizationDialogAsync">@loc["ThemeAndPersonalization"]</FluentNavLink>
             <FluentNavLink OnClick="ShowNotificationsDialogAsync">@loc["Notifications"]</FluentNavLink>
             <FluentNavLink OnClick="ShowAccessAndSecurityDialogAsync">@loc["AccessAndSecurity"]</FluentNavLink>
         </FluentNavGroup>
 
-        <FluentNavGroup Icon="@(new Icons.Regular.Size20.Question())" Title="@loc["Help"]" Expanded="true">
+        <FluentNavGroup Icon="@(new Size20.Question())" Title="@loc["Help"]" Expanded="true">
             <FluentNavLink Href="/privacy-policy">@loc["PrivacyPolicy"]</FluentNavLink>
             <FluentNavLink Href="/cookie-policy">@loc["CookiePolicy"]</FluentNavLink>
         </FluentNavGroup>
@@ -54,6 +56,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 </div>
 
 @code {
+
     private async Task ShowNewTicketDialogAsync()
     {
         await dialogService.ShowDialogAsync<TicketDialog>(
@@ -86,4 +89,5 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     {
         // TODO
     }
+
 }

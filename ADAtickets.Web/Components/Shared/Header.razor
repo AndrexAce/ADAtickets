@@ -15,47 +15,43 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
-@inherits ComponentBase
-
-@using System.Security.Claims
-@using ADAtickets.Client.Extensions
-@using ADAtickets.Shared.Constants
 @using ADAtickets.Shared.Extensions
 @using ADAtickets.Web.Components.Utilities
 @using Microsoft.AspNetCore.Components.Authorization
-@using Microsoft.Identity.Abstractions
+@using Microsoft.FluentUI.AspNetCore.Components.Icons.Regular
+@inherits ComponentBase
 
 @inject IDialogService dialogService
 @inject IStringLocalizer<Header> loc
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject NavigationManager navigationManager
-@inject IDownstreamApi downstreamApi
-@inject IConfiguration configuration
 
 <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center" HorizontalGap="20">
     @if (IsDarkThemeActive)
     {
         <a href="/my-tickets">
-            <img class="logo-icon" src="Images/Logos/LogoDark.svg" alt="@loc["ADAticketsLogoAlt"]" />
+            <img class="logo-icon" src="Images/Logos/LogoDark.svg" alt="@loc["ADAticketsLogoAlt"]"/>
         </a>
     }
     else
     {
         <a href="/my-tickets">
-            <img class="logo-icon" src="Images/Logos/LogoLight.svg" alt="@loc["ADAticketsLogoAlt"]" />
+            <img class="logo-icon" src="Images/Logos/LogoLight.svg" alt="@loc["ADAticketsLogoAlt"]"/>
         </a>
     }
     <FluentLabel Typo="Typography.Header" Color="Color.Fill">ADAtickets</FluentLabel>
-    <FluentSpacer />
-    <FluentProfileMenu FullName="@accountName" ImageSize="5rem" EMail="@accountEmail" HeaderLabel="@loc["HeaderLabel"]" OnHeaderButtonClick="SignOutAsync" HeaderButton="@loc["HeaderButton"]" FooterLink="@loc["FooterLink"]" OnFooterLinkClick="OpenEditProfilePanel">
+    <FluentSpacer/>
+    <FluentProfileMenu FullName="@accountName" ImageSize="5rem" EMail="@accountEmail" HeaderLabel="@loc["HeaderLabel"]"
+                       OnHeaderButtonClick="SignOutAsync" HeaderButton="@loc["HeaderButton"]"
+                       FooterLink="@loc["FooterLink"]" OnFooterLinkClick="OpenEditProfilePanel">
         <StartTemplate>@accountUsername</StartTemplate>
     </FluentProfileMenu>
-    <FluentButton Appearance="Appearance.Neutral" OnClick="OpenNotificationsPanel" IconStart="@(new Icons.Regular.Size20.Alert())"/>
+    <FluentButton Appearance="Appearance.Neutral" OnClick="OpenNotificationsPanel"
+                  IconStart="@(new Size20.Alert())"/>
 </FluentStack>
 
 @code {
-    [CascadingParameter]
-    private bool IsDarkThemeActive { get; set; }
+    [CascadingParameter] private bool IsDarkThemeActive { get; set; }
 
     private string? accountName;
     private string? accountEmail;
@@ -102,4 +98,5 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     {
         // TODO
     }
+
 }

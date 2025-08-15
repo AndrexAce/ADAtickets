@@ -67,9 +67,9 @@ body {
     transition: opacity 0.2s ease-in-out;
 }
 
-    .hover-hide:hover {
-        opacity: 1;
-    }
+.hover-hide:hover {
+    opacity: 1;
+}
 
 .tickets-grid {
     display: grid;
@@ -103,11 +103,11 @@ fluent-menu-item {
     margin: 0.5rem;
 }
 
-    fluent-menu-item span {
-        margin-right: 1rem;
-        display: flex;
-        justify-content: center;
-    }
+fluent-menu-item span {
+    margin-right: 1rem;
+    display: flex;
+    justify-content: center;
+}
 
 fluent-menu h6 {
     padding: 0.5rem 0rem 0rem 1rem;

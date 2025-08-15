@@ -16,9 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @implements IDialogContentComponent<SimpleDialogContent>
-
-@using ADAtickets.Web.Components.Pages
-@using static ADAtickets.Web.Components.Utilities.Dialogs
+@using static Utilities.Dialogs
 
 <FluentDialogHeader ShowDismiss="false" ShowDismissTooltip="false">
     <FluentStack VerticalAlignment="VerticalAlignment.Center">
@@ -33,19 +31,22 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 </FluentDialogBody>
 
 <FluentDialogFooter>
-    <FluentButton Appearance="Appearance.Accent" IconStart="Content.ConfirmButtonIcon" OnClick="HandleConfirmAsync">@Dialog.Instance.Parameters.PrimaryAction</FluentButton>
-    <FluentButton Appearance="Appearance.Neutral" OnClick="HandleCancelAsync">@Dialog.Instance.Parameters.SecondaryAction</FluentButton>
+    <FluentButton Appearance="Appearance.Accent" IconStart="Content.ConfirmButtonIcon"
+                  OnClick="HandleConfirmAsync">@Dialog.Instance.Parameters.PrimaryAction</FluentButton>
+    <FluentButton Appearance="Appearance.Neutral"
+                  OnClick="HandleCancelAsync">@Dialog.Instance.Parameters.SecondaryAction</FluentButton>
 </FluentDialogFooter>
 
 @code {
+
     /// <summary>
-    /// The dialog object bound to this component.
+    ///     The dialog object bound to this component.
     /// </summary>
     [CascadingParameter]
     public FluentDialog Dialog { get; set; } = default!;
 
     /// <summary>
-    /// Necessary data to display the dialog.
+    ///     Necessary data to display the dialog.
     /// </summary>
     [Parameter]
     public SimpleDialogContent Content { get; set; } = default!;
@@ -64,4 +65,5 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     {
         await Dialog.CancelAsync();
     }
+
 }

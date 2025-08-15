@@ -12,15 +12,19 @@
 # ADAtickets 🎫
 
 ## What is ADAtickets ❓
-ADAtickets is a simple, lightweight, open source ticketing system interacting with your enterprise repositories on Azure DevOps with a two-way synchronization.
+
+ADAtickets is a simple, lightweight, open source ticketing system interacting with your enterprise repositories on Azure
+DevOps with a two-way synchronization.
 
 It is based on .NET and other Microsoft technologies.
 
-It was thought to be executed on Docker Compose environments and is designed to be used in conjunction with Microsoft Entra ID (formerly Azure Active Directory) for authentication and authorization, as well as Azure DevOps.
+It was thought to be executed on Docker Compose environments and is designed to be used in conjunction with Microsoft
+Entra ID (formerly Azure Active Directory) for authentication and authorization, as well as Azure DevOps.
 
 ## Configuring ADAtickets ⚙️
 
-Check the related [wiki page](https://github.com/AndrexAce/ADAtickets/wiki/Setup) if you want to know how to configure ADAtickets.
+Check the related [wiki page](https://github.com/AndrexAce/ADAtickets/wiki/Setup) if you want to know how to configure
+ADAtickets.
 
 ## Roadmap 🗺️
 
@@ -30,4 +34,6 @@ Check the related [wiki page](https://github.com/AndrexAce/ADAtickets/wiki/Setup
 - Podman support along with Docker.
 
 ## License 📃
-This project is licensed under the GPL v3 License — see the [LICENSE](https://github.com/AndrexAce/ADAtickets/blob/master/LICENSE.txt) file for details.
+
+This project is licensed under the GPL v3 License — see
+the [LICENSE](https://github.com/AndrexAce/ADAtickets/blob/master/LICENSE.txt) file for details.
