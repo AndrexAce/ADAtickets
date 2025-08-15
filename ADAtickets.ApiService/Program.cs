@@ -29,6 +29,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Identity.Web;
 using Microsoft.OpenApi.Models;
 using Scalar.AspNetCore;
@@ -213,6 +214,13 @@ namespace ADAtickets.ApiService
 
             // Add authorization middleware.
             _ = app.UseAuthorization();
+
+            // Enable serving static files.
+            _ = app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider("/app"),
+                RequestPath = ""
+            });
 
             // Map the controllers endpoints for business logic APIs.
             _ = app.MapControllers();

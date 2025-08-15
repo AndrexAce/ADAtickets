@@ -1,6 +1,5 @@
 # This stage is used when running from VS in fast mode (Default for Debug configuration)
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
-USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
 LABEL org.opencontainers.image.source=https://github.com/andrexace/adatickets
@@ -25,5 +24,4 @@ RUN dotnet publish "./ADAtickets.ApiService.csproj" -c "$BUILD_CONFIGURATION" -o
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-USER $APP_UID
 ENTRYPOINT ["dotnet", "ADAtickets.ApiService.dll"]

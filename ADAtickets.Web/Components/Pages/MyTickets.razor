@@ -292,7 +292,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     private async Task LoadUsersAsync()
     {
-        Users = await usersClient.GetAllAsync();
+        Users = await usersClient.GetAllAsync(new Dictionary<string, string> { { nameof(UserRequestDto.Type), nameof(UserType.Operator) } });
+        Users = Users.Union(await usersClient.GetAllAsync(new Dictionary<string, string> { { nameof(UserRequestDto.Type), nameof(UserType.Admin) } }));
     }
 
     private async Task LoadTicketsAsync(IEnumerable<KeyValuePair<string, string>> filters)

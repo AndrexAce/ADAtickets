@@ -241,7 +241,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="403">The client was authenticated but had not enough privileges.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpPost]
-        [Authorize(Policy = Policy.Everyone)]
+        [Authorize(Policy = Policy.UserOnly)]
         [RequiredScope(Scope.Read, Scope.Write)]
         public async Task<ActionResult<TicketResponseDto>> PostTicket(TicketRequestDto ticketDto)
         {

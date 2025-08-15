@@ -44,7 +44,6 @@ namespace ADAtickets.ApiService.Controllers
     [Produces(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
     [FormatFilter]
     [ApiConventionType(typeof(ApiConventions))]
-    [Authorize(Policy.AdminOnly)]
     public sealed class AttachmentsController(IAttachmentRepository attachmentRepository, IMapper mapper) : ControllerBase
     {
         /// <summary>
@@ -63,6 +62,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="403">The client was authenticated but had not enough privileges.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpGet]
+        [Authorize(Policy = Policy.Everyone)]
         [RequiredScope(Scope.Read)]
         public async Task<ActionResult<IEnumerable<AttachmentResponseDto>>> GetAttachments([FromQuery] Dictionary<string, string>? filters)
         {
@@ -83,6 +83,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="404">The entity with the given id didn't exist.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpGet("{id:guid}")]
+        [Authorize(Policy = Policy.AdminOnly)]
         [RequiredScope(Scope.Read)]
         public async Task<ActionResult<AttachmentResponseDto>> GetAttachment(Guid id)
         {
@@ -129,6 +130,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="406">The client asked for an unsupported response format.</response>
         /// <response code="409">The entity was updated by another request at the same time.</response>
         [HttpPut("{id:guid}")]
+        [Authorize(Policy = Policy.AdminOnly)]
         [RequiredScope(Scope.Read, Scope.Write)]
         public async Task<ActionResult<AttachmentResponseDto>> PutAttachment(Guid id, AttachmentRequestDto attachmentDto)
         {
@@ -187,6 +189,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="403">The client was authenticated but had not enough privileges.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpPost]
+        [Authorize(Policy = Policy.UserOnly)]
         [RequiredScope(Scope.Read, Scope.Write)]
         public async Task<ActionResult<AttachmentResponseDto>> PostAttachment(AttachmentRequestDto attachmentDto)
         {
@@ -211,6 +214,7 @@ namespace ADAtickets.ApiService.Controllers
         /// <response code="404">The entity with the given id didn't exist.</response>
         /// <response code="406">The client asked for an unsupported response format.</response>
         [HttpDelete("{id:guid}")]
+        [Authorize(Policy = Policy.AdminOnly)]
         [RequiredScope(Scope.Read, Scope.Write)]
         public async Task<IActionResult> DeleteAttachment(Guid id)
         {

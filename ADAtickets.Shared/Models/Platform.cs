@@ -58,14 +58,6 @@ namespace ADAtickets.Shared.Models
         public ICollection<Ticket> Tickets { get; } = [];
 
         /// <summary>
-        /// The collection of users who marked the platform as preferred.
-        /// </summary>
-        [Required]
-        [InverseProperty(nameof(User.PreferredPlatforms))]
-        [JsonIgnore]
-        public ICollection<User> UsersPreferred { get; } = [];
-
-        /// <summary>
         /// Join entity between the platform and the users who marked it as preferred.
         /// </summary>
         [Required]

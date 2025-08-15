@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ADAtickets.ApiService.Migrations
 {
     [DbContext(typeof(ADAticketsDbContext))]
-    [Migration("20250813151123_FirstMigration")]
+    [Migration("20250815095100_FirstMigration")]
     partial class FirstMigration
     {
         /// <inheritdoc />
@@ -431,44 +431,6 @@ namespace ADAtickets.ApiService.Migrations
                     b.ToTable("user_platforms", (string)null);
                 });
 
-            modelBuilder.Entity("NotificationUser", b =>
-                {
-                    b.Property<Guid>("ReceivedNotificationsId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("received_notifications_id");
-
-                    b.Property<Guid>("RecipientsId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("recipients_id");
-
-                    b.HasKey("ReceivedNotificationsId", "RecipientsId")
-                        .HasName("pk_notification_user");
-
-                    b.HasIndex("RecipientsId")
-                        .HasDatabaseName("ix_notification_user_recipients_id");
-
-                    b.ToTable("notification_user", (string)null);
-                });
-
-            modelBuilder.Entity("PlatformUser", b =>
-                {
-                    b.Property<Guid>("PreferredPlatformsId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("preferred_platforms_id");
-
-                    b.Property<Guid>("UsersPreferredId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("users_preferred_id");
-
-                    b.HasKey("PreferredPlatformsId", "UsersPreferredId")
-                        .HasName("pk_platform_user");
-
-                    b.HasIndex("UsersPreferredId")
-                        .HasDatabaseName("ix_platform_user_users_preferred_id");
-
-                    b.ToTable("platform_user", (string)null);
-                });
-
             modelBuilder.Entity("ADAtickets.Shared.Models.Attachment", b =>
                 {
                     b.HasOne("ADAtickets.Shared.Models.Ticket", "Ticket")
@@ -612,40 +574,6 @@ namespace ADAtickets.ApiService.Migrations
                     b.Navigation("Platform");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("NotificationUser", b =>
-                {
-                    b.HasOne("ADAtickets.Shared.Models.Notification", null)
-                        .WithMany()
-                        .HasForeignKey("ReceivedNotificationsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_notification_user_notifications_received_notifications_id");
-
-                    b.HasOne("ADAtickets.Shared.Models.User", null)
-                        .WithMany()
-                        .HasForeignKey("RecipientsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_notification_user_users_recipients_id");
-                });
-
-            modelBuilder.Entity("PlatformUser", b =>
-                {
-                    b.HasOne("ADAtickets.Shared.Models.Platform", null)
-                        .WithMany()
-                        .HasForeignKey("PreferredPlatformsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_platform_user_platforms_preferred_platforms_id");
-
-                    b.HasOne("ADAtickets.Shared.Models.User", null)
-                        .WithMany()
-                        .HasForeignKey("UsersPreferredId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_platform_user_users_users_preferred_id");
                 });
 
             modelBuilder.Entity("ADAtickets.Shared.Models.Notification", b =>

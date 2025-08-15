@@ -62,142 +62,178 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         <FluentValidationSummary Model="@TicketRequest"/>
 
         <FluentStack Orientation="Orientation.Vertical">
-            @if (Content.IsEdit && !Content.IsUser)
+            @if (!Content.IsUser)
             {
-                <FluentSelect TOption="UserResponseDto"
-                    Label="@loc["AssignedOperator"]"
-                    Name="OperatorUserId"
-                    Items="users"
-                    OptionText="@(u => u.Name)"
-                    OptionValue="@(u => u.Id.ToString())"
-                    ReadOnly="@(Content.IsEdit && Content.IsUser)"
+                @if (Content.IsEdit)
+                {
+                    <FluentSelect TOption="UserResponseDto"
+                        Label="@loc["AssignedOperator"]"
+                        Name="OperatorUserId"
+                        Items="users"
+                        OptionText="@(u => $"{u.Name} {u.Surname}")"
+                        OptionValue="@(u => u.Id.ToString())"
+                        Placeholder="@loc["PleaseSelectAnOption"]"
+                        @bind-Value="OperatorIdString">
+                    </FluentSelect>
+                }
+                else
+                {
+                    <FluentLabel Weight="FontWeight.Bold">@loc["AssignedOperator"]</FluentLabel>
+                    <p>@users?.First(u => u.Id == new Guid(OperatorIdString)).Name</p>
+                }
+            }
+
+            @if (Content.IsEdit && Content.IsUser)
+            {
+                <FluentLabel Weight="FontWeight.Bold">@loc["TicketType"]</FluentLabel>
+                <p>@GetTypeText(TicketRequest.Type)</p>
+
+                <FluentLabel Weight="FontWeight.Bold">@loc["Platform"]</FluentLabel>
+                <p>@platforms?.First(p => p.Id == new Guid(PlatformIdString)).Name</p>
+            }
+            else
+            {
+                <FluentRadioGroup Name="Type"
+                    LabelTemplate="@TicketTypeLabel"
+                    Orientation="Orientation.Vertical"
+                    @bind-Value="TicketRequest.Type"
+                    Required>
+                    <FluentRadio Value="TicketType.Bug">@loc["Problem"]</FluentRadio>
+                    <FluentRadio Value="TicketType.Feature">@loc["Suggestion"]</FluentRadio>
+                </FluentRadioGroup>
+                <FluentValidationMessage For="@(() => TicketRequest.Type)" />
+
+                <FluentSelect TOption="PlatformResponseDto"
+                    Label="@loc["Platform"]"
+                    Name="PlatformId"
+                    Items="platforms"
+                    OptionText="@(p => p.Name)"
+                    OptionValue="@(p => p.Id.ToString())"
                     Placeholder="@loc["PleaseSelectAnOption"]"
-                    @bind-Value="OperatorIdString"
+                    @bind-Value="PlatformIdString"
                     Required>
                 </FluentSelect>
+                <FluentValidationMessage For="@(() => TicketRequest.PlatformId)" />
             }
 
-            <FluentRadioGroup Name="Type"
-                LabelTemplate="@TicketTypeLabel"
-                Orientation="Orientation.Vertical"
-                ReadOnly="@(Content.IsEdit && Content.IsUser)"
-                @bind-Value="TicketRequest.Type"
-                Required>
-                <FluentRadio Value="TicketType.Bug">@loc["Problem"]</FluentRadio>
-                <FluentRadio Value="TicketType.Feature">@loc["Suggestion"]</FluentRadio>
-            </FluentRadioGroup>
-            <FluentValidationMessage For="@(() => TicketRequest.Type)" />
+            @if (Content.IsEdit && !Content.IsUser)
+            {
+                <FluentLabel Weight="FontWeight.Bold">@loc["Title"]</FluentLabel>
+                <p>@TicketRequest.Title</p>
 
-            <FluentSelect TOption="PlatformResponseDto"
-                Label="@loc["Platform"]"
-                Name="PlatformId"
-                Items="platforms"
-                OptionText="@(p => p.Name)"
-                OptionValue="@(p => p.Id.ToString())"
-                ReadOnly="@(Content.IsEdit && Content.IsUser)"
-                Placeholder="@loc["PleaseSelectAnOption"]"
-                @bind-Value="PlatformIdString"
-                Required>
-            </FluentSelect>
-            <FluentValidationMessage For="@(() => TicketRequest.PlatformId)" />
+                <FluentLabel Weight="FontWeight.Bold">@loc["Description"]</FluentLabel>
+                <p>@TicketRequest.Description</p>
+            }
+            else
+            {
+                <FluentTextField Name="Title"
+                    Label="@loc["Title"]"
+                    Spellcheck="true"
+                    Style="width: 75%"
+                    ReadOnly="@(Content.IsEdit && !Content.IsUser)"
+                    @bind-Value="TicketRequest.Title"
+                    Required>
+                    <FluentIcon Value="@(new Icons.Regular.Size20.TextT())" Color="@Color.Neutral" Slot="start" />
+                </FluentTextField>
+                <FluentValidationMessage For="@(() => TicketRequest.Title)" />
 
-            <FluentTextField Name="Title"
-                Label="@loc["Title"]"
-                Spellcheck="true"
-                Style="width: 75%"
-                ReadOnly="@(Content.IsEdit && !Content.IsUser)"
-                @bind-Value="TicketRequest.Title"
-                Required>
-                <FluentIcon Value="@(new Icons.Regular.Size20.TextT())" Color="@Color.Neutral" Slot="start" />
-            </FluentTextField>
-            <FluentValidationMessage For="@(() => TicketRequest.Title)" />
+                <FluentTextArea Name="Description"
+                    Label="@loc["Description"]"
+                    Maxlength="5000"
+                    Spellcheck="true"
+                    Style="width: 100%"
+                    ReadOnly="@(Content.IsEdit && !Content.IsUser)"
+                    @bind-Value="TicketRequest.Description"
+                    Required />
+                <FluentValidationMessage For="@(() => TicketRequest.Description)" />
+            }
 
-            <FluentTextArea Name="Description" 
-                Label="@loc["Description"]"
-                Maxlength="5000"
-                Spellcheck="true"
-                Style="width: 100%"
-                ReadOnly="@(Content.IsEdit && !Content.IsUser)"
-                @bind-Value="TicketRequest.Description"
-                Required />
-            <FluentValidationMessage For="@(() => TicketRequest.Description)" />
+            @if (Content.IsEdit && Content.IsUser)
+            {
+                <FluentLabel Weight="FontWeight.Bold">@loc["Priority"]</FluentLabel>
+                <p>@GetPriorityText(TicketRequest.Priority)</p>
+            }
+            else
+            {
+                <FluentRadioGroup Name="Priority"
+                    Label="@loc["Priority"]"
+                    Orientation="Orientation.Vertical"
+                    @bind-Value="TicketRequest.Priority"
+                    Required>
+                    <FluentRadio Value="Priority.Low">@loc["Low"]</FluentRadio>
+                    <FluentRadio Value="Priority.Medium">@loc["Medium"]</FluentRadio>
+                    <FluentRadio Value="Priority.High">@loc["High"]</FluentRadio>
+                </FluentRadioGroup>
+                <FluentValidationMessage For="@(() => TicketRequest.Priority)" />
+            }
 
-            <FluentRadioGroup Name="Priority"
-                Label="@loc["Priority"]"
-                Orientation="Orientation.Vertical"
-                ReadOnly="@(Content.IsEdit && Content.IsUser)"
-                @bind-Value="TicketRequest.Priority"
-                Required>
-                <FluentRadio Value="Priority.Low">@loc["Low"]</FluentRadio>
-                <FluentRadio Value="Priority.Medium">@loc["Medium"]</FluentRadio>
-                <FluentRadio Value="Priority.High">@loc["High"]</FluentRadio>
-            </FluentRadioGroup>
-            <FluentValidationMessage For="@(() => TicketRequest.Priority)" />
-
-            <FluentStack Orientation="Orientation.Horizontal">
-                <FluentInputLabel Label="@loc["Attachments"]" />
-                @if (!Content.IsEdit)
+            @if (!Content.IsEdit || photoPath is not null || videoPath is not null)
+            {
+                <FluentStack Orientation="Orientation.Horizontal">
+                    <FluentLabel Weight="FontWeight.Bold">@loc["Attachments"]</FluentLabel>
+                    @if (!Content.IsEdit)
+                    {
+                        <FluentIcon Id="AttachmentsLabelButton" Icon="Icons.Regular.Size20.Info"></FluentIcon>
+                        <FluentTooltip Anchor="AttachmentsLabelButton" Position="TooltipPosition.End">@loc["AttachmentsTooltip"]</FluentTooltip>
+                    }
+                </FluentStack>
+                @if (!Content.IsEdit && photoPath is null)
                 {
-                    <FluentIcon Id="AttachmentsLabelButton" Icon="Icons.Regular.Size20.Info"></FluentIcon>
-                    <FluentTooltip Anchor="AttachmentsLabelButton" Position="TooltipPosition.End">@loc["AttachmentsTooltip"]</FluentTooltip>
+                    <FluentInputFile Id="photoUploader"
+                                     Mode="InputFileMode.Stream"
+                                     Accept="image/png,image/jpg,image/jpeg,image/gif,image/webp"
+                                     OnCompleted="HandleUploadPhotoCompletedAsync">
+                        <ChildContent>
+                            <label for="photoUploader" style="margin-top: 0.3rem;">
+                                <FluentIcon Value="@(new @Icons.Regular.Size20.ArrowUpload())" />
+                            </label>
+                            <div>
+                                @loc["UploadImage"]
+                            </div>
+                        </ChildContent>
+                    </FluentInputFile>
                 }
-            </FluentStack>
-            @if (photoPath is null)
-            {
-                <FluentInputFile Id="photoUploader"
-                                 Mode="InputFileMode.Stream"
-                                 Accept="image/png,image/jpg,image/jpeg,image/gif,image/webp"
-                                 OnCompleted="HandleUploadPhotoCompletedAsync">
-                    <ChildContent>
-                        <label for="photoUploader" style="margin-top: 0.3rem;">
-                            <FluentIcon Value="@(new @Icons.Regular.Size20.ArrowUpload())" />
-                        </label>
-                        <div>
-                            @loc["UploadImage"]
-                        </div>
-                    </ChildContent>
-                </FluentInputFile>
-            }
-            else
-            {
-                <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center">
-                    <span style="overflow: hidden; text-overflow: ellipsis; max-width: 15rem">@Path.GetFileName(photoPath)</span>
-                    <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Open())" OnClick="HandleViewPhotoClick">@loc["View"]</FluentButton>
+                else if (photoPath is not null)
+                {
+                    <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center">
+                        <span style="overflow: hidden; text-overflow: ellipsis; max-width: 15rem">@Path.GetFileName(photoPath)</span>
+                        <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Open())" OnClick="HandleViewPhotoClick">@loc["View"]</FluentButton>
 
-                    @if (!Content.IsEdit)
-                    {
-                        <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Delete())" OnClick="HandleDeletePhotoClick">@loc["Delete"]</FluentButton>
-                    }
-                </FluentStack>
-            }
+                        @if (!Content.IsEdit)
+                        {
+                            <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Delete())" OnClick="HandleDeletePhotoClick">@loc["Delete"]</FluentButton>
+                        }
+                    </FluentStack>
+                }
 
-            @if (videoPath is null)
-            {
-                <FluentInputFile Id="videoUploader"
-                                 Mode="InputFileMode.Stream"
-                                 Accept="video/mp4,video/webm"
-                                 OnCompleted="HandleUploadVideoCompletedAsync">
-                    <ChildContent>
-                        <label for="videoUploader" style="margin-top: 0.3rem;">
-                            <FluentIcon Value="@(new @Icons.Regular.Size20.ArrowUpload())" />
-                        </label>
-                        <div>
-                            @loc["UploadVideo"]
-                        </div>
-                    </ChildContent>
-                </FluentInputFile>
-            }
-            else
-            {
-                <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center">
-                    <p style="overflow: hidden; text-overflow: ellipsis; max-width: 15rem">@Path.GetFileName(videoPath)</p>
-                    <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Open())" OnClick="HandleViewVideoClick">@loc["View"]</FluentButton>
+                @if (!Content.IsEdit && videoPath is null)
+                {
+                    <FluentInputFile Id="videoUploader"
+                                     Mode="InputFileMode.Stream"
+                                     Accept="video/mp4,video/webm"
+                                     OnCompleted="HandleUploadVideoCompletedAsync">
+                        <ChildContent>
+                            <label for="videoUploader" style="margin-top: 0.3rem;">
+                                <FluentIcon Value="@(new @Icons.Regular.Size20.ArrowUpload())" />
+                            </label>
+                            <div>
+                                @loc["UploadVideo"]
+                            </div>
+                        </ChildContent>
+                    </FluentInputFile>
+                }
+                else if (videoPath is not null)
+                {
+                    <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center">
+                        <p style="overflow: hidden; text-overflow: ellipsis; max-width: 15rem">@Path.GetFileName(videoPath)</p>
+                        <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Open())" OnClick="HandleViewVideoClick">@loc["View"]</FluentButton>
 
-                    @if (!Content.IsEdit)
-                    {
-                        <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Delete())" OnClick="HandleDeleteVideoClick">@loc["Delete"]</FluentButton>
-                    }
-                </FluentStack>
+                        @if (!Content.IsEdit)
+                        {
+                            <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Delete())" OnClick="HandleDeleteVideoClick">@loc["Delete"]</FluentButton>
+                        }
+                    </FluentStack>
+                }
             }
         </FluentStack>
     </EditForm>
@@ -245,7 +281,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 }
                 else
                 {
-                    <img src="@($"adatickets.apiservice/{photoPath}")" style="max-width: 75vw; max-height: 75vh;" />
+                    <img src="@($"http://localhost:7213/{photoPath}")" style="max-width: 75vw; max-height: 75vh;" />
                 }
             </FluentStack>
         </FluentCard>
@@ -271,7 +307,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 }
                 else
                 {
-                    <video src="@($"adatickets.apiservice/{videoPath}")" style="max-width: 75vw; max-height: 75vh;" controls></video>
+                    <video src="@($"http://localhost:7213/{videoPath}")" style="max-width: 75vw; max-height: 75vh;" controls></video>
                 }
             </FluentStack>
         </FluentCard>
@@ -330,8 +366,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
         try
         {
-            users = await LoadUsersAsync(new Dictionary<string, string> { { nameof(User.Type), "Operator" } });
-            users = users.Union(await LoadUsersAsync(new Dictionary<string, string> { { nameof(User.Type), "Admin" } }));
+            users = await LoadUsersAsync(new Dictionary<string, string> { { nameof(UserRequestDto.Type), nameof(UserType.Operator) } });
+            users = users.Union(await LoadUsersAsync(new Dictionary<string, string> { { nameof(UserRequestDto.Type), nameof(UserType.Admin) } }));
 
             platforms = await LoadPlatformsAsync();
 
@@ -339,7 +375,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             {
                 TicketRequest = mapper.Map<TicketRequestDto>(Content.InitialTicketData);
 
-                IEnumerable<AttachmentResponseDto> attachments = await LoadAttachmentsAsync(new[] { new KeyValuePair<string, string>("TicketId", initialTicketData.Id.ToString()) });
+                IEnumerable<AttachmentResponseDto> attachments = await LoadAttachmentsAsync(new Dictionary<string, string> { { nameof(AttachmentRequestDto.TicketId), initialTicketData.Id.ToString() } });
 
                 photoPath = attachments.ElementAtOrDefault(0)?.Path;
                 videoPath = attachments.ElementAtOrDefault(1)?.Path;
@@ -481,7 +517,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     private async Task HandleConfirmCancelAsync()
     {
         await Dialog.CancelAsync();
-        
+
         DeleteTempFiles();
     }
 
@@ -567,4 +603,19 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             }
         }
     }
+
+    private string GetTypeText(TicketType ticketType) => ticketType switch
+    {
+        TicketType.Bug => loc["Problem"],
+        TicketType.Feature => loc["Suggestion"],
+        _ => ""
+    };
+
+    private string GetPriorityText(Priority priority) => priority switch
+    {
+        Priority.Low => loc["Low"],
+        Priority.Medium => loc["Medium"],
+        Priority.High => loc["High"],
+        _ => ""
+    };
 }

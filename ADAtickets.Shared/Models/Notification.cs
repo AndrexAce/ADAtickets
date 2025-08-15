@@ -82,14 +82,6 @@ namespace ADAtickets.Shared.Models
         public User User { get; set; } = null!;
 
         /// <summary>
-        /// The collection of the users the notification was sent to.
-        /// </summary>
-        [Required]
-        [InverseProperty(nameof(User.ReceivedNotifications))]
-        [JsonIgnore]
-        public ICollection<User> Recipients { get; } = [];
-
-        /// <summary>
         /// Join entity between the notification and the users it was sent to.
         /// </summary>
         [Required]

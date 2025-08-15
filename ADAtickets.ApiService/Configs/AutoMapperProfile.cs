@@ -41,12 +41,12 @@ namespace ADAtickets.ApiService.Configs
             _ = CreateMap<ReplyRequestDto, Reply>(MemberList.Source);
 
             _ = CreateMap<Notification, NotificationResponseDto>(MemberList.Destination)
-                .ForMember(notificationDto => notificationDto.Recipients, opt => opt.MapFrom(src => src.Recipients.Select(recipient => recipient.Id)));
+                .ForMember(notificationDto => notificationDto.Recipients, opt => opt.MapFrom(src => src.UserNotifications.Where(un => un.NotificationId == src.Id).Select(un => un.ReceiverUserId)));
             _ = CreateMap<NotificationRequestDto, Notification>(MemberList.Source);
 
             _ = CreateMap<Platform, PlatformResponseDto>(MemberList.Destination)
                 .ForMember(platformDto => platformDto.Tickets, opt => opt.MapFrom(src => src.Tickets.Select(ticket => ticket.Id)))
-                .ForMember(platformDto => platformDto.UsersPreferred, opt => opt.MapFrom(src => src.UsersPreferred.Select(user => user.Id)));
+                .ForMember(platformDto => platformDto.UsersPreferred, opt => opt.MapFrom(src => src.UserPlatforms.Where(up => up.PlatformId == src.Id).Select(up => up.UserId)));
             _ = CreateMap<PlatformRequestDto, Platform>(MemberList.Source);
 
             _ = CreateMap<Ticket, TicketResponseDto>(MemberList.Destination)
@@ -64,9 +64,9 @@ namespace ADAtickets.ApiService.Configs
                 .ForMember(userDto => userDto.AssignedTickets, opt => opt.MapFrom(src => src.AssignedTickets.Select(ticket => ticket.Id)))
                 .ForMember(userDto => userDto.Replies, opt => opt.MapFrom(src => src.Replies.Select(reply => reply.Id)))
                 .ForMember(userDto => userDto.Edits, opt => opt.MapFrom(src => src.Edits.Select(edit => edit.Id)))
-                .ForMember(userDto => userDto.PreferredPlatforms, opt => opt.MapFrom(src => src.PreferredPlatforms.Select(platform => platform.Id)))
+                .ForMember(userDto => userDto.PreferredPlatforms, opt => opt.MapFrom(src => src.UserPlatforms.Where(up => up.UserId == src.Id).Select(up => up.PlatformId)))
                 .ForMember(userDto => userDto.SentNotifications, opt => opt.MapFrom(src => src.SentNotifications.Select(notification => notification.Id)))
-                .ForMember(userDto => userDto.ReceivedNotifications, opt => opt.MapFrom(src => src.ReceivedNotifications.Select(notification => notification.Id)));
+                .ForMember(userDto => userDto.ReceivedNotifications, opt => opt.MapFrom(src => src.UserNotifications.Where(un => un.ReceiverUserId == src.Id).Select(un => un.NotificationId)));
             _ = CreateMap<UserRequestDto, User>(MemberList.Source);
 
             _ = CreateMap<Attachment, AttachmentResponseDto>(MemberList.Destination)

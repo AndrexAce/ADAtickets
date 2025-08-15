@@ -18,6 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @inherits ComponentBase
 
 @using ADAtickets.Client
+@using ADAtickets.Shared.Constants
 @using ADAtickets.Shared.Dtos.Requests
 @using ADAtickets.Shared.Dtos.Responses
 @using ADAtickets.Shared.Extensions
@@ -27,6 +28,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @using Humanizer
 @using System.Net
 @using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.Identity.Web
 @using static ADAtickets.Web.Components.Utilities.Dialogs
 
 @inject IStringLocalizer<TicketCard> loc
@@ -36,6 +38,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @inject IDialogService dialogService
 @inject IMapper mapper
 @inject AuthenticationStateProvider authenticationStateProvider
+@inject IConfiguration configuration
 
 <FluentCard Id="@(Ticket.Id.ToString())" Style="background: var(--neutral-layer-1)" Width="20rem">
     <FluentStack Orientation="Orientation.Vertical">
@@ -84,37 +87,39 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             <FluentSpacer />
             <FluentStack Orientation="Orientation.Horizontal" HorizontalAlignment="HorizontalAlignment.SpaceBetween">
                 <FluentButton Appearance="Appearance.Neutral" IconStart="@(new Icons.Regular.Size20.Open())">Apri</FluentButton>
-                <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Edit())">Modifica</FluentButton>
+                <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Edit())" OnClick="ShowEditTicketDialogAsync">Modifica</FluentButton>
             </FluentStack>
         }
     </FluentStack>
 </FluentCard>
 
-@if (Users is not null)
-{
-    <FluentMenu Anchor="@(Ticket.Id.ToString())" Trigger="MouseButton.Right" Anchored="false">
-        <FluentLabel Typo="Typography.H6">@loc["EditStatusMenuLabel"]</FluentLabel>
-        <FluentMenuItem Label="@loc["DeleteMenuItem"]" OnClick="HandleDeleteClickAsync">
-            <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.DeleteDismiss())" Color="Color.Neutral" Slot="start" /></span>
-        </FluentMenuItem>
-        <FluentMenuItem Label="@loc["CloseMenuItem"]" OnClick="HandleCloseClickAsync">
-            <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Checkmark())" Color="Color.Neutral" Slot="start" /></span>
-        </FluentMenuItem>
-        <FluentDivider />
-        <FluentLabel Typo="Typography.H6">@loc["AssignmentMenuLabel"]</FluentLabel>
-        <FluentMenuItem Label="@loc["AssignMenuItem"]">
-            <ChildContent>
-                <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Person())" Color="Color.Neutral" Slot="start" /></span>
-            </ChildContent>
-            <MenuItems>
-                @foreach (var user in Users ?? [])
-                {
-                    <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@($"{user.Name} {user.Surname}")" OnClick="args => HandleAssignClickAsync(user.Id)"/>
-                }
-            </MenuItems>
-        </FluentMenuItem>
-    </FluentMenu>
-}
+<AuthorizeView Policy="@Policy.OperatorOrAdmin">
+    @if (Users is not null)
+    {
+        <FluentMenu Anchor="@(Ticket.Id.ToString())" Trigger="MouseButton.Right" Anchored="false">
+            <FluentLabel Typo="Typography.H6">@loc["EditStatusMenuLabel"]</FluentLabel>
+            <FluentMenuItem Label="@loc["DeleteMenuItem"]" OnClick="HandleDeleteClickAsync">
+                <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.DeleteDismiss())" Color="Color.Neutral" Slot="start" /></span>
+            </FluentMenuItem>
+            <FluentMenuItem Label="@loc["CloseMenuItem"]" OnClick="HandleCloseClickAsync">
+                <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Checkmark())" Color="Color.Neutral" Slot="start" /></span>
+            </FluentMenuItem>
+            <FluentDivider />
+            <FluentLabel Typo="Typography.H6">@loc["AssignmentMenuLabel"]</FluentLabel>
+            <FluentMenuItem Label="@loc["AssignMenuItem"]">
+                <ChildContent>
+                    <span slot="start"><FluentIcon Value="@(new Icons.Regular.Size20.Person())" Color="Color.Neutral" Slot="start" /></span>
+                </ChildContent>
+                <MenuItems>
+                    @foreach (var user in Users ?? [])
+                    {
+                        <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@($"{user.Name} {user.Surname}")" OnClick="args => HandleAssignClickAsync(user.Id)" />
+                    }
+                </MenuItems>
+            </FluentMenuItem>
+        </FluentMenu>
+    }
+</AuthorizeView>
 
 @code {
     [CascadingParameter]
@@ -286,6 +291,24 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         }
     }
 
+    private async Task ShowEditTicketDialogAsync()
+    {
+        await dialogService.ShowDialogAsync<TicketDialog>(
+            new TicketDialogContent
+            {
+                IsEdit = true,
+                IsUser = await IsUserAsync(),
+                InitialTicketData = Ticket
+            },
+            new DialogParameters
+            {
+                TrapFocus = true,
+                PreventScroll = true,
+                PreventDismissOnOverlayClick = true
+            }
+        );
+    }
+
     private static string GetInitials(string? fullName)
     {
         if (string.IsNullOrWhiteSpace(fullName))
@@ -312,5 +335,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         }
 
         return null;
+    }
+
+    private async Task<bool> IsUserAsync()
+    {
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        return user.GetTenantId() == configuration["ExternalEntra:TenantId"];
     }
 }

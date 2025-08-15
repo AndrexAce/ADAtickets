@@ -100,14 +100,6 @@ namespace ADAtickets.Shared.Models
         public ICollection<Edit> Edits { get; } = [];
 
         /// <summary>
-        /// The collection of platforms the user prefers (if they are an operator, otherwise it must be empty).
-        /// </summary>
-        [Required]
-        [InverseProperty(nameof(Platform.UsersPreferred))]
-        [JsonIgnore]
-        public ICollection<Platform> PreferredPlatforms { get; } = [];
-
-        /// <summary>
         /// Join entity between the platform and the users who marked it as preferred.
         /// </summary>
         [Required]
@@ -123,14 +115,6 @@ namespace ADAtickets.Shared.Models
         [InverseProperty(nameof(Notification.User))]
         [JsonIgnore]
         public ICollection<Notification> SentNotifications { get; } = [];
-
-        /// <summary>
-        /// The collection of notifications the user received.
-        /// </summary>
-        [Required]
-        [InverseProperty(nameof(Notification.Recipients))]
-        [JsonIgnore]
-        public ICollection<Notification> ReceivedNotifications { get; } = [];
 
         /// <summary>
         /// Join entity between the user and the notifications they received.
