@@ -8,6 +8,7 @@
 
 	<ItemGroup>
 		<InternalsVisibleTo Include="ADAtickets.ApiService" />
+		<InternalsVisibleTo Include="ADAtickets.ApiService.Tests" />
 		<InternalsVisibleTo Include="ADAtickets.Web" />
 		<InternalsVisibleTo Include="ADAtickets.Installer" />
 		<InternalsVisibleTo Include="ADAtickets.Client" />
