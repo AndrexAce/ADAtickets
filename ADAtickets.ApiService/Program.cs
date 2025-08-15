@@ -18,9 +18,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using System.Net.Mime;
-using System.Reflection;
-using System.Text.Json.Serialization;
 using ADAtickets.ApiService.Configs;
 using ADAtickets.ApiService.Controllers;
 using ADAtickets.ApiService.Repositories;
@@ -37,6 +34,9 @@ using Microsoft.Identity.Web;
 using Microsoft.OpenApi.Models;
 using Scalar.AspNetCore;
 using StackExchange.Redis;
+using System.Net.Mime;
+using System.Reflection;
+using System.Text.Json.Serialization;
 
 namespace ADAtickets.ApiService;
 
@@ -215,7 +215,7 @@ internal static class Program
         // Enable serving static files.
         _ = app.UseStaticFiles(new StaticFileOptions
         {
-            FileProvider = new PhysicalFileProvider("/app"),
+            FileProvider = new PhysicalFileProvider(Directory.GetCurrentDirectory()),
             RequestPath = ""
         });
 
