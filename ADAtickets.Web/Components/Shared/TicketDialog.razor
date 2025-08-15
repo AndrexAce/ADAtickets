@@ -330,8 +330,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
         try
         {
-            users = await LoadUsersAsync(new[] { new KeyValuePair<string, string>("UserType", "Operator") });
-            users = users.Union(await LoadUsersAsync(new[] { new KeyValuePair<string, string>("UserType", "Admin") }));
+            users = await LoadUsersAsync(new Dictionary<string, string> { { nameof(User.Type), "Operator" } });
+            users = users.Union(await LoadUsersAsync(new Dictionary<string, string> { { nameof(User.Type), "Admin" } }));
 
             platforms = await LoadPlatformsAsync();
 

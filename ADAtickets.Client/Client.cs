@@ -136,7 +136,7 @@ namespace ADAtickets.Client
                 {
                     options.HttpMethod = nameof(HttpMethod.Get);
                     options.RelativePath = Endpoint;
-                    options.ExtraQueryParameters = filters?.ToDictionary();
+                    options.ExtraQueryParameters = filters?.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
                     options.AcquireTokenOptions.AuthenticationOptionsName = InferAuthenticationScheme(user);
                 },
                 user: user);
