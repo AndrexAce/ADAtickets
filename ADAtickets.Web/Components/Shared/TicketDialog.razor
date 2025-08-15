@@ -383,6 +383,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             {
                 var loggedInUser = await usersClient.GetAsync(user.GetEmail()!);
                 TicketRequest.CreatorUserId = loggedInUser.Id;
+                TicketRequest.Requester = loggedInUser.Id;
             }
 
             var ticketResponse = Content.IsEdit ?

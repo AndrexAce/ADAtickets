@@ -449,6 +449,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 // Update the ticket status to Closed.
                 var requestDto = mapper.Map<TicketRequestDto>(getResponse);
                 requestDto.Status = Status.Closed;
+                requestDto.Requester = await GetUserIdAsync();
 
                 await ticketsClient.PutAsync(ticketId, requestDto);
 
@@ -492,6 +493,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 // Update the ticket assignee.
                 var requestDto = mapper.Map<TicketRequestDto>(getResponse);
                 requestDto.OperatorUserId = operatorId;
+                requestDto.Requester = await GetUserIdAsync();
 
                 await ticketsClient.PutAsync(ticketId, requestDto);
 
@@ -691,6 +693,21 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         }
 
         return tickets;
+    }
+
+    private async Task<Guid?> GetUserIdAsync()
+    {
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.IsAuthenticated())
+        {
+            var loggedInUser = await usersClient.GetAsync(user.GetEmail()!);
+
+            return loggedInUser?.Id;
+        }
+
+        return null;
     }
 #endregion
 }

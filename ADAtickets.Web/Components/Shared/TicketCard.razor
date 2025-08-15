@@ -20,11 +20,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @using ADAtickets.Client
 @using ADAtickets.Shared.Dtos.Requests
 @using ADAtickets.Shared.Dtos.Responses
+@using ADAtickets.Shared.Extensions
 @using ADAtickets.Shared.Models
 @using ADAtickets.Web.Components.Utilities
 @using AutoMapper
 @using Humanizer
 @using System.Net
+@using Microsoft.AspNetCore.Components.Authorization
 @using static ADAtickets.Web.Components.Utilities.Dialogs
 
 @inject IStringLocalizer<TicketCard> loc
@@ -33,6 +35,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @inject IToastService toastService
 @inject IDialogService dialogService
 @inject IMapper mapper
+@inject AuthenticationStateProvider authenticationStateProvider
 
 <FluentCard Id="@(Ticket.Id.ToString())" Style="background: var(--neutral-layer-1)" Width="20rem">
     <FluentStack Orientation="Orientation.Vertical">
@@ -244,6 +247,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             // Update the ticket status to Closed.
             var requestDto = mapper.Map<TicketRequestDto>(getResponse);
             requestDto.Status = Status.Closed;
+            requestDto.Requester = await GetUserIdAsync();
 
             await ticketsClient.PutAsync(Ticket.Id, requestDto);
 
@@ -267,6 +271,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             // Update the ticket assignee.
             var requestDto = mapper.Map<TicketRequestDto>(getResponse);
             requestDto.OperatorUserId = operatorId;
+            requestDto.Requester = await GetUserIdAsync();
 
             await ticketsClient.PutAsync(Ticket.Id, requestDto);
 
@@ -292,5 +297,20 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             .Where(part => !string.IsNullOrWhiteSpace(part))
             .Select(part => part[0])
             .Aggregate(string.Empty, (acc, initial) => acc + initial);
+    }
+
+    private async Task<Guid?> GetUserIdAsync()
+    {
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.IsAuthenticated())
+        {
+            var loggedInUser = await usersClient.GetAsync(user.GetEmail()!);
+
+            return loggedInUser?.Id;
+        }
+
+        return null;
     }
 }
