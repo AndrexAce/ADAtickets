@@ -96,7 +96,7 @@ namespace ADAtickets.Shared.Extensions
         /// <returns><see langword="true"/> if the <see cref="ClaimsPrincipal"/> is a DevOps administrator; otherwise, <see langword="false"/>.</returns>
         public static bool IsDevOpsAdmin(this ClaimsPrincipal user)
         {
-            return user.FindFirst("wids")?.Value == "e3973bdf-4987-49ae-837a-ba8e231c7286";
+            return user.Claims.Any(claim => claim.Type == "wids" && claim.Value == "e3973bdf-4987-49ae-837a-ba8e231c7286");
         }
 
         /// <summary>
