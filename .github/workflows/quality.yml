@@ -94,9 +94,9 @@ jobs:
         env:
           ASPNETCORE_ENVIRONMENT: Staging
         run: |
-          coverlet ./ADAtickets.ApiService.Tests/bin/Release/net9.0/ADAtickets.ApiService.Tests.dll \
+          coverlet ./ADAtickets.Tests/bin/Release/net9.0/ADAtickets.Tests.dll \
           --target "dotnet" \
-          --targetargs "test ./ADAtickets.ApiService.Tests/ADAtickets.ApiService.Tests.csproj --no-build --configuration Release" \
+          --targetargs "test ./ADAtickets.Tests/ADAtickets.Tests.csproj --no-build --configuration Release" \
           -f=opencover \
           -o="coverage.xml"
 

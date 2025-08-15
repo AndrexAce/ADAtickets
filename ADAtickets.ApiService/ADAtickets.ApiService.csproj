@@ -51,7 +51,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="ADAtickets.ApiService.Tests" />
+    <InternalsVisibleTo Include="ADAtickets.Tests" />
 	<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
   </ItemGroup>
 
