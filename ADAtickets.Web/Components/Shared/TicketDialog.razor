@@ -131,10 +131,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
                     @if (Content.IsEdit)
                     {
-                    <FluentStack Orientation="Orientation.Vertical">
-                        <FluentLabel Weight="FontWeight.Bold">@loc["CurrentValue"]</FluentLabel>
-                        <span>@Content.InitialTicketData?.PlatformName</span>
-                    </FluentStack>
+                        <FluentStack Orientation="Orientation.Vertical">
+                            <FluentLabel Weight="FontWeight.Bold">@loc["CurrentValue"]</FluentLabel>
+                            <span>@Content.InitialTicketData?.PlatformName</span>
+                        </FluentStack>
                     }
                 </FluentStack>
             }
@@ -459,7 +459,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 // Set the ticket creator to the current user before creating the ticket.
                 if (!Content.IsEdit)
                 {
-                TicketForm.CreatorUserId = loggedInUser.Id;
+                    TicketForm.CreatorUserId = loggedInUser.Id;
                 }
 
                 // Set the person requesting the ticket write operation since it's required for PUT requests.
@@ -506,6 +506,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         finally
         {
             toastService.ClearProgressToasts();
+
+            await Content.StateChanged.InvokeAsync();
         }
     }
 

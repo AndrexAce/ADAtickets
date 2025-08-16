@@ -15,6 +15,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
+@implements IDisposable
 @page "/my-tickets"
 @layout MainLayout
 @using System.Security.Claims
@@ -44,6 +45,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @inject IMapper mapper
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject IConfiguration configuration
+@inject TicketRefreshService ticketRefreshService
 
 @attribute [Authorize(Policy = Policy.Everyone)]
 
@@ -319,6 +321,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     protected override async Task OnInitializedAsync()
     {
+        // Subscribe to refresh events
+        ticketRefreshService.RefreshRequested += HandleRefreshRequested;
+
         try
         {
             await LoadUsersAsync();
@@ -357,6 +362,19 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     #endregion
 
     #region Event handlers
+
+    private async void HandleRefreshRequested()
+    {
+        try
+        {
+            await LoadTicketsAsync(await GetBaseFiltersAsync());
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowCommunicationToast(Toasts.ErrorToastParameters(ex, loc["LoadingErrorToastTitle"], loc["LoadingErrorToastDetails"]));
+        }
+    }
 
     private void HandleSortDismissClick()
     {
@@ -759,4 +777,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     #endregion
 
+    public void Dispose()
+    {
+        // Unsubscribe to prevent memory leaks
+        ticketRefreshService.RefreshRequested -= HandleRefreshRequested;
+    }
 }

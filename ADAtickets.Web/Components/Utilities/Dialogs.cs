@@ -20,6 +20,7 @@
 
 using ADAtickets.Shared.Dtos.Responses;
 using ADAtickets.Shared.Models;
+using Microsoft.AspNetCore.Components;
 using Microsoft.FluentUI.AspNetCore.Components;
 
 namespace ADAtickets.Web.Components.Utilities;
@@ -102,6 +103,11 @@ public static class Dialogs
         ///     Whether the person opening the dialog is a <see cref="UserType.User" />.
         /// </summary>
         public required bool IsUser { get; init; }
+
+        /// <summary>
+        ///     Event callback that is triggered when the ticket state has changed.
+        /// </summary>
+        public required EventCallback StateChanged { get; set; }
 
         /// <summary>
         ///     Initial data to show in the ticket dialog (optional).

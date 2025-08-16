@@ -163,8 +163,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     private RenderFragment GetStatusBadge(Status status) => @<FluentBadge Fill="highlight"
                                                                           BackgroundColor="@GetStatusAppearance(status)"
                                                                           Circular="true">
-        @GetStatusText(status)
-    </FluentBadge>;
+                                                                @GetStatusText(status)
+                                                            </FluentBadge>;
 
     private static string GetPriorityAppearance(Priority priority) => priority switch
     {
@@ -307,6 +307,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             {
                 IsEdit = true,
                 IsUser = await IsUserAsync(),
+                StateChanged = StateChanged,
                 InitialTicketData = Ticket
             },
             new DialogParameters

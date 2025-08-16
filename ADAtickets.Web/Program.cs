@@ -123,6 +123,9 @@ internal static class Program
         // Add access to the HTTP client class.
         _ = builder.Services.AddHttpClient();
 
+        // Add other DI services.
+        _ = builder.Services.AddScoped<TicketRefreshService>();
+
         // Add Fluent UI components.
         _ = builder.Services.AddFluentUIComponents();
 
