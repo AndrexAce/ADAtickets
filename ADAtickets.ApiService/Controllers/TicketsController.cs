@@ -18,7 +18,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using System.Net.Mime;
 using ADAtickets.ApiService.Configs;
 using ADAtickets.ApiService.Repositories;
 using ADAtickets.Shared.Constants;
@@ -30,6 +29,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web.Resource;
+using System.Net.Mime;
 using Controller = ADAtickets.Shared.Constants.Controller;
 
 namespace ADAtickets.ApiService.Controllers;
@@ -288,6 +288,8 @@ public sealed class TicketsController(
 
         await ticketRepository.DeleteTicketAsync(ticket);
 
+        await azureDevOpsController.DeleteAzureDevOpsWorkItemAsync(ticket.WorkItemId);
+
         return NoContent();
     }
 
@@ -299,7 +301,11 @@ public sealed class TicketsController(
 
         await editsController.CreateCreationEntriesAsync(ticket, chosenOperatorId);
 
-        await azureDevOpsController.CreateAzureDevOpsWorkItemAsync(ticket, ticket.PlatformId);
+        var workItemId = await azureDevOpsController.CreateAzureDevOpsWorkItemAsync(ticket);
+
+        ticket.WorkItemId = workItemId ?? 0;
+
+        await ticketRepository.UpdateTicketAsync(ticket);
     }
 
     private async Task AutoAssignTicketAsync(Ticket ticket, Guid? chosenOperatorId)
@@ -308,6 +314,7 @@ public sealed class TicketsController(
         if (chosenOperatorId.HasValue)
         {
             ticket.OperatorUserId = chosenOperatorId.Value;
+            ticket.Status = Status.WaitingOperator;
             await ticketRepository.UpdateTicketAsync(ticket);
         }
     }
@@ -317,6 +324,8 @@ public sealed class TicketsController(
         await notificationsController.CreateEditNotificationsAsync(ticket, editor);
 
         await editsController.CreateEditEntryAsync(ticket, editor);
+
+        await azureDevOpsController.UpdateAzureDevOpsWorkItemAsync(ticket);
     }
 
     private async Task ProcessTicketOperatorUpdateAsync(Ticket ticket, Guid? oldAssignedOperator, Guid editor)
@@ -324,5 +333,7 @@ public sealed class TicketsController(
         await notificationsController.CreateOperatorEditNotificationsAsync(ticket, oldAssignedOperator, editor);
 
         await editsController.CreateOperatorEditEntryAsync(ticket, oldAssignedOperator, editor);
+
+        await azureDevOpsController.UpdateOperatorAzureDevOpsWorkItemAsync(ticket);
     }
 }

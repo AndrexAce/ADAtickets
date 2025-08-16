@@ -373,6 +373,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     private bool showPhoto;
     private bool showVideo;
 
+    private string? startingOperatorId;
+
     private RenderFragment TicketTypeLabel => @<FluentStack Orientation="Orientation.Horizontal">
                                                   <FluentLabel>@loc["TicketType"]</FluentLabel>
                                                   @if ((!Content.IsEdit && Content.IsUser) || (Content.IsEdit && !Content.IsUser))
@@ -403,6 +405,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 if (Content.IsEdit && !Content.IsUser)
                 {
                     TicketForm.PlatformId = "";
+                    startingOperatorId = TicketForm.OperatorUserId;
                     TicketForm.OperatorUserId = null;
                 }
 
@@ -456,14 +459,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             {
                 var loggedInUser = await usersClient.GetAsync(user.GetEmail()!);
 
-                // Set the ticket creator to the current user before creating the ticket.
-                if (!Content.IsEdit)
-                {
-                    TicketForm.CreatorUserId = loggedInUser.Id;
-                }
-
-                // Set the person requesting the ticket write operation since it's required for PUT requests.
-                TicketForm.Requester = loggedInUser.Id;
+                SetAdditionalDataBeforeSending(loggedInUser);
             }
 
             var ticketResponse = Content.IsEdit ?
@@ -508,6 +504,32 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             toastService.ClearProgressToasts();
 
             await Content.StateChanged.InvokeAsync();
+        }
+    }
+
+    private void SetAdditionalDataBeforeSending(UserResponseDto loggedInUser)
+    {
+        if (Content.IsEdit)
+        {
+            if (TicketForm.OperatorUserId is null && startingOperatorId is not null)
+            {
+                // If the ticket is being edited and unassigned from the operator, put it in the Unassigned status.
+                TicketForm.Status = Status.Unassigned;
+            }
+            else if (TicketForm.OperatorUserId is not null && startingOperatorId is null)
+            {
+                // If the ticket is being edited and assigned to an operator for the first time, set the waiting status.
+                TicketForm.Status = Status.WaitingOperator;
+            }
+            // Else, if assigned to another operator, keep the current status.
+
+            // Set the person requesting the ticket write operation since it's required for PUT requests.
+            TicketForm.Requester = loggedInUser.Id;
+        }
+        else
+        {
+            // Set the ticket creator to the current user.
+            TicketForm.CreatorUserId = loggedInUser.Id;
         }
     }
 

@@ -18,8 +18,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using System.Net.Mime;
-using System.Security.Cryptography.X509Certificates;
 using ADAtickets.ApiService.Configs;
 using ADAtickets.ApiService.Repositories;
 using ADAtickets.Shared.Constants;
@@ -38,6 +36,8 @@ using Microsoft.VisualStudio.Services.Identity.Client;
 using Microsoft.VisualStudio.Services.WebApi;
 using Microsoft.VisualStudio.Services.WebApi.Patch;
 using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
+using System.Net.Mime;
+using System.Security.Cryptography.X509Certificates;
 using ADAticketsUser = ADAtickets.Shared.Models.User;
 using Controller = ADAtickets.Shared.Constants.Controller;
 
@@ -46,9 +46,9 @@ namespace ADAtickets.ApiService.Controllers;
 /// <summary>
 ///     Web API controller managing requests involving Azure DevOps.
 /// </summary>
-/// <param name="userRepository">Object defining the operations allowed on the entity type.</param>
-/// <param name="configuration">Configuration object containing the application settings.</param>
+/// <param name="userRepository">Object defining the operations allowed on the <see cref="User" /> entity type.</param>
 /// <param name="platformRepository">Object defining the operations allowed on the <see cref="Platform" /> entity type.</param>
+/// <param name="configuration">Configuration object containing the application settings.</param>
 [Route($"v{Service.APIVersion}/{Controller.AzureDevOps}")]
 [ApiController]
 [Consumes(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
@@ -56,9 +56,10 @@ namespace ADAtickets.ApiService.Controllers;
 [FormatFilter]
 [ApiConventionType(typeof(ApiConventions))]
 public sealed class AzureDevOpsController(
-    IUserRepository userRepository,
     IConfiguration configuration,
-    IPlatformRepository platformRepository) : ControllerBase
+    IUserRepository userRepository,
+    IPlatformRepository platformRepository
+    ) : ControllerBase
 {
     /// <summary>
     ///     Determines if a specific <see cref="User" /> entity with <paramref name="email" /> has access to the Azure DevOps
@@ -166,62 +167,255 @@ public sealed class AzureDevOpsController(
         });
     }
 
-    internal async Task<ValueWrapper<bool>> CreateAzureDevOpsWorkItemAsync(Ticket ticket, Guid platformId)
+    internal async Task<int?> CreateAzureDevOpsWorkItemAsync(Ticket ticket)
     {
-        var platform = await platformRepository.GetPlatformByIdAsync(platformId);
+        var platform = await platformRepository.GetPlatformByIdAsync(ticket.PlatformId);
         var platformName = platform?.Name;
 
-        if (platformName is not null)
+        if (platformName is null)
         {
-            var connection = await ConnectToAzureDevOpsAsync();
+            return null;
+        }
 
-            try
+        var connection = await ConnectToAzureDevOpsAsync();
+
+        try
+        {
+            // Get the client and create the work item
+            var workItemClient = await connection.GetClientAsync<WorkItemTrackingHttpClient>();
+
+            var creationPatchDocument = new JsonPatchDocument
             {
-                var workItemClient = await connection.GetClientAsync<WorkItemTrackingHttpClient>();
+                new JsonPatchOperation
+                {
+                    Operation = Operation.Add,
+                    Path = "/fields/System.Title",
+                    Value = ticket.Title
+                },
+                new JsonPatchOperation
+                {
+                    Operation = Operation.Add,
+                    Path = "/fields/System.Description",
+                    Value = ticket.Description
+                },
+                new JsonPatchOperation
+                {
+                    Operation = Operation.Add,
+                    Path = "/fields/Microsoft.VSTS.Common.Priority",
+                    Value = 3 - (int)ticket.Priority
+                },
+                new JsonPatchOperation
+                {
+                    Operation = Operation.Add,
+                    Path = "/fields/System.CreatedDate",
+                    Value = ticket.CreationDateTime
+                },
+                new JsonPatchOperation
+                {
+                    Operation = Operation.Add,
+                    Path = "/fields/System.State",
+                    Value = "To Do"
+                },
+            };
 
-                var patchDocument = new JsonPatchDocument
+            var workItem = await workItemClient.CreateWorkItemAsync(creationPatchDocument, platformName,
+                ticket.Type == TicketType.Bug ? "Issue" : "Task");
+
+            // Update the work item with the assigned user (can't be done in creation)
+
+            if (workItem is null || !workItem.Id.HasValue)
+            {
+                return null;
+            }
+            else if (ticket.OperatorUser is null)
+            {
+                return workItem.Id;
+            }
+
+            var updatePatchDocument = new JsonPatchDocument
+            {
+                new JsonPatchOperation
+                {
+                    Operation = Operation.Add,
+                    Path = "/fields/System.AssignedTo",
+                    Value = $"{ticket.OperatorUser.Username}<{ticket.OperatorUser.Email}>"
+                }
+            };
+
+            workItem = await workItemClient.UpdateWorkItemAsync(updatePatchDocument, workItem.Id.Value);
+
+            return workItem.Id;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    internal async Task UpdateAzureDevOpsWorkItemAsync(Ticket ticket)
+    {
+        if (ticket.WorkItemId == 0)
+        {
+            return;
+        }
+
+        var platform = await platformRepository.GetPlatformByIdAsync(ticket.PlatformId);
+        var platformName = platform?.Name;
+
+        if (platformName is null)
+        {
+            return;
+        }
+
+        var connection = await ConnectToAzureDevOpsAsync();
+
+        try
+        {
+            // Get the client and update the work item
+            var workItemClient = await connection.GetClientAsync<WorkItemTrackingHttpClient>();
+
+            var updatePatchDocument = new JsonPatchDocument
+            {
+                new JsonPatchOperation
+                {
+                    Operation = Operation.Add,
+                    Path = "/fields/System.Title",
+                    Value = ticket.Title
+                },
+                new JsonPatchOperation
+                {
+                    Operation = Operation.Add,
+                    Path = "/fields/System.Description",
+                    Value = ticket.Description
+                },
+                new JsonPatchOperation
+                {
+                    Operation = Operation.Add,
+                    Path = "/fields/Microsoft.VSTS.Common.Priority",
+                    Value = 3 - (int)ticket.Priority
+                },
+                new JsonPatchOperation
+                {
+                    Operation = Operation.Add,
+                    Path = "/fields/System.State",
+                    Value = ticket.Status switch
+                    {
+                        Status.Unassigned => "To Do",
+                        Status.WaitingUser or Status.WaitingOperator => "Doing",
+                        Status.Closed => "Done",
+                        _ => "To Do"
+                    }
+                },
+                new JsonPatchOperation
+                {
+                    Operation = Operation.Add,
+                    Path = "/fields/System.WorkItemType",
+                    Value = ticket.Type == TicketType.Bug ? "Issue" : "Task"
+                },
+                new JsonPatchOperation
+                {
+                    Operation = Operation.Add,
+                    Path = "/fields/System.TeamProject",
+                    Value = ticket.Platform.Name
+                },
+                new JsonPatchOperation
+                {
+                    Operation = Operation.Add,
+                    Path = "/fields/System.AreaPath",
+                    Value = ticket.Platform.Name
+                },
+                new JsonPatchOperation
+                {
+                    Operation = Operation.Add,
+                    Path = "/fields/System.IterationPath",
+                    Value = ticket.Platform.Name
+                }
+            };
+
+            await workItemClient.UpdateWorkItemAsync(updatePatchDocument, ticket.WorkItemId);
+        }
+        catch
+        {
+            // Do nothing.
+        }
+    }
+
+    internal async Task UpdateOperatorAzureDevOpsWorkItemAsync(Ticket ticket)
+    {
+        if (ticket.WorkItemId == 0)
+        {
+            return;
+        }
+
+        var connection = await ConnectToAzureDevOpsAsync();
+
+        try
+        {
+            // Get the client and update the work item
+            var workItemClient = await connection.GetClientAsync<WorkItemTrackingHttpClient>();
+
+            if (!ticket.OperatorUserId.HasValue)
+            {
+                // If the operator user is null, we remove the AssignedTo field
+                var updatePatchDocument = new JsonPatchDocument
+                {
+                    new JsonPatchOperation
+                    {
+                        Operation = Operation.Remove,
+                        Path = "/fields/System.AssignedTo"
+                    }
+                };
+
+                await workItemClient.UpdateWorkItemAsync(updatePatchDocument, ticket.WorkItemId);
+            }
+            else
+            {
+                // Fetch the assigned operator for the ticket
+                var assignedOperator = await userRepository.GetUserByIdAsync(ticket.OperatorUserId.Value);
+
+                if (assignedOperator is null)
+                {
+                    return;
+                }
+
+                var updatePatchDocument = new JsonPatchDocument
                 {
                     new JsonPatchOperation
                     {
                         Operation = Operation.Add,
-                        Path = "/fields/System.Title",
-                        Value = ticket.Title
-                    },
-                    new JsonPatchOperation
-                    {
-                        Operation = Operation.Add,
-                        Path = "/fields/System.Description",
-                        Value = ticket.Description
-                    },
-                    new JsonPatchOperation
-                    {
-                        Operation = Operation.Add,
-                        Path = "/fields/Microsoft.VSTS.Common.Priority",
-                        Value = 3 - (int)ticket.Priority
-                    },
-                    new JsonPatchOperation
-                    {
-                        Operation = Operation.Add,
-                        Path = "/fields/System.CreatedDate",
-                        Value = ticket.CreationDateTime
-                    },
-                    new JsonPatchOperation
-                    {
-                        Operation = Operation.Add,
-                        Path = "/fields/System.State",
-                        Value = "To Do"
+                        Path = "/fields/System.AssignedTo",
+                        Value = $"{assignedOperator.Username}<{assignedOperator.Email}>"
                     }
                 };
 
-                await workItemClient.CreateWorkItemAsync(patchDocument, platformName,
-                    ticket.Type == TicketType.Bug ? "Issue" : "Task");
-            }
-            catch
-            {
-                return new ValueWrapper<bool>(false);
+                await workItemClient.UpdateWorkItemAsync(updatePatchDocument, ticket.WorkItemId);
             }
         }
+        catch
+        {
+            // Do nothing.
+        }
+    }
 
-        return new ValueWrapper<bool>(true);
+    internal async Task DeleteAzureDevOpsWorkItemAsync(int workItemId)
+    {
+        if (workItemId == 0)
+        {
+            return;
+        }
+
+        var connection = await ConnectToAzureDevOpsAsync();
+
+        try
+        {
+            // Get the client and create the work item
+            var workItemClient = await connection.GetClientAsync<WorkItemTrackingHttpClient>();
+
+            await workItemClient.DeleteWorkItemAsync(workItemId);
+        }
+        catch
+        {
+            // Do nothing.
+        }
     }
 }
