@@ -8,27 +8,27 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <AvaloniaResource Include="Assets\**"/>
+        <AvaloniaResource Include="Assets\**" />
     </ItemGroup>
 
     <ItemGroup>
-        <EmbeddedResource Include="Assets\docker-compose.override-prod.yml"/>
-        <EmbeddedResource Include="Assets\docker-compose.yml"/>
-        <EmbeddedResource Include="Assets\example.env"/>
+        <EmbeddedResource Include="Assets\docker-compose.override-prod.yml" />
+        <EmbeddedResource Include="Assets\docker-compose.yml" />
+        <EmbeddedResource Include="Assets\example.env" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectCapability Include="Avalonia"/>
-        <TrimmerRootAssembly Include="Avalonia.Themes.Fluent"/>
+        <ProjectCapability Include="Avalonia" />
+        <TrimmerRootAssembly Include="Avalonia.Themes.Fluent" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.3"/>
-        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.3"/>
-        <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.3"/>
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.4" />
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.4" />
+        <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.4" />
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.3"/>
-        <PackageReference Include="Docker.DotNet" Version="3.125.15"/>
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.4" />
+        <PackageReference Include="Docker.DotNet" Version="3.125.15" />
     </ItemGroup>
 
     <ItemGroup>
@@ -70,10 +70,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <InternalsVisibleTo Include="ADAtickets.Installer.Desktop"/>
+        <InternalsVisibleTo Include="ADAtickets.Installer.Desktop" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\ADAtickets.Shared\ADAtickets.Shared.csproj"/>
+        <ProjectReference Include="..\ADAtickets.Shared\ADAtickets.Shared.csproj" />
     </ItemGroup>
 </Project>

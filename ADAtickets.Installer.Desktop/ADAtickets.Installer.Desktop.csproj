@@ -8,14 +8,14 @@
         <ApplicationIcon>favicon.ico</ApplicationIcon>
     </PropertyGroup>
     <ItemGroup>
-        <Content Include="favicon.ico"/>
+        <Content Include="favicon.ico" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia.Desktop" Version="11.3.3"/>
+        <PackageReference Include="Avalonia.Desktop" Version="11.3.4" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\ADAtickets.Installer\ADAtickets.Installer.csproj"/>
+        <ProjectReference Include="..\ADAtickets.Installer\ADAtickets.Installer.csproj" />
     </ItemGroup>
 </Project>
