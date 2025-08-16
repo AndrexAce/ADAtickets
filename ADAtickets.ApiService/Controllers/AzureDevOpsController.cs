@@ -38,6 +38,7 @@ using Microsoft.VisualStudio.Services.Identity.Client;
 using Microsoft.VisualStudio.Services.WebApi;
 using Microsoft.VisualStudio.Services.WebApi.Patch;
 using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
+using ADAticketsUser = ADAtickets.Shared.Models.User;
 using Controller = ADAtickets.Shared.Constants.Controller;
 
 namespace ADAtickets.ApiService.Controllers;
@@ -77,7 +78,7 @@ public sealed class AzureDevOpsController(
     public async Task<ActionResult<ValueWrapper<bool>>> GetUserDevOpsAccess(string email)
     {
         // Check if the entity with the given key exists.
-        if (!(await userRepository.GetUsersByAsync([new KeyValuePair<string, string>("Email", email)])).Any())
+        if (!(await userRepository.GetUsersByAsync(new Dictionary<string, string> { { nameof(ADAticketsUser.Email), email } })).Any())
             return NotFound();
 
         // Insert the entity data into a new DTO and send it to the client.
@@ -98,7 +99,7 @@ public sealed class AzureDevOpsController(
     [HttpGet("projects")]
     [Authorize(Policy = Policy.OperatorOrAdmin)]
     [RequiredScope(Scope.Read)]
-    public async Task<ActionResult<IEnumerable<PlatformResponseDto>>> GetAllPlatformNames()
+    public async Task<ActionResult<IEnumerable<PlatformResponseDto>>> GetAllPlatforms()
     {
         var devOpsPlatforms = await GetAzureDevOpsPlatformsAsync();
 

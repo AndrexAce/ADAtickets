@@ -18,7 +18,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using System.Net.Mime;
 using ADAtickets.ApiService.Configs;
 using ADAtickets.ApiService.Repositories;
 using ADAtickets.Shared.Constants;
@@ -30,6 +29,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web.Resource;
+using System.Net.Mime;
 using Controller = ADAtickets.Shared.Constants.Controller;
 
 namespace ADAtickets.ApiService.Controllers;
@@ -280,18 +280,17 @@ public sealed class NotificationsController(
 
         // Find users who have the ticket platform as their preferred platform.
         var operatorsWithPreferredPlatform = await userPlatformRepository.GetUserPlatformsByAsync(
-        [
-            new KeyValuePair<string, string>(nameof(UserPlatform.PlatformId), ticket.PlatformId.ToString())
-        ]);
+            new Dictionary<string, string> { { nameof(UserPlatform.PlatformId), ticket.PlatformId.ToString() } }
+        );
 
         // If there is any user who prefer this platform, notify the first one with the least assigned tickets.
         if (operatorsWithPreferredPlatform.Any())
         {
             var operatorsSortedByWorkload = from userPlatform in operatorsWithPreferredPlatform
-                join user in await userRepository.GetUsersAsync()
-                    on userPlatform.UserId equals user.Id
-                orderby user.AssignedTickets.Count
-                select user.Id;
+                                            join user in await userRepository.GetUsersAsync()
+                                                on userPlatform.UserId equals user.Id
+                                            orderby user.AssignedTickets.Count
+                                            select user.Id;
 
             var operatorWithLeastWorkload = operatorsSortedByWorkload.FirstOrDefault();
 
@@ -439,8 +438,8 @@ public sealed class NotificationsController(
     private async Task SendNotificationToAllOperators(Notification notification)
     {
         var operators = from user in await userRepository.GetUsersAsync()
-            where user.Type == UserType.Admin || user.Type == UserType.Operator
-            select user.Id;
+                        where user.Type == UserType.Admin || user.Type == UserType.Operator
+                        select user.Id;
 
         foreach (var userId in operators)
         {

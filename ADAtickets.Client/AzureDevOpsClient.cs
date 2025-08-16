@@ -18,14 +18,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using System.Net;
-using System.Net.Http.Json;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using ADAtickets.Shared.Constants;
 using ADAtickets.Shared.Dtos.Responses;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Identity.Abstractions;
+using System.Net;
+using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace ADAtickets.Client;
 
@@ -91,7 +91,7 @@ public sealed class AzureDevOpsClient(
     /// <exception cref="InvalidOperationException">When the method is used when no user is logged in.</exception>
     /// <exception cref="HttpRequestException">When the API call fails.</exception>
     /// <exception cref="JsonException">When the JSON response cannot be parsed.</exception>
-    public async Task<IEnumerable<PlatformResponseDto>> GetAllPlatformNamesAsync()
+    public async Task<IEnumerable<PlatformResponseDto>> GetAllPlatformsAsync()
     {
         // Fetch the logged in user
         var user = (await authenticationStateProvider.GetAuthenticationStateAsync()).User;
