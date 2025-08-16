@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @implements IDialogContentComponent<TicketDialogContent>
 @using ADAtickets.Client
+@using ADAtickets.Shared.Dtos.Forms
 @using ADAtickets.Shared.Dtos.Requests
 @using ADAtickets.Shared.Dtos.Responses
 @using ADAtickets.Shared.Extensions
@@ -55,72 +56,96 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 </FluentDialogHeader>
 
 <FluentDialogBody>
-    <EditForm id="ticket_form" Model="@TicketRequest" OnValidSubmit="HandleValidSubmitAsync" FormName="ticket_form">
+    <EditForm id="ticket_form" Model="@TicketForm" OnValidSubmit="HandleValidSubmitAsync" FormName="ticket_form">
         <DataAnnotationsValidator/>
-        <FluentValidationSummary Model="@TicketRequest"/>
+        <FluentValidationSummary Model="@TicketForm"/>
 
         <FluentStack Orientation="Orientation.Vertical">
             @if (!Content.IsUser)
             {
                 @if (Content.IsEdit)
                 {
-                    <FluentSelect TOption="UserResponseDto"
-                                  Label="@loc["AssignedOperator"]"
-                                  Name="OperatorUserId"
-                                  Items="users"
-                                  OptionText="@(u => $"{u.Name} {u.Surname}")"
-                                  OptionValue="@(u => u.Id.ToString())"
-                                  Placeholder="@loc["PleaseSelectAnOption"]"
-                                  @bind-Value="OperatorIdString">
-                    </FluentSelect>
+                    <FluentStack Orientation="Orientation.Horizontal" HorizontalAlignment="HorizontalAlignment.Left" VerticalAlignment="VerticalAlignment.Center" HorizontalGap="20">
+                        <FluentStack Orientation="Orientation.Vertical">
+                            <FluentSelect TOption="UserResponseDto"
+                                          Label="@loc["AssignedOperator"]"
+                                          Name="OperatorUserId"
+                                          Items="users"
+                                          OptionText="@(u => $"{u.Name} {u.Surname}")"
+                                          OptionValue="@(u => u.Id.ToString())"
+                                          Placeholder="@loc["PleaseSelectAnOption"]"
+                                          @bind-Value="TicketForm.OperatorUserId">
+                            </FluentSelect>
+                        </FluentStack>
+
+                        @if (Content.InitialTicketData?.OperatorName is not null)
+                        {
+                            <FluentStack Orientation="Orientation.Vertical">
+                                <FluentLabel Weight="FontWeight.Bold">@loc["CurrentValue"]</FluentLabel>
+                                <span>@Content.InitialTicketData.OperatorName</span>
+                            </FluentStack>
+                        }
+                    </FluentStack>
                 }
                 else
                 {
                     <FluentLabel Weight="FontWeight.Bold">@loc["AssignedOperator"]</FluentLabel>
-                    <p>@users?.First(u => u.Id == new Guid(OperatorIdString)).Name</p>
+                    <p>@Content.InitialTicketData?.OperatorName</p>
                 }
             }
 
             @if (Content.IsEdit && Content.IsUser)
             {
                 <FluentLabel Weight="FontWeight.Bold">@loc["TicketType"]</FluentLabel>
-                <p>@GetTypeText(TicketRequest.Type)</p>
+                <p>@GetTypeText(TicketForm.Type)</p>
 
                 <FluentLabel Weight="FontWeight.Bold">@loc["Platform"]</FluentLabel>
-                <p>@platforms?.First(p => p.Id == new Guid(PlatformIdString)).Name</p>
+                <p>@Content.InitialTicketData?.PlatformName</p>
             }
             else
             {
                 <FluentRadioGroup Name="Type"
                                   LabelTemplate="@TicketTypeLabel"
                                   Orientation="Orientation.Vertical"
-                                  @bind-Value="TicketRequest.Type"
+                                  @bind-Value="TicketForm.Type"
                                   Required>
                     <FluentRadio Value="TicketType.Bug">@loc["Problem"]</FluentRadio>
                     <FluentRadio Value="TicketType.Feature">@loc["Suggestion"]</FluentRadio>
                 </FluentRadioGroup>
-                <FluentValidationMessage For="@(() => TicketRequest.Type)"/>
+                <FluentValidationMessage For="@(() => TicketForm.Type)"/>
 
-                <FluentSelect TOption="PlatformResponseDto"
-                              Label="@loc["Platform"]"
-                              Name="PlatformId"
-                              Items="platforms"
-                              OptionText="@(p => p.Name)"
-                              OptionValue="@(p => p.Id.ToString())"
-                              Placeholder="@loc["PleaseSelectAnOption"]"
-                              @bind-Value="PlatformIdString"
-                              Required>
-                </FluentSelect>
-                <FluentValidationMessage For="@(() => TicketRequest.PlatformId)"/>
+                <FluentStack Orientation="Orientation.Horizontal" HorizontalAlignment="HorizontalAlignment.Left" VerticalAlignment="VerticalAlignment.Center" HorizontalGap="20">
+                    <FluentStack Orientation="Orientation.Vertical">
+                        <FluentSelect TOption="PlatformResponseDto"
+                                      Label="@loc["Platform"]"
+                                      Name="PlatformId"
+                                      Items="platforms"
+                                      OptionText="@(p => p.Name)"
+                                      OptionValue="@(p => p.Id.ToString())"
+                                      Placeholder="@loc["PleaseSelectAnOption"]"
+                                      @bind-Value="TicketForm.PlatformId"
+                                      Required>
+                        </FluentSelect>
+                        <FluentValidationMessage For="@(() => TicketForm.PlatformId)" />
+                    </FluentStack>
+
+                    @if (Content.IsEdit)
+                    {
+                    <FluentStack Orientation="Orientation.Vertical">
+                        <FluentLabel Weight="FontWeight.Bold">@loc["CurrentValue"]</FluentLabel>
+                        <span>@Content.InitialTicketData?.PlatformName</span>
+                    </FluentStack>
+                    }
+                </FluentStack>
             }
 
             @if (Content.IsEdit && !Content.IsUser)
             {
                 <FluentLabel Weight="FontWeight.Bold">@loc["Title"]</FluentLabel>
-                <p>@TicketRequest.Title</p>
+                <p>@TicketForm.Title</p>
 
                 <FluentLabel Weight="FontWeight.Bold">@loc["Description"]</FluentLabel>
-                <p>@TicketRequest.Description</p>
+                <p>@TicketForm.Description</p>
             }
             else
             {
@@ -129,11 +154,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                                  Spellcheck="true"
                                  Style="width: 75%"
                                  ReadOnly="@(Content.IsEdit && !Content.IsUser)"
-                                 @bind-Value="TicketRequest.Title"
+                                 @bind-Value="TicketForm.Title"
                                  Required>
                     <FluentIcon Value="@(new Size20.TextT())" Color="@Color.Neutral" Slot="start"/>
                 </FluentTextField>
-                <FluentValidationMessage For="@(() => TicketRequest.Title)"/>
+                <FluentValidationMessage For="@(() => TicketForm.Title)"/>
 
                 <FluentTextArea Name="Description"
                                 Label="@loc["Description"]"
@@ -141,28 +166,28 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                                 Spellcheck="true"
                                 Style="width: 100%"
                                 ReadOnly="@(Content.IsEdit && !Content.IsUser)"
-                                @bind-Value="TicketRequest.Description"
+                                @bind-Value="TicketForm.Description"
                                 Required/>
-                <FluentValidationMessage For="@(() => TicketRequest.Description)"/>
+                <FluentValidationMessage For="@(() => TicketForm.Description)"/>
             }
 
             @if (Content.IsEdit && Content.IsUser)
             {
                 <FluentLabel Weight="FontWeight.Bold">@loc["Priority"]</FluentLabel>
-                <p>@GetPriorityText(TicketRequest.Priority)</p>
+                <p>@GetPriorityText(TicketForm.Priority)</p>
             }
             else
             {
                 <FluentRadioGroup Name="Priority"
                                   Label="@loc["Priority"]"
                                   Orientation="Orientation.Vertical"
-                                  @bind-Value="TicketRequest.Priority"
+                                  @bind-Value="TicketForm.Priority"
                                   Required>
                     <FluentRadio Value="Priority.Low">@loc["Low"]</FluentRadio>
                     <FluentRadio Value="Priority.Medium">@loc["Medium"]</FluentRadio>
                     <FluentRadio Value="Priority.High">@loc["High"]</FluentRadio>
                 </FluentRadioGroup>
-                <FluentValidationMessage For="@(() => TicketRequest.Priority)"/>
+                <FluentValidationMessage For="@(() => TicketForm.Priority)"/>
             }
 
             @if (!Content.IsEdit || photoPath is not null || videoPath is not null)
@@ -337,7 +362,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     [Parameter]
     public TicketDialogContent Content { get; set; } = default!;
 
-    [SupplyParameterFromForm] private TicketRequestDto TicketRequest { get; set; } = new();
+    [SupplyParameterFromForm] private TicketFormDto TicketForm { get; set; } = new();
 
     private IEnumerable<PlatformResponseDto>? platforms;
     private IEnumerable<UserResponseDto>? users;
@@ -347,18 +372,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     private bool showPhoto;
     private bool showVideo;
-
-    private string PlatformIdString
-    {
-        get => TicketRequest.PlatformId.ToString();
-        set => TicketRequest.PlatformId = Guid.TryParse(value, out var guid) ? guid : Guid.Empty;
-    }
-
-    private string OperatorIdString
-    {
-        get => TicketRequest.OperatorUserId?.ToString() ?? string.Empty;
-        set => TicketRequest.OperatorUserId = Guid.TryParse(value, out var guid) ? guid : null;
-    }
 
     private RenderFragment TicketTypeLabel => @<FluentStack Orientation="Orientation.Horizontal">
                                                   <FluentLabel>@loc["TicketType"]</FluentLabel>
@@ -384,7 +397,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
             if (Content.InitialTicketData is TicketResponseDto initialTicketData)
             {
-                TicketRequest = mapper.Map<TicketRequestDto>(Content.InitialTicketData);
+                TicketForm = mapper.Map<TicketFormDto>(Content.InitialTicketData);
+
+                // If the operator is editing the ticket, reset the operator and platform ids to empty the FluentSelect
+                if (Content.IsEdit && !Content.IsUser)
+                {
+                    TicketForm.PlatformId = "";
+                    TicketForm.OperatorUserId = null;
+                }
 
                 var attachments = await LoadAttachmentsAsync(new Dictionary<string, string> { { nameof(AttachmentRequestDto.TicketId), initialTicketData.Id.ToString() } });
 
@@ -429,18 +449,26 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
         try
         {
-            // Set the ticket creator to the current user before creating or updating the ticket.
             var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
             var user = authState.User;
 
             if (user.IsAuthenticated())
             {
                 var loggedInUser = await usersClient.GetAsync(user.GetEmail()!);
-                TicketRequest.CreatorUserId = loggedInUser.Id;
-                TicketRequest.Requester = loggedInUser.Id;
+
+                // Set the ticket creator to the current user before creating the ticket.
+                if (!Content.IsEdit)
+                {
+                TicketForm.CreatorUserId = loggedInUser.Id;
+                }
+
+                // Set the person requesting the ticket write operation since it's required for PUT requests.
+                TicketForm.Requester = loggedInUser.Id;
             }
 
-            var ticketResponse = Content.IsEdit ? await ticketsClient.PutAsync(Content.InitialTicketData!.Id, TicketRequest) : await ticketsClient.PostAsync(TicketRequest);
+            var ticketResponse = Content.IsEdit ?
+            await ticketsClient.PutAsync(Content.InitialTicketData!.Id, mapper.Map<TicketRequestDto>(TicketForm)) : 
+            await ticketsClient.PostAsync(mapper.Map<TicketRequestDto>(TicketForm));
 
             // Update the progress bar and the toast.
             progressToastParameters.Content.Progress = Content.IsEdit ? 100 : 50;

@@ -18,13 +18,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using ADAtickets.ApiService.Configs;
 using ADAtickets.ApiService.Repositories;
 using ADAtickets.Shared.Models;
 using Humanizer;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 
 namespace ADAtickets.ApiService.Services;
 
@@ -36,13 +36,19 @@ internal class TicketRepository(ADAticketsDbContext context) : ITicketRepository
     /// <inheritdoc cref="ITicketRepository.GetTicketByIdAsync" />
     public async Task<Ticket?> GetTicketByIdAsync(Guid id)
     {
-        return await context.Tickets.FindAsync(id);
+        return await context.Tickets.Include(t => t.CreatorUser)
+            .Include(t => t.OperatorUser)
+            .Include(t => t.Platform)
+            .FirstOrDefaultAsync(t => t.Id == id);
     }
 
     /// <inheritdoc cref="ITicketRepository.GetTicketsAsync" />
     public async Task<IEnumerable<Ticket>> GetTicketsAsync()
     {
-        return await context.Tickets.ToListAsync();
+        return await context.Tickets.Include(t => t.CreatorUser)
+            .Include(t => t.OperatorUser)
+            .Include(t => t.Platform)
+            .ToListAsync();
     }
 
     /// <inheritdoc cref="ITicketRepository.GetTicketsByAsync" />
@@ -52,7 +58,9 @@ internal class TicketRepository(ADAticketsDbContext context) : ITicketRepository
             "The comparison with the StringComparison overload is not translatable by Entity Framework and the EF.Function.ILike method is not standard SQL but PostgreSQL dialect.")]
     public async Task<IEnumerable<Ticket>> GetTicketsByAsync(IEnumerable<KeyValuePair<string, string>> filters)
     {
-        IQueryable<Ticket> query = context.Tickets.Include(t => t.CreatorUser);
+        IQueryable<Ticket> query = context.Tickets.Include(t => t.CreatorUser)
+            .Include(t => t.OperatorUser)
+            .Include(t => t.Platform);
 
         foreach (var filter in filters)
             switch (filter.Key.Pascalize())

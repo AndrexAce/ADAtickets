@@ -64,6 +64,10 @@ internal sealed class AutoMapperProfile : Profile
                 opt => opt.MapFrom(src => src.Notifications.Select(notifications => notifications.Id)))
             .ForMember(ticketDto => ticketDto.CreatorName,
                 opt => opt.MapFrom(src => $"{src.CreatorUser.Name} {src.CreatorUser.Surname}"))
+            .ForMember(ticketDto => ticketDto.OperatorName,
+                opt => opt.MapFrom(src => src.OperatorUser == null ? null : $"{src.OperatorUser.Name} {src.OperatorUser.Surname}"))
+            .ForMember(ticketDto => ticketDto.PlatformName,
+                opt => opt.MapFrom(src => src.Platform.Name))
             .ForMember(ticketDto => ticketDto.LastUpdateDateTime,
                 opt => opt.MapFrom(src =>
                     src.Edits.Any() ? src.Edits.MaxBy(edit => edit.EditDateTime)!.EditDateTime : src.CreationDateTime));

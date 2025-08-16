@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+using ADAtickets.Shared.Dtos.Forms;
 using ADAtickets.Shared.Dtos.Requests;
 using ADAtickets.Shared.Dtos.Responses;
 using AutoMapper;
@@ -54,5 +55,9 @@ internal sealed class AutoMapperProfile : Profile
         _ = CreateMap<UserPlatformResponseDto, UserPlatformRequestDto>(MemberList.Destination);
 
         _ = CreateMap<UserNotificationResponseDto, UserNotificationRequestDto>(MemberList.Destination);
+
+        _ = CreateMap<TicketResponseDto, TicketFormDto>(MemberList.Destination)
+            .ForMember(ticketForm => ticketForm.Requester, opt => opt.Ignore());
+        _ = CreateMap<TicketFormDto, TicketRequestDto>(MemberList.Destination);
     }
 }
