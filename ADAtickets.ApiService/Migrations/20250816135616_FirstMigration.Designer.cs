@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ADAtickets.ApiService.Migrations
 {
     [DbContext(typeof(ADAticketsDbContext))]
-    [Migration("20250815095100_FirstMigration")]
+    [Migration("20250816135616_FirstMigration")]
     partial class FirstMigration
     {
         /// <inheritdoc />
@@ -345,6 +345,12 @@ namespace ADAtickets.ApiService.Migrations
                     b.Property<UserType>("Type")
                         .HasColumnType("user_type")
                         .HasColumnName("type");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("username");
 
                     b.Property<uint>("Version")
                         .IsConcurrencyToken()

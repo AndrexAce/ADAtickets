@@ -115,7 +115,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                                  Label="@loc["UsernameLabel"]"
                                  Spellcheck="true"
                                  Style="width: 100%"
-                                 @bind-Value="username"
+                                 @bind-Value="UserRequest.Username"
                                  Required>
                     <FluentIcon Value="@(new Size20.Person())" Color="@Color.Neutral" Slot="start"/>
                 </FluentTextField>
@@ -184,7 +184,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     private IEnumerable<PlatformResponseDto>? favouritePlatforms;
     private string? favouritePlatformNames;
     private Guid? currentUserId;
-    private string? username;
 
     protected override async Task OnInitializedAsync()
     {
@@ -201,7 +200,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 UserRequest.Email = Content.GetEmail() ?? string.Empty;
                 UserRequest.Name = Content.GetName() ?? string.Empty;
                 UserRequest.Surname = Content.GetSurname() ?? string.Empty;
-                username = Content.GetUsername() ?? string.Empty;
+                UserRequest.Username = Content.GetUsername() ?? string.Empty;
             }
 
             if (Content.GetTenantId() == configuration["Entra:TenantId"])
@@ -223,7 +222,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     {
         var getResponse = await usersClient.GetAsync(Content.GetEmail()!);
 
-        return getResponse.Email == Content.GetEmail() && getResponse.Name == Content.GetName() && getResponse.Surname == Content.GetSurname();
+        return getResponse.Email == Content.GetEmail() && getResponse.Username == Content.GetUsername() && getResponse.Name == Content.GetName() && getResponse.Surname == Content.GetSurname();
     }
 
     private async Task AlignDbUserWithEntra()
@@ -231,6 +230,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         var newData = new UserRequestDto
         {
             Email = Content.GetEmail() ?? string.Empty,
+            Username = Content.GetUsername() ?? string.Empty,
             Name = Content.GetName() ?? string.Empty,
             Surname = Content.GetSurname() ?? string.Empty
         };
@@ -382,7 +382,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     {
         dynamic jsonContent = new ExpandoObject();
 
-        jsonContent.DisplayName = username;
+        jsonContent.DisplayName = UserRequest.Username;
         jsonContent.GivenName = UserRequest.Name;
         jsonContent.Surname = UserRequest.Surname;
 

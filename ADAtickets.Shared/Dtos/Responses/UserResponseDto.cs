@@ -18,8 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using System.Text.Json.Serialization;
 using ADAtickets.Shared.Models;
+using System.Text.Json.Serialization;
 
 namespace ADAtickets.Shared.Dtos.Responses;
 
@@ -33,6 +33,11 @@ public sealed class UserResponseDto : ResponseDto
     ///     The email address of the user.
     /// </summary>
     public string Email { get; init; } = string.Empty;
+
+    /// <summary>
+    ///     The username of the user.
+    /// </summary>
+    public string Username { get; init; } = string.Empty;
 
     /// <summary>
     ///     The name of the user.

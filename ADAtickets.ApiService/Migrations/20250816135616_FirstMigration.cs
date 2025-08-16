@@ -1,4 +1,5 @@
-﻿using ADAtickets.Shared.Models;
+﻿using System;
+using ADAtickets.Shared.Models;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -37,6 +38,7 @@ namespace ADAtickets.ApiService.Migrations
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     email = table.Column<string>(type: "text", nullable: false),
+                    username = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     surname = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     are_email_notifications_enabled = table.Column<bool>(type: "boolean", nullable: false),

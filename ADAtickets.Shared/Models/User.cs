@@ -18,12 +18,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+using AutoMapper.Configuration.Annotations;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
-using AutoMapper.Configuration.Annotations;
-using Microsoft.EntityFrameworkCore;
 
 namespace ADAtickets.Shared.Models;
 
@@ -41,6 +41,13 @@ public sealed class User : Entity
     [Required]
     [EmailAddress]
     public string Email { get; set; } = string.Empty;
+
+    /// <summary>
+    ///     The username of the user.
+    /// </summary>
+    [Required]
+    [MaxLength(50)]
+    public string Username { get; set; } = string.Empty;
 
     /// <summary>
     ///     The name of the user.

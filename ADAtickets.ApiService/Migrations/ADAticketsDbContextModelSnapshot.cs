@@ -343,6 +343,12 @@ namespace ADAtickets.ApiService.Migrations
                         .HasColumnType("user_type")
                         .HasColumnName("type");
 
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("username");
+
                     b.Property<uint>("Version")
                         .IsConcurrencyToken()
                         .ValueGeneratedOnAddOrUpdate()

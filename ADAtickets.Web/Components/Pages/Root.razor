@@ -90,6 +90,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             return await usersClient.PostAsync(new UserRequestDto
             {
                 Email = userEmail,
+                Username = user.GetUsername()!,
                 Name = user.GetName()!,
                 Surname = user.GetSurname()!,
                 Type = InferUserType(user),
