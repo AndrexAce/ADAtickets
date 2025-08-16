@@ -23,7 +23,7 @@ namespace ADAtickets.Web.Components.Utilities;
 /// <summary>
 ///     Wraps the event arguments for the <see cref="TicketCard.SelectedChanged" /> event.
 /// </summary>
-public class SelectedChangedEventArgs : EventArgs
+public sealed class SelectedChangedEventArgs : EventArgs
 {
     /// <summary>
     ///     The ID of the ticket bound to the card.

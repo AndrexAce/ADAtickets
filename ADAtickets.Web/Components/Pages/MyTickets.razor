@@ -18,6 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @implements IDisposable
 @page "/my-tickets"
 @layout MainLayout
+
 @using System.Security.Claims
 @using ADAtickets.Client
 @using ADAtickets.Shared.Constants
@@ -323,7 +324,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     {
         // Subscribe to refresh events
         ticketRefreshService.RefreshRequested += HandleRefreshRequested;
-
+        
         try
         {
             await LoadUsersAsync();
@@ -335,6 +336,17 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         {
             toastService.ShowCommunicationToast(Toasts.ErrorToastParameters(ex, loc["LoadingErrorToastTitle"], loc["LoadingErrorToastDetails"]));
         }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Start auto-refresh after the component is fully rendered
+            ticketRefreshService.StartAutoRefresh();
+        }
+        
+        await base.OnAfterRenderAsync(firstRender);
     }
 
     private async Task LoadUsersAsync()
@@ -779,7 +791,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     public void Dispose()
     {
-        // Unsubscribe to prevent memory leaks
+        // Stop auto-refresh and unsubscribe to prevent memory leaks
+        ticketRefreshService.StopAutoRefresh();
         ticketRefreshService.RefreshRequested -= HandleRefreshRequested;
+        ticketRefreshService.Dispose();
     }
 }
