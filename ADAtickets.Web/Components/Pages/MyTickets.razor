@@ -340,13 +340,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     private async Task SetupSignalR()
     {
-        // Connect to the hub
-        await signalRService.StartAsync($"{configuration["ADAticketsAPI:BaseUrl"]}/ticketsHub");
-
         // Register handlers for API-triggered methods
-        signalRService.On("TicketUpdated", HandleRefreshRequested);
-        signalRService.On("TicketCreated", HandleRefreshRequested);
-        signalRService.On("TicketDeleted", HandleRefreshRequested);
+        Action handlersRegistration = () =>
+        {
+            signalRService.On("TicketUpdated", HandleRefreshRequested);
+            signalRService.On("TicketCreated", HandleRefreshRequested);
+            signalRService.On("TicketDeleted", HandleRefreshRequested);
+        };
+
+        // Connect to the hub
+        await signalRService.StartAsync($"{configuration["ADAticketsAPI:BaseUrl"]}/ticketsHub", handlersRegistration);
     }
 
     private async Task LoadUsersAsync()

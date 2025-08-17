@@ -83,7 +83,7 @@ internal static class Program
                         .EnableRetryOnFailure();
                 })
                 .UseSnakeCaseNamingConvention();
-        });
+        }, ServiceLifetime.Transient);
 
         // Add JWTs decoding for both Entra ID and Entra External ID.
         var authBuilder = builder.Services.AddAuthentication();

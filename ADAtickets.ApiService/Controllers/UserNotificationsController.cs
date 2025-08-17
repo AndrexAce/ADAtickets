@@ -51,7 +51,6 @@ namespace ADAtickets.ApiService.Controllers;
 [Produces(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
 [FormatFilter]
 [ApiConventionType(typeof(ApiConventions))]
-[Authorize(Policy.OperatorOrAdmin)]
 public sealed class UserNotificationsController(
     IUserNotificationRepository userNotificationRepository,
     IMapper mapper,
@@ -80,6 +79,7 @@ public sealed class UserNotificationsController(
     /// <response code="403">The client was authenticated but had not enough privileges.</response>
     /// <response code="406">The client asked for an unsupported response format.</response>
     [HttpGet]
+    [Authorize(Policy.Everyone)]
     [RequiredScope(Scope.Read)]
     public async Task<ActionResult<IEnumerable<UserNotificationResponseDto>>> GetUserNotifications(
         [FromQuery] Dictionary<string, string>? filters)
@@ -106,6 +106,7 @@ public sealed class UserNotificationsController(
     /// <response code="404">The entity with the given id didn't exist.</response>
     /// <response code="406">The client asked for an unsupported response format.</response>
     [HttpGet("{id:guid}")]
+    [Authorize(Policy.AdminOnly)]
     [RequiredScope(Scope.Read)]
     public async Task<ActionResult<UserNotificationResponseDto>> GetUserNotification(Guid id)
     {
@@ -151,6 +152,7 @@ public sealed class UserNotificationsController(
     /// <response code="406">The client asked for an unsupported response format.</response>
     /// <response code="409">The entity was updated by another request at the same time.</response>
     [HttpPut("{id:guid}")]
+    [Authorize(Policy.Everyone)]
     [RequiredScope(Scope.Read, Scope.Write)]
     public async Task<ActionResult<UserNotificationResponseDto>> PutUserNotification(Guid id,
         UserNotificationRequestDto userNotificationDto)
@@ -210,6 +212,7 @@ public sealed class UserNotificationsController(
     /// <response code="403">The client was authenticated but had not enough privileges.</response>
     /// <response code="406">The client asked for an unsupported response format.</response>
     [HttpPost]
+    [Authorize(Policy.AdminOnly)]
     [RequiredScope(Scope.Read, Scope.Write)]
     public async Task<ActionResult<UserNotificationResponseDto>> PostUserNotification(
         UserNotificationRequestDto userNotificationDto)
@@ -239,6 +242,7 @@ public sealed class UserNotificationsController(
     /// <response code="404">The entity with the given id didn't exist.</response>
     /// <response code="406">The client asked for an unsupported response format.</response>
     [HttpDelete("{id:guid}")]
+    [Authorize(Policy.AdminOnly)]
     [RequiredScope(Scope.Read, Scope.Write)]
     public async Task<IActionResult> DeleteUserNotification(Guid id)
     {

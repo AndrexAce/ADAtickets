@@ -37,7 +37,7 @@ public sealed class UserNotificationsClient(
     AuthenticationStateProvider authenticationStateProvider,
     IDownstreamApi downstreamApi,
     IConfiguration configuration)
-    : Client<UserPlatformResponseDto, UserPlatformRequestDto>(authenticationStateProvider, downstreamApi, configuration)
+    : Client<UserNotificationResponseDto, UserNotificationRequestDto>(authenticationStateProvider, downstreamApi, configuration)
 {
     /// <inheritdoc cref="Client{TResponse, TRequest}.ControllerName" />
     protected override string ControllerName => Controller.UserNotifications;

@@ -33,13 +33,16 @@ public sealed class SignalRService : IAsyncDisposable
     ///     Starts the SignalR connection to the specified hub URL.
     /// </summary>
     /// <param name="hubUrl">URL of the hub to connect to.</param>
+    /// <param name="handlersRegistration">Function where all the method handlers called by the hubs are registered.</param>
     /// <returns>A <see cref="Task"/> running the operation.</returns>
-    public async Task StartAsync(string hubUrl)
+    public async Task StartAsync(string hubUrl, Action handlersRegistration)
     {
         hubConnection = new HubConnectionBuilder()
             .WithUrl(hubUrl)
             .WithAutomaticReconnect()
             .Build();
+
+        handlersRegistration.Invoke();
 
         await hubConnection.StartAsync();
     }
