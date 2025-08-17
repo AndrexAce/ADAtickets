@@ -121,10 +121,6 @@ namespace ADAtickets.ApiService.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<bool>("IsRead")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_read");
-
                     b.Property<string>("Message")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -371,6 +367,10 @@ namespace ADAtickets.ApiService.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("id");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_read");
 
                     b.Property<Guid>("NotificationId")
                         .HasColumnType("uuid")

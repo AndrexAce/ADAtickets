@@ -429,7 +429,6 @@ public sealed class NotificationsController(
             TicketId = ticketId,
             Message = message,
             SendDateTime = DateTimeOffset.UtcNow,
-            IsRead = false,
             UserId = userId
         };
 
@@ -443,7 +442,8 @@ public sealed class NotificationsController(
         var userNotification = new UserNotification
         {
             NotificationId = notificationId,
-            ReceiverUserId = receiverUserId
+            ReceiverUserId = receiverUserId,
+            IsRead = false
         };
 
         await userNotificationRepository.AddUserNotificationAsync(userNotification);

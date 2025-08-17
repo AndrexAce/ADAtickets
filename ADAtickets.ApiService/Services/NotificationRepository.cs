@@ -72,10 +72,6 @@ internal class NotificationRepository(ADAticketsDbContext context) : INotificati
                     query = query.Where(notification => notification.UserId == outUserId);
                     break;
 
-                case nameof(Notification.IsRead) when bool.TryParse(filter.Value, out var outIsRead):
-                    query = query.Where(notification => notification.IsRead == outIsRead);
-                    break;
-
                 case nameof(Notification.SendDateTime) when DateTimeOffset.TryParse(filter.Value,
                     CultureInfo.InvariantCulture, out var outSendDateTime):
                     query = query.Where(notification => notification.SendDateTime.Date == outSendDateTime.Date);

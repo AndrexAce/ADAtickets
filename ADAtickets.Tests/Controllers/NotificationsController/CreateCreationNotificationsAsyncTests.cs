@@ -122,8 +122,7 @@ public sealed class CreateCreationNotificationsAsyncTests
             It.Is<Notification>(n =>
                 n.TicketId == ticketId &&
                 n.Message == Notifications.TicketCreated &&
-                n.UserId == creatorUserId &&
-                !n.IsRead)), Times.Once);
+                n.UserId == creatorUserId)), Times.Once);
 
         // Verify all operators (Admin + Operator types) were notified - should be 2 notifications
         _mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()),

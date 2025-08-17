@@ -18,11 +18,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+using AutoMapper.Configuration.Annotations;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
-using AutoMapper.Configuration.Annotations;
 
 namespace ADAtickets.Shared.Models;
 
@@ -45,12 +45,6 @@ public sealed class Notification : Entity
     [Required]
     [MaxLength(200)]
     public string Message { get; set; } = string.Empty;
-
-    /// <summary>
-    ///     Whether the notification has been read by the user.
-    /// </summary>
-    [Required]
-    public bool IsRead { get; set; } = false;
 
     /// <summary>
     ///     The id of the ticket this notification is related to.

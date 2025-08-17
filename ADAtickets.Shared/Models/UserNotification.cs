@@ -18,12 +18,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+using AutoMapper.Configuration.Annotations;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
-using AutoMapper.Configuration.Annotations;
-using Microsoft.EntityFrameworkCore;
 
 namespace ADAtickets.Shared.Models;
 
@@ -64,4 +64,10 @@ public sealed class UserNotification : Entity
     [Ignore]
     [JsonIgnore]
     public Notification Notification { get; set; } = null!;
+
+    /// <summary>
+    ///     Whether the notification has been read by the user.
+    /// </summary>
+    [Required]
+    public bool IsRead { get; set; } = false;
 }

@@ -107,8 +107,7 @@ public sealed class CreateEditNotificationsAsyncTests
             It.Is<Notification>(n =>
                 n.TicketId == ticketId &&
                 n.Message == Notifications.TicketEdited &&
-                n.UserId == editorUserId &&
-                !n.IsRead)), Times.Once);
+                n.UserId == editorUserId)), Times.Once);
 
         // Verify assigned operator was notified
         _mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(

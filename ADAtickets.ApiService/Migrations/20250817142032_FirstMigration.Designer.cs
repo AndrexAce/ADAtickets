@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ADAtickets.ApiService.Migrations
 {
     [DbContext(typeof(ADAticketsDbContext))]
-    [Migration("20250816135616_FirstMigration")]
+    [Migration("20250817142032_FirstMigration")]
     partial class FirstMigration
     {
         /// <inheritdoc />
@@ -123,10 +123,6 @@ namespace ADAtickets.ApiService.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("id");
-
-                    b.Property<bool>("IsRead")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_read");
 
                     b.Property<string>("Message")
                         .IsRequired()
@@ -374,6 +370,10 @@ namespace ADAtickets.ApiService.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("id");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_read");
 
                     b.Property<Guid>("NotificationId")
                         .HasColumnType("uuid")

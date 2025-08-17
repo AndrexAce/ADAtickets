@@ -18,8 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using System.ComponentModel.DataAnnotations;
 using ADAtickets.Shared.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace ADAtickets.Shared.Dtos.Requests;
 
@@ -43,4 +43,10 @@ public sealed class UserNotificationRequestDto : RequestDto
     /// </summary>
     [Required]
     public Guid NotificationId { get; set; } = Guid.Empty;
+
+    /// <summary>
+    ///     Whether the notification has been read by the user.
+    /// </summary>
+    [Required]
+    public bool IsRead { get; set; } = false;
 }

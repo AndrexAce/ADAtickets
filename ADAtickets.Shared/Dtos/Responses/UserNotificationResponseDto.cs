@@ -40,4 +40,9 @@ public sealed class UserNotificationResponseDto : ResponseDto
     ///     The unique identifier of the notification.
     /// </summary>
     public Guid NotificationId { get; set; } = Guid.Empty;
+
+    /// <summary>
+    ///     Whether the notification has been read by the user.
+    /// </summary>
+    public bool IsRead { get; set; } = false;
 }

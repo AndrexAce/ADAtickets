@@ -44,12 +44,6 @@ public sealed class NotificationRequestDto : RequestDto
     public string Message { get; set; } = string.Empty;
 
     /// <summary>
-    ///     Whether the notification has been read by the user.
-    /// </summary>
-    [Required]
-    public bool IsRead { get; set; } = false;
-
-    /// <summary>
     ///     The id of the ticket this notification is related to.
     /// </summary>
     [Required]

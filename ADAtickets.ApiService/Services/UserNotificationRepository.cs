@@ -65,6 +65,10 @@ internal class UserNotificationRepository(ADAticketsDbContext context) : IUserNo
                     when Guid.TryParse(filter.Value, out var outNotificationId):
                     query = query.Where(u => u.NotificationId == outNotificationId);
                     break;
+
+                case nameof(UserNotification.IsRead) when bool.TryParse(filter.Value, out var outIsRead):
+                    query = query.Where(notification => notification.IsRead == outIsRead);
+                    break;
             }
 
         return await query.ToListAsync();

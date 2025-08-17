@@ -40,11 +40,6 @@ public sealed class NotificationResponseDto : ResponseDto
     public string Message { get; init; } = string.Empty;
 
     /// <summary>
-    ///     Whether the notification has been read by the user.
-    /// </summary>
-    public bool IsRead { get; init; } = false;
-
-    /// <summary>
     ///     The id of the ticket this notification is related to.
     /// </summary>
     public Guid TicketId { get; init; } = Guid.Empty;

@@ -172,7 +172,6 @@ namespace ADAtickets.ApiService.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     send_date_time = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     message = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    is_read = table.Column<bool>(type: "boolean", nullable: false),
                     ticket_id = table.Column<Guid>(type: "uuid", nullable: false),
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
@@ -229,6 +228,7 @@ namespace ADAtickets.ApiService.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     receiver_user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     notification_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    is_read = table.Column<bool>(type: "boolean", nullable: false),
                     xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
                 },
                 constraints: table =>

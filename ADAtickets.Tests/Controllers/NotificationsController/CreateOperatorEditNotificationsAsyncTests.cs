@@ -118,8 +118,7 @@ public sealed class CreateOperatorEditNotificationsAsyncTests
             It.Is<Notification>(n =>
                 n.TicketId == ticketId &&
                 n.Message == Notifications.TicketUnassigned &&
-                n.UserId == editorUserId &&
-                !n.IsRead)), Times.Once);
+                n.UserId == editorUserId)), Times.Once);
 
         // Verify creator notification link was created
         _mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(
@@ -176,16 +175,14 @@ public sealed class CreateOperatorEditNotificationsAsyncTests
             It.Is<Notification>(n =>
                 n.TicketId == ticketId &&
                 n.Message == Notifications.TicketAssignedToYou &&
-                n.UserId == newOperatorUserId &&
-                !n.IsRead)), Times.Once);
+                n.UserId == newOperatorUserId)), Times.Once);
 
         // Verify "ticket assigned" notification for creator and old operator
         _mockNotificationRepository.Verify(x => x.AddNotificationAsync(
             It.Is<Notification>(n =>
                 n.TicketId == ticketId &&
                 n.Message == Notifications.TicketAssigned &&
-                n.UserId == newOperatorUserId &&
-                !n.IsRead)), Times.Once);
+                n.UserId == newOperatorUserId)), Times.Once);
 
         // Verify new operator notification link
         _mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(
@@ -240,16 +237,14 @@ public sealed class CreateOperatorEditNotificationsAsyncTests
             It.Is<Notification>(n =>
                 n.TicketId == ticketId &&
                 n.Message == Notifications.TicketAssignedToYou &&
-                n.UserId == newOperatorUserId &&
-                !n.IsRead)), Times.Once);
+                n.UserId == newOperatorUserId)), Times.Once);
 
         // Verify "ticket assigned" notification for creator and old operator
         _mockNotificationRepository.Verify(x => x.AddNotificationAsync(
             It.Is<Notification>(n =>
                 n.TicketId == ticketId &&
                 n.Message == Notifications.TicketAssigned &&
-                n.UserId == newOperatorUserId &&
-                !n.IsRead)), Times.Once);
+                n.UserId == newOperatorUserId)), Times.Once);
 
         // Verify new operator notification link
         _mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(
