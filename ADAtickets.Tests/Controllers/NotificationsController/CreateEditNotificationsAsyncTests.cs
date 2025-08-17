@@ -18,10 +18,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+using ADAtickets.ApiService.Hubs;
 using ADAtickets.ApiService.Repositories;
 using ADAtickets.Shared.Constants;
 using ADAtickets.Shared.Models;
 using AutoMapper;
+using Microsoft.AspNetCore.SignalR;
 using Moq;
 using Controller = ADAtickets.ApiService.Controllers.NotificationsController;
 
@@ -48,6 +50,7 @@ public sealed class CreateEditNotificationsAsyncTests
     private readonly Mock<IUserNotificationRepository> _mockUserNotificationRepository;
     private readonly Mock<IUserPlatformRepository> _mockUserPlatformRepository;
     private readonly Mock<IUserRepository> _mockUserRepository;
+    private readonly Mock<IHubContext<NotificationsHub>> _mockHubContext;
 
     public CreateEditNotificationsAsyncTests()
     {
@@ -56,13 +59,15 @@ public sealed class CreateEditNotificationsAsyncTests
         _mockUserPlatformRepository = new Mock<IUserPlatformRepository>();
         _mockUserRepository = new Mock<IUserRepository>();
         _mockMapper = new Mock<IMapper>();
+        _mockHubContext = new Mock<IHubContext<NotificationsHub>>();
 
         _controller = new Controller(
             _mockNotificationRepository.Object,
             _mockMapper.Object,
             _mockUserNotificationRepository.Object,
             _mockUserPlatformRepository.Object,
-            _mockUserRepository.Object);
+            _mockUserRepository.Object,
+            _mockHubContext.Object);
     }
 
     #region CreateEditNotificationsAsync Tests

@@ -18,13 +18,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using ADAtickets.ApiService.Configs;
 using ADAtickets.ApiService.Repositories;
 using ADAtickets.Shared.Models;
 using Humanizer;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 
 namespace ADAtickets.ApiService.Services;
 
@@ -36,13 +36,15 @@ internal class NotificationRepository(ADAticketsDbContext context) : INotificati
     /// <inheritdoc cref="INotificationRepository.GetNotificationByIdAsync" />
     public async Task<Notification?> GetNotificationByIdAsync(Guid id)
     {
-        return await context.Notifications.FindAsync(id);
+        return await context.Notifications.Include(n => n.UserNotifications)
+            .FirstOrDefaultAsync(n => n.Id == id);
     }
 
     /// <inheritdoc cref="INotificationRepository.GetNotificationsAsync" />
     public async Task<IEnumerable<Notification>> GetNotificationsAsync()
     {
-        return await context.Notifications.ToListAsync();
+        return await context.Notifications.Include(n => n.UserNotifications)
+            .ToListAsync();
     }
 
     /// <inheritdoc cref="INotificationRepository.GetNotificationsByAsync" />

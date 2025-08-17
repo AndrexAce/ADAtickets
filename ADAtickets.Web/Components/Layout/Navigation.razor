@@ -24,7 +24,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
 @inject IStringLocalizer<Navigation> loc
 @inject IDialogService dialogService
-@inject TicketRefreshService ticketRefreshService
 
 <div class="nav-menu">
     <FluentNavMenu Width="250" Collapsible="true" CollapsedChildNavigation="true">
@@ -66,7 +65,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             {
                 IsEdit = false,
                 IsUser = true,
-                StateChanged = EventCallback.Factory.Create(this, HandleTicketStateChanged),
                 InitialTicketData = null
             },
             new DialogParameters
@@ -76,11 +74,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 PreventDismissOnOverlayClick = true
             }
         );
-    }
-
-    private void HandleTicketStateChanged()
-    {
-        ticketRefreshService.RequestRefresh();
     }
 
     private async Task ShowThemeAndPersonalizationDialogAsync()

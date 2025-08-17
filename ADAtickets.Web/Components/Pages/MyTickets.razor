@@ -15,7 +15,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
-@implements IDisposable
+@implements IAsyncDisposable
 @page "/my-tickets"
 @layout MainLayout
 
@@ -46,7 +46,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @inject IMapper mapper
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject IConfiguration configuration
-@inject TicketRefreshService ticketRefreshService
+@inject SignalRService signalRService
 
 @attribute [Authorize(Policy = Policy.Everyone)]
 
@@ -323,8 +323,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     protected override async Task OnInitializedAsync()
     {
         // Subscribe to refresh events
-        ticketRefreshService.RefreshRequested += HandleRefreshRequested;
-        
+        await SetupSignalR();
+
         try
         {
             await LoadUsersAsync();
@@ -338,15 +338,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         }
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    private async Task SetupSignalR()
     {
-        if (firstRender)
-        {
-            // Start auto-refresh after the component is fully rendered
-            ticketRefreshService.StartAutoRefresh();
-        }
-        
-        await base.OnAfterRenderAsync(firstRender);
+        // Connect to the hub
+        await signalRService.StartAsync($"{configuration["ADAticketsAPI:BaseUrl"]}/ticketsHub");
+
+        // Register handlers for API-triggered methods
+        signalRService.On("TicketUpdated", HandleRefreshRequested);
+        signalRService.On("TicketCreated", HandleRefreshRequested);
+        signalRService.On("TicketDeleted", HandleRefreshRequested);
     }
 
     private async Task LoadUsersAsync()
@@ -375,11 +375,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     #region Event handlers
 
-    private async void HandleRefreshRequested()
+    private async Task HandleRefreshRequested()
     {
         try
         {
             await LoadTicketsAsync(await GetBaseFiltersAsync());
+
             await InvokeAsync(StateHasChanged);
         }
         catch (Exception ex)
@@ -789,11 +790,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     #endregion
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
-        // Stop auto-refresh and unsubscribe to prevent memory leaks
-        ticketRefreshService.StopAutoRefresh();
-        ticketRefreshService.RefreshRequested -= HandleRefreshRequested;
-        ticketRefreshService.Dispose();
+        await signalRService.StopAsync();
     }
 }

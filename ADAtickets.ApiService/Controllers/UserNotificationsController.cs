@@ -18,8 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using System.Net.Mime;
 using ADAtickets.ApiService.Configs;
+using ADAtickets.ApiService.Hubs;
 using ADAtickets.ApiService.Repositories;
 using ADAtickets.Shared.Constants;
 using ADAtickets.Shared.Dtos.Requests;
@@ -28,8 +28,10 @@ using ADAtickets.Shared.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web.Resource;
+using System.Net.Mime;
 using Controller = ADAtickets.Shared.Constants.Controller;
 
 namespace ADAtickets.ApiService.Controllers;
@@ -42,6 +44,7 @@ namespace ADAtickets.ApiService.Controllers;
 ///     Object definining the mappings of fields between the <see cref="UserNotification" /> entity and
 ///     its <see cref="UserNotificationRequestDto" /> or <see cref="UserNotificationResponseDto" /> correspondant.
 /// </param>
+/// <param name="notificationsHub">SignalR hub managing the real-time updates of notifications.</param>
 [Route($"v{Service.APIVersion}/{Controller.UserNotifications}")]
 [ApiController]
 [Consumes(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
@@ -49,8 +52,11 @@ namespace ADAtickets.ApiService.Controllers;
 [FormatFilter]
 [ApiConventionType(typeof(ApiConventions))]
 [Authorize(Policy.OperatorOrAdmin)]
-public sealed class UserNotificationsController(IUserNotificationRepository userNotificationRepository, IMapper mapper)
-    : ControllerBase
+public sealed class UserNotificationsController(
+    IUserNotificationRepository userNotificationRepository,
+    IMapper mapper,
+    IHubContext<NotificationsHub> notificationsHub
+) : ControllerBase
 {
     /// <summary>
     ///     Fetch all the <see cref="UserNotification" /> entities or all the entities respecting the given criteria.
@@ -168,6 +174,9 @@ public sealed class UserNotificationsController(IUserNotificationRepository user
             return Conflict();
         }
 
+        // Send a signal to the people who have received this notification and are connected to this hub.
+        await notificationsHub.Clients.Group($"user_{userNotification.ReceiverUserId}").SendAsync("UserNotificationUpdated");
+
         return NoContent();
     }
 
@@ -210,6 +219,9 @@ public sealed class UserNotificationsController(IUserNotificationRepository user
         // Insert the DTO info into a new entity and add it to the data source.
         await userNotificationRepository.AddUserNotificationAsync(userNotification);
 
+        // Send a signal to the people who received this notification and are connected to this hub.
+        await notificationsHub.Clients.Group($"user_{userNotification.ReceiverUserId}").SendAsync("UserNotificationCreated");
+
         // Return the created entity and its location to the client.
         return CreatedAtAction(nameof(GetUserNotification), new { id = userNotification.Id },
             mapper.Map<UserNotificationResponseDto>(userNotification));
@@ -235,6 +247,9 @@ public sealed class UserNotificationsController(IUserNotificationRepository user
             return NotFound();
 
         await userNotificationRepository.DeleteUserNotificationAsync(userNotification);
+
+        // Send a signal to the people who have received this notification and are connected to this hub.
+        await notificationsHub.Clients.Group($"user_{userNotification.ReceiverUserId}").SendAsync("UserNotificationDeleted");
 
         return NoContent();
     }

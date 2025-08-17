@@ -20,6 +20,7 @@
 
 using ADAtickets.ApiService.Configs;
 using ADAtickets.ApiService.Controllers;
+using ADAtickets.ApiService.Hubs;
 using ADAtickets.ApiService.Repositories;
 using ADAtickets.ApiService.Services;
 using ADAtickets.Shared.Constants;
@@ -175,6 +176,9 @@ internal static class Program
                 .PersistKeysToStackExchangeRedis(
                     ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString(Service.Cache)!),
                     "ApiService-DataProtection-Keys");
+
+        // Add real-time communication with SignalR.
+        builder.Services.AddSignalR();
     }
 
     /// <summary>
@@ -221,6 +225,10 @@ internal static class Program
 
         // Map the controllers endpoints for business logic APIs.
         _ = app.MapControllers();
+
+        // Map hubs endpoints.
+        app.MapHub<TicketsHub>("/ticketsHub");
+        app.MapHub<NotificationsHub>("/notificationsHub");
     }
 
     private static void CreatePolicies(AuthorizationBuilder authorizationBuilder, ConfigurationManager configuration)

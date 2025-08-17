@@ -19,6 +19,7 @@
  */
 
 using ADAtickets.ApiService.Configs;
+using ADAtickets.ApiService.Hubs;
 using ADAtickets.ApiService.Repositories;
 using ADAtickets.Shared.Constants;
 using ADAtickets.Shared.Dtos.Requests;
@@ -27,6 +28,7 @@ using ADAtickets.Shared.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web.Resource;
 using System.Net.Mime;
@@ -42,6 +44,7 @@ namespace ADAtickets.ApiService.Controllers;
 ///     Object definining the mappings of fields between the <see cref="Ticket" /> entity and its
 ///     <see cref="TicketRequestDto" /> or <see cref="TicketResponseDto" /> correspondant.
 /// </param>
+/// <param name="ticketsHub">SignalR hub managing the real-time updates of tickets.</param>
 /// <param name="notificationsController">Controller managing the notifications.</param>
 /// <param name="editsController">Controller managing the edits.</param>
 /// <param name="azureDevOpsController">Controller managing the interaction with Azure DevOps.</param>
@@ -54,6 +57,7 @@ namespace ADAtickets.ApiService.Controllers;
 public sealed class TicketsController(
     ITicketRepository ticketRepository,
     IMapper mapper,
+    IHubContext<TicketsHub> ticketsHub,
     NotificationsController notificationsController,
     EditsController editsController,
     AzureDevOpsController azureDevOpsController
@@ -203,6 +207,9 @@ public sealed class TicketsController(
             return Conflict();
         }
 
+        // Send a signal to everyone connected to this hub.
+        await ticketsHub.Clients.All.SendAsync("TicketUpdated");
+
         return NoContent();
     }
 
@@ -263,6 +270,9 @@ public sealed class TicketsController(
         // Create notifications, assign the ticket and create the first edits.
         await ProcessTicketCreationAsync(ticket);
 
+        // Send a signal to everyone connected to this hub.
+        await ticketsHub.Clients.All.SendAsync("TicketCreated");
+
         // Return the created entity and its location to the client.
         return CreatedAtAction(nameof(GetTicket), new { id = ticket.Id }, mapper.Map<TicketResponseDto>(ticket));
     }
@@ -289,6 +299,9 @@ public sealed class TicketsController(
         await ticketRepository.DeleteTicketAsync(ticket);
 
         await azureDevOpsController.DeleteAzureDevOpsWorkItemAsync(ticket.WorkItemId);
+
+        // Send a signal to everyone connected to this hub.
+        await ticketsHub.Clients.All.SendAsync("TicketDeleted");
 
         return NoContent();
     }
