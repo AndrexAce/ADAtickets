@@ -15,16 +15,24 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
+@inherits ComponentBase
+@implements IAsyncDisposable
+
+@using ADAtickets.Client
+@using ADAtickets.Shared.Dtos.Responses
 @using ADAtickets.Shared.Extensions
 @using ADAtickets.Web.Components.Utilities
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.FluentUI.AspNetCore.Components.Icons.Regular
-@inherits ComponentBase
 
 @inject IDialogService dialogService
 @inject IStringLocalizer<Header> loc
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject NavigationManager navigationManager
+@inject IConfiguration configuration
+@inject SignalRService signalRService
+@inject UsersClient usersClient
+@inject UserNotificationsClient userNotificationsClient
 
 <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center" HorizontalGap="20">
     @if (IsDarkThemeActive)
@@ -46,16 +54,38 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                        FooterLink="@loc["FooterLink"]" OnFooterLinkClick="OpenEditProfilePanel">
         <StartTemplate>@accountUsername</StartTemplate>
     </FluentProfileMenu>
-    <FluentButton Appearance="Appearance.Neutral" OnClick="OpenNotificationsPanel"
-                  IconStart="@(new Size20.Alert())"/>
+    @if (isNewNotificationPresent && isUnreadNotificationPresent)
+    {
+        <FluentButton Appearance="Appearance.Neutral" OnClick="OpenNotificationsPanel" IconStart="@(new Size20.AlertBadge())" />
+    }
+    else if (!isNewNotificationPresent && isUnreadNotificationPresent)
+    {
+        <FluentButton Appearance="Appearance.Neutral" OnClick="OpenNotificationsPanel" IconStart="@(new Size20.Alert())" />
+    }
+    else
+    {
+        <FluentButton Appearance="Appearance.Accent" OnClick="OpenNotificationsPanel" IconStart="@(new Size20.Alert())" />
+    }
 </FluentStack>
 
 @code {
     [CascadingParameter] private bool IsDarkThemeActive { get; set; }
 
+    private IEnumerable<UserNotificationResponseDto> userNotifications = [];
+
     private string? accountName;
     private string? accountEmail;
     private string? accountUsername;
+
+    private bool isNewNotificationPresent;
+    private bool isUnreadNotificationPresent;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await SetupSignalR();
+
+        await LoadUserNotificationsAsync();
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -73,6 +103,50 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 StateHasChanged();
             }
         }
+    }
+
+    private async Task SetupSignalR()
+    {
+        // Register handlers for API-triggered methods
+        Action handlersRegistration = () =>
+        {
+            signalRService.On("NotificationUpdated", () => HandleRefreshRequested(false));
+            signalRService.On("NotificationDeleted", () => HandleRefreshRequested(false));
+            signalRService.On("UserNotificationCreated", () => HandleRefreshRequested(true));
+            signalRService.On("UserNotificationUpdated", () => HandleRefreshRequested(true));
+            signalRService.On("UserNotificationDeleted", () => HandleRefreshRequested(false));
+        };
+
+        // Connect to the hub
+        await signalRService.StartAsync($"{configuration["ADAticketsAPI:BaseUrl"]}/notificationsHub", handlersRegistration);
+        // Join the personal group for notifications
+        await signalRService.SendAsync("JoinPersonalGroup", await GetUserIdAsync());
+    }
+
+    private async Task LoadUserNotificationsAsync()
+    {
+        var userId = await GetUserIdAsync();
+
+        if (userId.HasValue)
+        {
+            userNotifications = await userNotificationsClient.GetAllAsync(
+                new Dictionary<string, string>
+                {
+                    { nameof(UserNotificationResponseDto.ReceiverUserId), userId.Value.ToString() }
+                }
+            );
+        }
+
+        isUnreadNotificationPresent = userNotifications.Any(un => !un.IsRead);
+    }
+
+    private async Task HandleRefreshRequested(bool showNewNotificationBadge)
+    {
+        await LoadUserNotificationsAsync();
+
+        if (showNewNotificationBadge) isNewNotificationPresent = true;
+
+        await InvokeAsync(StateHasChanged);
     }
 
     private async Task SignOutAsync()
@@ -96,10 +170,31 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     private async Task OpenNotificationsPanel()
     {
+        isNewNotificationPresent = false;
+
         var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
         await dialogService.ShowPanelAsync<NotificationsPanel>(user, Dialogs.PanelParameters());
     }
 
+    private async Task<Guid?> GetUserIdAsync()
+    {
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.IsAuthenticated())
+        {
+            var loggedInUser = await usersClient.GetAsync(user.GetEmail()!);
+
+            return loggedInUser?.Id;
+        }
+
+        return null;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await signalRService.StopAsync();
+    }
 }
