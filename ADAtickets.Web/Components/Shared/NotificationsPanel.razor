@@ -66,16 +66,4 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     {
         await Dialog.CancelAsync();
     }
-
-    private void HandleSelectedChanged(SelectedChangedEventArgs<NotificationResponseDto> args)
-    {
-        if (args.IsSelected)
-        {
-            selectedNotifications.Add(args.Item);
-        }
-        else
-        {
-            selectedNotifications.Remove(args.Item);
-        }
-    }
 }

@@ -518,16 +518,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
         try
         {
-            foreach (var ticket in selectedTickets)
+            foreach (var ticketId in selectedTickets.Select(t => t.Id))
             {
-                var getResponse = await ticketsClient.GetAsync(ticket.Id);
+                var getResponse = await ticketsClient.GetAsync(ticketId);
 
                 // Update the ticket status to Closed.
                 var requestDto = mapper.Map<TicketRequestDto>(getResponse);
                 requestDto.Status = Status.Closed;
                 requestDto.Requester = await GetUserIdAsync();
 
-                await ticketsClient.PutAsync(ticket.Id, requestDto);
+                await ticketsClient.PutAsync(ticketId, requestDto);
 
                 // Update the progress bar and the toast.
                 progressToastParameters.Content.Progress += 100 / selectedTickets.Count;
@@ -562,16 +562,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
         try
         {
-            foreach (var ticket in selectedTickets)
+            foreach (var ticketId in selectedTickets.Select(t => t.Id))
             {
-                var getResponse = await ticketsClient.GetAsync(ticket.Id);
+                var getResponse = await ticketsClient.GetAsync(ticketId);
 
                 // Update the ticket assignee.
                 var requestDto = mapper.Map<TicketRequestDto>(getResponse);
                 requestDto.OperatorUserId = operatorId;
                 requestDto.Requester = await GetUserIdAsync();
 
-                await ticketsClient.PutAsync(ticket.Id, requestDto);
+                await ticketsClient.PutAsync(ticketId, requestDto);
 
                 // Update the progress bar and the toast.
                 progressToastParameters.Content.Progress += 100 / selectedTickets.Count;
