@@ -111,7 +111,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 @activeDateFilter?.ToLocalTime().Humanize()
             </FluentBadge>
         }
-        @if (selectedTickets.Count > 0)
+        @if (selectedTickets.Any())
         {
             <FluentMenuButton Text="@loc["ActionsButton"]" IconStart="@(new Size20.SelectAllOn())">
                 <FluentLabel Typo="Typography.H6">@loc["EditStatusMenuLabel"]</FluentLabel>
@@ -304,7 +304,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     private IEnumerable<PlatformResponseDto>? platforms;
 
     // State management
-    private readonly HashSet<Guid> selectedTickets = [];
+    private readonly HashSet<TicketResponseDto> selectedTickets = [];
 
     private string? currentTab;
     private string? currentSort;
@@ -431,15 +431,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         await LoadTicketsAsync(await GetBaseFiltersAsync());
     }
 
-    private void HandleSelectedChanged(SelectedChangedEventArgs args)
+    private void HandleSelectedChanged(SelectedChangedEventArgs<TicketResponseDto> args)
     {
         if (args.IsSelected)
         {
-            selectedTickets.Add(args.TicketId);
+            selectedTickets.Add(args.Item);
         }
         else
         {
-            selectedTickets.Remove(args.TicketId);
+            selectedTickets.Remove(args.Item);
         }
     }
 
@@ -480,9 +480,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
         try
         {
-            foreach (var ticketId in selectedTickets)
+            foreach (var ticket in selectedTickets)
             {
-                await ticketsClient.DeleteAsync(ticketId);
+                await ticketsClient.DeleteAsync(ticket.Id);
 
                 // Update the progress bar and the toast.
                 progressToastParameters.Content.Progress += 100 / selectedTickets.Count;
@@ -517,16 +517,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
         try
         {
-            foreach (var ticketId in selectedTickets)
+            foreach (var ticket in selectedTickets)
             {
-                var getResponse = await ticketsClient.GetAsync(ticketId);
+                var getResponse = await ticketsClient.GetAsync(ticket.Id);
 
                 // Update the ticket status to Closed.
                 var requestDto = mapper.Map<TicketRequestDto>(getResponse);
                 requestDto.Status = Status.Closed;
                 requestDto.Requester = await GetUserIdAsync();
 
-                await ticketsClient.PutAsync(ticketId, requestDto);
+                await ticketsClient.PutAsync(ticket.Id, requestDto);
 
                 // Update the progress bar and the toast.
                 progressToastParameters.Content.Progress += 100 / selectedTickets.Count;
@@ -561,16 +561,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
         try
         {
-            foreach (var ticketId in selectedTickets)
+            foreach (var ticket in selectedTickets)
             {
-                var getResponse = await ticketsClient.GetAsync(ticketId);
+                var getResponse = await ticketsClient.GetAsync(ticket.Id);
 
                 // Update the ticket assignee.
                 var requestDto = mapper.Map<TicketRequestDto>(getResponse);
                 requestDto.OperatorUserId = operatorId;
                 requestDto.Requester = await GetUserIdAsync();
 
-                await ticketsClient.PutAsync(ticketId, requestDto);
+                await ticketsClient.PutAsync(ticket.Id, requestDto);
 
                 // Update the progress bar and the toast.
                 progressToastParameters.Content.Progress += 100 / selectedTickets.Count;

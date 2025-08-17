@@ -146,7 +146,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     ///     Event callback that is triggered when the selected state changes.
     /// </summary>
     [Parameter]
-    public EventCallback<SelectedChangedEventArgs> SelectedChanged { get; set; }
+    public EventCallback<SelectedChangedEventArgs<TicketResponseDto>> SelectedChanged { get; set; }
 
     /// <summary>
     ///     Event callback that is triggered when the ticket state has changed.
@@ -203,7 +203,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     private async Task HandleCheckStateChangedAsync(bool? checkState)
     {
         Selected = checkState ?? false;
-        await SelectedChanged.InvokeAsync(new SelectedChangedEventArgs { TicketId = Ticket.Id, IsSelected = Selected });
+        await SelectedChanged.InvokeAsync(new SelectedChangedEventArgs<TicketResponseDto> { Item = Ticket, IsSelected = Selected });
     }
 
     private async Task HandleDeleteClickAsync()

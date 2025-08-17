@@ -21,17 +21,18 @@
 namespace ADAtickets.Web.Components.Utilities;
 
 /// <summary>
-///     Wraps the event arguments for the <see cref="TicketCard.SelectedChanged" /> event.
+///     Wrapped event arguments for the <c>SelectedChanged</c> event.
 /// </summary>
-public sealed class SelectedChangedEventArgs : EventArgs
+/// <typeparam name="TItem">Type of the item being selected.</typeparam>
+public sealed class SelectedChangedEventArgs<TItem> : EventArgs
 {
     /// <summary>
-    ///     The ID of the ticket bound to the card.
+    ///     The item being selected or deselected.
     /// </summary>
-    public Guid TicketId { get; set; }
+    public required TItem Item { get; set; }
 
     /// <summary>
-    ///     Indicates whether the card is selected.
+    ///     Indicates whether the item is selected.
     /// </summary>
     public bool IsSelected { get; set; }
 }

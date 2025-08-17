@@ -96,7 +96,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     private async Task OpenNotificationsPanel()
     {
-        // TODO
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        await dialogService.ShowPanelAsync<NotificationsPanel>(user, Dialogs.PanelParameters());
     }
 
 }
