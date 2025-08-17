@@ -26,6 +26,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @using ADAtickets.Shared.Dtos.Responses
 @using ADAtickets.Shared.Extensions
 @using ADAtickets.Web.Components.Utilities
+@using AutoMapper
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.FluentUI.AspNetCore.Components.Icons.Regular
 @using Microsoft.Identity.Abstractions
@@ -37,6 +38,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @inject IDialogService dialogService
 @inject IConfiguration configuration
 @inject IDownstreamApi downstreamApi
+@inject IMapper mapper
 @inject UsersClient usersClient
 @inject UserPlatformsClient userPlatformsClient
 @inject PlatformsClient platformsClient
@@ -84,10 +86,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             <FluentLabel Typo="Typography.Body" Weight="FontWeight.Bold">@loc["SurnameLabel"]</FluentLabel>
             <FluentLabel Typo="Typography.Body">@Content.GetSurname()</FluentLabel>
 
-            <AuthorizeView Policy="@Policy.OperatorOrAdmin">
+            @if (Content.GetTenantId() == configuration["Entra:TenantId"])
+            {
                 <FluentLabel Typo="Typography.Body" Weight="FontWeight.Bold">@loc["FavouriteAppsLabel"]</FluentLabel>
                 <FluentLabel Typo="Typography.Body">@favouritePlatformNames</FluentLabel>
-            </AuthorizeView>
+            }
         </FluentStack>
     }
     else
@@ -119,7 +122,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                                  Required>
                     <FluentIcon Value="@(new Size20.Person())" Color="@Color.Neutral" Slot="start"/>
                 </FluentTextField>
-                <FluentValidationMessage For="@(() => UserRequest.Email)"/>
+                <FluentValidationMessage For="@(() => UserRequest.Username)"/>
 
                 <FluentTextField Name="Email"
                                  Label="@loc["NameLabel"]"
@@ -141,21 +144,20 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 </FluentTextField>
                 <FluentValidationMessage For="@(() => UserRequest.Surname)"/>
 
-                <AuthorizeView Policy="@Policy.OperatorOrAdmin">
-                    <ChildContent Context="selectContext">
-                        <FluentSelect TOption="PlatformResponseDto"
-                                      Label="@loc["FavouriteAppsLabel"]"
-                                      Name="PlatformId"
-                                      Items="platforms"
-                                      Multiple="true"
-                                      OptionText="@(p => p.Name)"
-                                      OptionValue="@(p => p.Id.ToString())"
-                                      @bind-SelectedOptions="favouritePlatforms">
-                            <FluentIcon Value="@(new Size20.Apps())" Color="@Color.Neutral"
-                                        Slot="indicator"/>
-                        </FluentSelect>
-                    </ChildContent>
-                </AuthorizeView>
+                @if (Content.GetTenantId() == configuration["Entra:TenantId"])
+                {
+                    <FluentSelect TOption="PlatformResponseDto"
+                                  Label="@loc["FavouriteAppsLabel"]"
+                                  Name="PlatformId"
+                                  Items="platforms"
+                                  Multiple="true"
+                                  OptionText="@(p => p.Name)"
+                                  OptionValue="@(p => p.Id.ToString())"
+                                  Placeholder="@loc["PleaseSelectOneOrMoreOptions"]"
+                                  @bind-SelectedOptions="favouritePlatforms"
+                                  Width="100%" Height="5rem">
+                    </FluentSelect>
+                }
             </FluentStack>
         </EditForm>
     }
@@ -177,13 +179,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     [Parameter]
     public required ClaimsPrincipal Content { get; set; }
 
-    [SupplyParameterFromForm] private UserRequestDto UserRequest { get; } = new();
+    [SupplyParameterFromForm] private UserRequestDto UserRequest { get; set; } = new();
 
     private bool isEdit;
+
     private IEnumerable<PlatformResponseDto>? platforms;
     private IEnumerable<PlatformResponseDto>? favouritePlatforms;
+
     private string? favouritePlatformNames;
-    private Guid? currentUserId;
 
     protected override async Task OnInitializedAsync()
     {
@@ -245,25 +248,25 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     private async Task GetFavouritePlatforms()
     {
-        var getResponse = await userPlatformsClient.GetAllAsync(new Dictionary<string, string> { { nameof(UserPlatformRequestDto.UserId), await GetCurrentUserId() } });
+        var getResponse = await userPlatformsClient.GetAllAsync(
+            new Dictionary<string, string> { { nameof(UserPlatformRequestDto.UserId), (await GetCurrentUserId()).ToString() } }
+        );
 
         favouritePlatforms = platforms!.Where(p => getResponse.Any(up => up.PlatformId == p.Id));
     }
 
     private void GetFavouritePlatformsName()
     {
-        var favouritePlatformsJoinedString = string.Join(",", favouritePlatforms!.Select(p => p.Name));
+        var favouritePlatformsJoinedString = string.Join(", ", favouritePlatforms!.Select(p => p.Name));
 
         favouritePlatformNames = string.IsNullOrWhiteSpace(favouritePlatformsJoinedString)
             ? loc["NoFavouritePlatformLabel"]
             : favouritePlatformsJoinedString;
     }
 
-    private async Task<string> GetCurrentUserId()
+    private async Task<Guid> GetCurrentUserId()
     {
-        currentUserId = (await usersClient.GetAsync(Content.GetEmail()!)).Id;
-
-        return currentUserId.ToString()!;
+        return (await usersClient.GetAsync(Content.GetEmail()!)).Id;
     }
 
     private void HandleEditClick()
@@ -318,10 +321,21 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 Content,
                 patchContent);
 
-            // If the user was successfully updated in Microsoft Graph, update the user in the database
+            // If the user was successfully updated in Microsoft Graph, update the user in the database and their favourite platforms
             if (response.IsSuccessStatusCode)
             {
                 await usersClient.PutAsync(Content.GetEmail()!, UserRequest);
+
+                foreach (var platform in favouritePlatforms!)
+                {
+                    var userPlatform = new UserPlatformRequestDto
+                    {
+                        UserId = await GetCurrentUserId(),
+                        PlatformId = platform.Id
+                    };
+
+                    await userPlatformsClient.PostAsync(userPlatform);
+                }
 
                 toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["ProfileEditSuccessToastTitle"], loc["ProfileEditSuccessToastDetails"]));
             }
@@ -388,5 +402,4 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
         return JsonSerializer.Serialize(jsonContent);
     }
-
 }
