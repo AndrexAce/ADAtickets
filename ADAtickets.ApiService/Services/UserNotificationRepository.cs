@@ -36,6 +36,8 @@ internal sealed class UserNotificationRepository(ADAticketsDbContext context) : 
     {
         return await context.UserNotifications.Include(un => un.Notification)
             .ThenInclude(n => n.User)
+            .Include(un => un.Notification)
+            .ThenInclude(n => n.Ticket)
             .FirstOrDefaultAsync(un => un.Id == id);
     }
 
@@ -44,6 +46,8 @@ internal sealed class UserNotificationRepository(ADAticketsDbContext context) : 
     {
         return await context.UserNotifications.Include(un => un.Notification)
             .ThenInclude(n => n.User)
+            .Include(un => un.Notification)
+            .ThenInclude(n => n.Ticket)
             .ToListAsync();
     }
 
@@ -52,7 +56,9 @@ internal sealed class UserNotificationRepository(ADAticketsDbContext context) : 
         IEnumerable<KeyValuePair<string, string>> filters)
     {
         IQueryable<UserNotification> query = context.UserNotifications.Include(un => un.Notification)
-            .ThenInclude(n => n.User);
+            .ThenInclude(n => n.User)
+            .Include(un => un.Notification)
+            .ThenInclude(n => n.Ticket);
 
         foreach (var filter in filters)
             switch (filter.Key.Pascalize())

@@ -53,7 +53,7 @@ public sealed record UserNotificationResponseDto : ResponseDto
     public string Message { get; init; } = string.Empty;
 
     /// <summary>
-    ///     The sending date and time of the notification (from related entities <see cref="Notification" />).
+    ///     The sending date and time of the notification (from related entity <see cref="Notification" />).
     /// </summary>
     [ValueFromRelationship]
     public DateTimeOffset SendDateTime { get; init; } = DateTimeOffset.UtcNow;
@@ -63,4 +63,17 @@ public sealed record UserNotificationResponseDto : ResponseDto
     /// </summary>
     [ValueFromRelationship]
     public string SenderName { get; init; } = string.Empty;
+
+    /// <summary>
+    ///     The ID of the ticket linked to the notification (from related entities <see cref="Notification" /> and <see cref="Ticket" />).
+    /// </summary>
+    [ValueFromRelationship]
+    public Guid TicketId { get; init; } = Guid.Empty;
+
+    /// <summary>
+    ///     The title of the ticket linked to the notification (from related entities <see cref="Notification" /> and <see cref="Ticket" />).
+    /// </summary>
+    [ValueFromRelationship]
+    public string TicketTitle { get; init; } = string.Empty;
+
 }

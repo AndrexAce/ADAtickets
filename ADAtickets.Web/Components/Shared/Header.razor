@@ -182,9 +182,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     {
         isNewNotificationPresent = false;
 
-        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-
         await dialogService.ShowPanelAsync<NotificationsPanel>(Dialogs.PanelParameters());
     }
 

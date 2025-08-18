@@ -87,7 +87,11 @@ internal sealed class AutoMapperProfile : Profile
             .ForMember(userNotificationDto => userNotificationDto.SendDateTime, // Extra
                 opt => opt.MapFrom(src => src.Notification.SendDateTime))
             .ForMember(userNotificationDto => userNotificationDto.SenderName, // Extra
-                opt => opt.MapFrom(src => $"{src.Notification.User.Name} {src.Notification.User.Surname}"));
+                opt => opt.MapFrom(src => $"{src.Notification.User.Name} {src.Notification.User.Surname}"))
+            .ForMember(userNotificationDto => userNotificationDto.TicketId, // Extra
+                opt => opt.MapFrom(src => src.Notification.Ticket.Id))
+            .ForMember(userNotificationDto => userNotificationDto.TicketTitle, // Extra
+                opt => opt.MapFrom(src => src.Notification.Ticket.Title));
         _ = CreateMap<UserNotificationRequestDto, UserNotification>(MemberList.Source);
 
         _ = CreateMap<UserPlatform, UserPlatformResponseDto>(MemberList.Destination);

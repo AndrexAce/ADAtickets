@@ -33,6 +33,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @inject IStringLocalizer<NotificationCard> loc
 @inject NotificationsClient notificationsClient
 @inject UserNotificationsClient userNotificationsClient
+@inject NavigationManager navigationManager
 
 <FluentCard Id="@(UserNotification.Id.ToString())" Style="@GetStyle()" Width="20rem">
     <FluentStack Orientation="Orientation.Vertical">
@@ -44,6 +45,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 </FluentStack>
             </FluentPersona>
             <FluentStack Orientation="Orientation.Horizontal" Class="hover-hide" HorizontalAlignment="HorizontalAlignment.Right" VerticalAlignment="VerticalAlignment.Center">
+                <FluentButton Appearance="Appearance.Lightweight" IconStart="@(new Icons.Regular.Size20.Open())" OnClick="HandleOpen" />
                 <FluentButton Appearance="Appearance.Lightweight" IconStart="@(new Icons.Regular.Size20.Delete())" OnClick="HandleDeleteClickAsync"/>
                 @if (!UserNotification.IsRead)
                 {
@@ -52,7 +54,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 }
             </FluentStack>
         </FluentStack>
-        <span style="width: 100%; text-wrap: wrap;">@loc[UserNotification.Message]</span>
+        <span style="width: 100%; text-wrap: wrap;">@($"{loc[UserNotification.Message]}: {UserNotification.TicketTitle}")</span>
     </FluentStack>
 </FluentCard>
 
@@ -101,6 +103,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     private async Task HandleDeleteClickAsync()
     {
         await OnDelete.InvokeAsync(UserNotification);
+    }
+
+    private void HandleOpen()
+    {
+        navigationManager.NavigateTo($"/tickets/{UserNotification.TicketId}", forceLoad: true);
     }
 
     private static string GetInitials(string? fullName)
