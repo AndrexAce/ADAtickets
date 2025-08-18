@@ -19,8 +19,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @inherits ComponentBase
 
 <FluentButton Appearance="Appearance.Accent" IconStart="@themeIcon" OnClick="UpdateTheme"></FluentButton>
-<FluentButton Appearance="Appearance.Accent" IconStart="@(new Size20.LockClosed())"></FluentButton>
-<FluentButton Appearance="Appearance.Accent" IconStart="@(new Size20.Cookies())"></FluentButton>
 <CultureSelector/>
 
 <FluentDesignTheme @bind-Mode="@mode" CustomColor="#7A6040" StorageName="theme" OnLuminanceChanged="UpdateTheme"/>
