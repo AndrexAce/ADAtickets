@@ -600,11 +600,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         }
     }
 
-    private async Task HandleStateChangedAsync()
-    {
-        await LoadTicketsAsync(await GetBaseFiltersAsync());
-    }
-
     private void HandleSortTitleClick(string order)
     {
         currentSort = loc["SortTitleMenuItem"];

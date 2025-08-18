@@ -1,0 +1,123 @@
+﻿<!-- ADAtickets is a simple, lightweight, open source ticketing system
+interacting with your enterprise repositories on Azure DevOps
+with a two-way synchronization.
+Copyright (C) 2025  Andrea Lucchese
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
+@inherits ComponentBase
+@using ADAtickets.Client
+@using ADAtickets.Shared.Constants
+@using ADAtickets.Shared.Dtos.Requests
+@using ADAtickets.Shared.Dtos.Responses
+@using ADAtickets.Shared.Extensions
+@using ADAtickets.Shared.Models
+@using ADAtickets.Web.Components.Utilities
+@using AutoMapper
+@using Humanizer
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.FluentUI.AspNetCore.Components.Icons.Regular
+@using Microsoft.Identity.Web
+@using static Utilities.Dialogs
+
+@inject IStringLocalizer<NotificationCard> loc
+@inject NotificationsClient notificationsClient
+@inject UserNotificationsClient userNotificationsClient
+
+<FluentCard Id="@(UserNotification.Id.ToString())" Style="@GetStyle()" Width="20rem">
+    <FluentStack Orientation="Orientation.Vertical">
+        <FluentStack Orientation="Orientation.Horizontal" HorizontalAlignment="HorizontalAlignment.SpaceBetween" VerticalAlignment="VerticalAlignment.Top">
+            <FluentPersona ImageSize="2rem" Initials="@GetInitials(UserNotification.SenderName)">
+                <FluentStack Orientation="Orientation.Vertical">
+                    <span style="max-width: 111px; text-wrap: wrap;">@UserNotification.SenderName</span>
+                    <span>@(UserNotification.SendDateTime.ToLocalTime().Humanize())</span>
+                </FluentStack>
+            </FluentPersona>
+            <FluentStack Orientation="Orientation.Horizontal" Class="hover-hide" HorizontalAlignment="HorizontalAlignment.Right" VerticalAlignment="VerticalAlignment.Center">
+                <FluentButton Appearance="Appearance.Lightweight" IconStart="@(new Icons.Regular.Size20.Delete())" OnClick="HandleDeleteClickAsync"/>
+                @if (!UserNotification.IsRead)
+                {
+                    <FluentButton Appearance="Appearance.Lightweight" IconStart="@(new Icons.Regular.Size20.Checkmark())" OnClick="HandleMarkAsReadClickAsync"/>
+                    <FluentCheckbox CheckStateChanged="HandleCheckStateChangedAsync" />
+                }
+            </FluentStack>
+        </FluentStack>
+        <span style="width: 100%; text-wrap: wrap;">@loc[UserNotification.Message]</span>
+    </FluentStack>
+</FluentCard>
+
+@code {
+    /// <summary>
+    ///     The <see cref="UserNotificationResponseDto" /> the card is bound to.
+    /// </summary>
+    [Parameter]
+    public required UserNotificationResponseDto UserNotification { get; set; }
+
+    /// <summary>
+    ///     Indicates whether the card is selected.
+    /// </summary>
+    [Parameter]
+    public bool Selected { get; set; } = false;
+
+    /// <summary>
+    ///     Event callback that is triggered when the selected state changes.
+    /// </summary>
+    [Parameter]
+    public EventCallback<SelectedChangedEventArgs<UserNotificationResponseDto>> SelectedChanged { get; set; }
+
+    /// <summary>
+    ///     Event callback that is triggered when the notification is marked as read.
+    /// </summary>
+    [Parameter]
+    public EventCallback<UserNotificationResponseDto> OnRead { get; set; }
+
+    /// <summary>
+    ///     Event callback that is triggered when the notification is marked as to be deleted.
+    /// </summary>
+    [Parameter]
+    public EventCallback<UserNotificationResponseDto> OnDelete { get; set; }
+
+    private async Task HandleCheckStateChangedAsync(bool? checkState)
+    {
+        Selected = checkState ?? false;
+        await SelectedChanged.InvokeAsync(new SelectedChangedEventArgs<UserNotificationResponseDto> { Item = UserNotification, IsSelected = Selected });
+    }
+
+    private async Task HandleMarkAsReadClickAsync()
+    {
+        await OnRead.InvokeAsync(UserNotification);
+    }
+
+    private async Task HandleDeleteClickAsync()
+    {
+        await OnDelete.InvokeAsync(UserNotification);
+    }
+
+    private static string GetInitials(string? fullName)
+    {
+        if (string.IsNullOrWhiteSpace(fullName))
+        {
+            return string.Empty;
+        }
+
+        return fullName.Split(' ')
+            .Where(part => !string.IsNullOrWhiteSpace(part))
+            .Select(part => part[0])
+            .Aggregate(string.Empty, (acc, initial) => acc + initial);
+    }
+
+    private string GetStyle()
+    {
+        return $"background: var(--neutral-layer-{(UserNotification.IsRead ? 2 : 3)});";
+    }
+}

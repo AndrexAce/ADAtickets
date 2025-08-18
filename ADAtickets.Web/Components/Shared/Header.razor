@@ -33,6 +33,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @inject SignalRService signalRService
 @inject UsersClient usersClient
 @inject UserNotificationsClient userNotificationsClient
+@inject NotificationsManager notificationsManager
 
 <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center" HorizontalGap="20">
     @if (IsDarkThemeActive)
@@ -71,8 +72,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @code {
     [CascadingParameter] private bool IsDarkThemeActive { get; set; }
 
-    private IEnumerable<UserNotificationResponseDto> userNotifications = [];
-
     private string? accountName;
     private string? accountEmail;
     private string? accountUsername;
@@ -82,6 +81,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     protected override async Task OnInitializedAsync()
     {
+        notificationsManager.OnUserNotificationsChanged += HandleUserNotificationsChanged;
+
         await SetupSignalR();
 
         await LoadUserNotificationsAsync();
@@ -113,7 +114,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             signalRService.On("NotificationUpdated", () => HandleRefreshRequested(false));
             signalRService.On("NotificationDeleted", () => HandleRefreshRequested(false));
             signalRService.On("UserNotificationCreated", () => HandleRefreshRequested(true));
-            signalRService.On("UserNotificationUpdated", () => HandleRefreshRequested(true));
+            signalRService.On("UserNotificationUpdated", () => HandleRefreshRequested(false));
             signalRService.On("UserNotificationDeleted", () => HandleRefreshRequested(false));
         };
 
@@ -129,15 +130,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
         if (userId.HasValue)
         {
-            userNotifications = await userNotificationsClient.GetAllAsync(
+            var notifications = await userNotificationsClient.GetAllAsync(
                 new Dictionary<string, string>
                 {
                     { nameof(UserNotificationResponseDto.ReceiverUserId), userId.Value.ToString() }
                 }
             );
+            
+            await notificationsManager.UpdateUserNotificationsAsync(notifications);
         }
-
-        isUnreadNotificationPresent = userNotifications.Any(un => !un.IsRead);
     }
 
     private async Task HandleRefreshRequested(bool showNewNotificationBadge)
@@ -147,6 +148,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         if (showNewNotificationBadge) isNewNotificationPresent = true;
 
         await InvokeAsync(StateHasChanged);
+    }
+
+    private void HandleUserNotificationsChanged()
+    {
+        var notifications = notificationsManager.UserNotifications;
+
+        isUnreadNotificationPresent = notifications.Any(un => !un.IsRead);
+
+        InvokeAsync(StateHasChanged);
     }
 
     private async Task SignOutAsync()
@@ -175,7 +185,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
-        await dialogService.ShowPanelAsync<NotificationsPanel>(user, Dialogs.PanelParameters());
+        await dialogService.ShowPanelAsync<NotificationsPanel>(Dialogs.PanelParameters());
     }
 
     private async Task<Guid?> GetUserIdAsync()
@@ -195,6 +205,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     public async ValueTask DisposeAsync()
     {
+        notificationsManager.OnUserNotificationsChanged -= HandleUserNotificationsChanged;
+
         await signalRService.StopAsync();
     }
 }

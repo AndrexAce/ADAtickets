@@ -52,7 +52,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             {
                 <FluentPersona ImageSize="3rem" Initials="@GetInitials(Ticket.CreatorName)">
                     <FluentStack Orientation="Orientation.Vertical">
-                        <p>@Ticket.CreatorName</p>
+                        <span>@Ticket.CreatorName</span>
                         <FluentStack Orientation="Orientation.Horizontal">
                             @if (Ticket.Type == TicketType.Bug)
                             {
@@ -62,7 +62,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                             {
                                 <FluentIcon Value="@(new Icons.Filled.Size20.Sparkle())"/>
                             }
-                            <p>@(Ticket.CreationDateTime.ToLocalTime().Humanize())</p>
+                            <span>@(Ticket.CreationDateTime.ToLocalTime().Humanize())</span>
                         </FluentStack>
                     </FluentStack>
                 </FluentPersona>
@@ -78,7 +78,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         }
         else
         {
-            <p>@Ticket.Title</p>
+            <p style="width: 100%; overflow: hidden; text-overflow: ellipsis;">@Ticket.Title</p>
             <FluentStack Orientation="Orientation.Horizontal" HorizontalAlignment="HorizontalAlignment.Center">
                 @GetPriorityBadge(Ticket.Priority)
                 @GetStatusBadge(Ticket.Status)

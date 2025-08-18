@@ -125,6 +125,7 @@ internal static class Program
 
         // Add other DI services.
         _ = builder.Services.AddTransient<SignalRService>();
+        _ = builder.Services.AddScoped<NotificationsManager>();
 
         // Add Fluent UI components.
         _ = builder.Services.AddFluentUIComponents();

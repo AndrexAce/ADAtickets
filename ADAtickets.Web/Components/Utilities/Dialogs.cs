@@ -59,6 +59,7 @@ public static class Dialogs
         return new DialogParameters
         {
             DialogType = DialogType.Panel,
+            Width = "25rem",
             Alignment = HorizontalAlignment.Right,
             TrapFocus = true,
             PreventScroll = true,

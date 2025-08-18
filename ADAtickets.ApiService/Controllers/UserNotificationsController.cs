@@ -242,7 +242,7 @@ public sealed class UserNotificationsController(
     /// <response code="404">The entity with the given id didn't exist.</response>
     /// <response code="406">The client asked for an unsupported response format.</response>
     [HttpDelete("{id:guid}")]
-    [Authorize(Policy.AdminOnly)]
+    [Authorize(Policy.Everyone)]
     [RequiredScope(Scope.Read, Scope.Write)]
     public async Task<IActionResult> DeleteUserNotification(Guid id)
     {

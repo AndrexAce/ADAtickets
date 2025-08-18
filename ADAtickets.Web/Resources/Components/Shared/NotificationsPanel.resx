@@ -123,4 +123,7 @@
   <data name="NotificationsPanelTitle" xml:space="preserve">
     <value>Notifications</value>
   </data>
+  <data name="NoNotificationsText" xml:space="preserve">
+    <value>There is nothing to see here. Congrats!</value>
+  </data>
 </root>

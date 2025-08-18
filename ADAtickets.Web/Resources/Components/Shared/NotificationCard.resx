@@ -117,13 +117,22 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="MarkAsReadButton" xml:space="preserve">
-    <value>Segna selezionati come letti</value>
+  <data name="TICKET_ASSIGNED_NOTIFICATION" xml:space="preserve">
+    <value>has been assigned to the ticket.</value>
   </data>
-  <data name="NotificationsPanelTitle" xml:space="preserve">
-    <value>Notifiche</value>
+  <data name="TICKET_ASSIGNED_TO_YOU_BY_SYSTEM_NOTIFICATION" xml:space="preserve">
+    <value>You have been assigned to the ticket automatically by the system.</value>
   </data>
-  <data name="NoNotificationsText" xml:space="preserve">
-    <value>Non c'è niente da vedere qui. Congratulazioni!</value>
+  <data name="TICKET_ASSIGNED_TO_YOU_NOTIFICATION" xml:space="preserve">
+    <value>You have been assigned to the ticket.</value>
+  </data>
+  <data name="TICKET_CREATED_NOTIFICATION" xml:space="preserve">
+    <value>created a ticket.</value>
+  </data>
+  <data name="TICKET_EDITED_NOTIFICATION" xml:space="preserve">
+    <value>has edited the ticket.</value>
+  </data>
+  <data name="TICKET_UNASSIGNED_NOTIFICATION" xml:space="preserve">
+    <value>has removed the assigned operator from the ticket.</value>
   </data>
 </root>
