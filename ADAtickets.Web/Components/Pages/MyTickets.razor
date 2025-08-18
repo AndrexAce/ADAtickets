@@ -284,8 +284,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             <CascadingValue Value="@Users">
                 @foreach (var ticket in tickets)
                 {
-                    <TicketCard Ticket="@ticket" SelectedChanged="HandleSelectedChanged"
-                                StateChanged="HandleStateChangedAsync"/>
+                    <TicketCard Ticket="@ticket" SelectedChanged="HandleSelectedChanged" />
                 }
             </CascadingValue>
         </div>

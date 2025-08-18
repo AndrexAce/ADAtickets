@@ -148,12 +148,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     [Parameter]
     public EventCallback<SelectedChangedEventArgs<TicketResponseDto>> SelectedChanged { get; set; }
 
-    /// <summary>
-    ///     Event callback that is triggered when the ticket state has changed.
-    /// </summary>
-    [Parameter]
-    public EventCallback StateChanged { get; set; }
-
     private RenderFragment GetPriorityBadge(Priority priority) => @<FluentBadge Fill="highlight"
                                                                                 BackgroundColor="@GetPriorityAppearance(priority)"
                                                                                 Circular="true">
@@ -242,9 +236,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             await ticketsClient.DeleteAsync(Ticket.Id);
 
             toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["DeleteSuccessToastTitle"], loc["DeleteSuccessToastDetails"]));
-
-            // Notify the parent component that the ticket has been deleted.
-            await StateChanged.InvokeAsync();
         }
         catch (Exception ex)
         {
@@ -266,9 +257,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             await ticketsClient.PutAsync(Ticket.Id, requestDto);
 
             toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["CloseSuccessToastTitle"], loc["CloseSuccessToastDetails"]));
-
-            // Notify the parent component that the ticket has been closed.
-            await StateChanged.InvokeAsync();
         }
         catch (Exception ex)
         {
@@ -290,9 +278,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             await ticketsClient.PutAsync(Ticket.Id, requestDto);
 
             toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["AssignSuccessToastTitle"], loc["AssignSuccessToastDetails"]));
-
-            // Notify the parent component that the ticket has been assigned.
-            await StateChanged.InvokeAsync();
         }
         catch (Exception ex)
         {
