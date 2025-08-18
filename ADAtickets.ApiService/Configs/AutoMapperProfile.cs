@@ -35,11 +35,15 @@ internal sealed class AutoMapperProfile : Profile
     /// </summary>
     public AutoMapperProfile()
     {
+        _ = CreateMap<Attachment, AttachmentResponseDto>(MemberList.Destination)
+            .ForMember(attachmentDto => attachmentDto.Path,
+        opt => opt.MapFrom(src => Path.GetRelativePath(Directory.GetCurrentDirectory(), src.Path)));
+        _ = CreateMap<AttachmentRequestDto, Attachment>(MemberList.Source)
+            .ForMember(attachment => attachment.Path, opt => opt.MapFrom(src => src.Name))
+            .ForSourceMember(attachmentDto => attachmentDto.Content, opt => opt.DoNotValidate());
+
         _ = CreateMap<Edit, EditResponseDto>(MemberList.Destination);
         _ = CreateMap<EditRequestDto, Edit>(MemberList.Source);
-
-        _ = CreateMap<Reply, ReplyResponseDto>(MemberList.Destination);
-        _ = CreateMap<ReplyRequestDto, Reply>(MemberList.Source);
 
         _ = CreateMap<Notification, NotificationResponseDto>(MemberList.Destination)
             .ForMember(notificationDto => notificationDto.Recipients,
@@ -55,6 +59,9 @@ internal sealed class AutoMapperProfile : Profile
                     opt.MapFrom(src => src.UserPlatforms.Where(up => up.PlatformId == src.Id).Select(up => up.UserId)));
         _ = CreateMap<PlatformRequestDto, Platform>(MemberList.Source);
 
+        _ = CreateMap<Reply, ReplyResponseDto>(MemberList.Destination);
+        _ = CreateMap<ReplyRequestDto, Reply>(MemberList.Source);
+
         _ = CreateMap<Ticket, TicketResponseDto>(MemberList.Destination)
             .ForMember(ticketDto => ticketDto.Edits, opt => opt.MapFrom(src => src.Edits.Select(edit => edit.Id)))
             .ForMember(ticketDto => ticketDto.Replies, opt => opt.MapFrom(src => src.Replies.Select(reply => reply.Id)))
@@ -62,17 +69,29 @@ internal sealed class AutoMapperProfile : Profile
                 opt => opt.MapFrom(src => src.Attachments.Select(attachment => attachment.Id)))
             .ForMember(ticketDto => ticketDto.Notifications,
                 opt => opt.MapFrom(src => src.Notifications.Select(notifications => notifications.Id)))
-            .ForMember(ticketDto => ticketDto.CreatorName,
+            .ForMember(ticketDto => ticketDto.CreatorName, // Extra
                 opt => opt.MapFrom(src => $"{src.CreatorUser.Name} {src.CreatorUser.Surname}"))
-            .ForMember(ticketDto => ticketDto.OperatorName,
+            .ForMember(ticketDto => ticketDto.OperatorName, // Extra
                 opt => opt.MapFrom(src => src.OperatorUser == null ? null : $"{src.OperatorUser.Name} {src.OperatorUser.Surname}"))
-            .ForMember(ticketDto => ticketDto.PlatformName,
+            .ForMember(ticketDto => ticketDto.PlatformName, // Extra
                 opt => opt.MapFrom(src => src.Platform.Name))
-            .ForMember(ticketDto => ticketDto.LastUpdateDateTime,
+            .ForMember(ticketDto => ticketDto.LastUpdateDateTime, // Extra
                 opt => opt.MapFrom(src =>
                     src.Edits.Any() ? src.Edits.MaxBy(edit => edit.EditDateTime)!.EditDateTime : src.CreationDateTime));
         _ = CreateMap<TicketRequestDto, Ticket>(MemberList.Source)
             .ForSourceMember(ticketDto => ticketDto.Requester, opt => opt.DoNotValidate());
+
+        _ = CreateMap<UserNotification, UserNotificationResponseDto>(MemberList.Destination)
+            .ForMember(userNotificationDto => userNotificationDto.Message, // Extra
+                opt => opt.MapFrom(src => src.Notification.Message))
+            .ForMember(userNotificationDto => userNotificationDto.SendDateTime, // Extra
+                opt => opt.MapFrom(src => src.Notification.SendDateTime))
+            .ForMember(userNotificationDto => userNotificationDto.SenderName, // Extra
+                opt => opt.MapFrom(src => $"{src.Notification.User.Name} {src.Notification.User.Surname}"));
+        _ = CreateMap<UserNotificationRequestDto, UserNotification>(MemberList.Source);
+
+        _ = CreateMap<UserPlatform, UserPlatformResponseDto>(MemberList.Destination);
+        _ = CreateMap<UserPlatformRequestDto, UserPlatform>(MemberList.Source);
 
         _ = CreateMap<User, UserResponseDto>(MemberList.Destination)
             .ForMember(userDto => userDto.CreatedTickets,
@@ -90,18 +109,5 @@ internal sealed class AutoMapperProfile : Profile
                 opt => opt.MapFrom(src =>
                     src.UserNotifications.Where(un => un.ReceiverUserId == src.Id).Select(un => un.NotificationId)));
         _ = CreateMap<UserRequestDto, User>(MemberList.Source);
-
-        _ = CreateMap<Attachment, AttachmentResponseDto>(MemberList.Destination)
-            .ForMember(attachmentDto => attachmentDto.Path,
-                opt => opt.MapFrom(src => Path.GetRelativePath(Directory.GetCurrentDirectory(), src.Path)));
-        _ = CreateMap<AttachmentRequestDto, Attachment>(MemberList.Source)
-            .ForMember(attachment => attachment.Path, opt => opt.MapFrom(src => src.Name))
-            .ForSourceMember(attachmentDto => attachmentDto.Content, opt => opt.DoNotValidate());
-
-        _ = CreateMap<UserPlatform, UserPlatformResponseDto>(MemberList.Destination);
-        _ = CreateMap<UserPlatformRequestDto, UserPlatform>(MemberList.Source);
-
-        _ = CreateMap<UserNotification, UserNotificationResponseDto>(MemberList.Destination);
-        _ = CreateMap<UserNotificationRequestDto, UserNotification>(MemberList.Source);
     }
 }

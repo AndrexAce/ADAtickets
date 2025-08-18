@@ -44,5 +44,5 @@ public sealed record ValueWrapper<TValue> where TValue : struct
     /// <summary>
     ///     The wrapped <typeparamref name="TValue" />.
     /// </summary>
-    public TValue Value { get; set; }
+    public TValue Value { get; init; }
 }

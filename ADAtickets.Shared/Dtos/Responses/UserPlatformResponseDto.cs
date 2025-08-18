@@ -18,8 +18,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using ADAtickets.Shared.Models;
-
 namespace ADAtickets.Shared.Dtos.Responses;
 
 /// <summary>
@@ -31,10 +29,10 @@ public sealed record UserPlatformResponseDto : ResponseDto
     /// <summary>
     ///     The unique identifier of the user.
     /// </summary>
-    public Guid UserId { get; set; } = Guid.Empty;
+    public Guid UserId { get; init; } = Guid.Empty;
 
     /// <summary>
     ///     The unique identifier of the platform.
     /// </summary>
-    public Guid PlatformId { get; set; } = Guid.Empty;
+    public Guid PlatformId { get; init; } = Guid.Empty;
 }

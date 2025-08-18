@@ -55,7 +55,7 @@ internal sealed class NotificationRepository(ADAticketsDbContext context) : INot
     public async Task<IEnumerable<Notification>> GetNotificationsByAsync(
         IEnumerable<KeyValuePair<string, string>> filters)
     {
-        IQueryable<Notification> query = context.Notifications;
+        IQueryable<Notification> query = context.Notifications.Include(n => n.UserNotifications);
 
         foreach (var filter in filters)
             switch (filter.Key.Pascalize())

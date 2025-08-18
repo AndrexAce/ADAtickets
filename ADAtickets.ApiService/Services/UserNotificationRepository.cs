@@ -34,20 +34,25 @@ internal sealed class UserNotificationRepository(ADAticketsDbContext context) : 
     /// <inheritdoc cref="IUserNotificationRepository.GetUserNotificationByIdAsync" />
     public async Task<UserNotification?> GetUserNotificationByIdAsync(Guid id)
     {
-        return await context.UserNotifications.FindAsync(id);
+        return await context.UserNotifications.Include(un => un.Notification)
+            .ThenInclude(n => n.User)
+            .FirstOrDefaultAsync(un => un.Id == id);
     }
 
     /// <inheritdoc cref="IUserNotificationRepository.GetUserNotificationsAsync" />
     public async Task<IEnumerable<UserNotification>> GetUserNotificationsAsync()
     {
-        return await context.UserNotifications.ToListAsync();
+        return await context.UserNotifications.Include(un => un.Notification)
+            .ThenInclude(n => n.User)
+            .ToListAsync();
     }
 
     /// <inheritdoc cref="IUserNotificationRepository.GetUserNotificationsByAsync" />
     public async Task<IEnumerable<UserNotification>> GetUserNotificationsByAsync(
         IEnumerable<KeyValuePair<string, string>> filters)
     {
-        IQueryable<UserNotification> query = context.UserNotifications;
+        IQueryable<UserNotification> query = context.UserNotifications.Include(un => un.Notification)
+            .ThenInclude(n => n.User);
 
         foreach (var filter in filters)
             switch (filter.Key.Pascalize())

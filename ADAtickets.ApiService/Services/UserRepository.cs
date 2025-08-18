@@ -35,13 +35,27 @@ internal sealed class UserRepository(ADAticketsDbContext context) : IUserReposit
     /// <inheritdoc cref="IUserRepository.GetUserByIdAsync" />
     public async Task<User?> GetUserByIdAsync(Guid id)
     {
-        return await context.Users.FindAsync(id);
+        return await context.Users.Include(u => u.CreatedTickets)
+            .Include(u => u.AssignedTickets)
+            .Include(u => u.Replies)
+            .Include(u => u.Edits)
+            .Include(u => u.UserPlatforms)
+            .Include(u => u.SentNotifications)
+            .Include(u => u.UserNotifications)
+            .FirstOrDefaultAsync(u => u.Id == id);
     }
 
     /// <inheritdoc cref="IUserRepository.GetUsersAsync" />
     public async Task<IEnumerable<User>> GetUsersAsync()
     {
-        return await context.Users.ToListAsync();
+        return await context.Users.Include(u => u.CreatedTickets)
+            .Include(u => u.AssignedTickets)
+            .Include(u => u.Replies)
+            .Include(u => u.Edits)
+            .Include(u => u.UserPlatforms)
+            .Include(u => u.SentNotifications)
+            .Include(u => u.UserNotifications)
+            .ToListAsync();
     }
 
     /// <inheritdoc cref="IUserRepository.GetUsersByAsync" />
@@ -51,7 +65,13 @@ internal sealed class UserRepository(ADAticketsDbContext context) : IUserReposit
             "The comparison with the StringComparison overload is not translatable by Entity Framework and the EF.Function.ILike method is not standard SQL but PostgreSQL dialect.")]
     public async Task<IEnumerable<User>> GetUsersByAsync(IEnumerable<KeyValuePair<string, string>> filters)
     {
-        IQueryable<User> query = context.Users;
+        IQueryable<User> query = context.Users.Include(u => u.CreatedTickets)
+            .Include(u => u.AssignedTickets)
+            .Include(u => u.Replies)
+            .Include(u => u.Edits)
+            .Include(u => u.UserPlatforms)
+            .Include(u => u.SentNotifications)
+            .Include(u => u.UserNotifications);
 
         foreach (var filter in filters)
             switch (filter.Key.Pascalize())

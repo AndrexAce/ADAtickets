@@ -39,6 +39,10 @@ internal sealed class TicketRepository(ADAticketsDbContext context) : ITicketRep
         return await context.Tickets.Include(t => t.CreatorUser)
             .Include(t => t.OperatorUser)
             .Include(t => t.Platform)
+            .Include(t => t.Edits)
+            .Include(t => t.Replies)
+            .Include(t => t.Attachments)
+            .Include(t => t.Notifications)
             .FirstOrDefaultAsync(t => t.Id == id);
     }
 
@@ -48,6 +52,10 @@ internal sealed class TicketRepository(ADAticketsDbContext context) : ITicketRep
         return await context.Tickets.Include(t => t.CreatorUser)
             .Include(t => t.OperatorUser)
             .Include(t => t.Platform)
+            .Include(t => t.Edits)
+            .Include(t => t.Replies)
+            .Include(t => t.Attachments)
+            .Include(t => t.Notifications)
             .ToListAsync();
     }
 
@@ -60,7 +68,11 @@ internal sealed class TicketRepository(ADAticketsDbContext context) : ITicketRep
     {
         IQueryable<Ticket> query = context.Tickets.Include(t => t.CreatorUser)
             .Include(t => t.OperatorUser)
-            .Include(t => t.Platform);
+            .Include(t => t.Platform)
+            .Include(t => t.Edits)
+            .Include(t => t.Replies)
+            .Include(t => t.Attachments)
+            .Include(t => t.Notifications);
 
         foreach (var filter in filters)
             switch (filter.Key.Pascalize())

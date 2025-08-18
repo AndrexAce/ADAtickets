@@ -108,6 +108,7 @@ public sealed record TicketResponseDto : ResponseDto
     /// <summary>
     ///     The last update date of the ticket (from related entity <see cref="Edit" />).
     /// </summary>
+    [ValueFromRelationship]
     public DateTimeOffset LastUpdateDateTime { get; init; } = DateTimeOffset.UtcNow;
 
     /// <summary>

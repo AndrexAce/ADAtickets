@@ -34,15 +34,33 @@ public sealed record UserNotificationResponseDto : ResponseDto
     /// <summary>
     ///     The unique identifier of the user.
     /// </summary>
-    public Guid ReceiverUserId { get; set; } = Guid.Empty;
+    public Guid ReceiverUserId { get; init; } = Guid.Empty;
 
     /// <summary>
     ///     The unique identifier of the notification.
     /// </summary>
-    public Guid NotificationId { get; set; } = Guid.Empty;
+    public Guid NotificationId { get; init; } = Guid.Empty;
 
     /// <summary>
     ///     Whether the notification has been read by the user.
     /// </summary>
-    public bool IsRead { get; set; } = false;
+    public bool IsRead { get; init; } = false;
+
+    /// <summary>
+    ///     The text of the notification (from related entity <see cref="Notification" />).
+    /// </summary>
+    [ValueFromRelationship]
+    public string Message { get; init; } = string.Empty;
+
+    /// <summary>
+    ///     The sending date and time of the notification (from related entities <see cref="Notification" />).
+    /// </summary>
+    [ValueFromRelationship]
+    public DateTimeOffset SendDateTime { get; init; } = DateTimeOffset.UtcNow;
+
+    /// <summary>
+    ///     The name of the user responsible for the notification (from related entities <see cref="Notification" /> and <see cref="User" />).
+    /// </summary>
+    [ValueFromRelationship]
+    public string SenderName { get; init; } = string.Empty;
 }

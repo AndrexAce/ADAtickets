@@ -35,13 +35,17 @@ internal sealed class PlatformRepository(ADAticketsDbContext context) : IPlatfor
     /// <inheritdoc cref="IPlatformRepository.GetPlatformByIdAsync" />
     public async Task<Platform?> GetPlatformByIdAsync(Guid id)
     {
-        return await context.Platforms.FindAsync(id);
+        return await context.Platforms.Include(p => p.Tickets)
+            .Include(p => p.UserPlatforms)
+            .FirstOrDefaultAsync(p => p.Id == id);
     }
 
     /// <inheritdoc cref="IPlatformRepository.GetPlatformsAsync" />
     public async Task<IEnumerable<Platform>> GetPlatformsAsync()
     {
-        return await context.Platforms.ToListAsync();
+        return await context.Platforms.Include(p => p.Tickets)
+            .Include(p => p.UserPlatforms)
+            .ToListAsync();
     }
 
     /// <inheritdoc cref="IPlatformRepository.GetPlatformsByAsync" />
@@ -51,7 +55,8 @@ internal sealed class PlatformRepository(ADAticketsDbContext context) : IPlatfor
             "The comparison with the StringComparison overload is not translatable by Entity Framework and the EF.Function.ILike method is not standard SQL but PostgreSQL dialect.")]
     public async Task<IEnumerable<Platform>> GetPlatformsByAsync(IEnumerable<KeyValuePair<string, string>> filters)
     {
-        IQueryable<Platform> query = context.Platforms;
+        IQueryable<Platform> query = context.Platforms.Include(p => p.Tickets)
+            .Include(p => p.UserPlatforms);
 
         foreach (var filter in filters)
             switch (filter.Key.Pascalize())
