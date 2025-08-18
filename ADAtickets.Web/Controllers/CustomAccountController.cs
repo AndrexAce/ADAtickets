@@ -18,11 +18,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using System.Diagnostics.CodeAnalysis;
 using ADAtickets.Shared.Constants;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI.Areas.MicrosoftIdentity.Controllers;
+using System.Diagnostics.CodeAnalysis;
 using Controller = Microsoft.AspNetCore.Mvc.Controller;
 
 namespace ADAtickets.Web.Controllers;
@@ -32,7 +32,7 @@ namespace ADAtickets.Web.Controllers;
 /// </summary>
 /// <param name="configuration"></param>
 [Route("[controller]/[action]")]
-public class CustomAccountController(IConfiguration configuration) : Controller
+public sealed class CustomAccountController(IConfiguration configuration) : Controller
 {
     /// <summary>
     ///     Signs out the user and redirects to the signed-out page.

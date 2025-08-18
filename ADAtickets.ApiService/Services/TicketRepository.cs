@@ -31,7 +31,7 @@ namespace ADAtickets.ApiService.Services;
 /// <summary>
 ///     Implements the methods to manage the <see cref="Ticket" /> entities in the underlying database.
 /// </summary>
-internal class TicketRepository(ADAticketsDbContext context) : ITicketRepository
+internal sealed class TicketRepository(ADAticketsDbContext context) : ITicketRepository
 {
     /// <inheritdoc cref="ITicketRepository.GetTicketByIdAsync" />
     public async Task<Ticket?> GetTicketByIdAsync(Guid id)

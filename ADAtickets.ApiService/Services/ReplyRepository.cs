@@ -18,20 +18,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using ADAtickets.ApiService.Configs;
 using ADAtickets.ApiService.Repositories;
 using ADAtickets.Shared.Models;
 using Humanizer;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 
 namespace ADAtickets.ApiService.Services;
 
 /// <summary>
 ///     Implements the methods to manage the <see cref="Reply" /> entities in the underlying database.
 /// </summary>
-internal class ReplyRepository(ADAticketsDbContext context) : IReplyRepository
+internal sealed class ReplyRepository(ADAticketsDbContext context) : IReplyRepository
 {
     /// <inheritdoc cref="IReplyRepository.GetReplyByIdAsync" />
     public async Task<Reply?> GetReplyByIdAsync(Guid id)

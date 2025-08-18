@@ -27,7 +27,7 @@ namespace ADAtickets.Shared.Dtos.Responses;
 ///     </para>
 ///     <para>It is a simplified version of the <see cref="Notification" /> class, used for data transfer to the client.</para>
 /// </summary>
-public sealed class NotificationResponseDto : ResponseDto
+public sealed record NotificationResponseDto : ResponseDto
 {
     /// <summary>
     ///     The date and time when the notification was sent.

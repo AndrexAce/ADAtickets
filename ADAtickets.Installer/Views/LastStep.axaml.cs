@@ -18,13 +18,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Reflection;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 using ADAtickets.Installer.ViewModels;
 using ADAtickets.Shared.Constants;
 using Avalonia.Controls;
@@ -32,6 +25,13 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Docker.DotNet;
 using Docker.DotNet.Models;
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Reflection;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ADAtickets.Installer.Views;
 

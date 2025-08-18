@@ -34,7 +34,7 @@ namespace ADAtickets.Tests.Services.ReplyRepository;
 ///         <item>Invalid entity</item>
 ///     </list>
 /// </summary>
-public class PostTests
+public sealed class PostTests
 {
     public static TheoryData<Reply> InvalidReplyData =>
     [

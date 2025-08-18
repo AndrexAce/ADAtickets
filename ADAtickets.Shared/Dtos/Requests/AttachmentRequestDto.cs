@@ -26,7 +26,7 @@ namespace ADAtickets.Shared.Dtos.Requests;
 ///     <para>Represents an attachment associated with a ticket.</para>
 ///     <para>It is a simplified version of the <see cref="Attachment" /> class, used for data transfer to the server.</para>
 /// </summary>
-public class AttachmentRequestDto : RequestDto
+public sealed class AttachmentRequestDto : RequestDto
 {
     /// <summary>
     ///     The name of the attachment.

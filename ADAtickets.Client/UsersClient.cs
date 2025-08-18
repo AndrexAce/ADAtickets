@@ -18,16 +18,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using System.Net;
-using System.Net.Http.Json;
-using System.Net.Mime;
-using System.Text.Json;
 using ADAtickets.Shared.Constants;
 using ADAtickets.Shared.Dtos.Requests;
 using ADAtickets.Shared.Dtos.Responses;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Identity.Abstractions;
+using System.Net;
+using System.Net.Http.Json;
+using System.Net.Mime;
+using System.Text.Json;
 
 namespace ADAtickets.Client;
 

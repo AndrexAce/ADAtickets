@@ -18,12 +18,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using System.Globalization;
 using ADAtickets.Installer.ViewModels;
 using ADAtickets.Installer.Views;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using System.Globalization;
 
 namespace ADAtickets.Installer;
 

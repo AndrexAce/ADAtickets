@@ -18,10 +18,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+using AutoMapper.Configuration.Annotations;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
-using AutoMapper.Configuration.Annotations;
 
 namespace ADAtickets.Shared.Models;
 

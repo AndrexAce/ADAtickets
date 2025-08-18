@@ -35,7 +35,7 @@ namespace ADAtickets.Tests.Services.AttachmentRepository;
 ///         <item>Invalid entity, valid data</item>
 ///     </list>
 /// </summary>
-public class PostTests
+public sealed class PostTests
 {
     public static TheoryData<Attachment> InvalidAttachmentData =>
     [

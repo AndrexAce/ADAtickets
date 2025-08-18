@@ -29,7 +29,7 @@ namespace ADAtickets.ApiService.Services;
 /// <summary>
 ///     Implements the methods to manage the <see cref="UserNotification" /> entities in the underlying database.
 /// </summary>
-internal class UserNotificationRepository(ADAticketsDbContext context) : IUserNotificationRepository
+internal sealed class UserNotificationRepository(ADAticketsDbContext context) : IUserNotificationRepository
 {
     /// <inheritdoc cref="IUserNotificationRepository.GetUserNotificationByIdAsync" />
     public async Task<UserNotification?> GetUserNotificationByIdAsync(Guid id)

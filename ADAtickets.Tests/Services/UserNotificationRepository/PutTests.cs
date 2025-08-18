@@ -34,7 +34,7 @@ namespace ADAtickets.Tests.Services.UserNotificationRepository;
 ///         <item>Invalid entity</item>
 ///     </list>
 /// </summary>
-public class PutTests
+public sealed class PutTests
 {
     public static TheoryData<UserNotification> InvalidUserNotificationData =>
     [

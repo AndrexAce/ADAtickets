@@ -34,7 +34,7 @@ namespace ADAtickets.Tests.Services.UserPlatformRepository;
 ///         <item>Invalid entity</item>
 ///     </list>
 /// </summary>
-public class PostTests
+public sealed class PostTests
 {
     public static TheoryData<UserPlatform> InvalidUserPlatformData =>
     [

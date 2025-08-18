@@ -36,7 +36,7 @@ namespace ADAtickets.Tests.Services.AttachmentRepository;
 ///         <item>Valid new entity, valid data, invalid old path</item>
 ///     </list>
 /// </summary>
-public class PutTests
+public sealed class PutTests
 {
     public static TheoryData<Attachment> InvalidAttachmentData =>
     [

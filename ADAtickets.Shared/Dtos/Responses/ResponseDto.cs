@@ -27,7 +27,7 @@ namespace ADAtickets.Shared.Dtos.Responses;
 ///     <para>Contains common properties and methods.</para>
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Never)]
-public abstract class ResponseDto
+public abstract record ResponseDto
 {
     /// <summary>
     ///     The unique identifier of the entity.

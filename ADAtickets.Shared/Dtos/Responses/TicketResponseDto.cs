@@ -27,7 +27,7 @@ namespace ADAtickets.Shared.Dtos.Responses;
 ///     <para>Represents a ticket sent by a user to the system.</para>
 ///     <para>It is a simplified version of the <see cref="Ticket" /> class, used for data transfer to the client.</para>
 /// </summary>
-public sealed class TicketResponseDto : ResponseDto
+public sealed record TicketResponseDto : ResponseDto
 {
     /// <summary>
     ///     The type of user request bound to the ticket.

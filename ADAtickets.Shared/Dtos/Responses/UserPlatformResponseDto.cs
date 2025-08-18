@@ -26,7 +26,7 @@ namespace ADAtickets.Shared.Dtos.Responses;
 ///     <para>Represents the link between a user and their preferred platform.</para>
 ///     <para>It is a simplified version of the <see cref="UserPlatform" /> class, used for data transfer to the client.</para>
 /// </summary>
-public sealed class UserPlatformResponseDto : ResponseDto
+public sealed record UserPlatformResponseDto : ResponseDto
 {
     /// <summary>
     ///     The unique identifier of the user.

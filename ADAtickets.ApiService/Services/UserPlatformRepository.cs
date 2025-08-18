@@ -29,7 +29,7 @@ namespace ADAtickets.ApiService.Services;
 /// <summary>
 ///     Implements the methods to manage the <see cref="UserPlatform" /> entities in the underlying database.
 /// </summary>
-internal class UserPlatformRepository(ADAticketsDbContext context) : IUserPlatformRepository
+internal sealed class UserPlatformRepository(ADAticketsDbContext context) : IUserPlatformRepository
 {
     /// <inheritdoc cref="IUserPlatformRepository.GetUserPlatformByIdAsync" />
     public async Task<UserPlatform?> GetUserPlatformByIdAsync(Guid id)

@@ -42,7 +42,7 @@ public sealed class DeleteTests
         User user = new() { Id = Guid.NewGuid() };
         Notification notification = new() { Id = Guid.NewGuid() };
         UserNotification userNotification = new()
-            { Id = Guid.NewGuid(), ReceiverUserId = user.Id, NotificationId = notification.Id };
+        { Id = Guid.NewGuid(), ReceiverUserId = user.Id, NotificationId = notification.Id };
         List<UserNotification> userNotifications = [userNotification];
 
         Mock<ADAticketsDbContext> mockContext = new();

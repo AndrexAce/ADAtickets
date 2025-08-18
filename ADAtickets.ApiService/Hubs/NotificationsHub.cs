@@ -25,7 +25,7 @@ namespace ADAtickets.ApiService.Hubs;
 /// <summary>
 ///     SignalR hub managing real-time communincation with clients when notifications are created, updated or deleted.
 /// </summary>
-public class NotificationsHub : Hub
+public sealed class NotificationsHub : Hub
 {
     /// <summary>
     ///     Inserts the user in a personal group based on their user identifier to send targeted notifications.

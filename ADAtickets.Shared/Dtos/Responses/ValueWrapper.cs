@@ -25,7 +25,7 @@ namespace ADAtickets.Shared.Dtos.Responses;
 /// </summary>
 /// <typeparam name="TValue">The value type the class contains.</typeparam>
 /// <param name="value">The value to wrap.</param>
-public sealed class ValueWrapper<TValue> where TValue : struct
+public sealed record ValueWrapper<TValue> where TValue : struct
 {
     private ValueWrapper()
     {

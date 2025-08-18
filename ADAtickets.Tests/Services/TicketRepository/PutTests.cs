@@ -34,7 +34,7 @@ namespace ADAtickets.Tests.Services.TicketRepository;
 ///         <item>Invalid entity</item>
 ///     </list>
 /// </summary>
-public class PutTests
+public sealed class PutTests
 {
     public static TheoryData<Ticket> InvalidTicketData =>
     [

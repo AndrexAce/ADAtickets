@@ -29,7 +29,7 @@ namespace ADAtickets.Shared.Dtos.Responses;
 ///         client.
 ///     </para>
 /// </summary>
-public sealed class UserNotificationResponseDto : ResponseDto
+public sealed record UserNotificationResponseDto : ResponseDto
 {
     /// <summary>
     ///     The unique identifier of the user.

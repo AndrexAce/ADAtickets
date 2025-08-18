@@ -18,8 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using System.Text.Json.Serialization;
 using ADAtickets.Shared.Models;
+using System.Text.Json.Serialization;
 
 namespace ADAtickets.Shared.Dtos.Responses;
 
@@ -27,7 +27,7 @@ namespace ADAtickets.Shared.Dtos.Responses;
 ///     <para>Represents a modification made to a ticket, either by a user or by the system.</para>
 ///     <para>It is a simplified version of the <see cref="Edit" /> class, used for data transfer to the client.</para>
 /// </summary>
-public sealed class EditResponseDto : ResponseDto
+public sealed record EditResponseDto : ResponseDto
 {
     /// <summary>
     ///     The date and time when the edit was made.

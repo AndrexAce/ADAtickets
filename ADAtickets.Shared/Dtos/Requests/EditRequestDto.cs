@@ -18,9 +18,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+using ADAtickets.Shared.Models;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
-using ADAtickets.Shared.Models;
 
 namespace ADAtickets.Shared.Dtos.Requests;
 

@@ -24,7 +24,7 @@ namespace ADAtickets.Shared.Dtos.Responses;
 ///     <para>Represents an attachment associated with a ticket.</para>
 ///     <para>It is a simplified version of the <see cref="Attachment" /> class, used for data transfer to the client.</para>
 /// </summary>
-public class AttachmentResponseDto : ResponseDto
+public sealed record AttachmentResponseDto : ResponseDto
 {
     /// <summary>
     ///     The path of the attachment on the server.

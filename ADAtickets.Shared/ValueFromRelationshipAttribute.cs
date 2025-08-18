@@ -17,16 +17,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-namespace ADAtickets.Shared
+namespace ADAtickets.Shared;
+
+/// <summary>
+///     Marks properties or fields that do not belong the original entityonthedatabase,but are fetched through its relationships.
+/// </summary>
+/// <remarks>
+///     The inclusion of these extra properties or fields allows toreducethebandwidthby making less network requests.
+/// </remarks>
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
+internal class ValueFromRelationshipAttribute : Attribute
 {
-    /// <summary>
-    ///     Marks properties or fields that do not belong the original entity on the database, but are fetched through its relationships.
-    /// </summary>
-    /// <remarks>
-    ///     The inclusion of these extra properties or fields allows to reduce the bandwidth by making less network requests.
-    /// </remarks>
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
-    internal class ValueFromRelationshipAttribute : Attribute
-    {
-    }
 }

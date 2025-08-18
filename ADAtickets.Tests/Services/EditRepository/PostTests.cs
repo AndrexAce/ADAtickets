@@ -34,7 +34,7 @@ namespace ADAtickets.Tests.Services.EditRepository;
 ///         <item>Invalid entity</item>
 ///     </list>
 /// </summary>
-public class PostTests
+public sealed class PostTests
 {
     public static TheoryData<Edit> InvalidEditData =>
     [

@@ -18,9 +18,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using System.ComponentModel.DataAnnotations;
-using System.IO;
-using System.Windows.Input;
 using ADAtickets.Installer.Assets;
 using ADAtickets.Installer.Views;
 using Avalonia;
@@ -29,6 +26,9 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using ReactiveUI;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
+using System.Windows.Input;
 
 namespace ADAtickets.Installer.ViewModels;
 

@@ -43,36 +43,36 @@ namespace ADAtickets.Tests.Controllers.NotificationsController;
 /// </summary>
 public sealed class CreateCreationNotificationsAsyncTests
 {
-    private readonly Controller _controller;
-    private readonly Mock<IMapper> _mockMapper;
-    private readonly Mock<INotificationRepository> _mockNotificationRepository;
-    private readonly Mock<IUserNotificationRepository> _mockUserNotificationRepository;
-    private readonly Mock<IUserPlatformRepository> _mockUserPlatformRepository;
-    private readonly Mock<IUserRepository> _mockUserRepository;
-    private readonly Mock<IHubContext<NotificationsHub>> _mockHubContext;
+    private readonly Controller controller;
+    private readonly Mock<IMapper> mockMapper;
+    private readonly Mock<INotificationRepository> mockNotificationRepository;
+    private readonly Mock<IUserNotificationRepository> mockUserNotificationRepository;
+    private readonly Mock<IUserPlatformRepository> mockUserPlatformRepository;
+    private readonly Mock<IUserRepository> mockUserRepository;
+    private readonly Mock<IHubContext<NotificationsHub>> mockHubContext;
 
     public CreateCreationNotificationsAsyncTests()
     {
-        _mockNotificationRepository = new Mock<INotificationRepository>();
-        _mockUserNotificationRepository = new Mock<IUserNotificationRepository>();
-        _mockUserPlatformRepository = new Mock<IUserPlatformRepository>();
-        _mockUserRepository = new Mock<IUserRepository>();
-        _mockMapper = new Mock<IMapper>();
-        _mockHubContext = new Mock<IHubContext<NotificationsHub>>();
+        mockNotificationRepository = new Mock<INotificationRepository>();
+        mockUserNotificationRepository = new Mock<IUserNotificationRepository>();
+        mockUserPlatformRepository = new Mock<IUserPlatformRepository>();
+        mockUserRepository = new Mock<IUserRepository>();
+        mockMapper = new Mock<IMapper>();
+        mockHubContext = new Mock<IHubContext<NotificationsHub>>();
 
-        _controller = new Controller(
-            _mockNotificationRepository.Object,
-            _mockMapper.Object,
-            _mockUserNotificationRepository.Object,
-            _mockUserPlatformRepository.Object,
-            _mockUserRepository.Object,
-            _mockHubContext.Object);
+        controller = new Controller(
+            mockNotificationRepository.Object,
+            mockMapper.Object,
+            mockUserNotificationRepository.Object,
+            mockUserPlatformRepository.Object,
+            mockUserRepository.Object,
+            mockHubContext.Object);
     }
 
     #region CreateCreationNotificationsAsync Tests
 
     [Fact]
-    public async Task CreateCreationNotificationsAsync_NoOperatorsWithPreferredPlatform_NotifiesAllOperators()
+    public async Task CreateCreationNotificationsAsyncNoOperatorsWithPreferredPlatformNotifiesAllOperators()
     {
         // Arrange
         var creatorUserId = Guid.NewGuid();
@@ -97,44 +97,44 @@ public sealed class CreateCreationNotificationsAsyncTests
         var emptyUserPlatforms = new List<UserPlatform>();
 
         // Setup mocks
-        _mockUserPlatformRepository.Setup(x => x.GetUserPlatformsByAsync(
+        mockUserPlatformRepository.Setup(x => x.GetUserPlatformsByAsync(
                 It.Is<IEnumerable<KeyValuePair<string, string>>>(filters =>
                     filters.Any(f => f.Key == nameof(UserPlatform.PlatformId) && f.Value == platformId.ToString()))))
             .ReturnsAsync(emptyUserPlatforms);
 
-        _mockUserRepository.Setup(x => x.GetUsersAsync())
+        mockUserRepository.Setup(x => x.GetUsersAsync())
             .ReturnsAsync(allOperators);
 
-        _mockNotificationRepository.Setup(x => x.AddNotificationAsync(It.IsAny<Notification>()))
+        mockNotificationRepository.Setup(x => x.AddNotificationAsync(It.IsAny<Notification>()))
             .Returns(Task.CompletedTask);
 
-        _mockUserNotificationRepository.Setup(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()))
+        mockUserNotificationRepository.Setup(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()))
             .Returns(Task.CompletedTask);
 
         // Act
-        var result = await _controller.CreateCreationNotificationsAsync(ticket);
+        var result = await controller.CreateCreationNotificationsAsync(ticket);
 
         // Assert
         Assert.Null(result); // Should return null when no auto-assignment occurs
 
         // Verify initial ticket created notification
-        _mockNotificationRepository.Verify(x => x.AddNotificationAsync(
+        mockNotificationRepository.Verify(x => x.AddNotificationAsync(
             It.Is<Notification>(n =>
                 n.TicketId == ticketId &&
                 n.Message == Notifications.TicketCreated &&
                 n.UserId == creatorUserId)), Times.Once);
 
         // Verify all operators (Admin + Operator types) were notified - should be 2 notifications
-        _mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()),
+        mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()),
             Times.Exactly(2));
 
         // Verify no additional notifications were created (only the initial one)
-        _mockNotificationRepository.Verify(x => x.AddNotificationAsync(It.IsAny<Notification>()), Times.Once);
+        mockNotificationRepository.Verify(x => x.AddNotificationAsync(It.IsAny<Notification>()), Times.Once);
     }
 
     [Fact]
     public async Task
-        CreateCreationNotificationsAsync_OperatorsWithPreferredPlatformButNoValidUsers_NotifiesAllOperators()
+        CreateCreationNotificationsAsyncOperatorsWithPreferredPlatformButNoValidUsersNotifiesAllOperators()
     {
         // Arrange
         var creatorUserId = Guid.NewGuid();
@@ -166,43 +166,43 @@ public sealed class CreateCreationNotificationsAsyncTests
         };
 
         // Setup mocks
-        _mockUserPlatformRepository.Setup(x => x.GetUserPlatformsByAsync(
+        mockUserPlatformRepository.Setup(x => x.GetUserPlatformsByAsync(
                 It.Is<IEnumerable<KeyValuePair<string, string>>>(filters =>
                     filters.Any(f => f.Key == nameof(UserPlatform.PlatformId) && f.Value == platformId.ToString()))))
             .ReturnsAsync(userPlatforms);
 
-        _mockUserRepository.Setup(x => x.GetUsersAsync())
+        mockUserRepository.Setup(x => x.GetUsersAsync())
             .ReturnsAsync(allUsers);
 
-        _mockNotificationRepository.Setup(x => x.AddNotificationAsync(It.IsAny<Notification>()))
+        mockNotificationRepository.Setup(x => x.AddNotificationAsync(It.IsAny<Notification>()))
             .Returns(Task.CompletedTask);
 
-        _mockUserNotificationRepository.Setup(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()))
+        mockUserNotificationRepository.Setup(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()))
             .Returns(Task.CompletedTask);
 
         // Act
-        var result = await _controller.CreateCreationNotificationsAsync(ticket);
+        var result = await controller.CreateCreationNotificationsAsync(ticket);
 
         // Assert
         Assert.Null(result); // Should return null when no valid operator found
 
         // Verify initial ticket created notification
-        _mockNotificationRepository.Verify(x => x.AddNotificationAsync(
+        mockNotificationRepository.Verify(x => x.AddNotificationAsync(
             It.Is<Notification>(n =>
                 n.TicketId == ticketId &&
                 n.Message == Notifications.TicketCreated &&
                 n.UserId == creatorUserId)), Times.Once);
 
         // Verify SendNotificationToAllOperators was called (operators from second call to GetUsersAsync)
-        _mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()),
+        mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()),
             Times.Exactly(1)); // Only operators from allUsers
 
         // Verify only the initial notification was created
-        _mockNotificationRepository.Verify(x => x.AddNotificationAsync(It.IsAny<Notification>()), Times.Once);
+        mockNotificationRepository.Verify(x => x.AddNotificationAsync(It.IsAny<Notification>()), Times.Once);
     }
 
     [Fact]
-    public async Task CreateCreationNotificationsAsync_OperatorWithPreferredPlatformAndLeastWorkload_AutoAssignsTicket()
+    public async Task CreateCreationNotificationsAsyncOperatorWithPreferredPlatformAndLeastWorkloadAutoAssignsTicket()
     {
         // Arrange
         var creatorUserId = Guid.NewGuid();
@@ -228,62 +228,62 @@ public sealed class CreateCreationNotificationsAsyncTests
         };
 
         // Setup mocks
-        _mockUserPlatformRepository.Setup(x => x.GetUserPlatformsByAsync(
+        mockUserPlatformRepository.Setup(x => x.GetUserPlatformsByAsync(
                 It.Is<IEnumerable<KeyValuePair<string, string>>>(filters =>
                     filters.Any(f => f.Key == nameof(UserPlatform.PlatformId) && f.Value == platformId.ToString()))))
             .ReturnsAsync(userPlatforms);
 
-        _mockUserRepository.Setup(x => x.GetUsersAsync())
+        mockUserRepository.Setup(x => x.GetUsersAsync())
             .ReturnsAsync(allUsers);
 
-        _mockNotificationRepository.Setup(x => x.AddNotificationAsync(It.IsAny<Notification>()))
+        mockNotificationRepository.Setup(x => x.AddNotificationAsync(It.IsAny<Notification>()))
             .Returns(Task.CompletedTask);
 
-        _mockUserNotificationRepository.Setup(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()))
+        mockUserNotificationRepository.Setup(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()))
             .Returns(Task.CompletedTask);
 
         // Act
-        var result = await _controller.CreateCreationNotificationsAsync(ticket);
+        var result = await controller.CreateCreationNotificationsAsync(ticket);
 
         // Assert
         Assert.Equal(operatorUserId, result); // Should return the assigned operator's ID
 
         // Verify initial ticket created notification
-        _mockNotificationRepository.Verify(x => x.AddNotificationAsync(
+        mockNotificationRepository.Verify(x => x.AddNotificationAsync(
             It.Is<Notification>(n =>
                 n.TicketId == ticketId &&
                 n.Message == Notifications.TicketCreated &&
                 n.UserId == creatorUserId)), Times.Once);
 
         // Verify system assignment notification for operator
-        _mockNotificationRepository.Verify(x => x.AddNotificationAsync(
+        mockNotificationRepository.Verify(x => x.AddNotificationAsync(
             It.Is<Notification>(n =>
                 n.TicketId == ticketId &&
                 n.Message == Notifications.TicketAssignedToYouBySystem &&
                 n.UserId == operatorUserId)), Times.Once);
 
         // Verify ticket assigned notification for creator
-        _mockNotificationRepository.Verify(x => x.AddNotificationAsync(
+        mockNotificationRepository.Verify(x => x.AddNotificationAsync(
             It.Is<Notification>(n =>
                 n.TicketId == ticketId &&
                 n.Message == Notifications.TicketAssigned &&
                 n.UserId == operatorUserId)), Times.Once);
 
         // Verify user notifications were created (operator about creation + operator about assignment + creator about assignment)
-        _mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(
+        mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(
             It.Is<UserNotification>(un => un.ReceiverUserId == operatorUserId)), Times.Exactly(2));
 
-        _mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(
+        mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(
             It.Is<UserNotification>(un => un.ReceiverUserId == creatorUserId)), Times.Once);
 
         // Total: 3 notifications, 3 user notification links
-        _mockNotificationRepository.Verify(x => x.AddNotificationAsync(It.IsAny<Notification>()), Times.Exactly(3));
-        _mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()),
+        mockNotificationRepository.Verify(x => x.AddNotificationAsync(It.IsAny<Notification>()), Times.Exactly(3));
+        mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()),
             Times.Exactly(3));
     }
 
     [Fact]
-    public async Task CreateCreationNotificationsAsync_MultipleOperatorsWithDifferentWorkloads_SelectsLeastWorkload()
+    public async Task CreateCreationNotificationsAsyncMultipleOperatorsWithDifferentWorkloadsSelectsLeastWorkload()
     {
         // Arrange
         var creatorUserId = Guid.NewGuid();
@@ -321,40 +321,40 @@ public sealed class CreateCreationNotificationsAsyncTests
         allUsers[2].AssignedTickets.Add(new Ticket());
 
         // Setup mocks
-        _mockUserPlatformRepository.Setup(x => x.GetUserPlatformsByAsync(
+        mockUserPlatformRepository.Setup(x => x.GetUserPlatformsByAsync(
                 It.Is<IEnumerable<KeyValuePair<string, string>>>(filters =>
                     filters.Any(f => f.Key == nameof(UserPlatform.PlatformId) && f.Value == platformId.ToString()))))
             .ReturnsAsync(userPlatforms);
 
-        _mockUserRepository.Setup(x => x.GetUsersAsync())
+        mockUserRepository.Setup(x => x.GetUsersAsync())
             .ReturnsAsync(allUsers);
 
-        _mockNotificationRepository.Setup(x => x.AddNotificationAsync(It.IsAny<Notification>()))
+        mockNotificationRepository.Setup(x => x.AddNotificationAsync(It.IsAny<Notification>()))
             .Returns(Task.CompletedTask);
 
-        _mockUserNotificationRepository.Setup(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()))
+        mockUserNotificationRepository.Setup(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()))
             .Returns(Task.CompletedTask);
 
         // Act
-        var result = await _controller.CreateCreationNotificationsAsync(ticket);
+        var result = await controller.CreateCreationNotificationsAsync(ticket);
 
         // Assert
         Assert.Equal(operator2Id, result); // Should return operator2 (least workload)
 
         // Verify notifications were created for the correct operator
-        _mockNotificationRepository.Verify(x => x.AddNotificationAsync(
+        mockNotificationRepository.Verify(x => x.AddNotificationAsync(
             It.Is<Notification>(n =>
                 n.Message == Notifications.TicketAssignedToYouBySystem &&
                 n.UserId == operator2Id)), Times.Once);
 
-        _mockNotificationRepository.Verify(x => x.AddNotificationAsync(
+        mockNotificationRepository.Verify(x => x.AddNotificationAsync(
             It.Is<Notification>(n =>
                 n.Message == Notifications.TicketAssigned &&
                 n.UserId == operator2Id)), Times.Once);
     }
 
     [Fact]
-    public async Task CreateCreationNotificationsAsync_OperatorsWithSameWorkload_SelectsFirstOne()
+    public async Task CreateCreationNotificationsAsyncOperatorsWithSameWorkloadSelectsFirstOne()
     {
         // Arrange
         var creatorUserId = Guid.NewGuid();
@@ -386,35 +386,35 @@ public sealed class CreateCreationNotificationsAsyncTests
         allUsers[1].AssignedTickets.Add(new Ticket());
 
         // Setup mocks
-        _mockUserPlatformRepository.Setup(x => x.GetUserPlatformsByAsync(
+        mockUserPlatformRepository.Setup(x => x.GetUserPlatformsByAsync(
                 It.Is<IEnumerable<KeyValuePair<string, string>>>(filters =>
                     filters.Any(f => f.Key == nameof(UserPlatform.PlatformId) && f.Value == platformId.ToString()))))
             .ReturnsAsync(userPlatforms);
 
-        _mockUserRepository.Setup(x => x.GetUsersAsync())
+        mockUserRepository.Setup(x => x.GetUsersAsync())
             .ReturnsAsync(allUsers);
 
-        _mockNotificationRepository.Setup(x => x.AddNotificationAsync(It.IsAny<Notification>()))
+        mockNotificationRepository.Setup(x => x.AddNotificationAsync(It.IsAny<Notification>()))
             .Returns(Task.CompletedTask);
 
-        _mockUserNotificationRepository.Setup(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()))
+        mockUserNotificationRepository.Setup(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()))
             .Returns(Task.CompletedTask);
 
         // Act
-        var result = await _controller.CreateCreationNotificationsAsync(ticket);
+        var result = await controller.CreateCreationNotificationsAsync(ticket);
 
         // Assert
         Assert.Equal(operator1Id, result); // Should return the first operator (FirstOrDefault behavior)
 
         // Verify notifications were created for the first operator
-        _mockNotificationRepository.Verify(x => x.AddNotificationAsync(
+        mockNotificationRepository.Verify(x => x.AddNotificationAsync(
             It.Is<Notification>(n =>
                 n.Message == Notifications.TicketAssignedToYouBySystem &&
                 n.UserId == operator1Id)), Times.Once);
     }
 
     [Fact]
-    public async Task CreateCreationNotificationsAsync_NoOperatorsInSystem_CreatesOnlyInitialNotification()
+    public async Task CreateCreationNotificationsAsyncNoOperatorsInSystemCreatesOnlyInitialNotification()
     {
         // Arrange
         var creatorUserId = Guid.NewGuid();
@@ -436,43 +436,43 @@ public sealed class CreateCreationNotificationsAsyncTests
         };
 
         // Setup mocks
-        _mockUserPlatformRepository.Setup(x => x.GetUserPlatformsByAsync(
+        mockUserPlatformRepository.Setup(x => x.GetUserPlatformsByAsync(
                 It.Is<IEnumerable<KeyValuePair<string, string>>>(filters =>
                     filters.Any(f => f.Key == nameof(UserPlatform.PlatformId) && f.Value == platformId.ToString()))))
             .ReturnsAsync(emptyUserPlatforms);
 
-        _mockUserRepository.Setup(x => x.GetUsersAsync())
+        mockUserRepository.Setup(x => x.GetUsersAsync())
             .ReturnsAsync(onlyRegularUsers);
 
-        _mockNotificationRepository.Setup(x => x.AddNotificationAsync(It.IsAny<Notification>()))
+        mockNotificationRepository.Setup(x => x.AddNotificationAsync(It.IsAny<Notification>()))
             .Returns(Task.CompletedTask);
 
-        _mockUserNotificationRepository.Setup(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()))
+        mockUserNotificationRepository.Setup(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()))
             .Returns(Task.CompletedTask);
 
         // Act
-        var result = await _controller.CreateCreationNotificationsAsync(ticket);
+        var result = await controller.CreateCreationNotificationsAsync(ticket);
 
         // Assert
         Assert.Null(result); // Should return null when no operators exist
 
         // Verify only the initial ticket created notification
-        _mockNotificationRepository.Verify(x => x.AddNotificationAsync(
+        mockNotificationRepository.Verify(x => x.AddNotificationAsync(
             It.Is<Notification>(n =>
                 n.TicketId == ticketId &&
                 n.Message == Notifications.TicketCreated &&
                 n.UserId == creatorUserId)), Times.Once);
 
         // Verify no user notifications were created (no operators to notify)
-        _mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()),
+        mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()),
             Times.Never);
 
         // Verify only one notification was created total
-        _mockNotificationRepository.Verify(x => x.AddNotificationAsync(It.IsAny<Notification>()), Times.Once);
+        mockNotificationRepository.Verify(x => x.AddNotificationAsync(It.IsAny<Notification>()), Times.Once);
     }
 
     [Fact]
-    public async Task CreateCreationNotificationsAsync_OperatorWithEmptyGuidId_NotifiesAllOperators()
+    public async Task CreateCreationNotificationsAsyncOperatorWithEmptyGuidIdNotifiesAllOperators()
     {
         // Arrange
         var creatorUserId = Guid.NewGuid();
@@ -498,37 +498,37 @@ public sealed class CreateCreationNotificationsAsyncTests
         };
 
         // Setup mocks
-        _mockUserPlatformRepository.Setup(x => x.GetUserPlatformsByAsync(
+        mockUserPlatformRepository.Setup(x => x.GetUserPlatformsByAsync(
                 It.Is<IEnumerable<KeyValuePair<string, string>>>(filters =>
                     filters.Any(f => f.Key == nameof(UserPlatform.PlatformId) && f.Value == platformId.ToString()))))
             .ReturnsAsync(userPlatforms);
 
-        _mockUserRepository.Setup(x => x.GetUsersAsync())
+        mockUserRepository.Setup(x => x.GetUsersAsync())
             .ReturnsAsync(allUsers);
 
-        _mockNotificationRepository.Setup(x => x.AddNotificationAsync(It.IsAny<Notification>()))
+        mockNotificationRepository.Setup(x => x.AddNotificationAsync(It.IsAny<Notification>()))
             .Returns(Task.CompletedTask);
 
-        _mockUserNotificationRepository.Setup(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()))
+        mockUserNotificationRepository.Setup(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()))
             .Returns(Task.CompletedTask);
 
         // Act
-        var result = await _controller.CreateCreationNotificationsAsync(ticket);
+        var result = await controller.CreateCreationNotificationsAsync(ticket);
 
         // Assert
         Assert.Null(result); // Should return null when operatorWithLeastWorkload is Guid.Empty
 
         // Verify initial notification was created
-        _mockNotificationRepository.Verify(x => x.AddNotificationAsync(
+        mockNotificationRepository.Verify(x => x.AddNotificationAsync(
             It.Is<Notification>(n =>
                 n.Message == Notifications.TicketCreated)), Times.Once);
 
         // Verify SendNotificationToAllOperators was called (should notify all the operators)
-        _mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()),
+        mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()),
             Times.Exactly(2));
 
         // Verify no auto-assignment notifications were created
-        _mockNotificationRepository.Verify(x => x.AddNotificationAsync(
+        mockNotificationRepository.Verify(x => x.AddNotificationAsync(
             It.Is<Notification>(n =>
                 n.Message == Notifications.TicketAssignedToYouBySystem)), Times.Never);
     }

@@ -25,7 +25,7 @@ namespace ADAtickets.Web.Components.Utilities;
 /// <summary>
 ///     Service managing real-time communication with the APIs.
 /// </summary>
-public sealed class SignalRService : IAsyncDisposable
+internal sealed class SignalRService : IAsyncDisposable
 {
     private HubConnection? hubConnection;
 

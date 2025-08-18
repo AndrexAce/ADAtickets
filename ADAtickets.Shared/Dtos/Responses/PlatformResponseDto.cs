@@ -24,7 +24,7 @@ namespace ADAtickets.Shared.Dtos.Responses;
 ///     <para>Represents a platform managed by the enterprise which tickets are related to.</para>
 ///     <para>It is a simplified version of the <see cref="Platform" /> class, used for data transfer to the client.</para>
 /// </summary>
-public sealed class PlatformResponseDto : ResponseDto
+public sealed record PlatformResponseDto : ResponseDto
 {
     /// <summary>
     ///     The name of the platform.

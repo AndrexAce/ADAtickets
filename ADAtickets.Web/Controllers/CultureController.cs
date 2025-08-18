@@ -27,7 +27,7 @@ namespace ADAtickets.Web.Controllers;
 ///     Handles culture-related actions.
 /// </summary>
 [Route("[controller]/[action]")]
-public class CultureController : Controller
+public sealed class CultureController : Controller
 {
     /// <summary>
     ///     Sets the culture for the current request and redirects to the specified URI.

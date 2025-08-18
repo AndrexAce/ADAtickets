@@ -27,7 +27,7 @@ namespace ADAtickets.Shared.Dtos.Responses;
 ///     <para>Represents a user of the system.</para>
 ///     <para>It is a simplified version of the <see cref="User" /> class, used for data transfer to the client.</para>
 /// </summary>
-public sealed class UserResponseDto : ResponseDto
+public sealed record UserResponseDto : ResponseDto
 {
     /// <summary>
     ///     The email address of the user.

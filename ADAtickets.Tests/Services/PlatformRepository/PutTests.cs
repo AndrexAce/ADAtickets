@@ -18,12 +18,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using System.Text.RegularExpressions;
 using ADAtickets.ApiService.Configs;
 using ADAtickets.Shared.Models;
 using Microsoft.EntityFrameworkCore;
 using MockQueryable.Moq;
 using Moq;
+using System.Text.RegularExpressions;
 using PlatformService = ADAtickets.ApiService.Services.PlatformRepository;
 
 namespace ADAtickets.Tests.Services.PlatformRepository;
@@ -35,7 +35,7 @@ namespace ADAtickets.Tests.Services.PlatformRepository;
 ///         <item>Invalid entity</item>
 ///     </list>
 /// </summary>
-public class PutTests
+public sealed class PutTests
 {
     public static TheoryData<Platform> InvalidPlatformData =>
     [

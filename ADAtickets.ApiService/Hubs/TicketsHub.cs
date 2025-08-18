@@ -25,7 +25,7 @@ namespace ADAtickets.ApiService.Hubs;
 /// <summary>
 ///     SignalR hub managing real-time communincation with clients when tickets are created, updated or deleted.
 /// </summary>
-public class TicketsHub : Hub
+public sealed class TicketsHub : Hub
 {
     // No methods needed
 }
