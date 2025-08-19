@@ -18,7 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace ADAtickets.Web.Components.Utilities;
+namespace ADAtickets.Web.Utilities;
 
 /// <summary>
 ///     Wrapped event arguments for the <c>SelectedChanged</c> event.

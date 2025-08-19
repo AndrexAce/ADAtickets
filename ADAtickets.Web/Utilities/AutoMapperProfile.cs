@@ -23,7 +23,7 @@ using ADAtickets.Shared.Dtos.Requests;
 using ADAtickets.Shared.Dtos.Responses;
 using AutoMapper;
 
-namespace ADAtickets.Web.Components.Utilities;
+namespace ADAtickets.Web.Utilities;
 
 /// <summary>
 ///     Defines the AutoMapper profile to map the Response DTOs to Request DTOs.

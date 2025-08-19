@@ -20,7 +20,7 @@
 
 using Microsoft.FluentUI.AspNetCore.Components;
 
-namespace ADAtickets.Web.Components.Utilities;
+namespace ADAtickets.Web.Utilities;
 
 /// <summary>
 ///     Provides utility methods for creating toast parameters and handling toast-related actions.

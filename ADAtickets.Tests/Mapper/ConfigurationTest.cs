@@ -20,7 +20,7 @@
 
 using AutoMapper;
 using ApiServiceAutoMapperProfile = ADAtickets.ApiService.Configs.AutoMapperProfile;
-using WebAutoMapperProfile = ADAtickets.Web.Components.Utilities.AutoMapperProfile;
+using WebAutoMapperProfile = ADAtickets.Web.Utilities.AutoMapperProfile;
 
 namespace ADAtickets.Tests.Mapper;
 

@@ -22,7 +22,7 @@ using ADAtickets.Client.Extensions;
 using ADAtickets.Shared.Constants;
 using ADAtickets.Shared.Extensions;
 using ADAtickets.Web.Components;
-using ADAtickets.Web.Components.Utilities;
+using ADAtickets.Web.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;

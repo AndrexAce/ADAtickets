@@ -22,7 +22,7 @@ using ADAtickets.Shared.Dtos.Responses;
 using ADAtickets.Shared.Models;
 using Microsoft.FluentUI.AspNetCore.Components;
 
-namespace ADAtickets.Web.Components.Utilities;
+namespace ADAtickets.Web.Utilities;
 
 /// <summary>
 ///     Provides utility methods for creating dialog parameters and handling dialog-related actions.

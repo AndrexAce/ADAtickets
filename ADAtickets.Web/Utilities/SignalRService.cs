@@ -20,7 +20,7 @@
 
 using Microsoft.AspNetCore.SignalR.Client;
 
-namespace ADAtickets.Web.Components.Utilities;
+namespace ADAtickets.Web.Utilities;
 
 /// <summary>
 ///     Service managing real-time communication with the APIs.

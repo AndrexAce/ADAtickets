@@ -23,7 +23,7 @@ using ADAtickets.Shared.Dtos.Requests;
 using ADAtickets.Shared.Dtos.Responses;
 using ADAtickets.Shared.Models;
 
-namespace ADAtickets.Web.Components.Utilities;
+namespace ADAtickets.Web.Utilities;
 
 /// <summary>
 ///     Service managing shared notification state between components with thread-safe operations.
