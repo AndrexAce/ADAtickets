@@ -86,11 +86,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             </FluentStack>
             <FluentSpacer/>
             <FluentStack Orientation="Orientation.Horizontal" HorizontalAlignment="HorizontalAlignment.SpaceBetween">
-                <FluentButton Appearance="Appearance.Neutral" IconStart="@(new Size20.Open())" OnClick="HandleOpen">Apri
+                <FluentButton Appearance="Appearance.Neutral" IconStart="@(new Size20.Open())" OnClick="HandleOpen"
+                    Style="@(Ticket.Status != Status.Closed ? string.Empty : "width: 100%;")">Apri
                 </FluentButton>
-                <FluentButton Appearance="Appearance.Accent" IconStart="@(new Size20.Edit())"
-                              OnClick="ShowEditTicketDialogAsync">Modifica
-                </FluentButton>
+                @if (Ticket.Status != Status.Closed)
+                {
+                    <FluentButton Appearance="Appearance.Accent" IconStart="@(new Size20.Edit())"
+                                  OnClick="ShowEditTicketDialogAsync">Modifica
+                    </FluentButton>
+                }
             </FluentStack>
         }
     </FluentStack>
@@ -105,25 +109,32 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 <span slot="start"><FluentIcon Value="@(new Size20.DeleteDismiss())" Color="Color.Neutral"
                                                Slot="start"/></span>
             </FluentMenuItem>
-            <FluentMenuItem Label="@loc["CloseMenuItem"]" OnClick="HandleCloseClickAsync">
-                <span slot="start"><FluentIcon Value="@(new Size20.Checkmark())" Color="Color.Neutral"
-                                               Slot="start"/></span>
-            </FluentMenuItem>
-            <FluentDivider/>
-            <FluentLabel Typo="Typography.H6">@loc["AssignmentMenuLabel"]</FluentLabel>
-            <FluentMenuItem Label="@loc["AssignMenuItem"]">
-                <ChildContent>
-                    <span slot="start"><FluentIcon Value="@(new Size20.Person())" Color="Color.Neutral"
-                                                   Slot="start"/></span>
-                </ChildContent>
-                <MenuItems>
-                    @foreach (var user in Users ?? [])
-                    {
-                        <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@($"{user.Name} {user.Surname}")"
-                                        OnClick="args => HandleAssignClickAsync(user.Id)"/>
-                    }
-                </MenuItems>
-            </FluentMenuItem>
+            @if (Ticket.Status != Status.Closed)
+            {
+                <FluentMenuItem Label="@loc["CloseMenuItem"]" OnClick="HandleCloseClickAsync">
+                    <span slot="start">
+                        <FluentIcon Value="@(new Size20.Checkmark())" Color="Color.Neutral"
+                                    Slot="start" />
+                    </span>
+                </FluentMenuItem>
+                <FluentDivider />
+                <FluentLabel Typo="Typography.H6">@loc["AssignmentMenuLabel"]</FluentLabel>
+                <FluentMenuItem Label="@loc["AssignMenuItem"]">
+                    <ChildContent>
+                        <span slot="start">
+                            <FluentIcon Value="@(new Size20.Person())" Color="Color.Neutral"
+                                        Slot="start" />
+                        </span>
+                    </ChildContent>
+                    <MenuItems>
+                        @foreach (var user in Users ?? [])
+                        {
+                            <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@($"{user.Name} {user.Surname}")"
+                                            OnClick="args => HandleAssignClickAsync(user.Id)" />
+                        }
+                    </MenuItems>
+                </FluentMenuItem>
+            }
         </FluentMenu>
     }
 </AuthorizeView>
@@ -275,6 +286,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             var requestDto = mapper.Map<TicketRequestDto>(getResponse);
             requestDto.OperatorUserId = operatorId;
             requestDto.Requester = await GetUserIdAsync();
+
+            if (Ticket.OperatorUserId is null)
+            {
+                // If the ticket is being edited and assigned to an operator for the first time, set the waiting status.
+                requestDto.Status = Status.WaitingOperator;
+            }
+            // Else, if assigned to another operator, keep the current status.
 
             await ticketsClient.PutAsync(Ticket.Id, requestDto);
 

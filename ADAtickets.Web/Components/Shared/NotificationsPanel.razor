@@ -25,6 +25,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @using static ADAtickets.Web.Utilities.Dialogs
 
 @inject IStringLocalizer<NotificationsPanel> loc
+@inject NavigationManager navigationManager
 @inject NotificationsManager notificationsManager
 @inject UserNotificationsClient userNotificationsClient
 
@@ -61,7 +62,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         <FluentStack Orientation="Orientation.Vertical" HorizontalAlignment="HorizontalAlignment.Center" VerticalAlignment="VerticalAlignment.Center">
             @foreach (var userNotification in userNotifications)
             {
-                <NotificationCard UserNotification="userNotification" SelectedChanged="HandleSelectedChanged" OnRead="HandleReadAsync" OnDelete="HandleDeleteAsync"/>
+                <NotificationCard UserNotification="userNotification" SelectedChanged="HandleSelectedChanged"
+                    OnRead="HandleReadAsync" OnDelete="HandleDeleteAsync" OnOpen="HandleOpenAsync"/>
             }
         </FluentStack>
     }
@@ -119,6 +121,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     private async Task HandleDeleteAsync(UserNotificationResponseDto notification)
     {
         await notificationsManager.DeleteAsync(notification.Id, userNotificationsClient);
+    }
+
+    private async Task HandleOpenAsync(UserNotificationResponseDto notification)
+    {
+        // Mark the notification as read before navigating
+        await notificationsManager.MarkAsReadAsync(notification.Id, userNotificationsClient);
+        
+        navigationManager.NavigateTo($"/ticket/{notification.TicketId}", true);
     }
 
     private async Task MarkSelectedAsReadAsync()

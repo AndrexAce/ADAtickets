@@ -222,9 +222,6 @@ public sealed class UserNotificationsController(
         // Insert the DTO info into a new entity and add it to the data source.
         await userNotificationRepository.AddUserNotificationAsync(userNotification);
 
-        // Send a signal to the people who received this notification and are connected to this hub.
-        await notificationsHub.Clients.Group($"user_{userNotification.ReceiverUserId}").SendAsync("UserNotificationCreated");
-
         // Return the created entity and its location to the client.
         return CreatedAtAction(nameof(GetUserNotification), new { id = userNotification.Id },
             mapper.Map<UserNotificationResponseDto>(userNotification));

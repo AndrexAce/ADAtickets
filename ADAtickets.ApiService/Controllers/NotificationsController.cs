@@ -199,9 +199,6 @@ public sealed class NotificationsController(
             return Conflict();
         }
 
-        // Send a signal to the people who have received this notification and are connected to this hub.
-        await SendSignalToClientsAsync("NotificationUpdated", notification.Id);
-
         return NoContent();
     }
 
@@ -276,9 +273,6 @@ public sealed class NotificationsController(
             return NotFound();
 
         await notificationRepository.DeleteNotificationAsync(notification);
-
-        // Send a signal to the people have received this notification and are connected to this hub.
-        await SendSignalToClientsAsync("NotificationDeleted", notification.Id);
 
         return NoContent();
     }
@@ -454,7 +448,7 @@ public sealed class NotificationsController(
         return userNotification;
     }
 
-    private async Task SendSignalToClientsAsync(string action, Guid notificationId)
+    internal async Task SendSignalToClientsAsync(string action, Guid notificationId)
     {
         var userNotifications = await userNotificationRepository.GetUserNotificationsByAsync(
             new Dictionary<string, string> { { nameof(UserNotification.NotificationId), notificationId.ToString() } }

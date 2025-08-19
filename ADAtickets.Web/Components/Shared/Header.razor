@@ -119,9 +119,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         // Register handlers for API-triggered methods
         Action handlersRegistration = () =>
         {
-            signalRService.On("NotificationUpdated", () => HandleRefreshRequested(false));
-            signalRService.On("NotificationDeleted", () => HandleRefreshRequested(false));
-            signalRService.On("UserNotificationCreated", () => HandleRefreshRequested(true));
             signalRService.On("UserNotificationUpdated", () => HandleRefreshRequested(false));
             signalRService.On("UserNotificationDeleted", () => HandleRefreshRequested(false));
         };

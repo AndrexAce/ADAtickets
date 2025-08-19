@@ -38,14 +38,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 <FluentCard Id="@(UserNotification.Id.ToString())" Style="@GetStyle()" Width="20rem">
     <FluentStack Orientation="Orientation.Vertical">
         <FluentStack Orientation="Orientation.Horizontal" HorizontalAlignment="HorizontalAlignment.SpaceBetween" VerticalAlignment="VerticalAlignment.Top">
-            <FluentPersona ImageSize="2rem" Initials="@GetInitials(UserNotification.SenderName)">
-                <FluentStack Orientation="Orientation.Vertical">
-                    <span style="max-width: 111px; text-wrap: wrap;">@UserNotification.SenderName</span>
-                    <span>@(UserNotification.SendDateTime.ToLocalTime().Humanize())</span>
-                </FluentStack>
-            </FluentPersona>
+            <FluentPersona ImageSize="2rem" Initials="@GetInitials(UserNotification.SenderName)" Style="align-self: center;"/>
+            <FluentStack Orientation="Orientation.Vertical" VerticalGap="0">
+                <span style="max-width: 111px; text-wrap: wrap;"><b>@UserNotification.SenderName</b></span>
+                <span>@(UserNotification.SendDateTime.ToLocalTime().Humanize())</span>
+            </FluentStack>
             <FluentStack Orientation="Orientation.Horizontal" Class="@(Selected ? string.Empty : "hover-hide")" HorizontalAlignment="HorizontalAlignment.Right" VerticalAlignment="VerticalAlignment.Center">
-                <FluentButton Appearance="Appearance.Lightweight" IconStart="@(new Icons.Regular.Size20.Open())" OnClick="HandleOpen" />
+                <FluentButton Appearance="Appearance.Lightweight" IconStart="@(new Icons.Regular.Size20.Open())" OnClick="HandleOpenClickAsync" />
                 <FluentButton Appearance="Appearance.Lightweight" IconStart="@(new Icons.Regular.Size20.Delete())" OnClick="HandleDeleteClickAsync"/>
                 @if (!UserNotification.IsRead)
                 {
@@ -89,6 +88,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     [Parameter]
     public EventCallback<UserNotificationResponseDto> OnDelete { get; set; }
 
+    /// <summary>
+    ///     Event callback that is triggered when the notification is opened.
+    /// </summary>
+    [Parameter]
+    public EventCallback<UserNotificationResponseDto> OnOpen { get; set; }
+
     private async Task HandleCheckStateChangedAsync(bool? checkState)
     {
         Selected = checkState ?? false;
@@ -105,9 +110,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         await OnDelete.InvokeAsync(UserNotification);
     }
 
-    private void HandleOpen()
+    private async Task HandleOpenClickAsync()
     {
-        navigationManager.NavigateTo($"/tickets/{UserNotification.TicketId}", forceLoad: true);
+        await OnOpen.InvokeAsync(UserNotification);
     }
 
     private static string GetInitials(string? fullName)
