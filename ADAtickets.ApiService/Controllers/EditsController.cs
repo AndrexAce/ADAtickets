@@ -282,14 +282,14 @@ public sealed class EditsController(IEditRepository editRepository, IMapper mapp
         }
     }
 
-    internal async Task CreateEditEntryAsync(Ticket ticket, Guid editor)
+    internal async Task CreateEditEntryAsync(Ticket ticket, Status oldStatus, Guid editor)
     {
         // Create the edit about the ticket edit by the editor.
         Edit edit = new()
         {
             EditDateTime = DateTime.UtcNow,
             Description = Edits.TicketEdited,
-            OldStatus = ticket.Status,
+            OldStatus = oldStatus,
             NewStatus = ticket.Status,
             TicketId = ticket.Id,
             UserId = editor

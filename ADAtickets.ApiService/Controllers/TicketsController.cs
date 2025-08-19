@@ -187,12 +187,14 @@ public sealed class TicketsController(
         {
             // Keep the old operator for notification purposes.
             var oldAssignedOperator = ticket.OperatorUserId;
+            // Keep the old status for edits purposes.
+            var oldStatus = ticket.Status;
 
             // Update the existing entity with the new data.
             await ticketRepository.UpdateTicketAsync(mapper.Map(ticketDto, ticket));
 
             // Create notification and create the edit.
-            await ProcessTicketUpdateAsync(ticket, ticketDto.Requester.Value);
+            await ProcessTicketUpdateAsync(ticket, oldStatus, ticketDto.Requester.Value);
 
             // If the operator was changed, create a notification and an edit.
             if (oldAssignedOperator != ticket.OperatorUserId)
@@ -302,6 +304,8 @@ public sealed class TicketsController(
 
         // Send a signal to everyone connected to this hub.
         await ticketsHub.Clients.All.SendAsync("TicketDeleted", ticket.Id);
+        foreach (var notificationId in ticket.Notifications.Select(n => n.Id))
+            await notificationsController.SendSignalToClientsAsync("UserNotificationDeleted", notificationId);
 
         return NoContent();
     }
@@ -332,11 +336,11 @@ public sealed class TicketsController(
         }
     }
 
-    private async Task ProcessTicketUpdateAsync(Ticket ticket, Guid editor)
+    private async Task ProcessTicketUpdateAsync(Ticket ticket, Status oldStatus, Guid editor)
     {
         await notificationsController.CreateEditNotificationsAsync(ticket, editor);
 
-        await editsController.CreateEditEntryAsync(ticket, editor);
+        await editsController.CreateEditEntryAsync(ticket, oldStatus, editor);
 
         await azureDevOpsController.UpdateAzureDevOpsWorkItemAsync(ticket);
     }

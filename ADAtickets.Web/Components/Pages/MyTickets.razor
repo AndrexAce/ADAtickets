@@ -571,16 +571,23 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
         try
         {
-            foreach (var ticketId in selectedTickets.Select(t => t.Id))
+            foreach (var ticket in selectedTickets)
             {
-                var getResponse = await ticketsClient.GetAsync(ticketId);
+                var getResponse = await ticketsClient.GetAsync(ticket.Id);
 
                 // Update the ticket assignee.
                 var requestDto = mapper.Map<TicketRequestDto>(getResponse);
                 requestDto.OperatorUserId = operatorId;
                 requestDto.Requester = await GetUserIdAsync();
 
-                await ticketsClient.PutAsync(ticketId, requestDto);
+                if (ticket.OperatorUserId is null)
+                {
+                    // If the ticket is being edited and assigned to an operator for the first time, set the waiting status.
+                    requestDto.Status = Status.WaitingOperator;
+                }
+                // Else, if assigned to another operator, keep the current status.
+
+                await ticketsClient.PutAsync(ticket.Id, requestDto);
 
                 // Update the progress bar and the toast.
                 progressToastParameters.Content.Progress += 100 / selectedTickets.Count;
