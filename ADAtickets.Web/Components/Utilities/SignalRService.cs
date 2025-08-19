@@ -27,7 +27,7 @@ namespace ADAtickets.Web.Components.Utilities;
 /// </summary>
 internal sealed class SignalRService : IAsyncDisposable
 {
-    private HubConnection? hubConnection;
+    private HubConnection? hubConnection = null;
 
     /// <summary>
     ///     Starts the SignalR connection to the specified hub URL.
@@ -57,6 +57,7 @@ internal sealed class SignalRService : IAsyncDisposable
         {
             await hubConnection.StopAsync();
             await hubConnection.DisposeAsync();
+            hubConnection = null;
         }
     }
 
@@ -66,6 +67,17 @@ internal sealed class SignalRService : IAsyncDisposable
     /// <param name="methodName">Name of the method called by the server.</param>
     /// <param name="handler">Asynchronous function handling the call.</param>
     public void On(string methodName, Func<Task> handler)
+    {
+        hubConnection?.On(methodName, handler);
+    }
+
+    /// <summary>
+    ///     Registers a handler for a specific method called by the SignalR hub.
+    /// </summary>
+    /// <typeparam name="T">Type of the argument passed by the server.</typeparam>
+    /// <param name="methodName">Name of the method called by the server.</param>
+    /// <param name="handler">Asynchronous function handling the call.</param>
+    public void On<T>(string methodName, Func<T, Task> handler)
     {
         hubConnection?.On(methodName, handler);
     }
@@ -93,6 +105,7 @@ internal sealed class SignalRService : IAsyncDisposable
         if (hubConnection is not null)
         {
             await hubConnection.DisposeAsync();
+            hubConnection = null;
         }
     }
 }

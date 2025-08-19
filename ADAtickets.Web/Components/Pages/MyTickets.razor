@@ -342,9 +342,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         // Register handlers for API-triggered methods
         Action handlersRegistration = () =>
         {
-            signalRService.On("TicketUpdated", HandleRefreshRequested);
+            signalRService.On<Guid>("TicketUpdated", HandleRefreshRequested);
             signalRService.On("TicketCreated", HandleRefreshRequested);
-            signalRService.On("TicketDeleted", HandleRefreshRequested);
+            signalRService.On<Guid>("TicketDeleted", HandleRefreshRequested);
         };
 
         // Connect to the hub
@@ -389,6 +389,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         {
             toastService.ShowCommunicationToast(Toasts.ErrorToastParameters(ex, loc["LoadingErrorToastTitle"], loc["LoadingErrorToastDetails"]));
         }
+    }
+
+    private async Task HandleRefreshRequested(Guid ticketId)
+    {
+        // Ignore the parameter. Reload all the tickets
+        await HandleRefreshRequested();
     }
 
     private void HandleSortDismissClick()

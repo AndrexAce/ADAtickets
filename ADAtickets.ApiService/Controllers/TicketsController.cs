@@ -208,7 +208,7 @@ public sealed class TicketsController(
         }
 
         // Send a signal to everyone connected to this hub.
-        await ticketsHub.Clients.All.SendAsync("TicketUpdated");
+        await ticketsHub.Clients.All.SendAsync("TicketUpdated", ticket.Id);
 
         return NoContent();
     }
@@ -301,7 +301,7 @@ public sealed class TicketsController(
         await azureDevOpsController.DeleteAzureDevOpsWorkItemAsync(ticket.WorkItemId);
 
         // Send a signal to everyone connected to this hub.
-        await ticketsHub.Clients.All.SendAsync("TicketDeleted");
+        await ticketsHub.Clients.All.SendAsync("TicketDeleted", ticket.Id);
 
         return NoContent();
     }

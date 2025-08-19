@@ -93,4 +93,23 @@ public static class Toasts
             }
         };
     }
+
+    /// <summary>
+    ///     Creates a <see cref="ToastParameters{T}" /> instance configured for a warning notification.
+    /// </summary>
+    /// <param name="title">The title of the toast notification.</param>
+    /// <param name="details">The detailed message content of the toast notification.</param>
+    /// <returns>A <see cref="ToastParameters{T}" /> object with the specified title and details.</returns>
+    public static ToastParameters<CommunicationToastContent> WarningToastParameters(string title, string details)
+    {
+        return new ToastParameters<CommunicationToastContent>
+        {
+            Intent = ToastIntent.Warning,
+            Title = title,
+            Content = new CommunicationToastContent
+            {
+                Details = details
+            }
+        };
+    }
 }

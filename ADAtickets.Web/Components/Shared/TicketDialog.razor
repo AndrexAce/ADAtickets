@@ -15,7 +15,9 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
+@implements IAsyncDisposable
 @implements IDialogContentComponent<TicketDialogContent>
+
 @using ADAtickets.Client
 @using ADAtickets.Shared.Dtos.Forms
 @using ADAtickets.Shared.Dtos.Requests
@@ -37,6 +39,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @inject IToastService toastService
 @inject IDialogService dialogService
 @inject IMapper mapper
+@inject SignalRService signalRService
+@inject IConfiguration configuration
 
 <FluentDialogHeader ShowDismiss="false" ShowDismissTooltip="false">
     <FluentStack VerticalAlignment="VerticalAlignment.Center">
@@ -399,6 +403,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
             if (Content.InitialTicketData is TicketResponseDto initialTicketData)
             {
+                // Subscribe to refresh events
+                await SetupSignalR();
+
                 TicketForm = mapper.Map<TicketFormDto>(Content.InitialTicketData);
 
                 // If the operator is editing the ticket, reset the operator and platform ids to empty the FluentSelect
@@ -437,9 +444,35 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         return await platformsClient.GetAllAsync();
     }
 
+    private async Task SetupSignalR()
+    {
+        // Register handlers for API-triggered methods
+        Action handlersRegistration = () =>
+        {
+            signalRService.On<Guid>("TicketUpdated", HandleRefreshRequested);
+            signalRService.On<Guid>("TicketDeleted", HandleRefreshRequested);
+        };
+
+        // Connect to the hub
+        await signalRService.StartAsync($"{configuration["ADAticketsAPI:BaseUrl"]}/ticketsHub", handlersRegistration);
+    }
+
     private async Task<IEnumerable<AttachmentResponseDto>> LoadAttachmentsAsync(IEnumerable<KeyValuePair<string, string>> filters)
     {
         return await attachmentsClient.GetAllAsync(filters);
+    }
+
+    private async Task HandleRefreshRequested(Guid ticketId)
+    {
+        // If the ticket being edited was updated or cancelled, close the dialog with a warning.
+        if (ticketId == Content.InitialTicketData?.Id)
+        {
+            await Dialog.CancelAsync();
+
+            DeleteTempFiles();
+
+            toastService.ShowCommunicationToast(Toasts.WarningToastParameters(loc["TicketChangedToastTitle"], loc["TicketChangedToastDetails"]));
+        }
     }
 
     private async Task HandleValidSubmitAsync()
@@ -703,4 +736,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         };
     }
 
+    public async ValueTask DisposeAsync()
+    {
+        await signalRService.StopAsync();
+    }
 }

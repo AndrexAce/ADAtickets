@@ -255,4 +255,10 @@
   <data name="CurrentValue" xml:space="preserve">
     <value>Current value is:</value>
   </data>
+  <data name="TicketChangedToastTitle" xml:space="preserve">
+    <value>Ticket changed</value>
+  </data>
+  <data name="TicketChangedToastDetails" xml:space="preserve">
+    <value>The dialog was closed because the ticket was changed by someone else while editing.</value>
+  </data>
 </root>
