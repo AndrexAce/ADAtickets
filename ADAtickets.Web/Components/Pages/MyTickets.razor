@@ -322,7 +322,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     protected override async Task OnInitializedAsync()
     {
         // Subscribe to refresh events
-        await SetupSignalR();
+        await SetupSignalRAsync();
 
         try
         {
@@ -337,7 +337,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         }
     }
 
-    private async Task SetupSignalR()
+    private async Task SetupSignalRAsync()
     {
         // Register handlers for API-triggered methods
         Action handlersRegistration = () =>

@@ -61,7 +61,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         <FluentStack Orientation="Orientation.Vertical" HorizontalAlignment="HorizontalAlignment.Center" VerticalAlignment="VerticalAlignment.Center">
             @foreach (var userNotification in userNotifications)
             {
-                <NotificationCard UserNotification="userNotification" SelectedChanged="HandleSelectedChanged" OnRead="HandleRead" OnDelete="HandleDelete"/>
+                <NotificationCard UserNotification="userNotification" SelectedChanged="HandleSelectedChanged" OnRead="HandleReadAsync" OnDelete="HandleDeleteAsync"/>
             }
         </FluentStack>
     }
@@ -111,12 +111,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         }
     }
 
-    private async Task HandleRead(UserNotificationResponseDto notification)
+    private async Task HandleReadAsync(UserNotificationResponseDto notification)
     {
         await notificationsManager.MarkAsReadAsync(notification.Id, userNotificationsClient);
     }
 
-    private async Task HandleDelete(UserNotificationResponseDto notification)
+    private async Task HandleDeleteAsync(UserNotificationResponseDto notification)
     {
         await notificationsManager.DeleteAsync(notification.Id, userNotificationsClient);
     }

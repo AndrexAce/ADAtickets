@@ -28,6 +28,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @using AutoMapper
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.FluentUI.AspNetCore.Components.Icons.Regular
+@using System.Text.RegularExpressions
 @using static Utilities.Dialogs
 
 @inject IStringLocalizer<TicketDialog> loc
@@ -257,7 +258,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 else if (videoPath is not null)
                 {
                     <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center">
-                        <p style="overflow: hidden; text-overflow: ellipsis; max-width: 15rem">@Path.GetFileName(videoPath)</p>
+                        <span 
+                            style="overflow: hidden; text-overflow: ellipsis; max-width: 15rem">@Path.GetFileName(videoPath)</span>
                         <FluentButton Appearance="Appearance.Accent" IconStart="@(new Size20.Open())"
                                       OnClick="HandleViewVideoClick">@loc["View"]</FluentButton>
 
@@ -306,7 +308,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         <FluentCard>
             <FluentStack Orientation="Orientation.Vertical">
                 <FluentStack Orientation="Orientation.Horizontal">
-                    <FluentLabel Typo="Typography.PaneHeader">Anteprima foto</FluentLabel>
+                    <FluentLabel Typo="Typography.PaneHeader">@loc["PhotoPreview"]</FluentLabel>
                     <FluentSpacer/>
                     <FluentButton Appearance="Appearance.Accent" IconStart="@(new Size20.DismissCircle())"
                                   OnClick="HandleViewPhotoClose">@loc["ClosePreview"]</FluentButton>
@@ -333,19 +335,18 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         <FluentCard>
             <FluentStack Orientation="Orientation.Vertical">
                 <FluentStack Orientation="Orientation.Horizontal">
-                    <FluentLabel Typo="Typography.PaneHeader">Anteprima video</FluentLabel>
+                    <FluentLabel Typo="Typography.PaneHeader">@loc["VideoPreview"]</FluentLabel>
                     <FluentSpacer/>
                     <FluentButton Appearance="Appearance.Accent" IconStart="@(new Size20.DismissCircle())"
                                   OnClick="HandleViewVideoClose">@loc["ClosePreview"]</FluentButton>
                 </FluentStack>
                 @if (!Content.IsEdit)
                 {
-                    <video src="@($"/{videoPath}")" style="max-width: 75vw; max-height: 75vh;" controls></video>
+                    <video src="@($"/{videoPath}")" style="max-width: 75vw; max-height: 75vh;" controls/>
                 }
                 else
                 {
-                    <video src="@($"http://localhost:7213/{videoPath}")" style="max-width: 75vw; max-height: 75vh;"
-                           controls></video>
+                    <video src="@($"http://localhost:7213/{videoPath}")" style="max-width: 75vw; max-height: 75vh;" controls/>
                 }
             </FluentStack>
         </FluentCard>
@@ -404,7 +405,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             if (Content.InitialTicketData is TicketResponseDto initialTicketData)
             {
                 // Subscribe to refresh events
-                await SetupSignalR();
+                await SetupSignalRAsync();
 
                 TicketForm = mapper.Map<TicketFormDto>(Content.InitialTicketData);
 
@@ -418,8 +419,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
                 var attachments = await LoadAttachmentsAsync(new Dictionary<string, string> { { nameof(AttachmentRequestDto.TicketId), initialTicketData.Id.ToString() } });
 
-                photoPath = attachments.ElementAtOrDefault(0)?.Path;
-                videoPath = attachments.ElementAtOrDefault(1)?.Path;
+                photoPath = attachments.FirstOrDefault(a => Regex.IsMatch(Path.GetFileName(a.Path), @"\.(png|jpg|jpeg|gif|webp)$"))?.Path;
+                videoPath = attachments.FirstOrDefault(a => Regex.IsMatch(Path.GetFileName(a.Path), @"\.(mp4|webm)$"))?.Path;
             }
         }
         catch (Exception ex)
@@ -444,7 +445,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         return await platformsClient.GetAllAsync();
     }
 
-    private async Task SetupSignalR()
+    private async Task SetupSignalRAsync()
     {
         // Register handlers for API-triggered methods
         Action handlersRegistration = () =>

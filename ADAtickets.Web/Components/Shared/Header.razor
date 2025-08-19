@@ -86,7 +86,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
         try
         {
-            await SetupSignalR();
+            await SetupSignalRAsync();
 
             await LoadUserNotificationsAsync();
         }
@@ -114,7 +114,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         }
     }
 
-    private async Task SetupSignalR()
+    private async Task SetupSignalRAsync()
     {
         // Register handlers for API-triggered methods
         Action handlersRegistration = () =>

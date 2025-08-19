@@ -261,4 +261,10 @@
   <data name="TicketChangedToastDetails" xml:space="preserve">
     <value>The dialog was closed because the ticket was changed by someone else while editing.</value>
   </data>
+  <data name="VideoPreview" xml:space="preserve">
+    <value>Video preview</value>
+  </data>
+  <data name="PhotoPreview" xml:space="preserve">
+    <value>Photo preview</value>
+  </data>
 </root>

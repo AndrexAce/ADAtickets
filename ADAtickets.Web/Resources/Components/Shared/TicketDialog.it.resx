@@ -261,4 +261,10 @@
   <data name="TicketChangedToastDetails" xml:space="preserve">
     <value>La finestra è stata chiusa perché il ticket è stato modificato da qualcun altro mentre lo modificavi.</value>
   </data>
+  <data name="VideoPreview" xml:space="preserve">
+    <value>Anteprima video</value>
+  </data>
+  <data name="PhotoPreview" xml:space="preserve">
+    <value>Anteprima foto</value>
+  </data>
 </root>
