@@ -44,7 +44,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                     <span>@(UserNotification.SendDateTime.ToLocalTime().Humanize())</span>
                 </FluentStack>
             </FluentPersona>
-            <FluentStack Orientation="Orientation.Horizontal" Class="hover-hide" HorizontalAlignment="HorizontalAlignment.Right" VerticalAlignment="VerticalAlignment.Center">
+            <FluentStack Orientation="Orientation.Horizontal" Class="@(Selected ? string.Empty : "hover-hide")" HorizontalAlignment="HorizontalAlignment.Right" VerticalAlignment="VerticalAlignment.Center">
                 <FluentButton Appearance="Appearance.Lightweight" IconStart="@(new Icons.Regular.Size20.Open())" OnClick="HandleOpen" />
                 <FluentButton Appearance="Appearance.Lightweight" IconStart="@(new Icons.Regular.Size20.Delete())" OnClick="HandleDeleteClickAsync"/>
                 @if (!UserNotification.IsRead)

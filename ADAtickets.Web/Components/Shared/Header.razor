@@ -34,6 +34,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @inject UsersClient usersClient
 @inject UserNotificationsClient userNotificationsClient
 @inject NotificationsManager notificationsManager
+@inject IToastService toastService
 
 <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center" HorizontalGap="20">
     @if (IsDarkThemeActive)
@@ -83,9 +84,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     {
         notificationsManager.OnUserNotificationsChanged += HandleUserNotificationsChanged;
 
-        await SetupSignalR();
+        try
+        {
+            await SetupSignalR();
 
-        await LoadUserNotificationsAsync();
+            await LoadUserNotificationsAsync();
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowCommunicationToast(Toasts.ErrorToastParameters(ex, loc["LoadingErrorToastTitle"], loc["LoadingErrorToastDetails"]));
+        }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -133,21 +141,28 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             var notifications = await userNotificationsClient.GetAllAsync(
                 new Dictionary<string, string>
                 {
-                    { nameof(UserNotificationResponseDto.ReceiverUserId), userId.Value.ToString() }
+                { nameof(UserNotificationResponseDto.ReceiverUserId), userId.Value.ToString() }
                 }
             );
-            
+
             await notificationsManager.UpdateUserNotificationsAsync(notifications);
         }
     }
 
     private async Task HandleRefreshRequested(bool showNewNotificationBadge)
     {
-        await LoadUserNotificationsAsync();
+        try 
+        {
+            await LoadUserNotificationsAsync();
 
-        if (showNewNotificationBadge) isNewNotificationPresent = true;
+            if (showNewNotificationBadge) isNewNotificationPresent = true;
 
-        await InvokeAsync(StateHasChanged);
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowCommunicationToast(Toasts.ErrorToastParameters(ex, loc["LoadingErrorToastTitle"], loc["LoadingErrorToastDetails"]));
+        }
     }
 
     private void HandleUserNotificationsChanged()

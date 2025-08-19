@@ -38,6 +38,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @inject IMapper mapper
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject IConfiguration configuration
+@inject NavigationManager navigationManager
 
 <FluentCard Id="@(Ticket.Id.ToString())" Style="background: var(--neutral-layer-1)" Width="20rem">
     <FluentStack Orientation="Orientation.Vertical">
@@ -67,7 +68,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                     </FluentStack>
                 </FluentPersona>
                 <FluentSpacer/>
-                <FluentCheckbox Class="hover-hide" CheckStateChanged="HandleCheckStateChangedAsync"/>
+                <FluentCheckbox Class="@(Selected ? string.Empty : "hover-hide")" CheckStateChanged="HandleCheckStateChangedAsync" />
             }
         </FluentStack>
         @if (Users is null)
@@ -85,7 +86,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             </FluentStack>
             <FluentSpacer/>
             <FluentStack Orientation="Orientation.Horizontal" HorizontalAlignment="HorizontalAlignment.SpaceBetween">
-                <FluentButton Appearance="Appearance.Neutral" IconStart="@(new Size20.Open())">Apri
+                <FluentButton Appearance="Appearance.Neutral" IconStart="@(new Size20.Open())" OnClick="HandleOpen">Apri
                 </FluentButton>
                 <FluentButton Appearance="Appearance.Accent" IconStart="@(new Size20.Edit())"
                               OnClick="ShowEditTicketDialogAsync">Modifica
@@ -301,6 +302,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 PreventDismissOnOverlayClick = true
             }
         );
+    }
+
+    private void HandleOpen()
+    {
+        navigationManager.NavigateTo($"/ticket/{Ticket.Id}", forceLoad: true);
     }
 
     private static string GetInitials(string? fullName)

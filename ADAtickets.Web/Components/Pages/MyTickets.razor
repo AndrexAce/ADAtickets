@@ -430,8 +430,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     private async Task HandleTabChangeAsync(FluentTab fluentTab)
     {
-        currentTab = fluentTab?.Id;
-        await LoadTicketsAsync(await GetBaseFiltersAsync());
+        try
+        {
+            currentTab = fluentTab?.Id;
+            await LoadTicketsAsync(await GetBaseFiltersAsync());
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowCommunicationToast(Toasts.ErrorToastParameters(ex, loc["LoadingErrorToastTitle"], loc["LoadingErrorToastDetails"]));
+        }
     }
 
     private void HandleSelectedChanged(SelectedChangedEventArgs<TicketResponseDto> args)
@@ -506,9 +513,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
             // Deselect all tickets.
             selectedTickets.Clear();
-
-            // Reload the tickets.
-            await LoadTicketsAsync(await GetBaseFiltersAsync());
         }
     }
 
@@ -550,9 +554,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
             // Deselect all tickets.
             selectedTickets.Clear();
-
-            // Reload the tickets.
-            await LoadTicketsAsync(await GetBaseFiltersAsync());
         }
     }
 
@@ -594,9 +595,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
             // Deselect all tickets.
             selectedTickets.Clear();
-
-            // Reload the tickets.
-            await LoadTicketsAsync(await GetBaseFiltersAsync());
         }
     }
 
