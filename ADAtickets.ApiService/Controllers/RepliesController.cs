@@ -19,6 +19,7 @@
  */
 
 using ADAtickets.ApiService.Configs;
+using ADAtickets.ApiService.Hubs;
 using ADAtickets.ApiService.Repositories;
 using ADAtickets.Shared.Constants;
 using ADAtickets.Shared.Dtos.Requests;
@@ -27,6 +28,7 @@ using ADAtickets.Shared.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web.Resource;
 using System.Net.Mime;
@@ -42,13 +44,14 @@ namespace ADAtickets.ApiService.Controllers;
 ///     Object definining the mappings of fields between the <see cref="Reply" /> entity and its
 ///     <see cref="ReplyRequestDto" /> or <see cref="ReplyResponseDto" /> correspondant.
 /// </param>
+/// <param name="repliesHub">SignalR hub managing the real-time updates of replies.</param>
 [Route($"v{Service.APIVersion}/{Controller.Replies}")]
 [ApiController]
 [Consumes(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
 [Produces(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
 [FormatFilter]
 [ApiConventionType(typeof(ApiConventions))]
-public sealed class RepliesController(IReplyRepository replyRepository, IMapper mapper) : ControllerBase
+public sealed class RepliesController(IReplyRepository replyRepository, IMapper mapper, IHubContext<RepliesHub> repliesHub) : ControllerBase
 {
     /// <summary>
     ///     Fetch all the <see cref="Reply" /> entities or all the entities respecting the given criteria.
@@ -216,6 +219,9 @@ public sealed class RepliesController(IReplyRepository replyRepository, IMapper 
         // Insert the DTO info into a new entity and add it to the data source.
         await replyRepository.AddReplyAsync(reply);
 
+        // Send a signal to the people who have received this reply and are connected to this hub.
+        await SendSignalToClientAsync("ReplyCreated", reply.TicketId);
+
         // Return the created entity and its location to the client.
         return CreatedAtAction(nameof(GetReply), new { id = reply.Id }, mapper.Map<ReplyResponseDto>(reply));
     }
@@ -242,5 +248,11 @@ public sealed class RepliesController(IReplyRepository replyRepository, IMapper 
         await replyRepository.DeleteReplyAsync(reply);
 
         return NoContent();
+    }
+
+    internal async Task SendSignalToClientAsync(string action, Guid ticketId)
+    {
+        // Send a signal to the people who are viewing the ticket this reply is related to and are connected to this hub.
+        await repliesHub.Clients.Group($"ticket_{ticketId}").SendAsync(action);
     }
 }

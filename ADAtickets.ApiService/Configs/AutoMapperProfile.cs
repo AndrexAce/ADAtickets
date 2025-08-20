@@ -61,7 +61,9 @@ internal sealed class AutoMapperProfile : Profile
                     opt.MapFrom(src => src.UserPlatforms.Where(up => up.PlatformId == src.Id).Select(up => up.UserId)));
         _ = CreateMap<PlatformRequestDto, Platform>(MemberList.Source);
 
-        _ = CreateMap<Reply, ReplyResponseDto>(MemberList.Destination);
+        _ = CreateMap<Reply, ReplyResponseDto>(MemberList.Destination)
+            .ForMember(replyDto => replyDto.AuthorName, // Extra
+                opt => opt.MapFrom(src => $"{src.AuthorUser.Name} {src.AuthorUser.Surname}"));
         _ = CreateMap<ReplyRequestDto, Reply>(MemberList.Source);
 
         _ = CreateMap<Ticket, TicketResponseDto>(MemberList.Destination)

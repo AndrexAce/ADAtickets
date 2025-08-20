@@ -47,6 +47,7 @@ namespace ADAtickets.ApiService.Controllers;
 /// <param name="ticketsHub">SignalR hub managing the real-time updates of tickets.</param>
 /// <param name="notificationsController">Controller managing the notifications.</param>
 /// <param name="editsController">Controller managing the edits.</param>
+/// <param name="repliesController">Controller managing the replies.</param>
 /// <param name="azureDevOpsController">Controller managing the interaction with Azure DevOps.</param>
 [Route($"v{Service.APIVersion}/{Controller.Tickets}")]
 [ApiController]
@@ -60,6 +61,7 @@ public sealed class TicketsController(
     IHubContext<TicketsHub> ticketsHub,
     NotificationsController notificationsController,
     EditsController editsController,
+    RepliesController repliesController,
     AzureDevOpsController azureDevOpsController
 ) : ControllerBase
 {
@@ -305,6 +307,7 @@ public sealed class TicketsController(
         // Send a signal to everyone connected to this hub.
         await ticketsHub.Clients.All.SendAsync("TicketDeleted", ticket.Id);
         await editsController.SendSignalToClientAsync("EditDeleted", ticket.Id);
+        await repliesController.SendSignalToClientAsync("ReplyDeleted", ticket.Id);
         foreach (var notificationId in ticket.Notifications.Select(n => n.Id))
             await notificationsController.SendSignalToClientsAsync("UserNotificationDeleted", notificationId);
 

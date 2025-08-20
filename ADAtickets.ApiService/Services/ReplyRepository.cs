@@ -36,13 +36,15 @@ internal sealed class ReplyRepository(ADAticketsDbContext context) : IReplyRepos
     /// <inheritdoc cref="IReplyRepository.GetReplyByIdAsync" />
     public async Task<Reply?> GetReplyByIdAsync(Guid id)
     {
-        return await context.Replies.FindAsync(id);
+        return await context.Replies.Include(r => r.AuthorUser)
+            .FirstOrDefaultAsync(r => r.Id == id);
     }
 
     /// <inheritdoc cref="IReplyRepository.GetRepliesAsync" />
     public async Task<IEnumerable<Reply>> GetRepliesAsync()
     {
-        return await context.Replies.ToListAsync();
+        return await context.Replies.Include(r => r.AuthorUser)
+            .ToListAsync();
     }
 
     /// <inheritdoc cref="IReplyRepository.GetRepliesByAsync" />
@@ -52,7 +54,7 @@ internal sealed class ReplyRepository(ADAticketsDbContext context) : IReplyRepos
             "The comparison with the StringComparison overload is not translatable by Entity Framework and the EF.Function.ILike method is not standard SQL but PostgreSQL dialect.")]
     public async Task<IEnumerable<Reply>> GetRepliesByAsync(IEnumerable<KeyValuePair<string, string>> filters)
     {
-        IQueryable<Reply> query = context.Replies;
+        IQueryable<Reply> query = context.Replies.Include(r => r.AuthorUser);
 
         foreach (var filter in filters)
             switch (filter.Key.Pascalize())

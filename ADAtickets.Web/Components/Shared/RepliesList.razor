@@ -1,0 +1,209 @@
+﻿<!-- ADAtickets is a simple, lightweight, open source ticketing system
+interacting with your enterprise repositories on Azure DevOps
+with a two-way synchronization.
+Copyright (C) 2025  Andrea Lucchese
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
+@inherits ComponentBase
+@implements IAsyncDisposable
+
+@using ADAtickets.Client
+@using ADAtickets.Shared.Dtos.Requests
+@using ADAtickets.Shared.Dtos.Responses
+@using ADAtickets.Shared.Extensions
+@using ADAtickets.Shared.Models
+@using ADAtickets.Web.Utilities
+@using AutoMapper
+@using Humanizer
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.Identity.Web
+
+@inject IStringLocalizer<RepliesList> loc
+@inject IConfiguration configuration
+@inject IMapper mapper
+@inject IToastService toastService
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject SignalRService signalRService
+@inject RepliesClient repliesClient
+@inject TicketsClient ticketsClient
+@inject UsersClient usersClient
+
+<FluentStack Orientation="Orientation.Vertical" Style="height: 90%;">
+    @if (replies is null)
+    {
+        <div style="width: 100%; display: flex; align-items: center; padding: 2rem; flex-direction: column;">
+            <FluentProgressRing />
+        </div>
+    }
+    else
+    {
+        <FluentStack Orientation="Orientation.Vertical" Style="overflow-y: auto; padding-right: 0.5rem;">
+            @foreach (var reply in replies)
+            {
+                <FluentCard Height="fit-content">
+                    <FluentStack Orientation="Orientation.Vertical">
+                        <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center" Style="padding-right: 0.5rem;">
+                            <FluentPersona ImageSize="2rem" Initials="@GetInitials(reply.AuthorName)" />
+                            <FluentStack Orientation="Orientation.Vertical" VerticalGap="0">
+                                <span style="max-width: 111px; text-wrap: wrap;"><b>@reply.AuthorName</b></span>
+                                <span>@(reply.ReplyDateTime.ToLocalTime().Humanize())</span>
+                            </FluentStack>
+                        </FluentStack>
+                        <span>@reply.Message</span>
+                    </FluentStack>
+                </FluentCard>
+            }
+        </FluentStack>
+    }
+    @if (isReplyEnabled)
+    {
+        <FluentStack Orientation="Orientation.Horizontal">
+            <FluentTextField Placeholder="@loc["ReplyTextFieldPlaceholder"]" Spellcheck="true" Style="width: stretch;" @bind-Value="replyText"></FluentTextField>
+            <FluentButton IconStart="@(new Icons.Regular.Size20.Send())" OnClick="HandleSendReplyClickAsync" />
+        </FluentStack>
+    }
+</FluentStack>
+
+@code {
+    [Parameter]
+    public required TicketResponseDto Ticket { get; set; }
+
+    private IEnumerable<ReplyResponseDto>? replies;
+    private string? replyText;
+    private bool isReplyEnabled;
+
+    override protected async Task OnInitializedAsync()
+    {
+        // Subscribe to refresh events
+        await SetupSignalRAsync();
+
+        // Load the replies list
+        await LoadRepliesAsync();
+    }
+
+    private async Task SetupSignalRAsync()
+    {
+        // Register handlers for API-triggered methods
+        Action handlersRegistration = () =>
+        {
+            signalRService.On("ReplyCreated", HandleRefreshRequestedAsync);
+            signalRService.On("ReplyDeleted", HandleRefreshRequestedAsync);
+        };
+
+        // Connect to the hub
+        await signalRService.StartAsync($"{configuration["ADAticketsAPI:BaseUrl"]}/repliesHub", handlersRegistration);
+        // Join the personal group for notifications
+        await signalRService.SendAsync("JoinPersonalGroup", Ticket.Id);
+    }
+
+    private async Task LoadRepliesAsync()
+    {
+        try
+        {
+            var fetchedReplies = await repliesClient.GetAllAsync(
+                new Dictionary<string, string> { { nameof(ReplyResponseDto.TicketId), Ticket.Id.ToString() } }
+            );
+
+            replies = fetchedReplies.OrderByDescending(e => e.ReplyDateTime);
+
+            isReplyEnabled = await GetIsReplyEnabledAsync();
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowCommunicationToast(Toasts.ErrorToastParameters(ex, loc["LoadingErrorToastTitle"], loc["LoadingErrorToastDetails"]));
+        }
+    }
+
+    private async Task HandleRefreshRequestedAsync()
+    {
+        await LoadRepliesAsync();
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task HandleSendReplyClickAsync()
+    {
+        if (!string.IsNullOrEmpty(replyText))
+        {
+            try
+            {
+                var senderId = await GetUserIdAsync();
+
+                if (senderId.HasValue)
+                {
+                    await repliesClient.PostAsync(new() { Message = replyText, AuthorUserId = senderId.Value, TicketId = Ticket.Id });
+
+                    var requestDto = mapper.Map<TicketRequestDto>(Ticket);
+                    requestDto.Status = await IsUserAsync() ? Status.WaitingOperator : Status.WaitingUser;
+                    requestDto.Requester = await GetUserIdAsync();
+
+                    await ticketsClient.PutAsync(Ticket.Id, requestDto);
+
+                    isReplyEnabled = false;
+                    replyText = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                toastService.ShowCommunicationToast(Toasts.ErrorToastParameters(ex, loc["SendErrorToastTitle"], loc["SendErrorToastDetails"]));
+            };
+        }
+    }
+
+    private async Task<bool> GetIsReplyEnabledAsync()
+    {
+        return (await IsUserAsync() && Ticket?.Status == Status.WaitingUser) || (!await IsUserAsync() && Ticket?.Status == Status.WaitingOperator);
+    }
+
+    private async Task<bool> IsUserAsync()
+    {
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        return user.GetTenantId() == configuration["ExternalEntra:TenantId"];
+    }
+
+    private async Task<Guid?> GetUserIdAsync()
+    {
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.IsAuthenticated())
+        {
+            var loggedInUser = await usersClient.GetAsync(user.GetEmail()!);
+
+            return loggedInUser?.Id;
+        }
+
+        return null;
+    }
+
+    private static string GetInitials(string? fullName)
+    {
+        if (string.IsNullOrWhiteSpace(fullName))
+        {
+            return string.Empty;
+        }
+
+        return fullName.Split(' ')
+            .Where(part => !string.IsNullOrWhiteSpace(part))
+            .Select(part => part[0])
+            .Aggregate(string.Empty, (acc, initial) => acc + initial);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await signalRService.StopAsync();
+    }
+}

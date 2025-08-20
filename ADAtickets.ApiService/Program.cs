@@ -160,6 +160,7 @@ internal static class Program
         _ = builder.Services.AddScoped<IUserNotificationRepository, UserNotificationRepository>();
         _ = builder.Services.AddScoped<NotificationsController>();
         _ = builder.Services.AddScoped<EditsController>();
+        _ = builder.Services.AddScoped<RepliesController>();
         _ = builder.Services.AddScoped<AzureDevOpsController>();
 
         // Add automapping of entities.
@@ -230,6 +231,7 @@ internal static class Program
         app.MapHub<TicketsHub>("/ticketsHub");
         app.MapHub<NotificationsHub>("/notificationsHub");
         app.MapHub<EditsHub>("/editsHub");
+        app.MapHub<RepliesHub>("/repliesHub");
     }
 
     private static void CreatePolicies(AuthorizationBuilder authorizationBuilder, ConfigurationManager configuration)

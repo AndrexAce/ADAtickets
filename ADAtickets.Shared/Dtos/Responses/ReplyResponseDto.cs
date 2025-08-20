@@ -18,6 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+using ADAtickets.Shared.Models;
+
 namespace ADAtickets.Shared.Dtos.Responses;
 
 /// <summary>
@@ -40,6 +42,12 @@ public sealed record ReplyResponseDto : ResponseDto
     ///     The id of the user who sent the reply.
     /// </summary>
     public Guid AuthorUserId { get; init; } = Guid.Empty;
+
+    /// <summary>
+    ///     The name of the user who sent the reply (from related entity <see cref="User"/>).
+    /// </summary>
+    [ValueFromRelationship]
+    public string AuthorName { get; init; } = string.Empty;
 
     /// <summary>
     ///     The id of the ticket this reply was sent to.

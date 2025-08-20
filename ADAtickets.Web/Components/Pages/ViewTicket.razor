@@ -149,7 +149,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 <FluentLabel Typo="Typography.Header">@loc["RepliesHeaderText"]</FluentLabel>
                 <FluentDivider Orientation="Orientation.Horizontal" Role="DividerRole.Presentation" />
                 <FluentSpacer Width="1" />
-                <!-- TODO -->
+                @if (ticket is null)
+                {
+                    <div style="width: 100%; display: flex; align-items: center; padding: 2rem; flex-direction: column;">
+                        <FluentProgressRing />
+                    </div>
+                }
+                else
+                {
+                    <RepliesList Ticket="ticket" />
+                }
             </FluentCard>
         </FluentStack>
     </FluentStack>
@@ -201,11 +210,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     public Guid TicketId { get; set; }
 
     private TicketResponseDto? ticket;
-    private string? photoPath = "";
-    private string? videoPath = "";
-    private bool showPhoto = false;
-    private bool showVideo = false;
-    private bool isDeleted = false;
+    private string? photoPath;
+    private string? videoPath;
+    private bool showPhoto;
+    private bool showVideo;
+    private bool isDeleted;
 
     override protected async Task OnInitializedAsync()
     {
