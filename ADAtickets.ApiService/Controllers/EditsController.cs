@@ -19,6 +19,7 @@
  */
 
 using ADAtickets.ApiService.Configs;
+using ADAtickets.ApiService.Hubs;
 using ADAtickets.ApiService.Repositories;
 using ADAtickets.Shared.Constants;
 using ADAtickets.Shared.Dtos.Requests;
@@ -27,9 +28,11 @@ using ADAtickets.Shared.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web.Resource;
 using System.Net.Mime;
+using System.Net.Sockets;
 using Controller = ADAtickets.Shared.Constants.Controller;
 
 namespace ADAtickets.ApiService.Controllers;
@@ -42,13 +45,14 @@ namespace ADAtickets.ApiService.Controllers;
 ///     Object definining the mappings of fields between the <see cref="Edit" /> entity and its
 ///     <see cref="EditRequestDto" /> or <see cref="EditResponseDto" /> correspondant.
 /// </param>
+/// <param name="editsHub">SignalR hub managing the real-time updates of edits.</param>
 [Route($"v{Service.APIVersion}/{Controller.Edits}")]
 [ApiController]
 [Consumes(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
 [Produces(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
 [FormatFilter]
 [ApiConventionType(typeof(ApiConventions))]
-public sealed class EditsController(IEditRepository editRepository, IMapper mapper) : ControllerBase
+public sealed class EditsController(IEditRepository editRepository, IMapper mapper, IHubContext<EditsHub> editsHub) : ControllerBase
 {
     /// <summary>
     ///     Fetch all the <see cref="Edit" /> entities or all the entities respecting the given criteria.
@@ -280,6 +284,8 @@ public sealed class EditsController(IEditRepository editRepository, IMapper mapp
 
             await editRepository.AddEditAsync(assignmentEdit);
         }
+
+        await SendSignalToClientAsync("EditCreated", ticket.Id);
     }
 
     internal async Task CreateEditEntryAsync(Ticket ticket, Status oldStatus, Guid editor)
@@ -296,6 +302,8 @@ public sealed class EditsController(IEditRepository editRepository, IMapper mapp
         };
 
         await editRepository.AddEditAsync(edit);
+
+        await SendSignalToClientAsync("EditCreated", ticket.Id);
     }
 
     internal async Task CreateOperatorEditEntryAsync(Ticket ticket, Guid? oldAssignedOperator, Guid editor)
@@ -326,5 +334,13 @@ public sealed class EditsController(IEditRepository editRepository, IMapper mapp
             };
 
         await editRepository.AddEditAsync(edit);
+
+        await SendSignalToClientAsync("EditCreated", ticket.Id);
+    }
+
+    internal async Task SendSignalToClientAsync(string action, Guid ticketId)
+    {
+        // Send a signal to the people who are viewing the ticket this edit is related to and are connected to this hub.
+        await editsHub.Clients.Group($"ticket_{ticketId}").SendAsync(action);
     }
 }

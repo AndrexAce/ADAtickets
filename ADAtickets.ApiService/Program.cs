@@ -229,6 +229,7 @@ internal static class Program
         // Map hubs endpoints.
         app.MapHub<TicketsHub>("/ticketsHub");
         app.MapHub<NotificationsHub>("/notificationsHub");
+        app.MapHub<EditsHub>("/editsHub");
     }
 
     private static void CreatePolicies(AuthorizationBuilder authorizationBuilder, ConfigurationManager configuration)

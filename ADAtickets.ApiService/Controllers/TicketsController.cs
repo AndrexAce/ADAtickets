@@ -304,6 +304,7 @@ public sealed class TicketsController(
 
         // Send a signal to everyone connected to this hub.
         await ticketsHub.Clients.All.SendAsync("TicketDeleted", ticket.Id);
+        await editsController.SendSignalToClientAsync("EditDeleted", ticket.Id);
         foreach (var notificationId in ticket.Notifications.Select(n => n.Id))
             await notificationsController.SendSignalToClientsAsync("UserNotificationDeleted", notificationId);
 

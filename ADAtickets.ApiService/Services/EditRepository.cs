@@ -36,13 +36,15 @@ internal sealed class EditRepository(ADAticketsDbContext context) : IEditReposit
     /// <inheritdoc cref="IEditRepository.GetEditByIdAsync" />
     public async Task<Edit?> GetEditByIdAsync(Guid id)
     {
-        return await context.Edits.FindAsync(id);
+        return await context.Edits.Include(e => e.User)
+            .FirstOrDefaultAsync(e => e.Id == id);
     }
 
     /// <inheritdoc cref="IEditRepository.GetEditsAsync" />
     public async Task<IEnumerable<Edit>> GetEditsAsync()
     {
-        return await context.Edits.ToListAsync();
+        return await context.Edits.Include(e => e.User)
+            .ToListAsync();
     }
 
     /// <inheritdoc cref="IEditRepository.GetEditsByAsync" />
@@ -52,7 +54,7 @@ internal sealed class EditRepository(ADAticketsDbContext context) : IEditReposit
             "The comparison with the StringComparison overload is not translatable by Entity Framework and the EF.Function.ILike method is not standard SQL but PostgreSQL dialect.")]
     public async Task<IEnumerable<Edit>> GetEditsByAsync(IEnumerable<KeyValuePair<string, string>> filters)
     {
-        IQueryable<Edit> query = context.Edits;
+        IQueryable<Edit> query = context.Edits.Include(e => e.User);
 
         foreach (var filter in filters)
             switch (filter.Key.Pascalize())

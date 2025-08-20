@@ -42,7 +42,9 @@ internal sealed class AutoMapperProfile : Profile
             .ForMember(attachment => attachment.Path, opt => opt.MapFrom(src => src.Name))
             .ForSourceMember(attachmentDto => attachmentDto.Content, opt => opt.DoNotValidate());
 
-        _ = CreateMap<Edit, EditResponseDto>(MemberList.Destination);
+        _ = CreateMap<Edit, EditResponseDto>(MemberList.Destination)
+            .ForMember(editDto => editDto.SenderName,
+                opt => opt.MapFrom(src => $"{src.User.Name} {src.User.Surname}"));
         _ = CreateMap<EditRequestDto, Edit>(MemberList.Source);
 
         _ = CreateMap<Notification, NotificationResponseDto>(MemberList.Destination)

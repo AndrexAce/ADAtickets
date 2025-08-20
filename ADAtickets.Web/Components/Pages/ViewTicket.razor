@@ -62,7 +62,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 {
                     <FluentStack Orientation="Orientation.Horizontal" Width="fit-content">
                         <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Checkmark())" OnClick="HandleCloseButtonClickAsync">@loc["CloseButtonText"]</FluentButton>
-                    <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Edit())" OnClick="HandleEditButtonClickAsync">@loc["EditButtonText"]</FluentButton>
+                        <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Edit())" OnClick="HandleEditButtonClickAsync">@loc["EditButtonText"]</FluentButton>
                     </FluentStack>
                 }
             </FluentStack>
@@ -134,7 +134,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 <FluentLabel Typo="Typography.Header">@loc["HistoryHeaderText"]</FluentLabel>
                 <FluentDivider Orientation="Orientation.Horizontal" Role="DividerRole.Presentation" />
                 <FluentSpacer Width="1" />
-                <!-- TODO -->
+                @if (ticket is null)
+                {
+                    <div style="width: 100%; display: flex; align-items: center; padding: 2rem; flex-direction: column;">
+                        <FluentProgressRing />
+                    </div>
+                }
+                else
+                {
+                    <EditsList TicketId="ticket.Id" />
+                }
             </FluentCard>
             <FluentCard Style="background: var(--neutral-layer-1); height: 50%;">
                 <FluentLabel Typo="Typography.Header">@loc["RepliesHeaderText"]</FluentLabel>

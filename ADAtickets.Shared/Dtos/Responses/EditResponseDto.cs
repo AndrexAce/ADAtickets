@@ -60,4 +60,10 @@ public sealed record EditResponseDto : ResponseDto
     ///     The id of the user who made the edit.
     /// </summary>
     public Guid UserId { get; init; } = Guid.Empty;
+
+    /// <summary>
+    ///     The name of the user responsible for the edit (from related entities <see cref="Notification" /> and <see cref="User" />).
+    /// </summary>
+    [ValueFromRelationship]
+    public string SenderName { get; init; } = string.Empty;
 }
