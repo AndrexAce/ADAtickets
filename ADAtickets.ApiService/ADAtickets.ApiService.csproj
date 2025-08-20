@@ -36,8 +36,8 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.8" />
-        <PackageReference Include="Microsoft.Identity.Web" Version="3.13.1" />
-        <PackageReference Include="Microsoft.Identity.Web.DownstreamApi" Version="3.13.1" />
+        <PackageReference Include="Microsoft.Identity.Web" Version="3.13.2" />
+        <PackageReference Include="Microsoft.Identity.Web.DownstreamApi" Version="3.13.2" />
         <PackageReference Include="Microsoft.TeamFoundationServer.Client" Version="19.225.1" />
         <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
         <PackageReference Include="Microsoft.VisualStudio.Services.InteractiveClient" Version="19.225.1" />

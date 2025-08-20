@@ -20,8 +20,8 @@
         <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Emoji" Version="4.12.1" />
         <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.12.1" />
         <PackageReference Include="Microsoft.Graph" Version="5.90.0" />
-        <PackageReference Include="Microsoft.Identity.Web.DownstreamApi" Version="3.13.1" />
-        <PackageReference Include="Microsoft.Identity.Web.UI" Version="3.13.1" />
+        <PackageReference Include="Microsoft.Identity.Web.DownstreamApi" Version="3.13.2" />
+        <PackageReference Include="Microsoft.Identity.Web.UI" Version="3.13.2" />
         <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
     </ItemGroup>
 
