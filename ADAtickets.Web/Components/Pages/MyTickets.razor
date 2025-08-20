@@ -119,25 +119,32 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                     <span slot="start"><FluentIcon Value="@(new Size20.DeleteDismiss())"
                                                    Color="Color.Neutral" Slot="start"/></span>
                 </FluentMenuItem>
-                <FluentMenuItem Label="@loc["CloseMenuItem"]" OnClick="HandleCloseClickAsync">
-                    <span slot="start"><FluentIcon Value="@(new Size20.Checkmark())" Color="Color.Neutral"
-                                                   Slot="start"/></span>
-                </FluentMenuItem>
-                <FluentDivider/>
-                <FluentLabel Typo="Typography.H6">@loc["AssignMenuLabel"]</FluentLabel>
-                <FluentMenuItem Label="@loc["AssignMenuItem"]">
-                    <ChildContent>
-                        <span slot="start"><FluentIcon Value="@(new Size20.Person())"
-                                                       Color="Color.Neutral" Slot="start"/></span>
-                    </ChildContent>
-                    <MenuItems>
-                        @foreach (var user in Users ?? [])
-                        {
-                            <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@($"{user.Name} {user.Surname}")"
-                                            OnClick="args => HandleAssignClickAsync(user.Id)"/>
-                        }
-                    </MenuItems>
-                </FluentMenuItem>
+                @if (!selectedTickets.Any(t => t.Status == Status.Closed))
+                {
+                    <FluentMenuItem Label="@loc["CloseMenuItem"]" OnClick="HandleCloseClickAsync">
+                        <span slot="start">
+                            <FluentIcon Value="@(new Size20.Checkmark())" Color="Color.Neutral"
+                                        Slot="start" />
+                        </span>
+                    </FluentMenuItem>
+                    <FluentDivider />
+                    <FluentLabel Typo="Typography.H6">@loc["AssignMenuLabel"]</FluentLabel>
+                    <FluentMenuItem Label="@loc["AssignMenuItem"]">
+                        <ChildContent>
+                            <span slot="start">
+                                <FluentIcon Value="@(new Size20.Person())"
+                                            Color="Color.Neutral" Slot="start" />
+                            </span>
+                        </ChildContent>
+                        <MenuItems>
+                            @foreach (var user in Users ?? [])
+                            {
+                                <FluentMenuItem Role="MenuItemRole.MenuItem" Label="@($"{user.Name} {user.Surname}")"
+                                                OnClick="args => HandleAssignClickAsync(user.Id)" />
+                            }
+                        </MenuItems>
+                    </FluentMenuItem>
+                }
             </FluentMenuButton>
         }
         <FluentMenuButton Text="@loc["EditViewButton"]" IconStart="@(new Size20.TextAlignLeft())">

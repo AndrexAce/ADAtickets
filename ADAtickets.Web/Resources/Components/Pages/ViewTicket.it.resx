@@ -216,4 +216,31 @@
   <data name="TicketTypeSuggestion" xml:space="preserve">
     <value>Suggerimento</value>
   </data>
+  <data name="CloseButtonText" xml:space="preserve">
+    <value>Chiudi</value>
+  </data>
+  <data name="CloseConfirmDialogCancelButton" xml:space="preserve">
+    <value>Non chiudere</value>
+  </data>
+  <data name="CloseConfirmDialogConfirmButton" xml:space="preserve">
+    <value>Chiudi</value>
+  </data>
+  <data name="CloseConfirmDialogMessage" xml:space="preserve">
+    <value>Se chiudi questo ticket, non sarà più apribile nuovamente.</value>
+  </data>
+  <data name="CloseConfirmDialogTitle" xml:space="preserve">
+    <value>Conferma chiusura</value>
+  </data>
+  <data name="CloseErrorToastDetails" xml:space="preserve">
+    <value>Si è verificato un errore mentre il ticket veniva chiuso. Riprova.</value>
+  </data>
+  <data name="CloseErrorToastTitle" xml:space="preserve">
+    <value>Errore chiusura</value>
+  </data>
+  <data name="CloseSuccessToastDetails" xml:space="preserve">
+    <value>La chiusura è stata completata con successo.</value>
+  </data>
+  <data name="CloseSuccessToastTitle" xml:space="preserve">
+    <value>Chiusura completata</value>
+  </data>
 </root>

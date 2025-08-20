@@ -68,7 +68,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                     </FluentStack>
                 </FluentPersona>
                 <FluentSpacer/>
-                <FluentCheckbox Class="@(Selected ? string.Empty : "hover-hide")" CheckStateChanged="HandleCheckStateChangedAsync" />
+                @if (!isUser)
+                {
+                    <FluentCheckbox Class="@(Selected ? string.Empty : "hover-hide")" CheckStateChanged="HandleCheckStateChangedAsync" />
+                }
             }
         </FluentStack>
         @if (Users is null)
@@ -159,6 +162,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     /// </summary>
     [Parameter]
     public EventCallback<SelectedChangedEventArgs<TicketResponseDto>> SelectedChanged { get; set; }
+
+    private bool isUser = false;
+
+    override async protected Task OnInitializedAsync()
+    {
+        isUser = await IsUserAsync();
+    }
 
     private RenderFragment GetPriorityBadge(Priority priority) => @<FluentBadge Fill="highlight"
                                                                                 BackgroundColor="@GetPriorityAppearance(priority)"
@@ -310,7 +320,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             new TicketDialogContent
             {
                 IsEdit = true,
-                IsUser = await IsUserAsync(),
+                IsUser = isUser,
                 InitialTicketData = Ticket
             },
             new DialogParameters

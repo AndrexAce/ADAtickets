@@ -22,11 +22,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @using System.Text.RegularExpressions
 @using ADAtickets.Client
 @using ADAtickets.Shared.Constants
+@using ADAtickets.Shared.Extensions
+@using ADAtickets.Shared.Dtos.Requests
 @using ADAtickets.Shared.Dtos.Responses
 @using ADAtickets.Shared.Models
 @using ADAtickets.Web.Components.Layout
 @using ADAtickets.Web.Components.Shared
 @using ADAtickets.Web.Utilities
+@using AutoMapper
 @using Humanizer
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
@@ -38,11 +41,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @inject IDialogService dialogService
 @inject IMessageService messageService
 @inject IConfiguration configuration
+@inject IMapper mapper
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject NavigationManager navigationManager
 @inject SignalRService signalRService
 @inject TicketsClient ticketsClient
 @inject AttachmentsClient attachmentsClient
+@inject UsersClient usersClient
 
 @attribute [Authorize(Policy = Policy.Everyone)]
 
@@ -55,7 +60,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 <FluentButton IconStart="@(new Icons.Regular.Size20.ArrowLeft())" OnClick="HandleBackButtonClick">@loc["BackButtonText"]</FluentButton>
                 @if (!isDeleted && ticket is not null && ticket.Status != Status.Closed)
                 {
+                    <FluentStack Orientation="Orientation.Horizontal" Width="fit-content">
+                        <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Checkmark())" OnClick="HandleCloseButtonClickAsync">@loc["CloseButtonText"]</FluentButton>
                     <FluentButton Appearance="Appearance.Accent" IconStart="@(new Icons.Regular.Size20.Edit())" OnClick="HandleEditButtonClickAsync">@loc["EditButtonText"]</FluentButton>
+                    </FluentStack>
                 }
             </FluentStack>
             <FluentSpacer Width="1" />
@@ -122,13 +130,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             }
         </FluentCard>
         <FluentStack Orientation="Orientation.Vertical" Style="height: 100%;">
-            <FluentCard Style="background: var(--neutral-layer-1)">
+            <FluentCard Style="background: var(--neutral-layer-1); height: 50%;">
                 <FluentLabel Typo="Typography.Header">@loc["HistoryHeaderText"]</FluentLabel>
                 <FluentDivider Orientation="Orientation.Horizontal" Role="DividerRole.Presentation" />
                 <FluentSpacer Width="1" />
                 <!-- TODO -->
             </FluentCard>
-            <FluentCard Style="background: var(--neutral-layer-1)">
+            <FluentCard Style="background: var(--neutral-layer-1); height: 50%;">
                 <FluentLabel Typo="Typography.Header">@loc["RepliesHeaderText"]</FluentLabel>
                 <FluentDivider Orientation="Orientation.Horizontal" Role="DividerRole.Presentation" />
                 <FluentSpacer Width="1" />
@@ -266,6 +274,39 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         navigationManager.NavigateTo("/my-tickets", true);
     }
 
+    private async Task HandleCloseButtonClickAsync()
+    {
+        await dialogService.ShowDialogAsync<SimpleDialog>(
+            new SimpleDialogContent
+            {
+                Message = loc["CloseConfirmDialogMessage"],
+                ConfirmAction = HandleConfirmCloseAsync,
+                ConfirmButtonIcon = new Icons.Regular.Size20.Checkmark()
+            },
+            ConfirmDialogParameters(loc["CloseConfirmDialogTitle"], loc["CloseConfirmDialogConfirmButton"], loc["CloseConfirmDialogCancelButton"]));
+    }
+
+    private async Task HandleConfirmCloseAsync()
+    {
+        try
+        {
+            var getResponse = await ticketsClient.GetAsync(TicketId);
+
+            // Update the ticket status to Closed.
+            var requestDto = mapper.Map<TicketRequestDto>(getResponse);
+            requestDto.Status = Status.Closed;
+            requestDto.Requester = await GetUserIdAsync();
+
+            await ticketsClient.PutAsync(TicketId, requestDto);
+
+            toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["CloseSuccessToastTitle"], loc["CloseSuccessToastDetails"]));
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowCommunicationToast(Toasts.ErrorToastParameters(ex, loc["CloseErrorToastTitle"], loc["CloseErrorToastDetails"]));
+        }
+    }
+
     private async Task HandleEditButtonClickAsync()
     {
         await dialogService.ShowDialogAsync<TicketDialog>(
@@ -366,6 +407,21 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         var user = authState.User;
 
         return user.GetTenantId() == configuration["ExternalEntra:TenantId"];
+    }
+
+    private async Task<Guid?> GetUserIdAsync()
+    {
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.IsAuthenticated())
+        {
+            var loggedInUser = await usersClient.GetAsync(user.GetEmail()!);
+
+            return loggedInUser?.Id;
+        }
+
+        return null;
     }
 
     public async ValueTask DisposeAsync()
