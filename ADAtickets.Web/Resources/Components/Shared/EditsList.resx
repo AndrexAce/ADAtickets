@@ -147,6 +147,9 @@
   <data name="TICKET_EDITED_EDIT" xml:space="preserve">
     <value>has edited the ticket.</value>
   </data>
+  <data name="TICKET_REPLIED_EDIT" xml:space="preserve">
+    <value>has replied to the ticket.</value>
+  </data>
   <data name="TICKET_UNASSIGNED_EDIT" xml:space="preserve">
     <value>has unassigned the operator from the ticket.</value>
   </data>

@@ -49,4 +49,9 @@ internal static class Edits
     ///     The message used when the ticket is unassigned from an operator.
     /// </summary>
     public const string TicketUnassigned = "TICKET_UNASSIGNED_EDIT";
+
+    /// <summary>
+    ///     The message used when someone replies to the ticket.
+    /// </summary>
+    public const string TicketReplied = "TICKET_REPLIED_EDIT";
 }

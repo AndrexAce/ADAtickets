@@ -291,10 +291,12 @@ public sealed class EditsController(IEditRepository editRepository, IMapper mapp
     internal async Task CreateEditEntryAsync(Ticket ticket, Status oldStatus, Guid editor)
     {
         // Create the edit about the ticket edit by the editor.
+        // If the status is being switched from WaitingOperator to WaitingUser or vice versa, it means someone replied to the ticket.
         Edit edit = new()
         {
             EditDateTime = DateTime.UtcNow,
-            Description = Edits.TicketEdited,
+            Description = (oldStatus == Status.WaitingOperator && ticket.Status == Status.WaitingUser)
+                || (oldStatus == Status.WaitingUser && ticket.Status == Status.WaitingOperator) ? Edits.TicketReplied : Edits.TicketEdited,
             OldStatus = oldStatus,
             NewStatus = ticket.Status,
             TicketId = ticket.Id,
