@@ -44,7 +44,7 @@ public static class Dialogs
             Title = title,
             PrimaryAction = okButtonText,
             SecondaryAction = cancelButtonText,
-            TrapFocus = true,
+            TrapFocus = false,
             PreventScroll = true,
             PreventDismissOnOverlayClick = true
         };
@@ -61,7 +61,7 @@ public static class Dialogs
             DialogType = DialogType.Panel,
             Width = "25rem",
             Alignment = HorizontalAlignment.Right,
-            TrapFocus = true,
+            TrapFocus = false,
             PreventScroll = true,
             PreventDismissOnOverlayClick = true
         };

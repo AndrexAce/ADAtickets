@@ -117,28 +117,22 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="DatabaseManagement" xml:space="preserve">
-    <value>Database management</value>
+  <data name="DarkTheme" xml:space="preserve">
+    <value>Dark theme</value>
   </data>
-  <data name="NewTicket" xml:space="preserve">
-    <value>New ticket</value>
+  <data name="LanguageLabel" xml:space="preserve">
+    <value>Language</value>
   </data>
-  <data name="Platforms" xml:space="preserve">
-    <value>Platforms</value>
+  <data name="LightTheme" xml:space="preserve">
+    <value>Light theme</value>
   </data>
-  <data name="Settings" xml:space="preserve">
-    <value>Settings</value>
+  <data name="SystemTheme" xml:space="preserve">
+    <value>System theme</value>
   </data>
-  <data name="ThemeAndPersonalization" xml:space="preserve">
+  <data name="ThemeAndPersonalizationDialogTitle" xml:space="preserve">
     <value>Theme and personalization</value>
   </data>
-  <data name="Tickets" xml:space="preserve">
-    <value>Tickets</value>
-  </data>
-  <data name="Users" xml:space="preserve">
-    <value>Users</value>
-  </data>
-  <data name="MyTickets" xml:space="preserve">
-    <value>My tickets</value>
+  <data name="ThemeLabel" xml:space="preserve">
+    <value>Theme</value>
   </data>
 </root>

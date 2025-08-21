@@ -117,17 +117,11 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AccessAndSecurity" xml:space="preserve">
-    <value>Accesso e sicurezza</value>
-  </data>
   <data name="DatabaseManagement" xml:space="preserve">
     <value>Gestione base di dati</value>
   </data>
   <data name="NewTicket" xml:space="preserve">
     <value>Nuovo ticket</value>
-  </data>
-  <data name="Notifications" xml:space="preserve">
-    <value>Notifiche</value>
   </data>
   <data name="Platforms" xml:space="preserve">
     <value>Piattaforme</value>

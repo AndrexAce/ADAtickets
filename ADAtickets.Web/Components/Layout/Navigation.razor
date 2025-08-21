@@ -45,8 +45,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         <FluentNavGroup Icon="@(new Size20.Settings())" Title="@loc["Settings"]" Expanded="true">
             <FluentNavLink
                 OnClick="ShowThemeAndPersonalizationDialogAsync">@loc["ThemeAndPersonalization"]</FluentNavLink>
-            <FluentNavLink OnClick="ShowNotificationsDialogAsync">@loc["Notifications"]</FluentNavLink>
-            <FluentNavLink OnClick="ShowAccessAndSecurityDialogAsync">@loc["AccessAndSecurity"]</FluentNavLink>
         </FluentNavGroup>
     </FluentNavMenu>
 </div>
@@ -64,7 +62,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             },
             new DialogParameters
             {
-                TrapFocus = true,
+                TrapFocus = false,
                 PreventScroll = true,
                 PreventDismissOnOverlayClick = true
             }
@@ -73,17 +71,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     private async Task ShowThemeAndPersonalizationDialogAsync()
     {
-        // TODO
-    }
-
-    private async Task ShowNotificationsDialogAsync()
-    {
-        // TODO
-    }
-
-    private async Task ShowAccessAndSecurityDialogAsync()
-    {
-        // TODO
+        await dialogService.ShowDialogAsync<ThemeAndPersonalizationDialog>(
+            new DialogParameters
+            {
+                TrapFocus = false,
+                PreventScroll = true,
+                PreventDismissOnOverlayClick = true
+            }
+        );
     }
 
 }
