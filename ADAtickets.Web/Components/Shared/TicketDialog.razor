@@ -419,8 +419,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
                 var attachments = await LoadAttachmentsAsync(new Dictionary<string, string> { { nameof(AttachmentRequestDto.TicketId), initialTicketData.Id.ToString() } });
 
-                photoPath = attachments.FirstOrDefault(a => Regex.IsMatch(Path.GetFileName(a.Path), @"\.(png|jpg|jpeg|gif|webp)$"))?.Path;
-                videoPath = attachments.FirstOrDefault(a => Regex.IsMatch(Path.GetFileName(a.Path), @"\.(mp4|webm)$"))?.Path;
+                photoPath = attachments.FirstOrDefault(a => Regex.IsMatch(Path.GetFileName(a.Path), @"\.(png|jpg|jpeg|gif|webp)$", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100)))?.Path;
+                videoPath = attachments.FirstOrDefault(a => Regex.IsMatch(Path.GetFileName(a.Path), @"\.(mp4|webm)$", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100)))?.Path;
             }
         }
         catch (Exception ex)
