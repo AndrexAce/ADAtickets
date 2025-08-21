@@ -1,0 +1,143 @@
+﻿<!-- ADAtickets is a simple, lightweight, open source ticketing system
+interacting with your enterprise repositories on Azure DevOps
+with a two-way synchronization.
+Copyright (C) 2025  Andrea Lucchese
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
+@page "/platforms"
+@layout MainLayout
+
+@using ADAtickets.Client
+@using ADAtickets.Shared.Constants
+@using ADAtickets.Shared.Dtos.Responses
+@using ADAtickets.Web.Components.Layout
+@using ADAtickets.Web.Components.Shared
+@using ADAtickets.Web.Utilities
+@using Microsoft.AspNetCore.Authorization
+
+@inject IStringLocalizer<Platforms> loc
+@inject IToastService toastService
+@inject PlatformsClient platformsClient
+@inject TicketsClient ticketsClient
+@inject AzureDevOpsClient azureDevOpsClient
+
+@attribute [Authorize(Policy = Policy.AdminOnly)]
+
+<PageTitle>ADAtickets - @loc["Title"]</PageTitle>
+<FluentStack Orientation="Orientation.Horizontal">
+    <FluentStack Orientation="Orientation.Vertical">
+        <FluentLabel Typo="Typography.Header">@loc["AvailablePlatformsHeader"]</FluentLabel>
+
+        @if (availablePlatforms is null)
+        {
+            <div style="width: 100%; display: flex; align-items: center; padding: 2rem; flex-direction: column;">
+                <FluentProgressRing />
+            </div>
+        }
+        else
+        {
+            @foreach (var availablePlatform in availablePlatforms)
+            {
+                <PlatformCard Platform="availablePlatform" IsImported="false" OnRegister="HandlePlatformRegistered" />
+            }
+        }
+    </FluentStack>
+    <FluentDivider Orientation="Orientation.Vertical" Role="DividerRole.Separator"/>
+    <FluentStack Orientation="Orientation.Vertical">
+        <FluentLabel Typo="Typography.Header">@loc["ImportedPlatformsHeader"]</FluentLabel>
+
+        @if (importedPlatforms is null)
+        {
+            <div style="width: 100%; display: flex; align-items: center; padding: 2rem; flex-direction: column;">
+                <FluentProgressRing />
+            </div>
+        }
+        else
+        {
+            @foreach (var importedPlatform in importedPlatforms)
+            {
+                <PlatformCard Platform="importedPlatform" IsImported="true" OnDelete="HandlePlatformDeleted" />
+            }
+        }
+    </FluentStack>
+</FluentStack>
+
+@code {
+
+    private IEnumerable<PlatformResponseDto>? availablePlatforms;
+    private IEnumerable<PlatformResponseDto>? importedPlatforms;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var availablePlatformsFromAzureDevOps = await azureDevOpsClient.GetAllPlatformsAsync();
+            importedPlatforms = await platformsClient.GetAllAsync();
+
+            // Remove all the already imported platforms
+            availablePlatforms = availablePlatformsFromAzureDevOps.Where(p => !importedPlatforms.Any(ip => ip.RepositoryUrl == p.RepositoryUrl)).ToList();
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowCommunicationToast(Toasts.ErrorToastParameters(ex, loc["LoadingErrorToastTitle"], loc["LoadingErrorToastDetails"]));
+        }
+    }
+
+    async Task HandlePlatformRegistered(PlatformResponseDto platform)
+    {
+        try
+        {
+            // Update the remote data source
+            await platformsClient.PostAsync(new() { Name = platform.Name, RepositoryUrl = platform.RepositoryUrl });
+
+            // Update the local data source
+            importedPlatforms = importedPlatforms?.Append(platform);
+            availablePlatforms = availablePlatforms?.Where(p => p.RepositoryUrl != platform.RepositoryUrl);
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowCommunicationToast(Toasts.ErrorToastParameters(ex, loc["RegisterErrorToastTitle"], loc["RegisterErrorToastDetails"]));
+        }
+    }
+
+    async Task HandlePlatformDeleted(PlatformResponseDto platform)
+    {
+        try
+        {
+            // Check if any ticket is still associated to the platform
+            var associatedTickets = await ticketsClient.GetAllAsync(
+                new Dictionary<string, string> { { nameof(TicketResponseDto.PlatformId), platform.Id.ToString() } }
+            );
+
+            if (!associatedTickets.Any())
+            {
+                // Update the remote data source
+                await platformsClient.DeleteAsync(platform.Id);
+
+                // Update the local data source
+                importedPlatforms = importedPlatforms?.Where(p => p.RepositoryUrl != platform.RepositoryUrl);
+                availablePlatforms = availablePlatforms?.Append(platform);
+            }
+            else
+            {
+                toastService.ShowCommunicationToast(Toasts.WarningToastParameters(loc["DeleteWarningToastTitle"], loc["DeleteWarningToastDetails"]));
+            }
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowCommunicationToast(Toasts.ErrorToastParameters(ex, loc["DeleteErrorToastTitle"], loc["DeleteErrorToastDetails"]));
+        }
+    }
+
+}
