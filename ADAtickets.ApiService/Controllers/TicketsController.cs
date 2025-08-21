@@ -300,6 +300,9 @@ public sealed class TicketsController(
         // Check if the requested entity exists.
         if (await ticketRepository.GetTicketByIdAsync(id) is not Ticket ticket) return NotFound();
 
+        // Save the UserNotifications before deletion in order to send the signals
+        var userNotificationsToSignal = await notificationsController.RetrieveAllTicketUserNotificationsAsync([.. ticket.Notifications]);
+
         await ticketRepository.DeleteTicketAsync(ticket);
 
         await azureDevOpsController.DeleteAzureDevOpsWorkItemAsync(ticket.WorkItemId);
@@ -308,8 +311,8 @@ public sealed class TicketsController(
         await ticketsHub.Clients.All.SendAsync("TicketDeleted", ticket.Id);
         await editsController.SendSignalToClientAsync("EditDeleted", ticket.Id);
         await repliesController.SendSignalToClientAsync("ReplyDeleted", ticket.Id);
-        foreach (var notificationId in ticket.Notifications.Select(n => n.Id))
-            await notificationsController.SendSignalToClientsAsync("UserNotificationDeleted", notificationId);
+        foreach (var userNotification in userNotificationsToSignal)
+            await notificationsController.SendSignalToClientAsync("UserNotificationDeleted", userNotification.ReceiverUserId);
 
         return NoContent();
     }

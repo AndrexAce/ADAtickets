@@ -448,19 +448,23 @@ public sealed class NotificationsController(
         return userNotification;
     }
 
-    internal async Task SendSignalToClientsAsync(string action, Guid notificationId)
+    internal async Task<IEnumerable<UserNotification>> RetrieveAllTicketUserNotificationsAsync(IEnumerable<Notification> notifications)
     {
-        var userNotifications = await userNotificationRepository.GetUserNotificationsByAsync(
-            new Dictionary<string, string> { { nameof(UserNotification.NotificationId), notificationId.ToString() } }
-        );
+        var userNotifications = new List<UserNotification>();
 
-        foreach (var userNotification in userNotifications)
+        foreach (var notification in notifications)
         {
-            await notificationsHub.Clients.Group($"user_{userNotification.ReceiverUserId}").SendAsync(action);
+            var userNotificationsForNotification = await userNotificationRepository.GetUserNotificationsByAsync(
+                new Dictionary<string, string> { { nameof(UserNotification.NotificationId), notification.Id.ToString() } }
+            );
+
+            userNotifications.AddRange(userNotificationsForNotification);
         }
+
+        return userNotifications;
     }
 
-    private async Task SendSignalToClientAsync(string action, Guid receiverId)
+    internal async Task SendSignalToClientAsync(string action, Guid receiverId)
     {
         await notificationsHub.Clients.Group($"user_{receiverId}").SendAsync(action);
     }
