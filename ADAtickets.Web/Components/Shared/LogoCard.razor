@@ -20,18 +20,20 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @inject IStringLocalizer<LogoCard> loc
 
 <FluentCard Width="@Width" Height="@Height" Style="@Style">
-    @if (IsDarkThemeActive)
-    {
-        <img src="Images/Logos/LogoDark.svg" alt="@loc["ADAticketsLogoAlt"]"/>
-    }
-    else
-    {
-        <img src="Images/Logos/LogoDark.svg" alt="@loc["ADAticketsLogoAlt"]"/>
-    }
-    <FluentLabel Typo="Typography.H1" Weight="FontWeight.Bold" Alignment="HorizontalAlignment.Center"
-                 MarginBlock="0.5rem">@Title</FluentLabel>
-    <FluentLabel Typo="Typography.Body" Alignment="HorizontalAlignment.Center" MarginBlock="0.5rem">@Text</FluentLabel>
-    @ChildContent
+    <FluentStack Orientation="Orientation.Vertical" HorizontalAlignment="HorizontalAlignment.Center">
+        @if (IsDarkThemeActive)
+        {
+            <img src="Images/Logos/LogoDark.svg" alt="@loc["ADAticketsLogoAlt"]" />
+        }
+        else
+        {
+            <img src="Images/Logos/LogoDark.svg" alt="@loc["ADAticketsLogoAlt"]" />
+        }
+        <FluentLabel Typo="Typography.H1" Weight="FontWeight.Bold" Alignment="HorizontalAlignment.Center"
+                     MarginBlock="0.5rem">@Title</FluentLabel>
+        <FluentLabel Typo="Typography.Body" Alignment="HorizontalAlignment.Center" MarginBlock="0.5rem">@Text</FluentLabel>
+        @ChildContent
+    </FluentStack>
 </FluentCard>
 
 @code {

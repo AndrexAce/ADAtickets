@@ -41,6 +41,7 @@ namespace ADAtickets.ApiService.Migrations
                     name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     surname = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     are_email_notifications_enabled = table.Column<bool>(type: "boolean", nullable: false),
+                    is_blocked = table.Column<bool>(type: "boolean", nullable: false),
                     type = table.Column<UserType>(type: "user_type", nullable: false),
                     xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
                 },

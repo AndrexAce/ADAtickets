@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ADAtickets.ApiService.Migrations
 {
     [DbContext(typeof(ADAticketsDbContext))]
-    [Migration("20250817142032_FirstMigration")]
+    [Migration("20250822141622_FirstMigration")]
     partial class FirstMigration
     {
         /// <inheritdoc />
@@ -325,6 +325,10 @@ namespace ADAtickets.ApiService.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("email");
+
+                    b.Property<bool>("IsBlocked")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_blocked");
 
                     b.Property<string>("Name")
                         .IsRequired()

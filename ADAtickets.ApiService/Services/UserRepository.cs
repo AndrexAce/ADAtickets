@@ -97,6 +97,10 @@ internal sealed class UserRepository(ADAticketsDbContext context) : IUserReposit
                     query = query.Where(u => u.AreEmailNotificationsEnabled == outAreEmailNotificationsEnabled);
                     break;
 
+                case nameof(User.IsBlocked) when bool.TryParse(filter.Value, out var outIsBlocked):
+                    query = query.Where(u => u.IsBlocked == outIsBlocked);
+                    break;
+
                 case nameof(User.Type) when Enum.TryParse(filter.Value, true, out UserType outType):
                     query = query.Where(u => u.Type == outType);
                     break;

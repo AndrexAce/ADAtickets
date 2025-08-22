@@ -53,20 +53,17 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             {
                 var loggedInUser = await CheckUserAgainstDatabase(authState.User);
 
-                if (loggedInUser.Type is UserType.User)
+                if (loggedInUser.IsBlocked)
+                {
+                    navigationManager.NavigateTo("/blocked", true);
+                }
+                else if (loggedInUser.Type is UserType.User || await HasUserAzureDevOpsPermissions(loggedInUser))
                 {
                     navigationManager.NavigateTo("/tickets", true);
                 }
                 else
                 {
-                    if (await HasUserAzureDevOpsPermissions(loggedInUser))
-                    {
-                        navigationManager.NavigateTo("/tickets", true);
-                    }
-                    else
-                    {
-                        navigationManager.NavigateTo("/azure-devops-noaccess", true);
-                    }
+                    navigationManager.NavigateTo("/azure-devops-noaccess", true);
                 }
             }
             catch

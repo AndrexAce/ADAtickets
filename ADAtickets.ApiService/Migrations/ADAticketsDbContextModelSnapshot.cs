@@ -323,6 +323,10 @@ namespace ADAtickets.ApiService.Migrations
                         .HasColumnType("text")
                         .HasColumnName("email");
 
+                    b.Property<bool>("IsBlocked")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_blocked");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)

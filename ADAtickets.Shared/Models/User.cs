@@ -70,6 +70,11 @@ public sealed class User : Entity
     public bool AreEmailNotificationsEnabled { get; set; } = false;
 
     /// <summary>
+    ///     Whether the user can login the application.
+    /// </summary>
+    public bool IsBlocked { get; init; } = false;
+
+    /// <summary>
     ///     The role of the user in the system.
     /// </summary>
     [Required]

@@ -61,6 +61,12 @@ public sealed class UserRequestDto : RequestDto
     public bool AreEmailNotificationsEnabled { get; set; } = false;
 
     /// <summary>
+    ///     Whether the user can login the application.
+    /// </summary>
+    [Required]
+    public bool IsBlocked { get; init; } = false;
+
+    /// <summary>
     ///     The role of the user in the system.
     /// </summary>
     [Required]
