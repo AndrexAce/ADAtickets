@@ -32,6 +32,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web.Resource;
 using System.Net.Mime;
+using System.Net.Sockets;
 using Controller = ADAtickets.Shared.Constants.Controller;
 
 namespace ADAtickets.ApiService.Controllers;
@@ -45,13 +46,25 @@ namespace ADAtickets.ApiService.Controllers;
 ///     <see cref="ReplyRequestDto" /> or <see cref="ReplyResponseDto" /> correspondant.
 /// </param>
 /// <param name="repliesHub">SignalR hub managing the real-time updates of replies.</param>
+/// <param name="userRepository">Object defining the operations allowed on the <see cref="User" /> entity type.</param>
+/// <param name="ticketRepository">Object defining the operations allowed on the <see cref="Ticket" /> entity type.</param>
+/// <param name="platformRepository">Object defining the operations allowed on the <see cref="Platform" /> entity type.</param>
+/// <param name="azureDevOpsController">Controller managing the interaction with Azure DevOps.</param>
 [Route($"v{Service.APIVersion}/{Controller.Replies}")]
 [ApiController]
 [Consumes(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
 [Produces(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
 [FormatFilter]
 [ApiConventionType(typeof(ApiConventions))]
-public sealed class RepliesController(IReplyRepository replyRepository, IMapper mapper, IHubContext<RepliesHub> repliesHub) : ControllerBase
+public sealed class RepliesController(
+    IReplyRepository replyRepository,
+    IMapper mapper,
+    IHubContext<RepliesHub> repliesHub,
+    IUserRepository userRepository,
+    ITicketRepository ticketRepository,
+    IPlatformRepository platformRepository,
+    AzureDevOpsController azureDevOpsController
+) : ControllerBase
 {
     /// <summary>
     ///     Fetch all the <see cref="Reply" /> entities or all the entities respecting the given criteria.
@@ -222,6 +235,8 @@ public sealed class RepliesController(IReplyRepository replyRepository, IMapper 
         // Send a signal to the people who have received this reply and are connected to this hub.
         await SendSignalToClientAsync("ReplyCreated", reply.TicketId);
 
+        await ProcessReplyCreationAsync(reply);
+
         // Return the created entity and its location to the client.
         return CreatedAtAction(nameof(GetReply), new { id = reply.Id }, mapper.Map<ReplyResponseDto>(reply));
     }
@@ -254,5 +269,15 @@ public sealed class RepliesController(IReplyRepository replyRepository, IMapper 
     {
         // Send a signal to the people who are viewing the ticket this reply is related to and are connected to this hub.
         await repliesHub.Clients.Group($"ticket_{ticketId}").SendAsync(action);
+    }
+
+    private async Task ProcessReplyCreationAsync(Reply reply)
+    {
+        if (await ticketRepository.GetTicketByIdAsync(reply.TicketId) is Ticket ticket &&
+           await platformRepository.GetPlatformByIdAsync(ticket.PlatformId) is Platform platform &&
+           await userRepository.GetUserByIdAsync(reply.AuthorUserId) is User user)
+        {
+            await azureDevOpsController.CreateCommentAzureDevOpsWorkItemAsync(ticket.WorkItemId, platform.Name, $"{user.Name} {user.Surname}", reply.Message);
+        }
     }
 }

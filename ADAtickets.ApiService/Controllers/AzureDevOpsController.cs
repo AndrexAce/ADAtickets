@@ -30,12 +30,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Web.Resource;
 using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
+using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using Microsoft.VisualStudio.Services.Client;
 using Microsoft.VisualStudio.Services.Identity;
 using Microsoft.VisualStudio.Services.Identity.Client;
 using Microsoft.VisualStudio.Services.WebApi;
 using Microsoft.VisualStudio.Services.WebApi.Patch;
 using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
+using System.Dynamic;
 using System.Net.Mime;
 using System.Security.Cryptography.X509Certificates;
 using ADAticketsUser = ADAtickets.Shared.Models.User;
@@ -412,6 +414,71 @@ public sealed class AzureDevOpsController(
             var workItemClient = await connection.GetClientAsync<WorkItemTrackingHttpClient>();
 
             await workItemClient.DeleteWorkItemAsync(workItemId);
+        }
+        catch
+        {
+            // Do nothing.
+        }
+    }
+
+    internal async Task CreateCommentAzureDevOpsWorkItemAsync(int workItemId, string platform, string authorName, string message)
+    {
+        if (workItemId == 0)
+        {
+            return;
+        }
+
+        var connection = await ConnectToAzureDevOpsAsync();
+
+        try
+        {
+            // Get the client and create the comment
+            var workItemClient = await connection.GetClientAsync<WorkItemTrackingHttpClient>();
+
+            var createRequest = new CommentCreate() { Text = $"<b>{authorName}:</b> {message}" };
+
+            await workItemClient.AddWorkItemCommentAsync(createRequest, platform, workItemId, CommentFormat.Html);
+        }
+        catch
+        {
+            // Do nothing.
+        }
+    }
+
+    internal async Task CreateAttachmentAzureDevOpsWorkItemAsync(int workItemId, string attachmentPath, string platformName)
+    {
+        if (workItemId == 0)
+        {
+            return;
+        }
+
+        var connection = await ConnectToAzureDevOpsAsync();
+
+        try
+        {
+            // Get the client and create the comment
+            var workItemClient = await connection.GetClientAsync<WorkItemTrackingHttpClient>();
+
+            using var stream = new StreamReader(attachmentPath);
+
+            var attachment = await workItemClient.CreateAttachmentAsync(stream.BaseStream, platformName, Path.GetFileName(attachmentPath), "Simple", platformName);
+
+            // If the attachment was created, add it to the work item
+            var attachmentValue = new ExpandoObject();
+            attachmentValue.TryAdd("rel", "AttachedFile");
+            attachmentValue.TryAdd("url", attachment.Url);
+
+            var updatePatchDocument = new JsonPatchDocument
+            {
+                new JsonPatchOperation
+                {
+                    Operation = Operation.Add,
+                    Path = "/relations/-",
+                    Value = attachmentValue
+                }
+            };
+
+            await workItemClient.UpdateWorkItemAsync(updatePatchDocument, workItemId);
         }
         catch
         {

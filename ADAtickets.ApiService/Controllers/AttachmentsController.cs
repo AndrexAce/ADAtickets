@@ -42,13 +42,22 @@ namespace ADAtickets.ApiService.Controllers;
 ///     Object definining the mappings of fields between the <see cref="Attachment" /> entity and its
 ///     <see cref="AttachmentRequestDto" /> or <see cref="AttachmentResponseDto" /> correspondant.
 /// </param>
+/// <param name="ticketRepository">Object defining the operations allowed on the <see cref="Ticket" /> entity type.</param>
+/// <param name="platformRepository">Object defining the operations allowed on the <see cref="Platform" /> entity type.</param>
+/// <param name="azureDevOpsController">Controller managing the interaction with Azure DevOps.</param>
 [Route($"v{Service.APIVersion}/{Controller.Attachments}")]
 [ApiController]
 [Consumes(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
 [Produces(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
 [FormatFilter]
 [ApiConventionType(typeof(ApiConventions))]
-public sealed class AttachmentsController(IAttachmentRepository attachmentRepository, IMapper mapper) : ControllerBase
+public sealed class AttachmentsController(
+    IAttachmentRepository attachmentRepository,
+    IMapper mapper,
+    ITicketRepository ticketRepository,
+    IPlatformRepository platformRepository,
+    AzureDevOpsController azureDevOpsController
+) : ControllerBase
 {
     /// <summary>
     ///     Fetch all the <see cref="Attachment" /> entities or all the entities respecting the given criteria.
@@ -214,6 +223,8 @@ public sealed class AttachmentsController(IAttachmentRepository attachmentReposi
         // Insert the DTO info into a new entity and add it to the data source.
         await attachmentRepository.AddAttachmentAsync(attachment, attachmentDto.Content);
 
+        await ProcessAttachmentCreationAsync(attachment);
+
         // Return the created entity and its location to the client.
         return CreatedAtAction(nameof(GetAttachment), new { id = attachment.Id },
             mapper.Map<AttachmentResponseDto>(attachment));
@@ -241,5 +252,14 @@ public sealed class AttachmentsController(IAttachmentRepository attachmentReposi
         await attachmentRepository.DeleteAttachmentAsync(attachment);
 
         return NoContent();
+    }
+
+    private async Task ProcessAttachmentCreationAsync(Attachment attachment)
+    {
+        if (await ticketRepository.GetTicketByIdAsync(attachment.TicketId) is Ticket ticket &&
+           await platformRepository.GetPlatformByIdAsync(ticket.PlatformId) is Platform platform)
+        {
+            await azureDevOpsController.CreateAttachmentAzureDevOpsWorkItemAsync(ticket.WorkItemId, attachment.Path, platform.Name);
+        }
     }
 }
