@@ -28,7 +28,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 <div class="nav-menu">
     <FluentNavMenu Width="250" Collapsible="true" CollapsedChildNavigation="true">
         <FluentNavGroup Icon="@(new Size20.TicketDiagonal())" Title="@loc["Tickets"]" Expanded="true">
-            <FluentNavLink Href="/my-tickets">@loc["MyTickets"]</FluentNavLink>
+            <FluentNavLink Href="/tickets">@loc["MyTickets"]</FluentNavLink>
             <AuthorizeView Policy="@Policy.UserOnly">
                 <FluentNavLink OnClick="ShowNewTicketDialogAsync">@loc["NewTicket"]</FluentNavLink>
             </AuthorizeView>

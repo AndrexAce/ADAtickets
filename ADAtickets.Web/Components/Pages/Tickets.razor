@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @implements IAsyncDisposable
-@page "/my-tickets"
+@page "/tickets"
 @layout MainLayout
 
 @using System.Security.Claims
@@ -287,14 +287,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     }
     else
     {
-        <div class="tickets-grid">
-            <CascadingValue Value="@Users">
+        <CascadingValue Value="@Users">
+            <FluentGrid AdaptiveRendering="true" Justify="JustifyContent.SpaceEvenly" Spacing="3">
                 @foreach (var ticket in tickets)
                 {
-                    <TicketCard Ticket="@ticket" SelectedChanged="HandleSelectedChanged" />
+                    <FluentGridItem xs="12" sm="12" md="6" lg="4" Style="display: flex; flex-direction: column; align-items: center;">
+                        <TicketCard Ticket="@ticket" SelectedChanged="HandleSelectedChanged" />
+                    </FluentGridItem>
                 }
-            </CascadingValue>
-        </div>
+            </FluentGrid>
+        </CascadingValue>
     }
 </FluentStack>
 

@@ -1,17 +1,5 @@
 @import '_content/Microsoft.FluentUI.AspNetCore.Components/css/reboot.css';
 
-body {
-    margin: 0;
-    padding: 0;
-    height: 100vh;
-    font-family: var(--body-font);
-    font-size: var(--type-ramp-base-font-size);
-    line-height: var(--type-ramp-base-line-height);
-    font-weight: var(--font-weight);
-    color: var(--neutral-foreground-rest);
-    background: var(--neutral-fill-layer-rest);
-}
-
 .header {
     height: fit-content !important;
 }
@@ -24,10 +12,6 @@ body {
 .header-grid {
     width: 100%;
     height: fit-content !important;
-}
-
-.grid-item {
-    align-items: center;
 }
 
 .main {
@@ -69,35 +53,6 @@ body {
 
 .hover-hide:hover {
     opacity: 1;
-}
-
-.tickets-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
-    width: 100%;
-    max-width: 80rem;
-    padding: 1rem 0;
-    align-items: start;
-    justify-items: center;
-    margin: 0 auto;
-    overflow-y: auto;
-}
-
-@media (max-width: 768px) {
-    .tickets-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-        padding: 0.5rem 0;
-        max-width: none;
-    }
-}
-
-@media (max-width: 1200px) and (min-width: 769px) {
-    .tickets-grid {
-        grid-template-columns: repeat(2, 1fr);
-        max-width: 50rem;
-    }
 }
 
 fluent-menu-item {
