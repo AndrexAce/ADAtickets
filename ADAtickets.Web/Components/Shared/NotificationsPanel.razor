@@ -63,7 +63,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             @foreach (var userNotification in userNotifications)
             {
                 <NotificationCard UserNotification="userNotification" SelectedChanged="HandleSelectedChanged"
-                    OnRead="HandleReadAsync" OnDelete="HandleDeleteAsync" OnOpen="HandleOpenAsync"/>
+                                  OnRead="HandleReadAsync" OnDelete="HandleDeleteAsync" OnOpen="HandleOpenAsync" @key="userNotification.Id" />
             }
         </FluentStack>
     }

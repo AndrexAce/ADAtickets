@@ -54,6 +54,19 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 <FluentStack Orientation="Orientation.Vertical">
     <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center"
                  HorizontalAlignment="HorizontalAlignment.End">
+        <FluentTabs Size="TabSize.Small" Width="100%" OnTabChange="HandleTabChangeAsync">
+            <FluentTab Label="@loc["AllTab"]" Icon="@(new Size20.Grid())" Id="AllTab">
+            </FluentTab>
+            <FluentTab Label="@loc["UnassignedTab"]" Icon="@(new Size20.Question())" Id="UnassignedTab">
+            </FluentTab>
+            <FluentTab Label="@loc["ToReplyTab"]" Icon="@(new Size20.ArrowReply())" Id="ToReplyTab">
+            </FluentTab>
+            <FluentTab Label="@loc["WaitingTab"]" Icon="@(new Size20.HourglassHalf())" Id="WaitingTab">
+            </FluentTab>
+            <FluentTab Label="@loc["ClosedTab"]" Icon="@(new Size20.Checkmark())" Id="ClosedTab">
+            </FluentTab>
+        </FluentTabs>
+
         @if (currentSort is not null && currentSortDirection is not null)
         {
             <FluentBadge Appearance="Appearance.Accent" Circular="true" OnDismissClick="HandleSortDismissClick"
@@ -74,7 +87,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             <FluentBadge Appearance="Appearance.Accent" Circular="true" OnDismissClick="HandleFilterUserDismissClick"
                          DismissIcon="@(new Size20.Dismiss().WithColor(Color.Fill))">
                 <FluentIcon Color="Color.Fill" Value="@(new Size20.Person())"/>
-                @activeUserFilter.Name @activeUserFilter.Surname
+                @activeUserFilter?.Name @activeUserFilter?.Surname
             </FluentBadge>
         }
         @if (activePlatformFilter is not null)
@@ -83,7 +96,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                          OnDismissClick="HandleFilterPlatformDismissClick"
                          DismissIcon="@(new Size20.Dismiss().WithColor(Color.Fill))">
                 <FluentIcon Color="Color.Fill" Value="@(new Size20.Apps())"/>
-                @activePlatformFilter.Name
+                @activePlatformFilter?.Name
             </FluentBadge>
         }
         @if (activePriorityFilter.HasValue)
@@ -259,18 +272,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             </FluentMenuItem>
         </FluentMenuButton>
     </FluentStack>
-    <FluentTabs Size="TabSize.Small" Width="100%" OnTabChange="HandleTabChangeAsync">
-        <FluentTab Label="@loc["AllTab"]" Icon="@(new Size20.Grid())" Id="AllTab">
-        </FluentTab>
-        <FluentTab Label="@loc["UnassignedTab"]" Icon="@(new Size20.Question())" Id="UnassignedTab">
-        </FluentTab>
-        <FluentTab Label="@loc["ToReplyTab"]" Icon="@(new Size20.ArrowReply())" Id="ToReplyTab">
-        </FluentTab>
-        <FluentTab Label="@loc["WaitingTab"]" Icon="@(new Size20.HourglassHalf())" Id="WaitingTab">
-        </FluentTab>
-        <FluentTab Label="@loc["ClosedTab"]" Icon="@(new Size20.Checkmark())" Id="ClosedTab">
-        </FluentTab>
-    </FluentTabs>
 
     @if (tickets is null)
     {
@@ -288,10 +289,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     else
     {
         <CascadingValue Value="@Users">
-            <FluentGrid AdaptiveRendering="true" Justify="JustifyContent.SpaceEvenly" Spacing="3">
+            <FluentGrid Justify="JustifyContent.FlexStart" Spacing="3" Style="width: 100%;">
                 @foreach (var ticket in tickets)
                 {
-                    <FluentGridItem xs="12" sm="12" md="6" lg="4" Style="display: flex; flex-direction: column; align-items: center;">
+                    <FluentGridItem xs="12" sm="12" md="6" lg="4" Style="display: flex; flex-direction: column; align-items: center;" @key="ticket.Id">
                         <TicketCard Ticket="@ticket" SelectedChanged="HandleSelectedChanged" />
                     </FluentGridItem>
                 }
@@ -362,8 +363,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     private async Task LoadUsersAsync()
     {
-        Users = await usersClient.GetAllAsync(new Dictionary<string, string> { { nameof(UserRequestDto.Type), nameof(UserType.Operator) } });
-        Users = Users.Union(await usersClient.GetAllAsync(new Dictionary<string, string> { { nameof(UserRequestDto.Type), nameof(UserType.Admin) } }));
+        Users = await usersClient.GetAllAsync();
     }
 
     private async Task LoadTicketsAsync(IEnumerable<KeyValuePair<string, string>> filters)
