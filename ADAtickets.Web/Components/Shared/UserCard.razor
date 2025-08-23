@@ -79,7 +79,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     ///     Event callback that is triggered when the selected state changes.
     /// </summary>
     [Parameter]
-    public EventCallback<SelectedChangedEventArgs<UserResponseDto>> SelectedChanged { get; set; }
+    public EventCallback<SelectedChangedEventArgs<UserResponseDto>> OnSelectedChanged { get; set; }
 
     /// <summary>
     ///     Event callback that is triggered when the user is blocked.
@@ -96,7 +96,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     private async Task HandleCheckStateChangedAsync(bool? checkState)
     {
         Selected = checkState ?? false;
-        await SelectedChanged.InvokeAsync(new SelectedChangedEventArgs<UserResponseDto> { Item = User, IsSelected = Selected });
+        await OnSelectedChanged.InvokeAsync(new SelectedChangedEventArgs<UserResponseDto> { Item = User, IsSelected = Selected });
     }
 
     private async Task HandleBlockClickAsync()
