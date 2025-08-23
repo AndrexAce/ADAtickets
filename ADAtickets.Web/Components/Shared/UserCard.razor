@@ -1,0 +1,181 @@
+﻿<!-- ADAtickets is a simple, lightweight, open source ticketing system
+interacting with your enterprise repositories on Azure DevOps
+with a two-way synchronization.
+Copyright (C) 2025  Andrea Lucchese
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
+@inherits ComponentBase
+
+@using ADAtickets.Client
+@using ADAtickets.Shared.Dtos.Requests
+@using ADAtickets.Shared.Dtos.Responses
+@using ADAtickets.Shared.Models
+@using ADAtickets.Web.Utilities
+@using AutoMapper
+@using static ADAtickets.Web.Utilities.Dialogs
+
+@inject IStringLocalizer<UserCard> loc
+@inject IDialogService dialogService
+@inject IToastService toastService
+@inject IMapper mapper
+@inject UsersClient usersClient
+
+<FluentCard Id="@(User.Id.ToString())" Style="background: var(--neutral-layer-1)" Width="20rem">
+    <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Top">
+        <FluentPersona ImageSize="3rem" Initials="@GetInitials($"{User.Name} {User.Surname}")" />
+        <FluentStack Orientation="Orientation.Vertical">
+            <FluentLabel Weight="FontWeight.Bold">@($"{User.Name} {User.Surname}")</FluentLabel>
+            <span>@GetUserRoleText(User.Type)</span>
+        </FluentStack>
+        <FluentCheckbox Class="@(Selected ? "" : "hover-hide")" CheckStateChanged="HandleCheckStateChangedAsync" />
+    </FluentStack>
+</FluentCard>
+
+<FluentMenu Anchor="@(User.Id.ToString())" Trigger="MouseButton.Right" Anchored="false">
+    <FluentLabel Typo="Typography.H6">@loc["EditStatusMenuLabel"]</FluentLabel>
+    @if (User.IsBlocked)
+    {
+        <FluentMenuItem Label="@loc["UnblockMenuItem"]" OnClick="HandleUnblockClickAsync">
+            <span slot="start">
+                <FluentIcon Value="@(new Icons.Regular.Size20.LockOpen())" Color="Color.Neutral" Slot="start" />
+            </span>
+        </FluentMenuItem>
+    }
+    else
+    {
+        <FluentMenuItem Label="@loc["BlockMenuItem"]" OnClick="HandleBlockClickAsync">
+            <span slot="start">
+                <FluentIcon Value="@(new Icons.Regular.Size20.LockClosed())" Color="Color.Neutral" Slot="start" />
+            </span>
+        </FluentMenuItem>
+    }
+</FluentMenu>
+
+@code {
+    /// <summary>
+    ///     The <see cref="UserResponseDto" /> the card is bound to.
+    /// </summary>
+    [Parameter]
+    public required UserResponseDto User { get; set; }
+
+    /// <summary>
+    ///     Indicates whether the card is selected.
+    /// </summary>
+    [Parameter]
+    public bool Selected { get; set; } = false;
+
+    /// <summary>
+    ///     Event callback that is triggered when the selected state changes.
+    /// </summary>
+    [Parameter]
+    public EventCallback<SelectedChangedEventArgs<UserResponseDto>> SelectedChanged { get; set; }
+
+    /// <summary>
+    ///     Event callback that is triggered when the user is blocked.
+    /// </summary>
+    [Parameter]
+    public EventCallback<SelectedChangedEventArgs<UserResponseDto>> OnBlock { get; set; }
+
+    /// <summary>
+    ///     Event callback that is triggered when the user is unblocked.
+    /// </summary>
+    [Parameter]
+    public EventCallback<SelectedChangedEventArgs<UserResponseDto>> OnUnblock { get; set; }
+
+    private async Task HandleCheckStateChangedAsync(bool? checkState)
+    {
+        Selected = checkState ?? false;
+        await SelectedChanged.InvokeAsync(new SelectedChangedEventArgs<UserResponseDto> { Item = User, IsSelected = Selected });
+    }
+
+    private async Task HandleBlockClickAsync()
+    {
+        await dialogService.ShowDialogAsync<SimpleDialog>(
+            new SimpleDialogContent
+            {
+                Message = loc["BlockConfirmDialogMessage"],
+                ConfirmAction = HandleConfirmBlockAsync,
+                ConfirmButtonIcon = new Icons.Regular.Size20.LockClosed()
+            },
+            ConfirmDialogParameters(loc["BlockConfirmDialogTitle"], loc["BlockConfirmDialogConfirmButton"], loc["BlockConfirmDialogCancelButton"]));
+
+        await OnBlock.InvokeAsync(new SelectedChangedEventArgs<UserResponseDto> { Item = User, IsSelected = Selected });
+    }
+
+    private async Task HandleUnblockClickAsync()
+    {
+        await dialogService.ShowDialogAsync<SimpleDialog>(
+            new SimpleDialogContent
+            {
+                Message = loc["UnblockConfirmDialogMessage"],
+                ConfirmAction = HandleConfirmUnblockAsync,
+                ConfirmButtonIcon = new Icons.Regular.Size20.LockOpen()
+            },
+            ConfirmDialogParameters(loc["UnblockConfirmDialogTitle"], loc["UnblockConfirmDialogConfirmButton"], loc["UnblockConfirmDialogCancelButton"]));
+
+        await OnUnblock.InvokeAsync(new SelectedChangedEventArgs<UserResponseDto> { Item = User, IsSelected = Selected });
+    }
+
+    private async Task HandleConfirmBlockAsync()
+    {
+        try
+        {
+            await usersClient.PutAsync(User.Id, mapper.Map<UserRequestDto>(User with { IsBlocked = true }));
+
+            toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["BlockSuccessToastTitle"], loc["BlockSuccessToastDetails"]));
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowCommunicationToast(Toasts.ErrorToastParameters(ex, loc["BlockErrorToastTitle"], loc["BlockErrorToastDetails"]));
+        }
+    }
+
+    private async Task HandleConfirmUnblockAsync()
+    {
+        try
+        {
+            await usersClient.PutAsync(User.Id, mapper.Map<UserRequestDto>(User with { IsBlocked = false }));
+
+            toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["UnblockSuccessToastTitle"], loc["UnblockSuccessToastDetails"]));
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowCommunicationToast(Toasts.ErrorToastParameters(ex, loc["UnblockErrorToastTitle"], loc["UnblockErrorToastDetails"]));
+        }
+    }
+
+    private static string GetInitials(string? fullName)
+    {
+        if (string.IsNullOrWhiteSpace(fullName))
+        {
+            return string.Empty;
+        }
+
+        return fullName.Split(' ')
+            .Where(part => !string.IsNullOrWhiteSpace(part))
+            .Select(part => part[0])
+            .Aggregate(string.Empty, (acc, initial) => acc + initial);
+    }
+
+    private string GetUserRoleText(UserType userType)
+    {
+        return userType switch
+        {
+            UserType.User => loc["UserTypeUser"],
+            UserType.Operator => loc["UserTypeOperator"],
+            UserType.Admin => loc["UserTypeAdmin"],
+            _ => ""
+        };
+    }
+}
