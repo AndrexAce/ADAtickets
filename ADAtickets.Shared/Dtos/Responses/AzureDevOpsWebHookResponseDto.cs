@@ -29,6 +29,8 @@ public sealed record AzureDevOpsWebHookResponseDto
 
     public static class Fields
     {
+        public const string CreatedDate = "System.CreatedDate";
+
         public const string CreatedBy = "System.CreatedBy";
 
         public const string ChangedBy = "System.ChangedBy";
