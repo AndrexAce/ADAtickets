@@ -49,4 +49,9 @@ internal static class Scheme
     ///     Cookie scheme employed by the logged in user or operator in the external tenant.
     /// </summary>
     public const string ExternalCookieDefault = "ExternalEntraCookies";
+
+    /// <summary>
+    ///     Basic scheme employed by Azure DevOps.
+    /// </summary>
+    public const string AzureDevOpsDefault = "Basic";
 }

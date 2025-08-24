@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+using ADAtickets.ApiService.Authentication;
 using ADAtickets.ApiService.Configs;
 using ADAtickets.ApiService.Controllers;
 using ADAtickets.ApiService.Hubs;
@@ -26,6 +27,7 @@ using ADAtickets.ApiService.Services;
 using ADAtickets.Shared.Constants;
 using ADAtickets.Shared.Extensions;
 using ADAtickets.Shared.Models;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
@@ -91,6 +93,9 @@ internal static class Program
             Scheme.OpenIdConnectDefault);
         _ = authBuilder.AddMicrosoftIdentityWebApi(
             builder.Configuration.GetSection(Scheme.ExternalOpenIdConnectDefault), Scheme.ExternalOpenIdConnectDefault);
+
+        // Add Basic Authentication for webhooks
+        _ = authBuilder.AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>(Scheme.AzureDevOpsDefault, null);
 
         // Add authorization policies.
         CreatePolicies(builder.Services.AddAuthorizationBuilder(), builder.Configuration);
@@ -268,6 +273,12 @@ internal static class Program
             {
                 _ = policy.RequireAuthenticatedUser()
                     .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault, Scheme.ExternalOpenIdConnectDefault);
+            })
+            .AddPolicy(Policy.WebHook, policy =>
+            {
+                policy.RequireAuthenticatedUser()
+                    .RequireClaim("webhook", "true")
+                    .AddAuthenticationSchemes(Scheme.AzureDevOpsDefault);
             });
     }
 }
