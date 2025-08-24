@@ -195,11 +195,6 @@ internal static class Program
     {
         if (app.Environment.IsDevelopment())
         {
-            // Apply migrations on startup if the app is in development
-            var scope = app.Services.CreateScope();
-            var db = scope.ServiceProvider.GetRequiredService<ADAticketsDbContext>();
-            await db.Database.MigrateAsync();
-
             // Map endpoint to access the API documentation.
             _ = app.UseSwagger(options => { options.RouteTemplate = "/openapi/{documentName}.json"; });
 
@@ -209,6 +204,11 @@ internal static class Program
             // Show detailed exception screen during development.
             _ = app.UseDeveloperExceptionPage();
         }
+
+        // Apply migrations on startup
+        var scope = app.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<ADAticketsDbContext>();
+        await db.Database.MigrateAsync();
 
         // Create an exception handler for APIs.
         _ = app.UseExceptionHandler();
