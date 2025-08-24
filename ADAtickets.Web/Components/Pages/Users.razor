@@ -22,18 +22,21 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @using ADAtickets.Shared.Constants
 @using ADAtickets.Shared.Dtos.Requests
 @using ADAtickets.Shared.Dtos.Responses
+@using ADAtickets.Shared.Extensions
 @using ADAtickets.Shared.Models
 @using ADAtickets.Web.Components.Layout
 @using ADAtickets.Web.Components.Shared
 @using ADAtickets.Web.Utilities
 @using AutoMapper
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
 @using static ADAtickets.Web.Utilities.Dialogs
 
 @inject IStringLocalizer<Users> loc
 @inject IToastService toastService
 @inject IDialogService dialogService
 @inject IMapper mapper
+@inject AuthenticationStateProvider authenticationStateProvider
 @inject UsersClient usersClient
 
 @attribute [Authorize(Policy = Policy.AdminOnly)]
@@ -120,12 +123,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     else
     {
         <FluentGrid AdaptiveRendering="true" Justify="JustifyContent.FlexStart" Spacing="3" Style="width: 100%;">
-            @foreach (var user in users)
-            {
-                <FluentGridItem xs="12" sm="12" md="6" lg="4" Style="display: flex; flex-direction: column; align-items: center;" @key="user.Id">
-                    <UserCard User="user" OnSelectedChanged="HandleSelectedChanged" OnBlock="HandleBlockAsync" OnUnblock="HandleUnblockAsync"/>
-                </FluentGridItem>
-            }
+            <CascadingValue Value="CurrentUserId">
+                @foreach (var user in users)
+                {
+                    <FluentGridItem xs="12" sm="12" md="6" lg="4" Style="display: flex; flex-direction: column; align-items: center;" @key="user.Id">
+                        <UserCard User="user" OnSelectedChanged="HandleSelectedChanged" OnBlock="HandleBlockAsync" OnUnblock="HandleUnblockAsync" />
+                    </FluentGridItem>
+                }
+            </CascadingValue>
         </FluentGrid>
     }
 </FluentStack>
@@ -139,6 +144,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     private IEnumerable<UserResponseDto>? originalUsers;
 
     // State management
+    public Guid? CurrentUserId { get; set; }
+
     private readonly HashSet<UserResponseDto> selectedUsers = [];
 
     private string? currentTab;
@@ -160,6 +167,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         {
             originalUsers = await usersClient.GetAllAsync();
             users = originalUsers;
+
+            var currentUserEmail = await GetCurrentUserEmail();
+            CurrentUserId = users.First(u => u.Email == currentUserEmail).Id;
 
             // After the users are retrieved, sort and filter based on the user preferences.
             ApplySelectedFiltersAndSort();
@@ -342,6 +352,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         }
 
         return users;
+    }
+
+    private async Task<string> GetCurrentUserEmail()
+    {
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        return user.GetEmail()!;
     }
 
     #endregion

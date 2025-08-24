@@ -38,7 +38,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             <FluentLabel Weight="FontWeight.Bold">@($"{User.Name} {User.Surname}")</FluentLabel>
             <span>@GetUserRoleText(User.Type)</span>
         </FluentStack>
-        <FluentCheckbox Class="@(Selected ? "" : "hover-hide")" CheckStateChanged="HandleCheckStateChangedAsync" />
+        @if (CurrentUserId != User.Id)
+        {
+            <FluentCheckbox Class="@(Selected ? "" : "hover-hide")" CheckStateChanged="HandleCheckStateChangedAsync" />
+        }
     </FluentStack>
 </FluentCard>
 
@@ -63,6 +66,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 </FluentMenu>
 
 @code {
+
+    /// <summary>
+    ///     The id of the current logged in user.
+    /// </summary>
+    [CascadingParameter]
+    public Guid? CurrentUserId { get; set; }
+
     /// <summary>
     ///     The <see cref="UserResponseDto" /> the card is bound to.
     /// </summary>
