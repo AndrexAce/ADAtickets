@@ -29,6 +29,10 @@ services:
       # DevOps API configuration variables
       - AzureDevOpsAPI__BaseUrl=https://dev.azure.com/${DEVOPSORGANIZATIONNAME:?error}
       - AzureDevOpsAPI__Scopes__0=499b84ac-1321-427f-aa17-267ca6975798/.default
+      # Webhooks configuration variables
+      - Webhook__ServicePrincipalIdentifier=${SERVICEPRINCIPALID:?error}
+      - Webhook__BasicAuth__Username=${BASICAUTHUSERNAME:?error}
+      - Webhook__BasicAuth__Password=${BASICAUTHPASSWORD:?error}
     volumes:
       - ${APIAUTHCERTIFICATEDISKPATH:?error}:/certs:ro
 

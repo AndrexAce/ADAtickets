@@ -80,6 +80,24 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                              Watermark="{x:Static assets:Resources.ExampleNameWatermark}" HorizontalAlignment="Stretch"
                              Width="NaN" />
                 </StackPanel>
+				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+					<TextBlock Text="{x:Static assets:Resources.ServicePrincipalIdLabel}" FontFamily="Segoe UI" />
+					<TextBox Text="{Binding ServicePrincipalId}"
+                             Watermark="00000000-0000-0000-0000-000000000000" HorizontalAlignment="Stretch"
+                             Width="NaN" />
+				</StackPanel>
+				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+					<TextBlock Text="{x:Static assets:Resources.BasicAuthUsernameLabel}" FontFamily="Segoe UI" />
+					<TextBox Text="{Binding BasicAuthUsername}"
+                             Watermark="username" HorizontalAlignment="Stretch"
+                             Width="NaN" />
+				</StackPanel>
+				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+					<TextBlock Text="{x:Static assets:Resources.BasicAuthPasswordLabel}" FontFamily="Segoe UI" />
+					<TextBox Text="{Binding BasicAuthPassword}"
+                             Watermark="password" HorizontalAlignment="Stretch"
+                             Width="NaN" />
+				</StackPanel>
             </UniformGrid>
         </StackPanel>
         <Separator />

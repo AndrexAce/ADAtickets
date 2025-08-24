@@ -42,6 +42,9 @@ internal sealed class MainViewModel : ReactiveObject
     private string? _dbPassword;
     private string? _dbUserName;
     private string? _devOpsOrganizationName;
+    private string? _servicePrincipalId;
+    private string? _basicAuthUsername;
+    private string? _basicAuthPassword;
     private string? _externalApiAppId;
     private string? _externalTenantId;
     private string? _externalWebAppId;
@@ -127,6 +130,33 @@ internal sealed class MainViewModel : ReactiveObject
     {
         get => _devOpsOrganizationName;
         set => this.RaiseAndSetIfChanged(ref _devOpsOrganizationName, value);
+    }
+
+    [Required(ErrorMessageResourceType = typeof(Resources),
+        ErrorMessageResourceName = "FieldRequired")]
+    [RegularExpression(@"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+        ErrorMessageResourceType = typeof(Resources),
+        ErrorMessageResourceName = "InvalidGuid")]
+    public string? ServicePrincipalId
+    {
+        get => _servicePrincipalId;
+        set => this.RaiseAndSetIfChanged(ref _servicePrincipalId, value);
+    }
+
+    [Required(ErrorMessageResourceType = typeof(Resources),
+        ErrorMessageResourceName = "FieldRequired")]
+    public string? BasicAuthUsername
+    {
+        get => _basicAuthUsername;
+        set => this.RaiseAndSetIfChanged(ref _basicAuthUsername, value);
+    }
+
+    [Required(ErrorMessageResourceType = typeof(Resources),
+    ErrorMessageResourceName = "FieldRequired")]
+    public string? BasicAuthPassword
+    {
+        get => _basicAuthPassword;
+        set => this.RaiseAndSetIfChanged(ref _basicAuthPassword, value);
     }
 
     [Required(ErrorMessageResourceType = typeof(Resources),
@@ -362,6 +392,15 @@ internal sealed class MainViewModel : ReactiveObject
 
         context.MemberName = nameof(DevOpsOrganizationName);
         isValid &= Validator.TryValidateProperty(DevOpsOrganizationName, context, []);
+
+        context.MemberName = nameof(ServicePrincipalId);
+        isValid &= Validator.TryValidateProperty(ServicePrincipalId, context, []);
+
+        context.MemberName = nameof(BasicAuthUsername);
+        isValid &= Validator.TryValidateProperty(BasicAuthUsername, context, []);
+
+        context.MemberName = nameof(BasicAuthPassword);
+        isValid &= Validator.TryValidateProperty(BasicAuthPassword, context, []);
 
         return isValid;
     }

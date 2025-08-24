@@ -215,6 +215,17 @@ internal partial class LastStep : UserControl
             $"WEBAUTHCERTIFICATEPASSWORD={viewModel.WebAuthCertificatePassword}", RegexOptions.Multiline,
             TimeSpan.FromMilliseconds(100));
 
+        // Webhooks configuration (API)
+        fileContent = Regex.Replace(fileContent, "^SERVICEPRINCIPALID=.*$",
+            $"SERVICEPRINCIPALID={viewModel.ServicePrincipalId}",
+            RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
+        fileContent = Regex.Replace(fileContent, "^BASICAUTHUSERNAME=.*$",
+            $"BASICAUTHUSERNAME={viewModel.BasicAuthUsername}",
+            RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
+        fileContent = Regex.Replace(fileContent, "^BASICAUTHPASSWORD=.*$",
+            $"BASICAUTHPASSWORD={viewModel.BasicAuthPassword}",
+            RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
+
         // Write to temporary location
         var tempEnvPath = Path.Combine(path, ".env");
         await File.WriteAllTextAsync(tempEnvPath, fileContent);

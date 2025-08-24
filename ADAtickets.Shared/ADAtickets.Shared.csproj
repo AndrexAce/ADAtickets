@@ -7,16 +7,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <InternalsVisibleTo Include="ADAtickets.ApiService"/>
-        <InternalsVisibleTo Include="ADAtickets.Tests"/>
-        <InternalsVisibleTo Include="ADAtickets.Web"/>
-        <InternalsVisibleTo Include="ADAtickets.Installer"/>
-        <InternalsVisibleTo Include="ADAtickets.Client"/>
+        <InternalsVisibleTo Include="ADAtickets.ApiService" />
+        <InternalsVisibleTo Include="ADAtickets.Tests" />
+        <InternalsVisibleTo Include="ADAtickets.Web" />
+        <InternalsVisibleTo Include="ADAtickets.Installer" />
+        <InternalsVisibleTo Include="ADAtickets.Client" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="AutoMapper" Version="14.0.0"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.8"/>
+        <PackageReference Include="AutoMapper" Version="14.0.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.8" />
+        <PackageReference Include="Microsoft.TeamFoundationServer.Client" Version="19.225.1" />
     </ItemGroup>
 
 </Project>

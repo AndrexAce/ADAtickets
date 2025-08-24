@@ -211,9 +211,6 @@ public sealed class TicketsController(
             return Conflict();
         }
 
-        // Send a signal to everyone connected to this hub.
-        await ticketsHub.Clients.All.SendAsync("TicketUpdated", ticket.Id);
-
         return NoContent();
     }
 
@@ -274,9 +271,6 @@ public sealed class TicketsController(
         // Create notifications, assign the ticket and create the first edits.
         await ProcessTicketCreationAsync(ticket);
 
-        // Send a signal to everyone connected to this hub.
-        await ticketsHub.Clients.All.SendAsync("TicketCreated");
-
         // Return the created entity and its location to the client.
         return CreatedAtAction(nameof(GetTicket), new { id = ticket.Id }, mapper.Map<TicketResponseDto>(ticket));
     }
@@ -305,19 +299,12 @@ public sealed class TicketsController(
 
         await ticketRepository.DeleteTicketAsync(ticket);
 
-        await azureDevOpsController.DeleteAzureDevOpsWorkItemAsync(ticket.WorkItemId);
-
-        // Send a signal to everyone connected to this hub.
-        await ticketsHub.Clients.All.SendAsync("TicketDeleted", ticket.Id);
-        await editsController.SendSignalToClientAsync("EditDeleted", ticket.Id);
-        await repliesController.SendSignalToClientAsync("ReplyDeleted", ticket.Id);
-        foreach (var userNotification in userNotificationsToSignal)
-            await notificationsController.SendSignalToClientAsync("UserNotificationDeleted", userNotification.ReceiverUserId);
+        await ProcessTicketDeletionAsync(ticket, userNotificationsToSignal);
 
         return NoContent();
     }
 
-    private async Task ProcessTicketCreationAsync(Ticket ticket)
+    internal async Task ProcessTicketCreationAsync(Ticket ticket, bool? includeAzureDevOpsOperations = true)
     {
         var chosenOperatorId = await notificationsController.CreateCreationNotificationsAsync(ticket);
 
@@ -325,11 +312,17 @@ public sealed class TicketsController(
 
         await editsController.CreateCreationEntriesAsync(ticket, chosenOperatorId);
 
-        var workItemId = await azureDevOpsController.CreateAzureDevOpsWorkItemAsync(ticket);
+        if (includeAzureDevOpsOperations == true)
+        {
+            var workItemId = await azureDevOpsController.CreateAzureDevOpsWorkItemAsync(ticket);
 
-        ticket.WorkItemId = workItemId ?? 0;
+            ticket.WorkItemId = workItemId ?? 0;
 
-        await ticketRepository.UpdateTicketAsync(ticket);
+            await ticketRepository.UpdateTicketAsync(ticket);
+        }
+
+        // Send a signal to everyone connected to this hub.
+        await ticketsHub.Clients.All.SendAsync("TicketCreated");
     }
 
     private async Task AutoAssignTicketAsync(Ticket ticket, Guid? chosenOperatorId)
@@ -343,21 +336,48 @@ public sealed class TicketsController(
         }
     }
 
-    private async Task ProcessTicketUpdateAsync(Ticket ticket, Status oldStatus, Guid editor)
+    internal async Task ProcessTicketUpdateAsync(Ticket ticket, Status oldStatus, Guid editor, bool? includeAzureDevOpsOperations = true)
     {
         await notificationsController.CreateEditNotificationsAsync(ticket, editor);
 
         await editsController.CreateEditEntryAsync(ticket, oldStatus, editor);
 
-        await azureDevOpsController.UpdateAzureDevOpsWorkItemAsync(ticket);
+        if (includeAzureDevOpsOperations == true)
+        {
+            await azureDevOpsController.UpdateAzureDevOpsWorkItemAsync(ticket);
+        }
+
+        // Send a signal to everyone connected to this hub.
+        await ticketsHub.Clients.All.SendAsync("TicketUpdated", ticket.Id);
     }
 
-    private async Task ProcessTicketOperatorUpdateAsync(Ticket ticket, Guid? oldAssignedOperator, Guid editor)
+    internal async Task ProcessTicketOperatorUpdateAsync(Ticket ticket, Guid? oldAssignedOperator, Guid editor, bool? includeAzureDevOpsOperations = true)
     {
         await notificationsController.CreateOperatorEditNotificationsAsync(ticket, oldAssignedOperator, editor);
 
         await editsController.CreateOperatorEditEntryAsync(ticket, oldAssignedOperator, editor);
 
-        await azureDevOpsController.UpdateOperatorAzureDevOpsWorkItemAsync(ticket);
+        if (includeAzureDevOpsOperations == true)
+        {
+            await azureDevOpsController.UpdateOperatorAzureDevOpsWorkItemAsync(ticket);
+        }
+
+        // Send a signal to everyone connected to this hub.
+        await ticketsHub.Clients.All.SendAsync("TicketUpdated", ticket.Id);
+    }
+
+    internal async Task ProcessTicketDeletionAsync(Ticket ticket, IEnumerable<UserNotification> userNotificationsToSignal, bool? includeAzureDevOpsOperations = true)
+    {
+        if (includeAzureDevOpsOperations == true)
+        {
+            await azureDevOpsController.DeleteAzureDevOpsWorkItemAsync(ticket.WorkItemId);
+        }
+
+        // Send a signal to everyone connected to this hub.
+        await ticketsHub.Clients.All.SendAsync("TicketDeleted", ticket.Id);
+        await editsController.SendSignalToClientAsync("EditDeleted", ticket.Id);
+        await repliesController.SendSignalToClientAsync("ReplyDeleted", ticket.Id);
+        foreach (var userNotification in userNotificationsToSignal)
+            await notificationsController.SendSignalToClientAsync("UserNotificationDeleted", userNotification.ReceiverUserId);
     }
 }

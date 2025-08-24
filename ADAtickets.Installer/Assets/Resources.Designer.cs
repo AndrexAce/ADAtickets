@@ -106,6 +106,24 @@ namespace ADAtickets.Installer.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Basic auth password:.
+        /// </summary>
+        public static string BasicAuthPasswordLabel {
+            get {
+                return ResourceManager.GetString("BasicAuthPasswordLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Basic auth username:.
+        /// </summary>
+        public static string BasicAuthUsernameLabel {
+            get {
+                return ResourceManager.GetString("BasicAuthUsernameLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Pulling cache container....
         /// </summary>
         public static string CacheContainerPull {
@@ -318,6 +336,15 @@ namespace ADAtickets.Installer.Assets {
         public static string Previous {
             get {
                 return ResourceManager.GetString("Previous", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Service principal ID:.
+        /// </summary>
+        public static string ServicePrincipalIdLabel {
+            get {
+                return ResourceManager.GetString("ServicePrincipalIdLabel", resourceCulture);
             }
         }
         

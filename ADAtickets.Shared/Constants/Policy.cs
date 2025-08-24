@@ -44,4 +44,9 @@ internal static class Policy
     ///     The name of the policy that requires the user to be authenticated with any role (User, Operator, or Admin).
     /// </summary>
     public const string Everyone = "UserOperatorAdmin";
+
+    /// <summary>
+    ///     The name of the policy that requires the caller to be an Azure DevOps webhook.
+    /// </summary>
+    public const string WebHook = "WebHook";
 }
