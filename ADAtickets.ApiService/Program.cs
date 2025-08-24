@@ -205,10 +205,13 @@ internal static class Program
             _ = app.UseDeveloperExceptionPage();
         }
 
-        // Apply migrations on startup
-        var scope = app.Services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<ADAticketsDbContext>();
-        await db.Database.MigrateAsync();
+        // Apply migrations on startup if not executing the tests
+        if (!app.Environment.IsStaging())
+        {
+            var scope = app.Services.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<ADAticketsDbContext>();
+            await db.Database.MigrateAsync();
+        }
 
         // Create an exception handler for APIs.
         _ = app.UseExceptionHandler();
