@@ -154,7 +154,7 @@ public sealed class WebhookController(
     }
 
     /// <summary>
-    ///     Handles the incoming webhook from Azure DevOps when a work item is delete to delete an existing ticket.
+    ///     Handles the incoming webhook from Azure DevOps when a work item is deleted to delete an existing ticket.
     /// </summary>
     /// <param name="payload">The content of the Azure DevOps request body.</param>
     /// <returns>A <see cref="Task" /> returning an <see cref="ActionResult" /> that incapsulates the call result.</returns>
@@ -190,6 +190,8 @@ public sealed class WebhookController(
         // Save the UserNotifications before deletion in order to send the signals
         var userNotificationsToSignal = await notificationsController.RetrieveAllTicketUserNotificationsAsync(existingTicket.Notifications);
 
+        await ticketRepository.DeleteTicketAsync(existingTicket);
+
         await ticketsController.ProcessTicketDeletionAsync(existingTicket, userNotificationsToSignal, includeAzureDevOpsOperations: false);
 
         return NoContent();
@@ -199,6 +201,7 @@ public sealed class WebhookController(
     {
         return payload.EventType == "workitem.created"
                && payload.Resource.Id.HasValue
+               && payload.Resource.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.Fields.CreatedDate)
                && payload.Resource.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.Fields.CreatedBy)
                && payload.Resource.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.Fields.TeamProject)
                && payload.Resource.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.Fields.WorkItemType)
@@ -270,10 +273,11 @@ public sealed class WebhookController(
         var newTicket = new Ticket
         {
             Type = MapTypeFromDevOps(workItem.Fields[AzureDevOpsWebHookResponseDto.Fields.WorkItemType].ToString()!),
+            CreationDateTime = DateTimeOffset.Parse(workItem.Fields[AzureDevOpsWebHookResponseDto.Fields.CreatedDate].ToString()!, CultureInfo.InvariantCulture),
             Title = workItem.Fields[AzureDevOpsWebHookResponseDto.Fields.Title].ToString()!,
             Description = cleanDescription,
             Priority = MapPriorityFromDevOps(int.Parse(workItem.Fields[AzureDevOpsWebHookResponseDto.Fields.Priority].ToString()!)),
-            Status = MapStatusFromDevOps(workItem.Fields[AzureDevOpsWebHookResponseDto.Fields.State].ToString()!),
+            Status = operatorUser is null ? Status.Unassigned : Status.WaitingOperator,
             WorkItemId = workItem.Id!.Value,
             PlatformId = platform.Id,
             CreatorUserId = creatorUser.Id,
@@ -308,7 +312,7 @@ public sealed class WebhookController(
         existingTicket.Priority = MapPriorityFromDevOps(int.Parse(workItem.Fields[AzureDevOpsWebHookResponseDto.Fields.Priority].ToString()!));
         existingTicket.Status = MapStatusFromDevOps(workItem.Fields[AzureDevOpsWebHookResponseDto.Fields.State].ToString()!);
         existingTicket.PlatformId = platform.Id;
-        existingTicket.OperatorUserId = operatorUser?.Id;
+        existingTicket.OperatorUserId = existingTicket.Status == Status.Unassigned ? null : operatorUser?.Id;
 
         await ticketRepository.UpdateTicketAsync(existingTicket);
 
