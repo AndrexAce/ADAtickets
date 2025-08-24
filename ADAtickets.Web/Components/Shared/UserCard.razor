@@ -33,6 +33,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
 <FluentCard Id="@(User.Id.ToString())" Style="background: var(--neutral-layer-1)" Width="20rem">
     <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Top">
+        @if (User.IsBlocked)
+        {
+            <FluentIcon Icon="Icons.Filled.Size20.LockClosed" />
+        }
+        else
+        {
+            <FluentIcon Icon="Icons.Filled.Size20.LockOpen" />
+        }
         <FluentPersona ImageSize="3rem" Initials="@GetInitials($"{User.Name} {User.Surname}")" />
         <FluentStack Orientation="Orientation.Vertical">
             <FluentLabel Weight="FontWeight.Bold">@($"{User.Name} {User.Surname}")</FluentLabel>
@@ -119,8 +127,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 ConfirmButtonIcon = new Icons.Regular.Size20.LockClosed()
             },
             ConfirmDialogParameters(loc["BlockConfirmDialogTitle"], loc["BlockConfirmDialogConfirmButton"], loc["BlockConfirmDialogCancelButton"]));
-
-        await OnBlock.InvokeAsync(new SelectedChangedEventArgs<UserResponseDto> { Item = User, IsSelected = Selected });
     }
 
     private async Task HandleUnblockClickAsync()
@@ -133,8 +139,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 ConfirmButtonIcon = new Icons.Regular.Size20.LockOpen()
             },
             ConfirmDialogParameters(loc["UnblockConfirmDialogTitle"], loc["UnblockConfirmDialogConfirmButton"], loc["UnblockConfirmDialogCancelButton"]));
-
-        await OnUnblock.InvokeAsync(new SelectedChangedEventArgs<UserResponseDto> { Item = User, IsSelected = Selected });
     }
 
     private async Task HandleConfirmBlockAsync()
@@ -144,6 +148,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             await usersClient.PutAsync(User.Id, mapper.Map<UserRequestDto>(User with { IsBlocked = true }));
 
             toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["BlockSuccessToastTitle"], loc["BlockSuccessToastDetails"]));
+
+            await OnUnblock.InvokeAsync(new SelectedChangedEventArgs<UserResponseDto> { Item = User, IsSelected = Selected });
         }
         catch (Exception ex)
         {
@@ -158,6 +164,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             await usersClient.PutAsync(User.Id, mapper.Map<UserRequestDto>(User with { IsBlocked = false }));
 
             toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["UnblockSuccessToastTitle"], loc["UnblockSuccessToastDetails"]));
+
+            await OnBlock.InvokeAsync(new SelectedChangedEventArgs<UserResponseDto> { Item = User, IsSelected = Selected });
         }
         catch (Exception ex)
         {

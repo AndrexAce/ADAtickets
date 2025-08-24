@@ -127,7 +127,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 @foreach (var user in users)
                 {
                     <FluentGridItem xs="12" sm="12" md="6" lg="4" Style="display: flex; flex-direction: column; align-items: center;" @key="user.Id">
-                        <UserCard User="user" OnSelectedChanged="HandleSelectedChanged" OnBlock="HandleBlockAsync" OnUnblock="HandleUnblockAsync" />
+                        <UserCard User="user" OnSelectedChanged="HandleSelectedChanged" OnBlock="HandleBlockUnblockAsync" OnUnblock="HandleBlockUnblockAsync" />
                     </FluentGridItem>
                 }
             </CascadingValue>
@@ -216,13 +216,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         }
     }
 
-    private async Task HandleBlockAsync()
+    private async Task HandleBlockUnblockAsync()
     {
-        await LoadUsersAsync();
-    }
+        // Deselect all users.
+        selectedUsers.Clear();
 
-    private async Task HandleUnblockAsync()
-    {
+        // Reload the users
         await LoadUsersAsync();
     }
 
@@ -281,6 +280,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
             // Deselect all users.
             selectedUsers.Clear();
+
+            // Reload the users
+            await LoadUsersAsync();
         }
     }
 
@@ -315,6 +317,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
             // Deselect all users.
             selectedUsers.Clear();
+
+            // Reload the users
+            await LoadUsersAsync();
         }
     }
 
