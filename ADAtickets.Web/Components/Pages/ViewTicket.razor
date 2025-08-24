@@ -248,8 +248,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 new Dictionary<string, string> { { nameof(AttachmentResponseDto.TicketId), ticket.Id.ToString() } }
             );
 
-            photoPath = attachments.FirstOrDefault(a => Regex.IsMatch(Path.GetFileName(a.Path), @"\.(png|jpg|jpeg|gif|webp)$", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100)))?.Path;
-            videoPath = attachments.FirstOrDefault(a => Regex.IsMatch(Path.GetFileName(a.Path), @"\.(mp4|webm)$", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100)))?.Path;
+            photoPath = attachments.FirstOrDefault(a => Regex.IsMatch(Path.GetFileName(a.Path), @"\.(png|jpg|jpeg|gif|webp)$", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100)))?.Path;
+            videoPath = attachments.FirstOrDefault(a => Regex.IsMatch(Path.GetFileName(a.Path), @"\.(mp4|webm)$", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100)))?.Path;
         }
         catch (Exception ex)
         {
