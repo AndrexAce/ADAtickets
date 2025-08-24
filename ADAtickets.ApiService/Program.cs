@@ -166,6 +166,7 @@ internal static class Program
         _ = builder.Services.AddScoped<NotificationsController>();
         _ = builder.Services.AddScoped<EditsController>();
         _ = builder.Services.AddScoped<RepliesController>();
+        _ = builder.Services.AddScoped<TicketsController>();
         _ = builder.Services.AddScoped<AzureDevOpsController>();
 
         // Add automapping of entities.

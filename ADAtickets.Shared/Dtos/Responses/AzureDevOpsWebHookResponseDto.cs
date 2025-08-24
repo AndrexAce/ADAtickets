@@ -23,28 +23,28 @@ namespace ADAtickets.Shared.Dtos.Responses;
 
 public sealed record AzureDevOpsWebHookResponseDto
 {
-    public Guid SubscriptionId { get; init; } = Guid.Empty;
-
-    public int NotificationId { get; init; } = 0;
-
-    public Guid Id { get; init; } = Guid.Empty;
-
     public string EventType { get; init; } = string.Empty;
 
-    public string PublisherId { get; init; } = string.Empty;
-
-    public sealed record AzureDevOpsMessage
-    {
-        public string Text { get; init; } = string.Empty;
-
-        public string Html { get; init; } = string.Empty;
-
-        public string Markdown { get; init; } = string.Empty;
-    }
-
-    public AzureDevOpsMessage Message { get; init; } = new AzureDevOpsMessage();
-
-    public AzureDevOpsMessage DetailedMessage { get; init; } = new AzureDevOpsMessage();
-
     public WorkItem Resource { get; init; } = new WorkItem();
+
+    public static class Fields
+    {
+        public const string CreatedBy = "System.CreatedBy";
+
+        public const string ChangedBy = "System.ChangedBy";
+
+        public const string AssignedTo = "System.AssignedTo";
+
+        public const string TeamProject = "System.TeamProject";
+
+        public const string WorkItemType = "System.WorkItemType";
+
+        public const string Title = "System.Title";
+
+        public const string Description = "System.Description";
+
+        public const string Priority = "Microsoft.VSTS.Common.Priority";
+
+        public const string State = "System.State";
+    }
 }
