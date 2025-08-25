@@ -326,7 +326,7 @@ public sealed class WebhookController(
 
         // Clean the description from HTML and Markdown
         var rawDescription = workItem.Fields[AzureDevOpsWebHookResponseDto.Fields.Description].ToString()!;
-        var cleanDescription = CleanDescription(rawDescription);
+        var cleanDescription = SanitizeText(rawDescription);
 
         // Map work item to ticket
         var newTicket = new Ticket
@@ -362,7 +362,7 @@ public sealed class WebhookController(
 
         // Clean the description from HTML and Markdown
         var rawDescription = workItem.Fields[AzureDevOpsWebHookResponseDto.Fields.Description].ToString()!;
-        var cleanDescription = CleanDescription(rawDescription);
+        var cleanDescription = SanitizeText(rawDescription);
 
         // Apply only the fields that should be updated from DevOps
         existingTicket.Type = MapTypeFromDevOps(workItem.Fields[AzureDevOpsWebHookResponseDto.Fields.WorkItemType].ToString()!);
@@ -387,11 +387,15 @@ public sealed class WebhookController(
 
         var comment = await azureDevOpsController.GetLastCommentAzureDevOpsWorkItemAsync(workItem.Id!.Value, platformName);
 
+        // Clean the message from HTML and Markdown
+        var rawMessage = comment!.Text;
+        var cleanMessage = SanitizeText(rawMessage);
+
         // Map comment to reply
         var reply = new Reply
         {
-            ReplyDateTime = comment!.CreatedDate,
-            Message = comment.Text,
+            ReplyDateTime = comment.CreatedDate,
+            Message = cleanMessage,
             AuthorUserId = await GetUserIdFromWorkItemAsync(payload),
             TicketId = existingTicket.Id
         };
@@ -414,14 +418,14 @@ public sealed class WebhookController(
         return user.Id;
     }
 
-    private static string CleanDescription(string rawDescription)
+    private static string SanitizeText(string rawText)
     {
-        if (string.IsNullOrWhiteSpace(rawDescription))
+        if (string.IsNullOrWhiteSpace(rawText))
         {
             return string.Empty;
         }
 
-        var cleaned = rawDescription;
+        var cleaned = rawText;
 
         // Decode HTML entities first
         cleaned = WebUtility.HtmlDecode(cleaned);
