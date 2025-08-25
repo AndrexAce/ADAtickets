@@ -183,7 +183,10 @@ internal static class Program
         // Configure antiforgery protection.
         _ = app.UseAntiforgery();
 
-        // Map static data paths.
+        // Map static files path (for runtime assets).
+        _ = app.UseStaticFiles();
+
+        // Map static files path (for build-time assets).
         _ = app.MapStaticAssets();
 
         // Map the controllers endpoints.

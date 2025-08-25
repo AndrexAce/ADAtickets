@@ -26,11 +26,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <base href="/"/>
-    <link rel="stylesheet" href="@Assets["CSS/app.css"]"/>
-    <link rel="stylesheet" href="@Assets["ADAtickets.Web.styles.css"]"/>
+    <link rel="stylesheet" type="text/css" href="@Assets["CSS/app.css"]"/>
+    <link rel="stylesheet" type="text/css" href="@Assets["ADAtickets.Web.styles.css"]"/>
     <link href="/_content/Microsoft.FluentUI.AspNetCore.Components/css/reboot.css" rel="stylesheet"/>
     <ImportMap/>
-    <link rel="icon" type="image/x-icon" href="favicon.ico"/>
+    <link rel="icon" type="image/x-icon" href="@Assets["Images/Icons/favicon.ico"]"/>
     <HeadOutlet/>
 </head>
 
@@ -38,7 +38,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 <CascadingAuthenticationState>
     <Routes @rendermode="InteractiveServer"/>
 </CascadingAuthenticationState>
-<script src="_framework/blazor.web.js"></script>
+<script src="_framework/blazor.web.js" type="text/javascript"></script>
 <script src="_content/Microsoft.FluentUI.AspNetCore.Components/js/loading-theme.js" type="text/javascript"></script>
 <loading-theme storage-name="theme"></loading-theme>
 </body>
