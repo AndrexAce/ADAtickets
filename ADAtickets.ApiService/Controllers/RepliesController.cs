@@ -232,9 +232,6 @@ public sealed class RepliesController(
         // Insert the DTO info into a new entity and add it to the data source.
         await replyRepository.AddReplyAsync(reply);
 
-        // Send a signal to the people who have received this reply and are connected to this hub.
-        await SendSignalToClientAsync("ReplyCreated", reply.TicketId);
-
         await ProcessReplyCreationAsync(reply);
 
         // Return the created entity and its location to the client.
@@ -271,13 +268,17 @@ public sealed class RepliesController(
         await repliesHub.Clients.Group($"ticket_{ticketId}").SendAsync(action);
     }
 
-    private async Task ProcessReplyCreationAsync(Reply reply)
+    internal async Task ProcessReplyCreationAsync(Reply reply, bool? includeAzureDevOpsOperations = true)
     {
         if (await ticketRepository.GetTicketByIdAsync(reply.TicketId) is Ticket ticket &&
            await platformRepository.GetPlatformByIdAsync(ticket.PlatformId) is Platform platform &&
-           await userRepository.GetUserByIdAsync(reply.AuthorUserId) is User user)
+           await userRepository.GetUserByIdAsync(reply.AuthorUserId) is User user &&
+           includeAzureDevOpsOperations == true)
         {
-            await azureDevOpsController.CreateCommentAzureDevOpsWorkItemAsync(ticket.WorkItemId, platform.Name, $"{user.Name} {user.Surname}", reply.Message);
+            await azureDevOpsController.CreateCommentAzureDevOpsWorkItemAsync(ticket.WorkItemId, platform.Name, $"{user.Name} {user.Surname}", user.Email, reply.Message);
         }
+
+        // Send a signal to the people who have received this reply and are connected to this hub.
+        await SendSignalToClientAsync("ReplyCreated", reply.TicketId);
     }
 }

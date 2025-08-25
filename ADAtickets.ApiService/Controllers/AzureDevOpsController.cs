@@ -421,7 +421,7 @@ public sealed class AzureDevOpsController(
         }
     }
 
-    internal async Task CreateCommentAzureDevOpsWorkItemAsync(int workItemId, string platform, string authorName, string message)
+    internal async Task CreateCommentAzureDevOpsWorkItemAsync(int workItemId, string platform, string authorName, string authorEmail, string message)
     {
         if (workItemId == 0)
         {
@@ -435,7 +435,7 @@ public sealed class AzureDevOpsController(
             // Get the client and create the comment
             var workItemClient = await connection.GetClientAsync<WorkItemTrackingHttpClient>();
 
-            var createRequest = new CommentCreate() { Text = $"<b>{authorName}:</b> {message}" };
+            var createRequest = new CommentCreate() { Text = $"<b>{authorName} <{authorEmail}>:</b> {message}" };
 
             await workItemClient.AddWorkItemCommentAsync(createRequest, platform, workItemId, CommentFormat.Html);
         }
@@ -483,6 +483,30 @@ public sealed class AzureDevOpsController(
         catch
         {
             // Do nothing.
+        }
+    }
+
+    internal async Task<Comment?> GetLastCommentAzureDevOpsWorkItemAsync(int workItemId, string platformName)
+    {
+        if (workItemId == 0)
+        {
+            return null;
+        }
+
+        var connection = await ConnectToAzureDevOpsAsync();
+
+        try
+        {
+            // Get the client and get the comments
+            var workItemClient = await connection.GetClientAsync<WorkItemTrackingHttpClient>();
+
+            var comments = await workItemClient.GetCommentsAsync(platformName, workItemId);
+
+            return comments.Comments.OrderByDescending(c => c.CreatedDate).FirstOrDefault();
+        }
+        catch
+        {
+            return null;
         }
     }
 }

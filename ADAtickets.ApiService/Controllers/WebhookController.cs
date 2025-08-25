@@ -38,22 +38,29 @@ namespace ADAtickets.ApiService.Controllers;
 /// <param name="ticketRepository">Object defining the operations allowed on the <see cref="Ticket"/> entity type. </param>
 /// <param name="platformRepository">Object defining the operations allowed on the <see cref="Platform"/> entity type.</param>
 /// <param name="userRepository">Object defining the operations allowed on the <see cref="User"/> entity type.</param>
+/// <param name="replyRepository">Object defining the operations allowed on the <see cref="Reply"/> entity type.</param>
 /// <param name="configuration">Configuration object containing the application settings.</param>
 /// <param name="ticketsController">Controller managing the tickets.</param>
 /// <param name="notificationsController">Controller managing the notifications.</param>
+/// <param name="repliesController">Controller managing the replies.</param>
+/// <param name="azureDevOpsController">Controller managing the interaction with Azure DevOps.</param>
 [Route($"v{Service.APIVersion}/webhook")]
 [ApiController]
 [Consumes(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
 [Produces(MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml)]
 [Authorize(Policy = Policy.WebHook, AuthenticationSchemes = Scheme.AzureDevOpsDefault)]
 [FormatFilter]
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S107:Methods should not have too many parameters")]
 public sealed class WebhookController(
     ITicketRepository ticketRepository,
     IPlatformRepository platformRepository,
     IUserRepository userRepository,
+    IReplyRepository replyRepository,
     IConfiguration configuration,
     TicketsController ticketsController,
-    NotificationsController notificationsController
+    NotificationsController notificationsController,
+    RepliesController repliesController,
+    AzureDevOpsController azureDevOpsController
 ) : ControllerBase
 {
     /// <summary>
@@ -198,6 +205,49 @@ public sealed class WebhookController(
         return NoContent();
     }
 
+    /// <summary>
+    ///     Handles the incoming webhook from Azure DevOps when a work item is commented to add a new reply.
+    /// </summary>
+    /// <param name="payload">The content of the Azure DevOps request body.</param>
+    /// <returns>A <see cref="Task" /> returning an <see cref="ActionResult" /> that incapsulates the call result.</returns>
+    [HttpPost("reply/created")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> PostReply([FromBody] AzureDevOpsWebHookResponseDto payload)
+    {
+        // Check if the item has all the required fields
+        if (!IsRepliedPayloadValid(payload))
+        {
+            return BadRequest();
+        }
+
+        // Check if this work item was edited by ADAtickets API to avoid infinite loops
+        if (IsUpdatedByADAtickets(payload))
+        {
+            return Ok();
+        }
+
+        // Check if ticket exists for this work item
+        var existingTicket = (await ticketRepository.GetTicketsByAsync(
+            new Dictionary<string, string> { { nameof(Ticket.WorkItemId), payload.Resource.Id!.Value.ToString() } }
+        )).FirstOrDefault();
+
+        if (existingTicket is null)
+        {
+            return NotFound();
+        }
+
+        // Create new reply from work item
+        var createdReply = await CreateReplyFromWorkItemAsync(payload, existingTicket);
+
+        // Create notifications, assign the ticket and create the first edits.
+        await repliesController.ProcessReplyCreationAsync(createdReply, includeAzureDevOpsOperations: false);
+
+        return Created();
+    }
+
     private static bool IsCreatePayloadValid(AzureDevOpsWebHookResponseDto payload)
     {
         return payload.EventType == "workitem.created"
@@ -230,6 +280,14 @@ public sealed class WebhookController(
         return payload.EventType == "workitem.deleted"
                && payload.Resource.Id.HasValue
                && payload.Resource.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.Fields.ChangedBy);
+    }
+
+    private static bool IsRepliedPayloadValid(AzureDevOpsWebHookResponseDto payload)
+    {
+        return payload.EventType == "workitem.commented"
+               && payload.Resource.Id.HasValue
+               && payload.Resource.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.Fields.ChangedBy)
+               && payload.Resource.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.Fields.TeamProject);
     }
 
     private bool IsCreatedByADAtickets(AzureDevOpsWebHookResponseDto payload)
@@ -318,6 +376,29 @@ public sealed class WebhookController(
         await ticketRepository.UpdateTicketAsync(existingTicket);
 
         return existingTicket;
+    }
+
+    private async Task<Reply> CreateReplyFromWorkItemAsync(AzureDevOpsWebHookResponseDto payload, Ticket existingTicket)
+    {
+        var workItem = payload.Resource;
+
+        // Fetch the item platform name
+        var platformName = workItem.Fields[AzureDevOpsWebHookResponseDto.Fields.TeamProject].ToString()!;
+
+        var comment = await azureDevOpsController.GetLastCommentAzureDevOpsWorkItemAsync(workItem.Id!.Value, platformName);
+
+        // Map comment to reply
+        var reply = new Reply
+        {
+            ReplyDateTime = comment!.CreatedDate,
+            Message = comment.Text,
+            AuthorUserId = await GetUserIdFromWorkItemAsync(payload),
+            TicketId = existingTicket.Id
+        };
+
+        await replyRepository.AddReplyAsync(reply);
+
+        return reply;
     }
 
     private async Task<Guid> GetUserIdFromWorkItemAsync(AzureDevOpsWebHookResponseDto payload)
