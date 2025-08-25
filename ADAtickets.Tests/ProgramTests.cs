@@ -21,6 +21,7 @@
 using ADAtickets.ApiService;
 using ADAtickets.ApiService.Configs;
 using ADAtickets.ApiService.Controllers;
+using ADAtickets.ApiService.Hubs;
 using ADAtickets.ApiService.Repositories;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication;
@@ -29,6 +30,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
@@ -60,6 +62,8 @@ public class ProgramTests
         Assert.NotNull(services.GetService<IUserNotificationRepository>());
         Assert.NotNull(services.GetService<NotificationsController>());
         Assert.NotNull(services.GetService<EditsController>());
+        Assert.NotNull(services.GetService<RepliesController>());
+        Assert.NotNull(services.GetService<TicketsController>());
         Assert.NotNull(services.GetService<AzureDevOpsController>());
 
         // Assert: AutoMapper
@@ -89,6 +93,12 @@ public class ProgramTests
 
         // Assert: Redis cache
         Assert.NotNull(services.GetService<IDistributedCache>());
+
+        // Assert: SignalR
+        Assert.NotNull(services.GetService<IHubContext<TicketsHub>>());
+        Assert.NotNull(services.GetService<IHubContext<NotificationsHub>>());
+        Assert.NotNull(services.GetService<IHubContext<EditsHub>>());
+        Assert.NotNull(services.GetService<IHubContext<RepliesHub>>());
     }
 
     [Fact]
