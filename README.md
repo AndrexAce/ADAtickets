@@ -30,7 +30,7 @@ ADAtickets.
 
 - Automatic deployment of needed resources during setup with Azure SDK.
 - View branches and commits linked to tickets.
-- SMS notifications.
+- Email notifications.
 - Podman support along with Docker.
 
 ## License 📃
