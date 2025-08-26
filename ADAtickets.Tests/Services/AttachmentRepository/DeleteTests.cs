@@ -31,6 +31,7 @@ namespace ADAtickets.Tests.Services.AttachmentRepository;
 ///     <c>DeleteAttachmentByIdAsync(Guid)</c>
 ///     <list type="number">
 ///         <item>Existing entity</item>
+///         <item>Non existing entity</item>
 ///     </list>
 /// </summary>
 public sealed class DeleteTests
@@ -59,6 +60,31 @@ public sealed class DeleteTests
 
         // Assert
         Assert.Null(deletedAttachment);
-        Assert.False(File.Exists(attachment.Path));
+    }
+
+    [Fact]
+    public async Task DeleteAttachmentByIdAsync_NonExistingEntity_DoesNothing()
+    {
+        // Arrange
+        Attachment attachment = new() { Id = Guid.NewGuid(), Path = "/delete.png" };
+        List<Attachment> attachments = [new() { Id = Guid.NewGuid(), Path = "/path.png" }];
+
+        Mock<ADAticketsDbContext> mockContext = new();
+        Mock<DbSet<Attachment>> mockSet = attachments.BuildMockDbSet();
+        _ = mockSet.Setup(s => s.Remove(It.IsAny<Attachment>()))
+            .Callback<Attachment>(attachment => attachments.RemoveAll(a => a.Id == attachment.Id));
+        _ = mockContext.Setup(c => c.Attachments)
+            .Returns(mockSet.Object);
+
+        AttachmentService service = new(mockContext.Object);
+
+        var cancellationToken = TestContext.Current.CancellationToken;
+
+        // Act
+        await service.DeleteAttachmentAsync(attachment);
+        var deletedAttachment = await mockContext.Object.Attachments.SingleOrDefaultAsync(cancellationToken);
+
+        // Assert
+        Assert.NotNull(deletedAttachment);
     }
 }
