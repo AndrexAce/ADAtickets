@@ -31,6 +31,7 @@ namespace ADAtickets.Tests.Services.EditRepository;
 ///     <c>DeleteEditByIdAsync(Guid)</c>
 ///     <list type="number">
 ///         <item>Existing entity</item>
+///         <item>Non existing entity</item>
 ///     </list>
 /// </summary>
 public sealed class DeleteTests
@@ -59,5 +60,31 @@ public sealed class DeleteTests
 
         // Assert
         Assert.Null(deletedEdit);
+    }
+
+    [Fact]
+    public async Task DeleteEditByIdAsync_NonExistingEntity_DoesNothing()
+    {
+        // Arrange
+        Edit edit = new() { Id = Guid.NewGuid() };
+        List<Edit> edits = [new() { Id = Guid.NewGuid() }];
+
+        Mock<ADAticketsDbContext> mockContext = new();
+        Mock<DbSet<Edit>> mockSet = edits.BuildMockDbSet();
+        _ = mockSet.Setup(s => s.Remove(It.IsAny<Edit>()))
+            .Callback<Edit>(edit => edits.RemoveAll(e => e.Id == edit.Id));
+        _ = mockContext.Setup(c => c.Edits)
+            .Returns(mockSet.Object);
+
+        EditService service = new(mockContext.Object);
+
+        var cancellationToken = TestContext.Current.CancellationToken;
+
+        // Act
+        await service.DeleteEditAsync(edit);
+        var deletedEdit = await mockContext.Object.Edits.SingleOrDefaultAsync(cancellationToken);
+
+        // Assert
+        Assert.NotNull(deletedEdit);
     }
 }

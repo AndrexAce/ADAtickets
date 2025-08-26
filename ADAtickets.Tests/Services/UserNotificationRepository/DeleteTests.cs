@@ -31,6 +31,7 @@ namespace ADAtickets.Tests.Services.UserNotificationRepository;
 ///     <c>DeleteUserNotificationByIdAsync(Guid)</c>
 ///     <list type="number">
 ///         <item>Existing entity</item>
+///         <item>Non existing entity</item>
 ///     </list>
 /// </summary>
 public sealed class DeleteTests
@@ -64,5 +65,36 @@ public sealed class DeleteTests
 
         // Assert
         Assert.Null(deletedUserNotification);
+    }
+
+    [Fact]
+    public async Task DeleteUserByIdAsync_NonExistingEntity_DoesNothing()
+    {
+        // Arrange
+        User user = new() { Id = Guid.NewGuid() };
+        Notification notification = new() { Id = Guid.NewGuid() };
+        UserNotification userNotification = new()
+        { Id = Guid.NewGuid(), ReceiverUserId = user.Id, NotificationId = notification.Id };
+        List<UserNotification> userNotifications = [new() { Id = Guid.NewGuid(), ReceiverUserId = user.Id, NotificationId = notification.Id }];
+
+        Mock<ADAticketsDbContext> mockContext = new();
+        Mock<DbSet<UserNotification>> mockSet = userNotifications.BuildMockDbSet();
+        _ = mockSet.Setup(s => s.Remove(It.IsAny<UserNotification>()))
+            .Callback<UserNotification>(userNotification =>
+                userNotifications.RemoveAll(un => un.Id == userNotification.Id));
+        _ = mockContext.Setup(c => c.UserNotifications)
+            .Returns(mockSet.Object);
+
+        UserNotificationService service = new(mockContext.Object);
+
+        var cancellationToken = TestContext.Current.CancellationToken;
+
+        // Act
+        await service.DeleteUserNotificationAsync(userNotification);
+        var deletedUserNotification =
+            await mockContext.Object.UserNotifications.SingleOrDefaultAsync(cancellationToken);
+
+        // Assert
+        Assert.NotNull(deletedUserNotification);
     }
 }

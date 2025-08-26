@@ -31,6 +31,7 @@ namespace ADAtickets.Tests.Services.UserPlatformRepository;
 ///     <c>DeleteUserPlatformByIdAsync(Guid)</c>
 ///     <list type="number">
 ///         <item>Existing entity</item>
+///         <item>Non existing entity</item>
 ///     </list>
 /// </summary>
 public sealed class DeleteTests
@@ -61,5 +62,33 @@ public sealed class DeleteTests
 
         // Assert
         Assert.Null(deletedUserPlatform);
+    }
+
+    [Fact]
+    public async Task DeleteUserByIdAsync_NonExistingEntity_DoesNothing()
+    {
+        // Arrange
+        User user = new() { Id = Guid.NewGuid() };
+        Platform platform = new() { Id = Guid.NewGuid() };
+        UserPlatform userPlatform = new() { Id = Guid.NewGuid(), UserId = user.Id, PlatformId = platform.Id };
+        List<UserPlatform> userPlatforms = [new() { Id = Guid.NewGuid(), UserId = user.Id, PlatformId = platform.Id }];
+
+        Mock<ADAticketsDbContext> mockContext = new();
+        Mock<DbSet<UserPlatform>> mockSet = userPlatforms.BuildMockDbSet();
+        _ = mockSet.Setup(s => s.Remove(It.IsAny<UserPlatform>()))
+            .Callback<UserPlatform>(userPlatform => userPlatforms.RemoveAll(up => up.Id == userPlatform.Id));
+        _ = mockContext.Setup(c => c.UserPlatforms)
+            .Returns(mockSet.Object);
+
+        UserPlatformService service = new(mockContext.Object);
+
+        var cancellationToken = TestContext.Current.CancellationToken;
+
+        // Act
+        await service.DeleteUserPlatformAsync(userPlatform);
+        var deletedUserPlatform = await mockContext.Object.UserPlatforms.SingleOrDefaultAsync(cancellationToken);
+
+        // Assert
+        Assert.NotNull(deletedUserPlatform);
     }
 }

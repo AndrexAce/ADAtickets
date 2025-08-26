@@ -31,6 +31,7 @@ namespace ADAtickets.Tests.Services.ReplyRepository;
 ///     <c>DeleteReplyByIdAsync(Guid)</c>
 ///     <list type="number">
 ///         <item>Existing entity</item>
+///         <item>Non existing entity</item>
 ///     </list>
 /// </summary>
 public sealed class DeleteTests
@@ -59,5 +60,31 @@ public sealed class DeleteTests
 
         // Assert
         Assert.Null(deletedReply);
+    }
+
+    [Fact]
+    public async Task DeleteReplyByIdAsync_NonExistingEntity_DoesNothing()
+    {
+        // Arrange
+        Reply reply = new() { Id = Guid.NewGuid() };
+        List<Reply> replies = [new() { Id = Guid.NewGuid() }];
+
+        Mock<ADAticketsDbContext> mockContext = new();
+        Mock<DbSet<Reply>> mockSet = replies.BuildMockDbSet();
+        _ = mockSet.Setup(s => s.Remove(It.IsAny<Reply>()))
+            .Callback<Reply>(reply => replies.RemoveAll(r => r.Id == reply.Id));
+        _ = mockContext.Setup(c => c.Replies)
+            .Returns(mockSet.Object);
+
+        ReplyService service = new(mockContext.Object);
+
+        var cancellationToken = TestContext.Current.CancellationToken;
+
+        // Act
+        await service.DeleteReplyAsync(reply);
+        var deletedReply = await mockContext.Object.Replies.SingleOrDefaultAsync(cancellationToken);
+
+        // Assert
+        Assert.NotNull(deletedReply);
     }
 }

@@ -31,6 +31,7 @@ namespace ADAtickets.Tests.Services.PlatformRepository;
 ///     <c>DeletePlatformByIdAsync(Guid)</c>
 ///     <list type="number">
 ///         <item>Existing entity</item>
+///         <item>Non existing entity</item>
 ///     </list>
 /// </summary>
 public sealed class DeleteTests
@@ -59,5 +60,31 @@ public sealed class DeleteTests
 
         // Assert
         Assert.Null(deletedPlatform);
+    }
+
+    [Fact]
+    public async Task DeletePlatformByIdAsync_NonExistingEntity_DoesNothing()
+    {
+        // Arrange
+        Platform platform = new() { Id = Guid.NewGuid() };
+        List<Platform> platforms = [new() { Id = Guid.NewGuid() }];
+
+        Mock<ADAticketsDbContext> mockContext = new();
+        Mock<DbSet<Platform>> mockSet = platforms.BuildMockDbSet();
+        _ = mockSet.Setup(s => s.Remove(It.IsAny<Platform>()))
+            .Callback<Platform>(platform => platforms.RemoveAll(p => p.Id == platform.Id));
+        _ = mockContext.Setup(c => c.Platforms)
+            .Returns(mockSet.Object);
+
+        PlatformService service = new(mockContext.Object);
+
+        var cancellationToken = TestContext.Current.CancellationToken;
+
+        // Act
+        await service.DeletePlatformAsync(platform);
+        var deletedPlatform = await mockContext.Object.Platforms.SingleOrDefaultAsync(cancellationToken);
+
+        // Assert
+        Assert.NotNull(deletedPlatform);
     }
 }

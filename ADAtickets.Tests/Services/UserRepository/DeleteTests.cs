@@ -31,6 +31,7 @@ namespace ADAtickets.Tests.Services.UserRepository;
 ///     <c>DeleteUserByIdAsync(Guid)</c>
 ///     <list type="number">
 ///         <item>Existing entity</item>
+///         <item>Non existing entity</item>
 ///     </list>
 /// </summary>
 public sealed class DeleteTests
@@ -59,5 +60,31 @@ public sealed class DeleteTests
 
         // Assert
         Assert.Null(deletedUser);
+    }
+
+    [Fact]
+    public async Task DeleteUserByIdAsync_NonExistingEntity_DoesNothing()
+    {
+        // Arrange
+        User user = new() { Id = Guid.NewGuid() };
+        List<User> users = [new() { Id = Guid.NewGuid() }];
+
+        Mock<ADAticketsDbContext> mockContext = new();
+        Mock<DbSet<User>> mockSet = users.BuildMockDbSet();
+        _ = mockSet.Setup(s => s.Remove(It.IsAny<User>()))
+            .Callback<User>(user => users.RemoveAll(u => u.Id == user.Id));
+        _ = mockContext.Setup(c => c.Users)
+            .Returns(mockSet.Object);
+
+        UserService service = new(mockContext.Object);
+
+        var cancellationToken = TestContext.Current.CancellationToken;
+
+        // Act
+        await service.DeleteUserAsync(user);
+        var deletedUser = await mockContext.Object.Users.SingleOrDefaultAsync(cancellationToken);
+
+        // Assert
+        Assert.NotNull(deletedUser);
     }
 }

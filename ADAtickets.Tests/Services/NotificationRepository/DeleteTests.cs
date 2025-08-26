@@ -31,6 +31,7 @@ namespace ADAtickets.Tests.Services.NotificationRepository;
 ///     <c>DeleteNotificationByIdAsync(Guid)</c>
 ///     <list type="number">
 ///         <item>Existing entity</item>
+///         <item>Non existing entity</item>
 ///     </list>
 /// </summary>
 public sealed class DeleteTests
@@ -59,5 +60,31 @@ public sealed class DeleteTests
 
         // Assert
         Assert.Null(deletedNotification);
+    }
+
+    [Fact]
+    public async Task DeleteNotificationByIdAsync_NonExistingEntity_DoesNothing()
+    {
+        // Arrange
+        Notification notification = new() { Id = Guid.NewGuid() };
+        List<Notification> notifications = [new() { Id = Guid.NewGuid() }];
+
+        Mock<ADAticketsDbContext> mockContext = new();
+        Mock<DbSet<Notification>> mockSet = notifications.BuildMockDbSet();
+        _ = mockSet.Setup(s => s.Remove(It.IsAny<Notification>()))
+            .Callback<Notification>(notification => notifications.RemoveAll(n => n.Id == notification.Id));
+        _ = mockContext.Setup(c => c.Notifications)
+            .Returns(mockSet.Object);
+
+        NotificationService service = new(mockContext.Object);
+
+        var cancellationToken = TestContext.Current.CancellationToken;
+
+        // Act
+        await service.DeleteNotificationAsync(notification);
+        var deletedNotification = await mockContext.Object.Notifications.SingleOrDefaultAsync(cancellationToken);
+
+        // Assert
+        Assert.NotNull(deletedNotification);
     }
 }

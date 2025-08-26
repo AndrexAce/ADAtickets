@@ -31,6 +31,7 @@ namespace ADAtickets.Tests.Services.TicketRepository;
 ///     <c>DeleteTicketByIdAsync(Guid)</c>
 ///     <list type="number">
 ///         <item>Existing entity</item>
+///         <item>Non existing entity</item>
 ///     </list>
 /// </summary>
 public sealed class DeleteTests
@@ -59,5 +60,31 @@ public sealed class DeleteTests
 
         // Assert
         Assert.Null(deletedTicket);
+    }
+
+    [Fact]
+    public async Task DeleteTicketByIdAsync_NonExistingEntity_DoesNothing()
+    {
+        // Arrange
+        Ticket ticket = new() { Id = Guid.NewGuid() };
+        List<Ticket> tickets = [new() { Id = Guid.NewGuid() }];
+
+        Mock<ADAticketsDbContext> mockContext = new();
+        Mock<DbSet<Ticket>> mockSet = tickets.BuildMockDbSet();
+        _ = mockSet.Setup(s => s.Remove(It.IsAny<Ticket>()))
+            .Callback<Ticket>(ticket => tickets.RemoveAll(t => t.Id == ticket.Id));
+        _ = mockContext.Setup(c => c.Tickets)
+            .Returns(mockSet.Object);
+
+        TicketService service = new(mockContext.Object);
+
+        var cancellationToken = TestContext.Current.CancellationToken;
+
+        // Act
+        await service.DeleteTicketAsync(ticket);
+        var deletedTicket = await mockContext.Object.Tickets.SingleOrDefaultAsync(cancellationToken);
+
+        // Assert
+        Assert.NotNull(deletedTicket);
     }
 }
