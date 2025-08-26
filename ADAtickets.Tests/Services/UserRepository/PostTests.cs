@@ -23,6 +23,7 @@ using ADAtickets.Shared.Models;
 using Microsoft.EntityFrameworkCore;
 using MockQueryable.Moq;
 using Moq;
+using System.Text.RegularExpressions;
 using UserService = ADAtickets.ApiService.Services.UserRepository;
 
 namespace ADAtickets.Tests.Services.UserRepository;
@@ -38,13 +39,15 @@ public sealed class PostTests
 {
     public static TheoryData<User> InvalidUserData =>
     [
-        Utilities.CreateUser(new string('a', 51), "Lucchese"),
-        Utilities.CreateUser("Andrea", new string('a', 51))
+        Utilities.CreateUser("@gmail.com", "AndrexAce", "Andrea", "Lucchese"),
+        Utilities.CreateUser("test@gmail.com", new string('a', 51), "Andrea", "Lucchese"),
+        Utilities.CreateUser("test@gmail.com", "AndrexAce", new string('a', 51), "Lucchese"),
+        Utilities.CreateUser("test@gmail.com", "AndrexAce", "Andrea", new string('a', 51))
     ];
 
     public static TheoryData<User> ValidUserData =>
     [
-        Utilities.CreateUser("Andrea", "Lucchese")
+        Utilities.CreateUser("andrylook14@gmail.com", "AndrexAce", "Andrea", "Lucchese")
     ];
 
     [Theory]
@@ -59,7 +62,11 @@ public sealed class PostTests
         _ = mockUserSet.Setup(s => s.Add(It.IsAny<User>()))
             .Callback<User>(u =>
             {
-                if (u.Name.Length <= 50 && u.Surname.Length <= 50) users.Add(u);
+                if (Regex.IsMatch(u.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100)) &&
+                    u.Username.Length <= 50 && u.Name.Length <= 50 && u.Surname.Length <= 50)
+                {
+                    users.Add(u);
+                }
             });
         _ = mockContext.Setup(c => c.Users)
             .Returns(mockUserSet.Object);
@@ -89,7 +96,11 @@ public sealed class PostTests
         _ = mockUserSet.Setup(s => s.Add(It.IsAny<User>()))
             .Callback<User>(u =>
             {
-                if (u.Name.Length <= 50 && u.Surname.Length <= 50) users.Add(u);
+                if (Regex.IsMatch(u.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100)) &&
+                    u.Username.Length <= 50 && u.Name.Length <= 50 && u.Surname.Length <= 50)
+                {
+                    users.Add(u);
+                }
             });
         _ = mockContext.Setup(c => c.Users)
             .Returns(mockUserSet.Object);
