@@ -72,6 +72,7 @@ public sealed class User : Entity
     /// <summary>
     ///     Whether the user can login the application.
     /// </summary>
+    [Required]
     public bool IsBlocked { get; init; } = false;
 
     /// <summary>

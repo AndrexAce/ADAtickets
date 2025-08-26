@@ -25,11 +25,15 @@ namespace ADAtickets.Tests.Services.UserRepository;
 internal static class Utilities
 {
     public static User CreateUser(
+        string email = "",
+        string username = "",
         string name = "",
         string surname = "")
     {
         return new User
         {
+            Email = email,
+            Username = username,
             Name = name,
             Surname = surname
         };
