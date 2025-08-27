@@ -32,7 +32,6 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web.Resource;
 using System.Net.Mime;
-using System.Net.Sockets;
 using Controller = ADAtickets.Shared.Constants.Controller;
 
 namespace ADAtickets.ApiService.Controllers;
@@ -71,34 +70,52 @@ public sealed class RepliesController(
     /// </summary>
     /// <remarks>
     ///     For example, the following request:
-    ///     <c>GET /api/Replies?ticketId=123e4567-e89b-12d3-a456-426614174000example&amp;message=example</c>
+    ///     <c>GET /api/Replies?ticketId=123e4567-e89b-12d3-a456-426614174000&amp;message=example&amp;pageNumber=1&amp;pageSize=10</c>
     ///     Retrieves the entities linked to the ticket with id <b>123e4567-e89b-12d3-a456-426614174000</b> and containing
-    ///     <b>example</b> in their message.
+    ///     <b>example</b> in their message, returning the first page with 10 items.
     /// </remarks>
+    /// <param name="pageNumber">The page number to retrieve (optional, defaults to returning all items unpaged).</param>
+    /// <param name="pageSize">The number of items per page (optional, required when pageNumber is specified).</param>
     /// <param name="filters">
     ///     A group of key-value pairs defining the property name and value <see cref="Reply" /> entities
     ///     should be filtered by.
     /// </param>
     /// <returns>
-    ///     A <see cref="Task" /> returning an <see cref="ActionResult" />, which wraps the server response and the list
+    ///     A <see cref="Task" /> returning an <see cref="ActionResult" />, which wraps the server response and the paginated list
     ///     of entities.
     /// </returns>
     /// <response code="200">The entities were found.</response>
-    /// <response code="400">The provided filters were not formatted correctly.</response>
+    /// <response code="400">The provided filters were not formatted correctly or pagination parameters are invalid.</response>
     /// <response code="401">The client was not authenticated.</response>
     /// <response code="403">The client was authenticated but had not enough privileges.</response>
     /// <response code="406">The client asked for an unsupported response format.</response>
     [HttpGet]
     [Authorize(Policy = Policy.Everyone)]
     [RequiredScope(Scope.Read)]
-    public async Task<ActionResult<IEnumerable<ReplyResponseDto>>> GetReplies(
-        [FromQuery] Dictionary<string, string>? filters)
+    public async Task<ActionResult<Page<ReplyResponseDto>>> GetReplies(
+        [FromQuery] int? pageNumber = null,
+        [FromQuery] int? pageSize = null,
+        [FromQuery] Dictionary<string, string>? filters = null)
     {
         var replies = await (filters != null
             ? replyRepository.GetRepliesByAsync(filters)
             : replyRepository.GetRepliesAsync());
 
-        return Ok(replies.Select(mapper.Map<ReplyResponseDto>));
+        var replyDtos = replies.Select(mapper.Map<ReplyResponseDto>);
+
+        // Return paginated or unpaginated results based on parameters
+        Page<ReplyResponseDto> result;
+
+        if (pageNumber.HasValue && pageSize.HasValue)
+        {
+            result = new Page<ReplyResponseDto>(replyDtos, pageNumber.Value, pageSize.Value);
+        }
+        else
+        {
+            result = new Page<ReplyResponseDto>(replyDtos);
+        }
+
+        return Ok(result);
     }
 
     /// <summary>
@@ -131,8 +148,8 @@ public sealed class RepliesController(
     ///     Update a specific <see cref="Reply" /> entity.
     /// </summary>
     /// <remarks>
-    ///     JSON request body example:
-    ///     <code>
+    /// JSON request body example:
+    /// <code>
     /// {
     ///     "ReplyDateTime": "2025-04-27T16:31:17.512Z",
     ///     "Message": "Example message.",
@@ -140,8 +157,8 @@ public sealed class RepliesController(
     ///     "TicketId": "123e4567-e89b-12d3-a456-426614174000"
     /// }
     /// </code>
-    ///     XML request body example:
-    ///     <code>
+    /// XML request body example:
+    /// <code>
     /// &lt;ReplyRequestDto&gt;
     ///     &lt;ReplyDateTime&gt;2025-04-27T16:31:17.512Z&lt;/ReplyDateTime&gt;
     ///     &lt;Message&gt;Example message.&lt;/Message&gt;
@@ -193,8 +210,8 @@ public sealed class RepliesController(
     ///     Create a new <see cref="Reply" /> entity.
     /// </summary>
     /// <remarks>
-    ///     JSON request body example:
-    ///     <code>
+    /// JSON request body example:
+    /// <code>
     /// {
     ///     "ReplyDateTime": "2025-04-27T16:31:17.512Z",
     ///     "Message": "Example message.",
@@ -202,8 +219,8 @@ public sealed class RepliesController(
     ///     "TicketId": "123e4567-e89b-12d3-a456-426614174000"
     /// }
     /// </code>
-    ///     XML request body example:
-    ///     <code>
+    /// XML request body example:
+    /// <code>
     /// &lt;ReplyRequestDto&gt;
     ///     &lt;ReplyDateTime&gt;2025-04-27T16:31:17.512Z&lt;/ReplyDateTime&gt;
     ///     &lt;Message&gt;Example message.&lt;/Message&gt;

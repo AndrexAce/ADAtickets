@@ -165,7 +165,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     {
         try
         {
-            originalUsers = await usersClient.GetAllAsync();
+            originalUsers = (await usersClient.GetAllAsync()).Items;
             users = originalUsers;
 
             var currentUserEmail = await GetCurrentUserEmail();

@@ -83,7 +83,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         try
         {
             var availablePlatformsFromAzureDevOps = await azureDevOpsClient.GetAllPlatformsAsync();
-            importedPlatforms = await platformsClient.GetAllAsync();
+            importedPlatforms = (await platformsClient.GetAllAsync()).Items;
 
             // Remove all the already imported platforms
             availablePlatforms = availablePlatformsFromAzureDevOps.Where(p => !importedPlatforms.Any(ip => ip.RepositoryUrl == p.RepositoryUrl)).ToList();
@@ -116,9 +116,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         try
         {
             // Check if any ticket is still associated to the platform
-            var associatedTickets = await ticketsClient.GetAllAsync(
+            var associatedTickets = (await ticketsClient.GetAllAsync(
                 new Dictionary<string, string> { { nameof(TicketResponseDto.PlatformId), platform.Id.ToString() } }
-            );
+            )).Items;
 
             if (!associatedTickets.Any())
             {

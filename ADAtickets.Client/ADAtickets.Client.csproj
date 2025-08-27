@@ -30,6 +30,7 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.Identity.Web.DownstreamApi" Version="3.13.2" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     </ItemGroup>
 
     <ItemGroup>

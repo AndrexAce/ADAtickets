@@ -19,8 +19,9 @@
  */
 
 using ADAtickets.Shared.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
 namespace ADAtickets.Shared.Dtos.Requests;
 
@@ -46,14 +47,14 @@ public sealed class EditRequestDto : RequestDto
     ///     The status the ticket was in before the edit.
     /// </summary>
     [Required]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter))]
     public Status OldStatus { get; set; } = Status.Unassigned;
 
     /// <summary>
     ///     The status the ticket will be after the edit.
     /// </summary>
     [Required]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter))]
     public Status NewStatus { get; set; } = Status.Unassigned;
 
     /// <summary>

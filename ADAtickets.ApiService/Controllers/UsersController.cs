@@ -55,31 +55,48 @@ public sealed class UsersController(IUserRepository userRepository, IMapper mapp
     /// </summary>
     /// <remarks>
     ///     For example, the following request:
-    ///     <c>GET /api/Users?name=john&amp;microsoftAccountId=null</c>
-    ///     Retrieves the entities containing <b>john</b> in their name and not linked to a Microsoft account.
+    ///     <c>GET /api/Users?name=john&amp;microsoftAccountId=null&amp;pageNumber=1&amp;pageSize=10</c>
+    ///     Retrieves the entities containing <b>john</b> in their name and not linked to a Microsoft account, returning the first page with 10 items.
     /// </remarks>
+    /// <param name="pageNumber">The page number to retrieve (optional, defaults to returning all items unpaged).</param>
+    /// <param name="pageSize">The number of items per page (optional, required when pageNumber is specified).</param>
     /// <param name="filters">
     ///     A group of key-value pairs defining the property name and value <see cref="User" /> entities
     ///     should be filtered by.
     /// </param>
     /// <returns>
-    ///     A <see cref="Task" /> returning an <see cref="ActionResult" />, which wraps the server response and the list
+    ///     A <see cref="Task" /> returning an <see cref="ActionResult" />, which wraps the server response and the paginated list
     ///     of entities.
     /// </returns>
     /// <response code="200">The entities were found.</response>
-    /// <response code="400">The provided filters were not formatted correctly.</response>
+    /// <response code="400">The provided filters were not formatted correctly or pagination parameters are invalid.</response>
     /// <response code="401">The client was not authenticated.</response>
     /// <response code="403">The client was authenticated but had not enough privileges.</response>
     /// <response code="406">The client asked for an unsupported response format.</response>
     [HttpGet]
     [Authorize(Policy = Policy.Everyone)]
     [RequiredScope(Scope.Read)]
-    public async Task<ActionResult<IEnumerable<UserResponseDto>>> GetUsers(
-        [FromQuery] Dictionary<string, string>? filters)
+    public async Task<ActionResult<Page<UserResponseDto>>> GetUsers(
+        [FromQuery] int? pageNumber = null,
+        [FromQuery] int? pageSize = null,
+        [FromQuery] Dictionary<string, string>? filters = null)
     {
         var users = await (filters != null ? userRepository.GetUsersByAsync(filters) : userRepository.GetUsersAsync());
+        var userDtos = users.Select(mapper.Map<UserResponseDto>);
 
-        return Ok(users.Select(mapper.Map<UserResponseDto>));
+        // Return paginated or unpaginated results based on parameters
+        Page<UserResponseDto> result;
+
+        if (pageNumber.HasValue && pageSize.HasValue)
+        {
+            result = new Page<UserResponseDto>(userDtos, pageNumber.Value, pageSize.Value);
+        }
+        else
+        {
+            result = new Page<UserResponseDto>(userDtos);
+        }
+
+        return Ok(result);
     }
 
     /// <summary>
@@ -143,8 +160,8 @@ public sealed class UsersController(IUserRepository userRepository, IMapper mapp
     ///     Update a specific <see cref="User" /> entity.
     /// </summary>
     /// <remarks>
-    ///     JSON request body example:
-    ///     <code>
+    /// JSON request body example:
+    /// <code>
     /// {
     ///     "Email": "john.smith@outlook.com",
     ///     "Name": "John",
@@ -153,8 +170,8 @@ public sealed class UsersController(IUserRepository userRepository, IMapper mapp
     ///     "Type": "User",
     /// }
     /// </code>
-    ///     XML request body example:
-    ///     <code>
+    /// XML request body example:
+    /// <code>
     /// &lt;UserRequestDto&gt;
     ///     &lt;Email&gt;john.smith@outlook.com&lt;Email&gt;
     ///     &lt;Name&gt;John&lt;/Name&gt;
@@ -207,8 +224,8 @@ public sealed class UsersController(IUserRepository userRepository, IMapper mapp
     ///     Update a specific <see cref="User" /> entity.
     /// </summary>
     /// <remarks>
-    ///     JSON request body example:
-    ///     <code>
+    /// JSON request body example:
+    /// <code>
     /// {
     ///     "Email": "john.smith@outlook.com",
     ///     "Name": "John",
@@ -217,8 +234,8 @@ public sealed class UsersController(IUserRepository userRepository, IMapper mapp
     ///     "Type": "User",
     /// }
     /// </code>
-    ///     XML request body example:
-    ///     <code>
+    /// XML request body example:
+    /// <code>
     /// &lt;UserRequestDto&gt;
     ///     &lt;Email&gt;john.smith@outlook.com&lt;Email&gt;
     ///     &lt;Name&gt;John&lt;/Name&gt;
@@ -277,8 +294,8 @@ public sealed class UsersController(IUserRepository userRepository, IMapper mapp
     ///     Create a new <see cref="User" /> entity.
     /// </summary>
     /// <remarks>
-    ///     JSON request body example:
-    ///     <code>
+    /// JSON request body example:
+    /// <code>
     /// {
     ///     "Email": "john.smith@outlook.com",
     ///     "Name": "John",
@@ -287,8 +304,8 @@ public sealed class UsersController(IUserRepository userRepository, IMapper mapp
     ///     "Type": "User",
     /// }
     /// </code>
-    ///     XML request body example:
-    ///     <code>
+    /// XML request body example:
+    /// <code>
     /// &lt;UserRequestDto&gt;
     ///     &lt;Email&gt;john.smith@outlook.com&lt;Email&gt;
     ///     &lt;Name&gt;John&lt;/Name&gt;

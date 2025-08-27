@@ -19,9 +19,9 @@
  */
 
 using AutoMapper.Configuration.Annotations;
+using Newtonsoft.Json;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
 namespace ADAtickets.Shared.Models;
 

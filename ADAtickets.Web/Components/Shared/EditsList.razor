@@ -97,9 +97,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     {
         try
         {
-            var fetchedEdits = await editsClient.GetAllAsync(
+            var fetchedEdits = (await editsClient.GetAllAsync(
                 new Dictionary<string, string> { { nameof(EditResponseDto.TicketId), TicketId.ToString() } }
-            );
+            )).Items;
 
             edits = fetchedEdits.OrderByDescending(e => e.EditDateTime);
         }

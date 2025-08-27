@@ -64,34 +64,52 @@ public sealed class AttachmentsController(
     /// </summary>
     /// <remarks>
     ///     For example, the following request:
-    ///     <c>GET /api/Attachments?ticketId=123e4567-e89b-12d3-a456-426614174000&amp;path=example.png</c>
+    ///     <c>GET /api/Attachments?ticketId=123e4567-e89b-12d3-a456-426614174000&amp;path=example.png&amp;pageNumber=1&amp;pageSize=10</c>
     ///     Retrieves the entities linked to the ticket with id <b>123e4567-e89b-12d3-a456-426614174000</b> and which contain
-    ///     <b>example.png</b> in the path.
+    ///     <b>example.png</b> in the path, returning the first page with 10 items.
     /// </remarks>
     /// <param name="filters">
     ///     A group of key-value pairs defining the property name and value <see cref="Attachment" />
     ///     entities should be filtered by.
     /// </param>
+    /// <param name="pageNumber">The page number to retrieve (optional, defaults to returning all items unpaged).</param>
+    /// <param name="pageSize">The number of items per page (optional, required when pageNumber is specified).</param>
     /// <returns>
-    ///     A <see cref="Task" /> returning an <see cref="ActionResult" />, which wraps the server response and the list
+    ///     A <see cref="Task" /> returning an <see cref="ActionResult" />, which wraps the server response and the paginated list
     ///     of entities.
     /// </returns>
     /// <response code="200">The entities were found.</response>
-    /// <response code="400">The provided filters were not formatted correctly.</response>
+    /// <response code="400">The provided filters were not formatted correctly or pagination parameters are invalid.</response>
     /// <response code="401">The client was not authenticated.</response>
     /// <response code="403">The client was authenticated but had not enough privileges.</response>
     /// <response code="406">The client asked for an unsupported response format.</response>
     [HttpGet]
     [Authorize(Policy = Policy.Everyone)]
     [RequiredScope(Scope.Read)]
-    public async Task<ActionResult<IEnumerable<AttachmentResponseDto>>> GetAttachments(
-        [FromQuery] Dictionary<string, string>? filters)
+    public async Task<ActionResult<Page<AttachmentResponseDto>>> GetAttachments(
+        [FromQuery] int? pageNumber = null,
+        [FromQuery] int? pageSize = null,
+        [FromQuery] Dictionary<string, string>? filters = null)
     {
         var attachments = await (filters != null
             ? attachmentRepository.GetAttachmentsByAsync(filters)
             : attachmentRepository.GetAttachmentsAsync());
 
-        return Ok(attachments.Select(mapper.Map<AttachmentResponseDto>));
+        var attachmentDtos = attachments.Select(mapper.Map<AttachmentResponseDto>);
+
+        // Return paginated or unpaginated results based on parameters
+        Page<AttachmentResponseDto> result;
+
+        if (pageNumber.HasValue && pageSize.HasValue)
+        {
+            result = new Page<AttachmentResponseDto>(attachmentDtos, pageNumber.Value, pageSize.Value);
+        }
+        else
+        {
+            result = new Page<AttachmentResponseDto>(attachmentDtos);
+        }
+
+        return Ok(result);
     }
 
     /// <summary>
@@ -124,16 +142,16 @@ public sealed class AttachmentsController(
     ///     Update a specific <see cref="Attachment" /> entity.
     /// </summary>
     /// <remarks>
-    ///     JSON request body example:
-    ///     <code>
+    /// JSON request body example:
+    /// <code>
     /// {
     ///     "Name": "photo.png",
     ///     "TicketId": "123e4567-e89b-12d3-a456-426614174000",
     ///     "Content": [0, 0, 0, 0, 0, 0]
     /// }
     /// </code>
-    ///     XML request body example:
-    ///     <code>
+    /// XML request body example:
+    /// <code>
     /// &lt;AttachmentRequestDto&gt;
     ///     &lt;Name&gt;photo.png&lt;/AttachmentDateTime&gt;
     ///     &lt;TicketId&gt;123e4567-e89b-12d3-a456-426614174000&lt;/TicketId&gt;
@@ -186,16 +204,16 @@ public sealed class AttachmentsController(
     ///     Create a new <see cref="Attachment" /> entity.
     /// </summary>
     /// <remarks>
-    ///     JSON request body example:
-    ///     <code>
+    /// JSON request body example:
+    /// <code>
     /// {
     ///     "Name": "photo.png",
     ///     "TicketId": "123e4567-e89b-12d3-a456-426614174000",
     ///     "Content": [0, 0, 0, 0, 0, 0]
     /// }
     /// </code>
-    ///     XML request body example:
-    ///     <code>
+    /// XML request body example:
+    /// <code>
     /// &lt;AttachmentRequestDto&gt;
     ///     &lt;Name&gt;photo.png&lt;/AttachmentDateTime&gt;
     ///     &lt;TicketId&gt;123e4567-e89b-12d3-a456-426614174000&lt;/TicketId&gt;

@@ -25,13 +25,13 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Identity.Abstractions;
 using Microsoft.Identity.Web;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using System.ComponentModel;
 using System.Net;
-using System.Net.Http.Json;
 using System.Net.Mime;
 using System.Security.Claims;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace ADAtickets.Client;
 
@@ -75,12 +75,13 @@ public abstract class Client<TResponse, TRequest>(
     protected readonly IDownstreamApi downstreamApi = downstreamApi;
 
     /// <summary>
-    ///     The serialization options used to serialize and deserialize JSON data.
+    ///     The serialization settings used to serialize and deserialize JSON data.
     /// </summary>
-    protected readonly JsonSerializerOptions JsonOptions = new()
+    protected readonly JsonSerializerSettings JsonSettings = new()
     {
-        Converters = { new JsonStringEnumConverter(allowIntegerValues: false) },
-        PropertyNameCaseInsensitive = true
+        Converters = { new StringEnumConverter() },
+        ContractResolver = new CamelCasePropertyNamesContractResolver(),
+        NullValueHandling = NullValueHandling.Ignore
     };
 
     /// <summary>
@@ -117,22 +118,41 @@ public abstract class Client<TResponse, TRequest>(
             },
             user);
 
-        return response.StatusCode is HttpStatusCode.OK
-            ? await response.Content.ReadFromJsonAsync<TResponse>(JsonOptions) ??
-              throw new JsonException(JsonExceptionMessage)
-            : throw new HttpRequestException(response.ReasonPhrase, null, response.StatusCode);
+        if (response.StatusCode is HttpStatusCode.OK)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<TResponse>(content, JsonSettings) ??
+                   throw new JsonException(JsonExceptionMessage);
+        }
+
+        throw new HttpRequestException(response.ReasonPhrase, null, response.StatusCode);
     }
 
     /// <summary>
     ///     Fetch all the entities or all the entities respecting the given criteria.
     /// </summary>
     /// <param name="filters">A group of key-value pairs defining the property name and value entities should be filtered by.</param>
-    /// <returns>The collection of entities.</returns>
+    /// <param name="pageNumber">The page number to retrieve (optional, defaults to returning all items unpaged).</param>
+    /// <param name="pageSize">The number of items per page (optional, required when <paramref name="pageNumber"/> is specified).</param>
+    /// <returns>A <see cref="Page{TResponse}" /> entities.</returns>
     /// <exception cref="InvalidOperationException">When the method is used when no user is logged in.</exception>
+    /// <exception cref="ArgumentNullException">When the method is invoked with only one between <paramref name="pageNumber"/> and <paramref name="pageSize"/>.</exception>
     /// <exception cref="HttpRequestException">When the API call fails.</exception>
     /// <exception cref="JsonException">When the JSON response cannot be parsed.</exception>
-    public async Task<IEnumerable<TResponse>> GetAllAsync(IEnumerable<KeyValuePair<string, string>>? filters = null)
+    public async Task<Page<TResponse>> GetAllAsync(IEnumerable<KeyValuePair<string, string>>? filters = null, int? pageNumber = null, int? pageSize = null)
     {
+        // Accept either both pageNumber and pageSize or none of them
+        if (pageNumber.HasValue && pageSize.HasValue)
+        {
+            filters ??= [];
+            filters = filters.Append(new KeyValuePair<string, string>(nameof(pageNumber), pageNumber.Value.ToString()))
+                             .Append(new KeyValuePair<string, string>(nameof(pageSize), pageSize.Value.ToString()));
+        }
+        else if (pageNumber.HasValue ^ pageSize.HasValue)
+        {
+            throw new ArgumentNullException(pageNumber.HasValue ? nameof(pageSize) : nameof(pageNumber));
+        }
+
         // Fetch the logged in user
         var user = (await authenticationStateProvider.GetAuthenticationStateAsync()).User;
 
@@ -148,10 +168,14 @@ public abstract class Client<TResponse, TRequest>(
             },
             user);
 
-        return response.StatusCode is HttpStatusCode.OK
-            ? await response.Content.ReadFromJsonAsync<IEnumerable<TResponse>>(JsonOptions) ??
-              throw new JsonException(JsonExceptionMessage)
-            : throw new HttpRequestException(response.ReasonPhrase, null, response.StatusCode);
+        if (response.StatusCode is HttpStatusCode.OK)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<Page<TResponse>>(content, JsonSettings) ??
+                   throw new JsonException(JsonExceptionMessage);
+        }
+
+        throw new HttpRequestException(response.ReasonPhrase, null, response.StatusCode);
     }
 
     /// <summary>
@@ -167,6 +191,9 @@ public abstract class Client<TResponse, TRequest>(
         // Fetch the logged in user
         var user = (await authenticationStateProvider.GetAuthenticationStateAsync()).User;
 
+        var jsonContent = JsonConvert.SerializeObject(entity, JsonSettings);
+        var httpContent = new StringContent(jsonContent, System.Text.Encoding.UTF8, MediaTypeNames.Application.Json);
+
         // Call the APIs with the permissions granted to the user
         var response = await downstreamApi.CallApiForUserAsync(
             InferServiceName(user),
@@ -178,12 +205,16 @@ public abstract class Client<TResponse, TRequest>(
                 options.AcquireTokenOptions.AuthenticationOptionsName = InferAuthenticationScheme(user);
             },
             user,
-            JsonContent.Create(entity, options: JsonOptions));
+            httpContent);
 
-        return response.StatusCode is HttpStatusCode.Created
-            ? await response.Content.ReadFromJsonAsync<TResponse>(JsonOptions) ??
-              throw new JsonException(JsonExceptionMessage)
-            : throw new HttpRequestException(response.ReasonPhrase, null, response.StatusCode);
+        if (response.StatusCode is HttpStatusCode.Created)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<TResponse>(content, JsonSettings) ??
+                   throw new JsonException(JsonExceptionMessage);
+        }
+
+        throw new HttpRequestException(response.ReasonPhrase, null, response.StatusCode);
     }
 
     /// <summary>
@@ -200,6 +231,9 @@ public abstract class Client<TResponse, TRequest>(
         // Fetch the logged in user
         var user = (await authenticationStateProvider.GetAuthenticationStateAsync()).User;
 
+        var jsonContent = JsonConvert.SerializeObject(entity, JsonSettings);
+        var httpContent = new StringContent(jsonContent, System.Text.Encoding.UTF8, MediaTypeNames.Application.Json);
+
         // Call the APIs with the permissions granted to the user
         var response = await downstreamApi.CallApiForUserAsync(
             InferServiceName(user),
@@ -211,11 +245,14 @@ public abstract class Client<TResponse, TRequest>(
                 options.AcquireTokenOptions.AuthenticationOptionsName = InferAuthenticationScheme(user);
             },
             user,
-            JsonContent.Create(entity, options: JsonOptions));
+            httpContent);
 
         if (response.StatusCode is HttpStatusCode.Created)
-            return await response.Content.ReadFromJsonAsync<TResponse>(JsonOptions) ??
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<TResponse>(content, JsonSettings) ??
                    throw new JsonException(JsonExceptionMessage);
+        }
 
         return response.StatusCode is HttpStatusCode.NoContent
             ? null

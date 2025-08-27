@@ -19,8 +19,9 @@
  */
 
 using ADAtickets.Shared.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
 namespace ADAtickets.Shared.Dtos.Requests;
 
@@ -70,6 +71,6 @@ public sealed class UserRequestDto : RequestDto
     ///     The role of the user in the system.
     /// </summary>
     [Required]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter))]
     public UserType Type { get; set; } = UserType.User;
 }

@@ -24,10 +24,9 @@ using ADAtickets.Shared.Dtos.Responses;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Identity.Abstractions;
+using Newtonsoft.Json;
 using System.Net;
-using System.Net.Http.Json;
 using System.Net.Mime;
-using System.Text.Json;
 
 namespace ADAtickets.Client;
 
@@ -71,10 +70,14 @@ public sealed class UsersClient(
             },
             user);
 
-        return response.StatusCode is HttpStatusCode.OK
-            ? await response.Content.ReadFromJsonAsync<UserResponseDto>(JsonOptions) ??
-              throw new JsonException(JsonExceptionMessage)
-            : throw new HttpRequestException(response.ReasonPhrase, null, response.StatusCode);
+        if (response.StatusCode is HttpStatusCode.OK)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<UserResponseDto>(content, JsonSettings) ??
+                   throw new JsonException(JsonExceptionMessage);
+        }
+
+        throw new HttpRequestException(response.ReasonPhrase, null, response.StatusCode);
     }
 
     /// <summary>
@@ -92,6 +95,9 @@ public sealed class UsersClient(
         // Fetch the logged in user
         var user = (await authenticationStateProvider.GetAuthenticationStateAsync()).User;
 
+        var jsonContent = JsonConvert.SerializeObject(entity, JsonSettings);
+        var httpContent = new StringContent(jsonContent, System.Text.Encoding.UTF8, MediaTypeNames.Application.Json);
+
         // Call the APIs with the permissions granted to the user
         var response = await downstreamApi.CallApiForUserAsync(
             InferServiceName(user),
@@ -103,11 +109,14 @@ public sealed class UsersClient(
                 options.AcquireTokenOptions.AuthenticationOptionsName = InferAuthenticationScheme(user);
             },
             user,
-            JsonContent.Create(entity, options: JsonOptions));
+            httpContent);
 
-        if (response.StatusCode is HttpStatusCode.OK)
-            return await response.Content.ReadFromJsonAsync<UserResponseDto>(JsonOptions) ??
+        if (response.StatusCode is HttpStatusCode.Created)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<UserResponseDto>(content, JsonSettings) ??
                    throw new JsonException(JsonExceptionMessage);
+        }
 
         return response.StatusCode is HttpStatusCode.NoContent
             ? null
