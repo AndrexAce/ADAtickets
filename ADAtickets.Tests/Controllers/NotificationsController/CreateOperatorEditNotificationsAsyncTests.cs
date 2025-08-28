@@ -31,15 +31,44 @@ namespace ADAtickets.Tests.Controllers.NotificationsController;
 
 /// <summary>
 ///     Tests for <see cref="Controller.CreateOperatorEditNotificationsAsync(Ticket, Guid?, Guid)" />
+///     This method handles operator assignment/unassignment notifications with the following logic:
 ///     <list type="number">
-///         <item>Operator unassigned -> creates unassignment notifications</item>
-///         <item>Operator assigned as first assignment -> creates assignment notifications</item>
-///         <item>Operator assigned as reassignment from old operator -> creates assignment notifications</item>
-///         <item>Operator unassigned but no operators in the system edge case -> creates unassignment notification only</item>
-///         <item>Operator assigned as new operator but they are also creator edge case -> </item>
-///         <item>Reassignment to the same operator edge case -> creates correct notifications</item>
-///         <item>Operator assigned but old operator has invalid identifier edge case -> creates correct notifications</item>
-///         <item>Ticket creator and editor are the same person edge case -> creates correct notifications</item>
+///         <item>Binary decision based on ticket.OperatorUserId state:
+///             <list type="bullet">
+///                 <item>If ticket.OperatorUserId is null: UNASSIGNMENT path</item>
+///                 <item>If ticket.OperatorUserId has value: ASSIGNMENT path</item>
+///             </list>
+///         </item>
+///         <item>UNASSIGNMENT path (ticket.OperatorUserId is null):
+///             <list type="bullet">
+///                 <item>Creates "TicketUnassigned" notification with editor as responsible</item>
+///                 <item>Notifies creator via UserNotification</item>
+///                 <item>Calls SendNotificationToAllOperators (filters by Type == Admin || Type == Operator)</item>
+///                 <item>Total: 1 notification, 1+ UserNotification entries (creator + all operators)</item>
+///             </list>
+///         </item>
+///         <item>ASSIGNMENT path (ticket.OperatorUserId has value):
+///             <list type="bullet">
+///                 <item>Creates "TicketAssignedToYou" notification with new operator as responsible</item>
+///                 <item>Notifies new operator via UserNotification</item>
+///                 <item>Creates "TicketAssigned" notification with new operator as responsible</item>
+///                 <item>Notifies creator via UserNotification</item>
+///                 <item>If oldAssignedOperator.HasValue: also notifies old operator via UserNotification</item>
+///                 <item>Total: 2 notifications, 2-3 UserNotification entries (new operator + creator + optional old operator)</item>
+///             </list>
+///         </item>
+///         <item>The method does NOT validate user relationships or prevent duplicate notifications</item>
+///     </list>
+///     Test scenarios covered:
+///     <list type="number">
+///         <item>Unassignment path: ticket.OperatorUserId == null -> TicketUnassigned + SendNotificationToAllOperators</item>
+///         <item>Assignment path (first time): ticket.OperatorUserId != null, oldAssignedOperator == null -> 2 notifications, 2 UserNotifications</item>
+///         <item>Assignment path (reassignment): ticket.OperatorUserId != null, oldAssignedOperator != null -> 2 notifications, 3 UserNotifications</item>
+///         <item>Edge case: SendNotificationToAllOperators with no Admin/Operator users -> minimal UserNotifications</item>
+///         <item>Edge case: Creator and new operator are same person -> creates duplicate notifications to same user</item>
+///         <item>Edge case: Old and new operator are same person -> creates notifications as if different people</item>
+///         <item>Edge case: oldAssignedOperator == Guid.Empty but HasValue == true -> still notifies Guid.Empty</item>
+///         <item>Edge case: Creator is also editor -> notifications still use correct responsible user IDs</item>
 ///     </list>
 /// </summary>
 public sealed class CreateOperatorEditNotificationsAsyncTests
@@ -88,7 +117,7 @@ public sealed class CreateOperatorEditNotificationsAsyncTests
         {
             Id = ticketId,
             CreatorUserId = creatorUserId,
-            OperatorUserId = null, // Operator has been unassigned
+            OperatorUserId = null, // Triggers UNASSIGNMENT path (ticket.OperatorUserId is null)
             PlatformId = platformId
         };
 
@@ -96,7 +125,7 @@ public sealed class CreateOperatorEditNotificationsAsyncTests
         {
             new() { Id = operatorUserId1, Type = UserType.Operator },
             new() { Id = operatorUserId2, Type = UserType.Admin },
-            new() { Id = Guid.NewGuid(), Type = UserType.User } // Should not be notified
+            new() { Id = Guid.NewGuid(), Type = UserType.User } // Should not be notified by SendNotificationToAllOperators
         };
 
         // Setup mocks
@@ -113,29 +142,29 @@ public sealed class CreateOperatorEditNotificationsAsyncTests
         await controller.CreateOperatorEditNotificationsAsync(ticket, oldAssignedOperator, editorUserId);
 
         // Assert
-        // Verify unassignment notification was created
+        // Verify TicketUnassigned notification was created with editor as responsible
         mockNotificationRepository.Verify(x => x.AddNotificationAsync(
             It.Is<Notification>(n =>
                 n.TicketId == ticketId &&
                 n.Message == Notifications.TicketUnassigned &&
                 n.UserId == editorUserId)), Times.Once);
 
-        // Verify creator notification link was created
+        // Verify creator was notified (always happens in unassignment path)
         mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(
             It.Is<UserNotification>(un => un.ReceiverUserId == creatorUserId)), Times.Once);
 
-        // Verify all operators were notified (2 operators: Admin + Operator types)
+        // Verify SendNotificationToAllOperators was called - should notify Admin + Operator types
         mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(
             It.Is<UserNotification>(un => un.ReceiverUserId == operatorUserId1)), Times.Once);
 
         mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(
             It.Is<UserNotification>(un => un.ReceiverUserId == operatorUserId2)), Times.Once);
 
-        // Total: 1 creator + 2 operators = 3 user notifications
+        // Total: 1 creator + 2 operators = 3 UserNotification entries
         mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()),
             Times.Exactly(3));
 
-        // Verify only one notification was created (unassignment notification)
+        // Verify only one notification was created (unassignment notification only)
         mockNotificationRepository.Verify(x => x.AddNotificationAsync(It.IsAny<Notification>()), Times.Once);
     }
 
@@ -153,11 +182,11 @@ public sealed class CreateOperatorEditNotificationsAsyncTests
         {
             Id = ticketId,
             CreatorUserId = creatorUserId,
-            OperatorUserId = newOperatorUserId, // Operator has been assigned
+            OperatorUserId = newOperatorUserId, // Triggers ASSIGNMENT path (ticket.OperatorUserId has value)
             PlatformId = platformId
         };
 
-        Guid? oldAssignedOperator = null; // First assignment scenario
+        Guid? oldAssignedOperator = null; // First assignment scenario (oldAssignedOperator.HasValue == false)
 
         // Setup mocks
         mockNotificationRepository.Setup(x => x.AddNotificationAsync(It.IsAny<Notification>()))
@@ -170,33 +199,33 @@ public sealed class CreateOperatorEditNotificationsAsyncTests
         await controller.CreateOperatorEditNotificationsAsync(ticket, oldAssignedOperator, editorUserId);
 
         // Assert
-        // Verify "assigned to you" notification for new operator
+        // Verify TicketAssignedToYou notification for new operator (first notification in assignment path)
         mockNotificationRepository.Verify(x => x.AddNotificationAsync(
             It.Is<Notification>(n =>
                 n.TicketId == ticketId &&
                 n.Message == Notifications.TicketAssignedToYou &&
                 n.UserId == newOperatorUserId)), Times.Once);
 
-        // Verify "ticket assigned" notification for creator and old operator
+        // Verify TicketAssigned notification for creator and old operator (second notification in assignment path)
         mockNotificationRepository.Verify(x => x.AddNotificationAsync(
             It.Is<Notification>(n =>
                 n.TicketId == ticketId &&
                 n.Message == Notifications.TicketAssigned &&
                 n.UserId == newOperatorUserId)), Times.Once);
 
-        // Verify new operator notification link
+        // Verify new operator UserNotification link (from first notification)
         mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(
             It.Is<UserNotification>(un => un.ReceiverUserId == newOperatorUserId)), Times.Once);
 
-        // Verify creator notification link
+        // Verify creator UserNotification link (from second notification)
         mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(
             It.Is<UserNotification>(un => un.ReceiverUserId == creatorUserId)), Times.Once);
 
-        // Total: 1 new operator + 1 creator = 2 user notifications (no old operator)
+        // Total: 1 new operator + 1 creator = 2 UserNotification entries (no old operator since oldAssignedOperator is null)
         mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()),
             Times.Exactly(2));
 
-        // Verify exactly 2 notifications were created
+        // Verify exactly 2 notifications were created (assignment path creates 2 notifications)
         mockNotificationRepository.Verify(x => x.AddNotificationAsync(It.IsAny<Notification>()), Times.Exactly(2));
     }
 
@@ -215,11 +244,11 @@ public sealed class CreateOperatorEditNotificationsAsyncTests
         {
             Id = ticketId,
             CreatorUserId = creatorUserId,
-            OperatorUserId = newOperatorUserId, // New operator assigned
+            OperatorUserId = newOperatorUserId, // Triggers ASSIGNMENT path (ticket.OperatorUserId has value)
             PlatformId = platformId
         };
 
-        Guid? oldAssignedOperator = oldOperatorUserId; // Reassignment scenario
+        Guid? oldAssignedOperator = oldOperatorUserId; // Reassignment scenario (oldAssignedOperator.HasValue == true)
 
         // Setup mocks
         mockNotificationRepository.Setup(x => x.AddNotificationAsync(It.IsAny<Notification>()))
@@ -232,37 +261,37 @@ public sealed class CreateOperatorEditNotificationsAsyncTests
         await controller.CreateOperatorEditNotificationsAsync(ticket, oldAssignedOperator, editorUserId);
 
         // Assert
-        // Verify "assigned to you" notification for new operator
+        // Verify TicketAssignedToYou notification for new operator (first notification in assignment path)
         mockNotificationRepository.Verify(x => x.AddNotificationAsync(
             It.Is<Notification>(n =>
                 n.TicketId == ticketId &&
                 n.Message == Notifications.TicketAssignedToYou &&
                 n.UserId == newOperatorUserId)), Times.Once);
 
-        // Verify "ticket assigned" notification for creator and old operator
+        // Verify TicketAssigned notification for creator and old operator (second notification in assignment path)
         mockNotificationRepository.Verify(x => x.AddNotificationAsync(
             It.Is<Notification>(n =>
                 n.TicketId == ticketId &&
                 n.Message == Notifications.TicketAssigned &&
                 n.UserId == newOperatorUserId)), Times.Once);
 
-        // Verify new operator notification link
+        // Verify new operator UserNotification link (from first notification)
         mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(
             It.Is<UserNotification>(un => un.ReceiverUserId == newOperatorUserId)), Times.Once);
 
-        // Verify creator notification link
+        // Verify creator UserNotification link (from second notification)
         mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(
             It.Is<UserNotification>(un => un.ReceiverUserId == creatorUserId)), Times.Once);
 
-        // Verify old operator notification link
+        // Verify old operator UserNotification link (from second notification, oldAssignedOperator.HasValue condition)
         mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(
             It.Is<UserNotification>(un => un.ReceiverUserId == oldOperatorUserId)), Times.Once);
 
-        // Total: 1 new operator + 1 creator + 1 old operator = 3 user notifications
+        // Total: 1 new operator + 1 creator + 1 old operator = 3 UserNotification entries
         mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()),
             Times.Exactly(3));
 
-        // Verify exactly 2 notifications were created
+        // Verify exactly 2 notifications were created (assignment path always creates 2 notifications)
         mockNotificationRepository.Verify(x => x.AddNotificationAsync(It.IsAny<Notification>()), Times.Exactly(2));
     }
 
@@ -280,13 +309,13 @@ public sealed class CreateOperatorEditNotificationsAsyncTests
         {
             Id = ticketId,
             CreatorUserId = creatorUserId,
-            OperatorUserId = null, // Operator has been unassigned
+            OperatorUserId = null, // Triggers UNASSIGNMENT path (ticket.OperatorUserId is null)
             PlatformId = platformId
         };
 
         var users = new List<User>
         {
-            new() { Id = creatorUserId, Type = UserType.User } // Only regular users, no operators/admins
+            new() { Id = creatorUserId, Type = UserType.User } // Only regular users, no Admin/Operator types for SendNotificationToAllOperators
         };
 
         // Setup mocks
@@ -303,18 +332,19 @@ public sealed class CreateOperatorEditNotificationsAsyncTests
         await controller.CreateOperatorEditNotificationsAsync(ticket, Guid.NewGuid(), editorUserId);
 
         // Assert
-        // Verify unassignment notification was created
+        // Verify TicketUnassigned notification was created with editor as responsible
         mockNotificationRepository.Verify(x => x.AddNotificationAsync(
             It.Is<Notification>(n =>
                 n.TicketId == ticketId &&
                 n.Message == Notifications.TicketUnassigned &&
                 n.UserId == editorUserId)), Times.Once);
 
-        // Verify creator notification link was created
+        // Verify creator was notified (always happens in unassignment path)
         mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(
             It.Is<UserNotification>(un => un.ReceiverUserId == creatorUserId)), Times.Once);
 
-        // No operators to notify, so only 1 user notification (creator)
+        // SendNotificationToAllOperators was called but found no Admin/Operator users to notify
+        // Only 1 UserNotification entry (creator only)
         mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()),
             Times.Exactly(1));
     }
@@ -333,11 +363,11 @@ public sealed class CreateOperatorEditNotificationsAsyncTests
         {
             Id = ticketId,
             CreatorUserId = creatorOperatorUserId,
-            OperatorUserId = creatorOperatorUserId, // Creator becomes operator
+            OperatorUserId = creatorOperatorUserId, // Triggers ASSIGNMENT path, creator and operator are same person
             PlatformId = platformId
         };
 
-        Guid? oldAssignedOperator = null; // First assignment
+        Guid? oldAssignedOperator = null; // First assignment (oldAssignedOperator.HasValue == false)
 
         // Setup mocks
         mockNotificationRepository.Setup(x => x.AddNotificationAsync(It.IsAny<Notification>()))
@@ -361,11 +391,11 @@ public sealed class CreateOperatorEditNotificationsAsyncTests
                 n.Message == Notifications.TicketAssigned &&
                 n.UserId == creatorOperatorUserId)), Times.Once);
 
-        // Should notify the same person twice (as operator and as creator)
+        // Should notify the same person twice (as new operator and as creator) - method doesn't prevent duplicates
         mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(
             It.Is<UserNotification>(un => un.ReceiverUserId == creatorOperatorUserId)), Times.Exactly(2));
 
-        // Total: 2 notifications, 2 user notifications
+        // Total: 2 notifications (assignment path), 2 UserNotification entries (both to same person)
         mockNotificationRepository.Verify(x => x.AddNotificationAsync(It.IsAny<Notification>()), Times.Exactly(2));
         mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()),
             Times.Exactly(2));
@@ -385,11 +415,11 @@ public sealed class CreateOperatorEditNotificationsAsyncTests
         {
             Id = ticketId,
             CreatorUserId = creatorUserId,
-            OperatorUserId = operatorUserId,
+            OperatorUserId = operatorUserId, // Triggers ASSIGNMENT path
             PlatformId = platformId
         };
 
-        Guid? oldAssignedOperator = operatorUserId; // Same operator as current
+        Guid? oldAssignedOperator = operatorUserId; // Same operator as current (oldAssignedOperator.HasValue == true)
 
         // Setup mocks
         mockNotificationRepository.Setup(x => x.AddNotificationAsync(It.IsAny<Notification>()))
@@ -402,7 +432,7 @@ public sealed class CreateOperatorEditNotificationsAsyncTests
         await controller.CreateOperatorEditNotificationsAsync(ticket, oldAssignedOperator, editorUserId);
 
         // Assert
-        // Should still create all notifications, even if old and new operator are the same
+        // Should still create all notifications, even if old and new operator are the same - method doesn't validate this
         mockNotificationRepository.Verify(x => x.AddNotificationAsync(
             It.Is<Notification>(n =>
                 n.Message == Notifications.TicketAssignedToYou &&
@@ -413,15 +443,15 @@ public sealed class CreateOperatorEditNotificationsAsyncTests
                 n.Message == Notifications.TicketAssigned &&
                 n.UserId == operatorUserId)), Times.Once);
 
-        // Verify new operator notification link
+        // Verify operator gets notified twice (as new operator and as old operator)
         mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(
             It.Is<UserNotification>(un => un.ReceiverUserId == operatorUserId)), Times.Exactly(2));
 
-        // Verify creator notification link
+        // Verify creator gets notified once
         mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(
             It.Is<UserNotification>(un => un.ReceiverUserId == creatorUserId)), Times.Once);
 
-        // Total: 2 operator notifications + 1 creator = 3 user notifications
+        // Total: 2 operator notifications + 1 creator = 3 UserNotification entries
         mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()),
             Times.Exactly(3));
     }
@@ -441,11 +471,11 @@ public sealed class CreateOperatorEditNotificationsAsyncTests
         {
             Id = ticketId,
             CreatorUserId = creatorUserId,
-            OperatorUserId = newOperatorUserId,
+            OperatorUserId = newOperatorUserId, // Triggers ASSIGNMENT path
             PlatformId = platformId
         };
 
-        Guid? oldAssignedOperator = Guid.Empty; // Empty GUID should still have HasValue = true
+        Guid? oldAssignedOperator = Guid.Empty; // Empty GUID but HasValue == true, so oldAssignedOperator condition will execute
 
         // Setup mocks
         mockNotificationRepository.Setup(x => x.AddNotificationAsync(It.IsAny<Notification>()))
@@ -458,18 +488,18 @@ public sealed class CreateOperatorEditNotificationsAsyncTests
         await controller.CreateOperatorEditNotificationsAsync(ticket, oldAssignedOperator, editorUserId);
 
         // Assert
-        // Should notify the empty GUID as old operator (even though it's not a valid user)
+        // Should notify the empty GUID as old operator (even though it's not a valid user) - method doesn't validate user IDs
         mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(
             It.Is<UserNotification>(un => un.ReceiverUserId == Guid.Empty)), Times.Once);
 
-        // Should still notify new operator and creator
+        // Should still notify new operator and creator normally
         mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(
             It.Is<UserNotification>(un => un.ReceiverUserId == newOperatorUserId)), Times.Once);
 
         mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(
             It.Is<UserNotification>(un => un.ReceiverUserId == creatorUserId)), Times.Once);
 
-        // Total: 1 new operator + 1 creator + 1 old operator (Guid.Empty) = 3 user notifications
+        // Total: 1 new operator + 1 creator + 1 old operator (Guid.Empty) = 3 UserNotification entries
         mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()),
             Times.Exactly(3));
     }
@@ -487,12 +517,12 @@ public sealed class CreateOperatorEditNotificationsAsyncTests
         {
             Id = ticketId,
             CreatorUserId = creatorEditorUserId,
-            OperatorUserId = operatorUserId,
+            OperatorUserId = operatorUserId, // Triggers ASSIGNMENT path
             PlatformId = platformId
         };
 
         var editorUserId = creatorEditorUserId; // Editor is the creator
-        Guid? oldAssignedOperator = null;
+        Guid? oldAssignedOperator = null; // First assignment (oldAssignedOperator.HasValue == false)
 
         // Setup mocks
         mockNotificationRepository.Setup(x => x.AddNotificationAsync(It.IsAny<Notification>()))
@@ -505,20 +535,20 @@ public sealed class CreateOperatorEditNotificationsAsyncTests
         await controller.CreateOperatorEditNotificationsAsync(ticket, oldAssignedOperator, editorUserId);
 
         // Assert
-        // Should create notifications with editor as responsible (who is also the creator)
+        // Should create notifications with new operator as responsible (assignment path uses ticket.OperatorUserId.Value)
         mockNotificationRepository.Verify(x => x.AddNotificationAsync(
                 It.Is<Notification>(n =>
-                    n.UserId == operatorUserId)),
-            Times.Exactly(2)); // Both notifications should have operator as responsible
+                    n.UserId == operatorUserId)), // Both notifications in assignment path use new operator as responsible
+            Times.Exactly(2));
 
-        // Should notify operator and creator (same person gets notified as creator)
+        // Should notify operator and creator (who is also the editor)
         mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(
             It.Is<UserNotification>(un => un.ReceiverUserId == operatorUserId)), Times.Once);
 
         mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(
             It.Is<UserNotification>(un => un.ReceiverUserId == creatorEditorUserId)), Times.Once);
 
-        // Total: 2 user notifications
+        // Total: 2 UserNotification entries (1 operator + 1 creator/editor)
         mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()),
             Times.Exactly(2));
     }

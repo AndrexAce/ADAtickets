@@ -31,14 +31,32 @@ namespace ADAtickets.Tests.Controllers.NotificationsController;
 
 /// <summary>
 ///     Tests for <see cref="Controller.CreateCreationNotificationsAsync(Ticket)" />.
+///     This method handles ticket creation notifications with the following logic:
 ///     <list type="number">
-///         <item>No operators with preferred platform -> notifies all operators</item>
-///         <item>Operators with preferred platform but no valid users -> notifies all operators</item>
-///         <item>Operators with preferred platform and valid user with least workload -> auto-assigns</item>
-///         <item>Multiple operators with different workloads -> selects least workload</item>
-///         <item>Operators with same workload -> selects first one</item>
-///         <item>No operators in system edge case -> creates only initial notification</item>
-///         <item>Operator with empty Guid ID edge case -> notifies all operators</item>
+///         <item>Always creates an initial "TicketCreated" notification with the creator as responsible</item>
+///         <item>Searches for UserPlatform entries matching the ticket's platform ID</item>
+///         <item>If platform preferences exist:
+///             <list type="bullet">
+///                 <item>Performs LINQ join between UserPlatform entries and all users by UserId</item>
+///                 <item>Orders joined results by user.AssignedTickets.Count ascending</item>
+///                 <item>Selects the first operator ID (least workload, or first if tied)</item>
+///                 <item>If valid operator found (non-Guid.Empty): auto-assigns with 3 notifications total</item>
+///                 <item>If no valid operator (Guid.Empty): falls back to SendNotificationToAllOperators</item>
+///             </list>
+///         </item>
+///         <item>If no platform preferences exist: calls SendNotificationToAllOperators immediately</item>
+///         <item>SendNotificationToAllOperators notifies all users with Type == Admin || Type == Operator</item>
+///         <item>Returns assigned operator's ID on successful auto-assignment, null otherwise</item>
+///     </list>
+///     Test scenarios covered:
+///     <list type="number">
+///         <item>No UserPlatform entries for ticket's platform -> SendNotificationToAllOperators called</item>
+///         <item>UserPlatform entries exist but LINQ join yields no matches -> SendNotificationToAllOperators called</item>
+///         <item>Valid operator found via join -> auto-assigns with full notification chain (3 notifications)</item>
+///         <item>Multiple operators with different AssignedTickets.Count -> selects minimum count</item>
+///         <item>Multiple operators with same AssignedTickets.Count -> FirstOrDefault behavior</item>
+///         <item>No Admin/Operator users exist -> SendNotificationToAllOperators finds no targets</item>
+///         <item>LINQ join succeeds but FirstOrDefault returns Guid.Empty -> SendNotificationToAllOperators fallback</item>
 ///     </list>
 /// </summary>
 public sealed class CreateCreationNotificationsAsyncTests
@@ -90,10 +108,10 @@ public sealed class CreateCreationNotificationsAsyncTests
         {
             new() { Id = Guid.NewGuid(), Type = UserType.Operator },
             new() { Id = Guid.NewGuid(), Type = UserType.Admin },
-            new() { Id = Guid.NewGuid(), Type = UserType.User } // Should not be notified
+            new() { Id = Guid.NewGuid(), Type = UserType.User } // Should not be notified by SendNotificationToAllOperators
         };
 
-        // No operators with preferred platform
+        // No UserPlatform entries for this platform - triggers immediate SendNotificationToAllOperators call
         var emptyUserPlatforms = new List<UserPlatform>();
 
         // Setup mocks
@@ -115,20 +133,20 @@ public sealed class CreateCreationNotificationsAsyncTests
         var result = await controller.CreateCreationNotificationsAsync(ticket);
 
         // Assert
-        Assert.Null(result); // Should return null when no auto-assignment occurs
+        Assert.Null(result); // Should return null when SendNotificationToAllOperators path is taken
 
-        // Verify initial ticket created notification
+        // Verify initial TicketCreated notification with creator as responsible
         mockNotificationRepository.Verify(x => x.AddNotificationAsync(
             It.Is<Notification>(n =>
                 n.TicketId == ticketId &&
                 n.Message == Notifications.TicketCreated &&
                 n.UserId == creatorUserId)), Times.Once);
 
-        // Verify all operators (Admin + Operator types) were notified - should be 2 notifications
+        // Verify SendNotificationToAllOperators was called - should notify Admin + Operator types (2 notifications)
         mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()),
             Times.Exactly(2));
 
-        // Verify no additional notifications were created (only the initial one)
+        // Verify only the initial notification was created (no auto-assignment notifications)
         mockNotificationRepository.Verify(x => x.AddNotificationAsync(It.IsAny<Notification>()), Times.Once);
     }
 
@@ -150,19 +168,13 @@ public sealed class CreateCreationNotificationsAsyncTests
 
         var userPlatforms = new List<UserPlatform>
         {
-            new() { UserId = Guid.NewGuid(), PlatformId = platformId }
+            new() { UserId = Guid.NewGuid(), PlatformId = platformId } // UserPlatform exists but...
         };
 
         var allUsers = new List<User>
         {
-            new() { Id = Guid.NewGuid(), Type = UserType.User }, // Different user, won't match join
-            new() { Id = Guid.NewGuid(), Type = UserType.Operator }
-        };
-
-        var allOperators = new List<User>
-        {
-            new() { Id = Guid.NewGuid(), Type = UserType.Operator },
-            new() { Id = Guid.NewGuid(), Type = UserType.Admin }
+            new() { Id = Guid.NewGuid(), Type = UserType.User }, // Different UserId - LINQ join will fail
+            new() { Id = Guid.NewGuid(), Type = UserType.Operator } // Different UserId - LINQ join will fail
         };
 
         // Setup mocks
@@ -184,20 +196,20 @@ public sealed class CreateCreationNotificationsAsyncTests
         var result = await controller.CreateCreationNotificationsAsync(ticket);
 
         // Assert
-        Assert.Null(result); // Should return null when no valid operator found
+        Assert.Null(result); // Should return null when LINQ join yields no results and falls back to SendNotificationToAllOperators
 
-        // Verify initial ticket created notification
+        // Verify initial TicketCreated notification with creator as responsible
         mockNotificationRepository.Verify(x => x.AddNotificationAsync(
             It.Is<Notification>(n =>
                 n.TicketId == ticketId &&
                 n.Message == Notifications.TicketCreated &&
                 n.UserId == creatorUserId)), Times.Once);
 
-        // Verify SendNotificationToAllOperators was called (operators from second call to GetUsersAsync)
+        // Verify SendNotificationToAllOperators was called - but only 1 operator in allUsers matches Admin/Operator filter
         mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()),
-            Times.Exactly(1)); // Only operators from allUsers
+            Times.Exactly(1));
 
-        // Verify only the initial notification was created
+        // Verify only the initial notification was created (no auto-assignment occurred)
         mockNotificationRepository.Verify(x => x.AddNotificationAsync(It.IsAny<Notification>()), Times.Once);
     }
 
@@ -219,12 +231,12 @@ public sealed class CreateCreationNotificationsAsyncTests
 
         var userPlatforms = new List<UserPlatform>
         {
-            new() { UserId = operatorUserId, PlatformId = platformId }
+            new() { UserId = operatorUserId, PlatformId = platformId } // UserPlatform exists and...
         };
 
         var allUsers = new List<User>
         {
-            new() { Id = operatorUserId, Type = UserType.Operator } // Empty workload
+            new() { Id = operatorUserId, Type = UserType.Operator } // Matching UserId - LINQ join succeeds, AssignedTickets.Count = 0
         };
 
         // Setup mocks
@@ -246,37 +258,37 @@ public sealed class CreateCreationNotificationsAsyncTests
         var result = await controller.CreateCreationNotificationsAsync(ticket);
 
         // Assert
-        Assert.Equal(operatorUserId, result); // Should return the assigned operator's ID
+        Assert.Equal(operatorUserId, result); // Should return the auto-assigned operator's ID
 
-        // Verify initial ticket created notification
+        // Verify initial TicketCreated notification with creator as responsible
         mockNotificationRepository.Verify(x => x.AddNotificationAsync(
             It.Is<Notification>(n =>
                 n.TicketId == ticketId &&
                 n.Message == Notifications.TicketCreated &&
                 n.UserId == creatorUserId)), Times.Once);
 
-        // Verify system assignment notification for operator
+        // Verify TicketAssignedToYouBySystem notification with operator as responsible
         mockNotificationRepository.Verify(x => x.AddNotificationAsync(
             It.Is<Notification>(n =>
                 n.TicketId == ticketId &&
                 n.Message == Notifications.TicketAssignedToYouBySystem &&
                 n.UserId == operatorUserId)), Times.Once);
 
-        // Verify ticket assigned notification for creator
+        // Verify TicketAssigned notification with operator as responsible (for creator)
         mockNotificationRepository.Verify(x => x.AddNotificationAsync(
             It.Is<Notification>(n =>
                 n.TicketId == ticketId &&
                 n.Message == Notifications.TicketAssigned &&
                 n.UserId == operatorUserId)), Times.Once);
 
-        // Verify user notifications were created (operator about creation + operator about assignment + creator about assignment)
+        // Verify UserNotification entries: operator gets 2 (creation + assignment), creator gets 1 (assignment)
         mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(
             It.Is<UserNotification>(un => un.ReceiverUserId == operatorUserId)), Times.Exactly(2));
 
         mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(
             It.Is<UserNotification>(un => un.ReceiverUserId == creatorUserId)), Times.Once);
 
-        // Total: 3 notifications, 3 user notification links
+        // Total: 3 notifications created, 3 UserNotification entries created
         mockNotificationRepository.Verify(x => x.AddNotificationAsync(It.IsAny<Notification>()), Times.Exactly(3));
         mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()),
             Times.Exactly(3));
@@ -309,15 +321,15 @@ public sealed class CreateCreationNotificationsAsyncTests
 
         var allUsers = new List<User>
         {
-            new() { Id = operator1Id, Type = UserType.Operator }, // 2 tickets
-            new() { Id = operator2Id, Type = UserType.Operator }, // 0 tickets - should be selected
-            new() { Id = operator3Id, Type = UserType.Operator } // 1 ticket
+            new() { Id = operator1Id, Type = UserType.Operator }, // Will have 2 AssignedTickets.Count
+            new() { Id = operator2Id, Type = UserType.Operator }, // Will have 0 AssignedTickets.Count - should be selected by orderby
+            new() { Id = operator3Id, Type = UserType.Operator } // Will have 1 AssignedTickets.Count
         };
 
-        // Add 2 tickets to operator1
+        // Simulate different workloads by adding tickets to AssignedTickets collections
         allUsers[0].AssignedTickets.Add(new Ticket());
         allUsers[0].AssignedTickets.Add(new Ticket());
-        // Add 1 ticket to operator3
+        // operator2 has 0 tickets (default)
         allUsers[2].AssignedTickets.Add(new Ticket());
 
         // Setup mocks
@@ -339,9 +351,9 @@ public sealed class CreateCreationNotificationsAsyncTests
         var result = await controller.CreateCreationNotificationsAsync(ticket);
 
         // Assert
-        Assert.Equal(operator2Id, result); // Should return operator2 (least workload)
+        Assert.Equal(operator2Id, result); // Should return operator2 (AssignedTickets.Count = 0, minimum)
 
-        // Verify notifications were created for the correct operator
+        // Verify auto-assignment notifications were created for the operator with least workload
         mockNotificationRepository.Verify(x => x.AddNotificationAsync(
             It.Is<Notification>(n =>
                 n.Message == Notifications.TicketAssignedToYouBySystem &&
@@ -378,10 +390,10 @@ public sealed class CreateCreationNotificationsAsyncTests
 
         var allUsers = new List<User>
         {
-            new() { Id = operator1Id, Type = UserType.Operator }, // 1 ticket
-            new() { Id = operator2Id, Type = UserType.Operator } // 1 ticket (same workload)
+            new() { Id = operator1Id, Type = UserType.Operator }, // Will have 1 AssignedTickets.Count
+            new() { Id = operator2Id, Type = UserType.Operator } // Will have 1 AssignedTickets.Count (same as operator1)
         };
-        // Add 1 ticket to both operators to simulate same workload
+        // Simulate same workload - both operators have 1 assigned ticket
         allUsers[0].AssignedTickets.Add(new Ticket());
         allUsers[1].AssignedTickets.Add(new Ticket());
 
@@ -404,9 +416,9 @@ public sealed class CreateCreationNotificationsAsyncTests
         var result = await controller.CreateCreationNotificationsAsync(ticket);
 
         // Assert
-        Assert.Equal(operator1Id, result); // Should return the first operator (FirstOrDefault behavior)
+        Assert.Equal(operator1Id, result); // Should return operator1 (FirstOrDefault when orderby results in tie)
 
-        // Verify notifications were created for the first operator
+        // Verify auto-assignment notifications were created for the first operator in the ordered sequence
         mockNotificationRepository.Verify(x => x.AddNotificationAsync(
             It.Is<Notification>(n =>
                 n.Message == Notifications.TicketAssignedToYouBySystem &&
@@ -431,7 +443,7 @@ public sealed class CreateCreationNotificationsAsyncTests
         var emptyUserPlatforms = new List<UserPlatform>();
         var onlyRegularUsers = new List<User>
         {
-            new() { Id = Guid.NewGuid(), Type = UserType.User }, // Only regular users, no operators
+            new() { Id = Guid.NewGuid(), Type = UserType.User }, // Regular users won't be notified by SendNotificationToAllOperators
             new() { Id = creatorUserId, Type = UserType.User }
         };
 
@@ -454,20 +466,20 @@ public sealed class CreateCreationNotificationsAsyncTests
         var result = await controller.CreateCreationNotificationsAsync(ticket);
 
         // Assert
-        Assert.Null(result); // Should return null when no operators exist
+        Assert.Null(result); // Should return null when SendNotificationToAllOperators path is taken
 
-        // Verify only the initial ticket created notification
+        // Verify only the initial TicketCreated notification with creator as responsible
         mockNotificationRepository.Verify(x => x.AddNotificationAsync(
             It.Is<Notification>(n =>
                 n.TicketId == ticketId &&
                 n.Message == Notifications.TicketCreated &&
                 n.UserId == creatorUserId)), Times.Once);
 
-        // Verify no user notifications were created (no operators to notify)
+        // Verify SendNotificationToAllOperators was called but found no Admin/Operator users to notify
         mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()),
             Times.Never);
 
-        // Verify only one notification was created total
+        // Verify only one notification was created (no auto-assignment, no operator notifications)
         mockNotificationRepository.Verify(x => x.AddNotificationAsync(It.IsAny<Notification>()), Times.Once);
     }
 
@@ -488,13 +500,13 @@ public sealed class CreateCreationNotificationsAsyncTests
 
         var userPlatforms = new List<UserPlatform>
         {
-            new() { UserId = Guid.Empty, PlatformId = platformId } // Invalid user ID
+            new() { UserId = Guid.Empty, PlatformId = platformId } // UserPlatform with invalid UserId
         };
 
         var allUsers = new List<User>
         {
-            new() { Id = Guid.Empty, Type = UserType.Operator }, // Should be skipped due to Guid.Empty
-            new() { Id = Guid.NewGuid(), Type = UserType.Operator }
+            new() { Id = Guid.Empty, Type = UserType.Operator }, // LINQ join will succeed but FirstOrDefault returns Guid.Empty
+            new() { Id = Guid.NewGuid(), Type = UserType.Operator } // This will be notified by SendNotificationToAllOperators
         };
 
         // Setup mocks
@@ -516,18 +528,18 @@ public sealed class CreateCreationNotificationsAsyncTests
         var result = await controller.CreateCreationNotificationsAsync(ticket);
 
         // Assert
-        Assert.Null(result); // Should return null when operatorWithLeastWorkload is Guid.Empty
+        Assert.Null(result); // Should return null when operatorWithLeastWorkload == Guid.Empty triggers fallback
 
-        // Verify initial notification was created
+        // Verify initial TicketCreated notification was created
         mockNotificationRepository.Verify(x => x.AddNotificationAsync(
             It.Is<Notification>(n =>
                 n.Message == Notifications.TicketCreated)), Times.Once);
 
-        // Verify SendNotificationToAllOperators was called (should notify all the operators)
+        // Verify SendNotificationToAllOperators was called - should notify both Operator users (including Guid.Empty)
         mockUserNotificationRepository.Verify(x => x.AddUserNotificationAsync(It.IsAny<UserNotification>()),
             Times.Exactly(2));
 
-        // Verify no auto-assignment notifications were created
+        // Verify no auto-assignment notifications were created (fallback path taken)
         mockNotificationRepository.Verify(x => x.AddNotificationAsync(
             It.Is<Notification>(n =>
                 n.Message == Notifications.TicketAssignedToYouBySystem)), Times.Never);
