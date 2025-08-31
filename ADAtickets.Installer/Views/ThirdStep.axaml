@@ -64,22 +64,22 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 </StackPanel>
                 <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
                     <TextBlock Text="{x:Static assets:Resources.WebAuthCertificatePathLabel}" FontFamily="Segoe UI" />
-                    <TextBox Text="{Binding WebAuthCertificatePath}" Watermark="/path/to/certificate.pfx"
+                    <TextBox Text="{Binding WebAuthCertificatePath}" Watermark="{x:Static assets:Resources.CertificatePathWatermark}"
                              HorizontalAlignment="Stretch" Width="NaN" />
                 </StackPanel>
                 <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
                     <TextBlock Text="{x:Static assets:Resources.WebAuthCertificatePasswordLabel}" FontFamily="Segoe UI" />
-                    <TextBox Text="{Binding WebAuthCertificatePassword}" PasswordChar="•" HorizontalAlignment="Stretch"
+                    <TextBox Text="{Binding WebAuthCertificatePassword}" Watermark="{x:Static assets:Resources.PasswordWatermark}" HorizontalAlignment="Stretch"
                              Width="NaN" />
                 </StackPanel>
                 <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
                     <TextBlock Text="{x:Static assets:Resources.ApiAuthCertificatePathLabel}" FontFamily="Segoe UI" />
-                    <TextBox Text="{Binding ApiAuthCertificatePath}" Watermark="/path/to/certificate.pfx"
+                    <TextBox Text="{Binding ApiAuthCertificatePath}" Watermark="{x:Static assets:Resources.CertificatePathWatermark}"
                              HorizontalAlignment="Stretch" Width="NaN" />
                 </StackPanel>
                 <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
                     <TextBlock Text="{x:Static assets:Resources.ApiAuthCertificatePasswordLabel}" FontFamily="Segoe UI" />
-                    <TextBox Text="{Binding ApiAuthCertificatePassword}" PasswordChar="•" HorizontalAlignment="Stretch"
+                    <TextBox Text="{Binding ApiAuthCertificatePassword}" Watermark="{x:Static assets:Resources.PasswordWatermark}" HorizontalAlignment="Stretch"
                              Width="NaN" />
                 </StackPanel>
             </UniformGrid>

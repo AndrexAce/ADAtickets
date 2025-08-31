@@ -124,11 +124,29 @@ namespace ADAtickets.Installer.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to username.
+        /// </summary>
+        public static string BasicUsernameWatermark {
+            get {
+                return ResourceManager.GetString("BasicUsernameWatermark", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Pulling cache container....
         /// </summary>
         public static string CacheContainerPull {
             get {
                 return ResourceManager.GetString("CacheContainerPull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /path/to/certificate.pfx.
+        /// </summary>
+        public static string CertificatePathWatermark {
+            get {
+                return ResourceManager.GetString("CertificatePathWatermark", resourceCulture);
             }
         }
         
@@ -309,6 +327,15 @@ namespace ADAtickets.Installer.Assets {
         public static string Next {
             get {
                 return ResourceManager.GetString("Next", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to password.
+        /// </summary>
+        public static string PasswordWatermark {
+            get {
+                return ResourceManager.GetString("PasswordWatermark", resourceCulture);
             }
         }
         

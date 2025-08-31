@@ -158,14 +158,6 @@ internal partial class LastStep : UserControl
             $"SSLCERTIFICATEPASSWORD={viewModel.SslCertificatePassword}", RegexOptions.Compiled | RegexOptions.Multiline,
             TimeSpan.FromMilliseconds(100));
 
-        // App tag
-        var apiTag = await Dispatcher.UIThread.InvokeAsync(() => viewModel.ApiVersion?.Content?.ToString());
-        fileContent = Regex.Replace(fileContent, "^APITAG=.*$", $"APITAG={apiTag}", RegexOptions.Compiled | RegexOptions.Multiline,
-            TimeSpan.FromMilliseconds(100));
-        var webTag = await Dispatcher.UIThread.InvokeAsync(() => viewModel.WebVersion?.Content?.ToString());
-        fileContent = Regex.Replace(fileContent, "^WEBTAG=.*$", $"WEBTAG={webTag}", RegexOptions.Compiled | RegexOptions.Multiline,
-            TimeSpan.FromMilliseconds(100));
-
         // DevOps configuration
         fileContent = Regex.Replace(fileContent, "^DEVOPSORGANIZATIONNAME=.*$",
             $"DEVOPSORGANIZATIONNAME={viewModel.DevOpsOrganizationName}", RegexOptions.Compiled | RegexOptions.Multiline,
@@ -303,7 +295,7 @@ internal partial class LastStep : UserControl
                     new ImagesCreateParameters
                     {
                         FromImage = "ghcr.io/andrexace/adatickets-api",
-                        Tag = await Dispatcher.UIThread.InvokeAsync(() => viewModel.ApiVersion?.Content?.ToString())
+                        Tag = "latest"
                     },
                     null,
                     new Progress<JSONMessage>(),
@@ -333,7 +325,7 @@ internal partial class LastStep : UserControl
                     new ImagesCreateParameters
                     {
                         FromImage = "ghcr.io/andrexace/adatickets-web",
-                        Tag = await Dispatcher.UIThread.InvokeAsync(() => viewModel.WebVersion?.Content?.ToString())
+                        Tag = "latest"
                     },
                     null,
                     new Progress<JSONMessage>(),

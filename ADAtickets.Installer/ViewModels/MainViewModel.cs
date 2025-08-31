@@ -37,7 +37,6 @@ internal sealed class MainViewModel : ReactiveObject
     private string? _apiAppId;
     private string? _apiAuthCertificatePassword;
     private string? _apiAuthCertificatePath;
-    private ComboBoxItem? _apiVersion;
     private UserControl _currentView;
     private string? _dbPassword;
     private string? _dbUserName;
@@ -57,7 +56,6 @@ internal sealed class MainViewModel : ReactiveObject
     private string? _webAppId;
     private string? _webAuthCertificatePassword;
     private string? _webAuthCertificatePath;
-    private ComboBoxItem? _webVersion;
 
     public MainViewModel()
     {
@@ -88,7 +86,7 @@ internal sealed class MainViewModel : ReactiveObject
 
     [Required(ErrorMessageResourceType = typeof(Resources),
         ErrorMessageResourceName = "FieldRequired")]
-    [RegularExpression(@"^[a-zA-Z0-9\/\\_.~:-]+$",
+    [RegularExpression(@"^[a-zA-Z0-9\/\\_.~:-]+\.pfx$",
         ErrorMessageResourceType = typeof(Resources),
         ErrorMessageResourceName = "InvalidPath")]
     public string? SslCertificatePath
@@ -103,22 +101,6 @@ internal sealed class MainViewModel : ReactiveObject
     {
         get => _sslCertificatePassword;
         set => this.RaiseAndSetIfChanged(ref _sslCertificatePassword, value);
-    }
-
-    [Required(ErrorMessageResourceType = typeof(Resources),
-        ErrorMessageResourceName = "FieldRequired")]
-    public ComboBoxItem? ApiVersion
-    {
-        get => _apiVersion;
-        set => this.RaiseAndSetIfChanged(ref _apiVersion, value);
-    }
-
-    [Required(ErrorMessageResourceType = typeof(Resources),
-        ErrorMessageResourceName = "FieldRequired")]
-    public ComboBoxItem? WebVersion
-    {
-        get => _webVersion;
-        set => this.RaiseAndSetIfChanged(ref _webVersion, value);
     }
 
     [Required(ErrorMessageResourceType = typeof(Resources),
@@ -227,7 +209,7 @@ internal sealed class MainViewModel : ReactiveObject
 
     [Required(ErrorMessageResourceType = typeof(Resources),
         ErrorMessageResourceName = "FieldRequired")]
-    [RegularExpression(@"^[a-zA-Z0-9\/\\_.~:-]+$",
+    [RegularExpression(@"^[a-zA-Z0-9\/\\_.~:-]+\.pfx$",
         ErrorMessageResourceType = typeof(Resources),
         ErrorMessageResourceName = "InvalidPath")]
     public string? ApiAuthCertificatePath
@@ -246,7 +228,7 @@ internal sealed class MainViewModel : ReactiveObject
 
     [Required(ErrorMessageResourceType = typeof(Resources),
         ErrorMessageResourceName = "FieldRequired")]
-    [RegularExpression(@"^[a-zA-Z0-9\/\\_.~:-]+$",
+    [RegularExpression(@"^[a-zA-Z0-9\/\\_.~:-]+\.pfx$",
         ErrorMessageResourceType = typeof(Resources),
         ErrorMessageResourceName = "InvalidPath")]
     public string? WebAuthCertificatePath
@@ -368,12 +350,6 @@ internal sealed class MainViewModel : ReactiveObject
 
         context.MemberName = nameof(SslCertificatePassword);
         isValid &= Validator.TryValidateProperty(SslCertificatePassword, context, []);
-
-        context.MemberName = nameof(ApiVersion);
-        isValid &= Validator.TryValidateProperty(ApiVersion, context, []);
-
-        context.MemberName = nameof(WebVersion);
-        isValid &= Validator.TryValidateProperty(WebVersion, context, []);
 
         return isValid;
     }

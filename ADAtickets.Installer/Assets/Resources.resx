@@ -249,4 +249,13 @@
   <data name="BasicAuthPasswordLabel" xml:space="preserve">
     <value>Basic auth password:</value>
   </data>
+  <data name="PasswordWatermark" xml:space="preserve">
+    <value>password</value>
+  </data>
+  <data name="BasicUsernameWatermark" xml:space="preserve">
+    <value>username</value>
+  </data>
+  <data name="CertificatePathWatermark" xml:space="preserve">
+    <value>/path/to/certificate.pfx</value>
+  </data>
 </root>
