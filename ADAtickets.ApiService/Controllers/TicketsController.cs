@@ -310,7 +310,7 @@ public sealed class TicketsController(
 
         await AutoAssignTicketAsync(ticket, chosenOperatorId);
 
-        await editsController.CreateCreationEntriesAsync(ticket, chosenOperatorId);
+        await editsController.CreateCreationEntriesAsync(ticket, chosenOperatorId ?? ticket.OperatorUserId);
 
         if (includeAzureDevOpsOperations == true)
         {
