@@ -66,7 +66,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             }
         </FluentStack>
     }
-    @if (isReplyEnabled)
+    @if (isReplyEnabled && AllowReply)
     {
         <FluentStack Orientation="Orientation.Horizontal">
             <FluentTextField Placeholder="@loc["ReplyTextFieldPlaceholder"]" Spellcheck="true" Style="width: stretch;" @bind-Value="replyText"></FluentTextField>
@@ -78,6 +78,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @code {
     [Parameter]
     public required TicketResponseDto Ticket { get; set; }
+
+    [Parameter]
+    public bool AllowReply { get; set; }
 
     private IEnumerable<ReplyResponseDto>? replies;
     private string? replyText;

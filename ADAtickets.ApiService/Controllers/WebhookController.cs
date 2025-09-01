@@ -23,7 +23,6 @@ using ADAtickets.Shared.Dtos.Responses;
 using ADAtickets.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualStudio.Services.Common;
 using System.Globalization;
 using System.Net;
 using System.Net.Mime;
@@ -132,7 +131,7 @@ public sealed class WebhookController(
 
         // Check if ticket exists for this work item
         var existingTicket = (await ticketRepository.GetTicketsByAsync(
-            new Dictionary<string, string> { { nameof(Ticket.WorkItemId), payload.Resource.Id!.Value.ToString() } }
+            new Dictionary<string, string> { { nameof(Ticket.WorkItemId), payload.Resource.Revision.Id!.Value.ToString() } }
         )).FirstOrDefault();
 
         if (existingTicket is null)
@@ -180,7 +179,7 @@ public sealed class WebhookController(
         }
 
         // Check if this work item was edited by ADAtickets API to avoid infinite loops
-        if (IsUpdatedByADAtickets(payload))
+        if (IsDeletedByADAtickets(payload))
         {
             return Ok();
         }
@@ -252,54 +251,61 @@ public sealed class WebhookController(
     {
         return payload.EventType == "workitem.created"
                && payload.Resource.Id.HasValue
-               && payload.Resource.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.Fields.CreatedDate)
-               && payload.Resource.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.Fields.CreatedBy)
-               && payload.Resource.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.Fields.TeamProject)
-               && payload.Resource.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.Fields.WorkItemType)
-               && payload.Resource.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.Fields.Title)
-               && payload.Resource.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.Fields.Description)
-               && payload.Resource.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.Fields.Priority)
-               && payload.Resource.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.Fields.State);
+               && payload.Resource.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.WorkItemFields.CreatedDate)
+               && payload.Resource.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.WorkItemFields.CreatedBy)
+               && payload.Resource.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.WorkItemFields.TeamProject)
+               && payload.Resource.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.WorkItemFields.WorkItemType)
+               && payload.Resource.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.WorkItemFields.Title)
+               && payload.Resource.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.WorkItemFields.Description)
+               && payload.Resource.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.WorkItemFields.Priority)
+               && payload.Resource.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.WorkItemFields.State);
     }
 
     private static bool IsUpdatePayloadValid(AzureDevOpsWebHookResponseDto payload)
     {
         return payload.EventType == "workitem.updated"
                && payload.Resource.Id.HasValue
-               && payload.Resource.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.Fields.ChangedBy)
-               && payload.Resource.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.Fields.TeamProject)
-               && payload.Resource.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.Fields.WorkItemType)
-               && payload.Resource.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.Fields.Title)
-               && payload.Resource.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.Fields.Description)
-               && payload.Resource.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.Fields.Priority)
-               && payload.Resource.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.Fields.State);
+               && payload.Resource.Revision.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.WorkItemFields.ChangedBy)
+               && payload.Resource.Revision.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.WorkItemFields.TeamProject)
+               && payload.Resource.Revision.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.WorkItemFields.WorkItemType)
+               && payload.Resource.Revision.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.WorkItemFields.Title)
+               && payload.Resource.Revision.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.WorkItemFields.Description)
+               && payload.Resource.Revision.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.WorkItemFields.Priority)
+               && payload.Resource.Revision.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.WorkItemFields.State);
     }
 
     private static bool IsDeletePayloadValid(AzureDevOpsWebHookResponseDto payload)
     {
         return payload.EventType == "workitem.deleted"
                && payload.Resource.Id.HasValue
-               && payload.Resource.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.Fields.ChangedBy);
+               && payload.Resource.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.WorkItemFields.ChangedBy);
     }
 
     private static bool IsRepliedPayloadValid(AzureDevOpsWebHookResponseDto payload)
     {
         return payload.EventType == "workitem.commented"
                && payload.Resource.Id.HasValue
-               && payload.Resource.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.Fields.ChangedBy)
-               && payload.Resource.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.Fields.TeamProject);
+               && payload.Resource.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.WorkItemFields.ChangedBy)
+               && payload.Resource.Fields.ContainsKey(AzureDevOpsWebHookResponseDto.WorkItemFields.TeamProject);
     }
 
     private bool IsCreatedByADAtickets(AzureDevOpsWebHookResponseDto payload)
     {
-        var createdBy = payload.Resource.Fields[AzureDevOpsWebHookResponseDto.Fields.CreatedBy].ToString()!;
+        var createdBy = payload.Resource.Fields[AzureDevOpsWebHookResponseDto.WorkItemFields.CreatedBy].ToString()!;
 
         return IsADATicketsServicePrincipal(createdBy);
     }
 
     private bool IsUpdatedByADAtickets(AzureDevOpsWebHookResponseDto payload)
     {
-        var changedBy = payload.Resource.Fields[AzureDevOpsWebHookResponseDto.Fields.ChangedBy].ToString()!;
+        var changedBy = payload.Resource.Revision.Fields[AzureDevOpsWebHookResponseDto.WorkItemFields.ChangedBy].ToString()!;
+
+        return IsADATicketsServicePrincipal(changedBy);
+    }
+
+    private bool IsDeletedByADAtickets(AzureDevOpsWebHookResponseDto payload)
+    {
+        var changedBy = payload.Resource.Fields[AzureDevOpsWebHookResponseDto.WorkItemFields.ChangedBy].ToString()!;
 
         return IsADATicketsServicePrincipal(changedBy);
     }
@@ -317,25 +323,27 @@ public sealed class WebhookController(
 
         // Find the platform by project name
         var platforms = await platformRepository.GetPlatformsAsync();
-        var platform = platforms.First(p => p.Name == workItem.Fields[AzureDevOpsWebHookResponseDto.Fields.TeamProject].ToString());
+        var platform = platforms.First(p => p.Name == workItem.Fields[AzureDevOpsWebHookResponseDto.WorkItemFields.TeamProject].ToString());
 
         // Find the users by user email
         var users = await userRepository.GetUsersAsync();
-        var creatorUser = users.First(u => workItem.Fields[AzureDevOpsWebHookResponseDto.Fields.CreatedBy].ToString()!.Contains(u.Email));
-        var operatorUser = users.FirstOrDefault(u => (workItem.Fields.GetValueOrDefault(AzureDevOpsWebHookResponseDto.Fields.AssignedTo)?.ToString() ?? "").Contains(u.Email));
+        var creatorUser = users.First(u => workItem.Fields[AzureDevOpsWebHookResponseDto.WorkItemFields.CreatedBy].ToString()!.Contains(u.Email));
+        var operatorUser = users.FirstOrDefault(u => (workItem.Fields.TryGetValue(AzureDevOpsWebHookResponseDto.WorkItemFields.AssignedTo, out object? value)
+            ? value?.ToString() ?? ""
+            : "").Contains(u.Email));
 
         // Clean the description from HTML and Markdown
-        var rawDescription = workItem.Fields[AzureDevOpsWebHookResponseDto.Fields.Description].ToString()!;
+        var rawDescription = workItem.Fields[AzureDevOpsWebHookResponseDto.WorkItemFields.Description].ToString()!;
         var cleanDescription = SanitizeText(rawDescription);
 
         // Map work item to ticket
         var newTicket = new Ticket
         {
-            Type = MapTypeFromDevOps(workItem.Fields[AzureDevOpsWebHookResponseDto.Fields.WorkItemType].ToString()!),
-            CreationDateTime = DateTimeOffset.Parse(workItem.Fields[AzureDevOpsWebHookResponseDto.Fields.CreatedDate].ToString()!, CultureInfo.InvariantCulture),
-            Title = workItem.Fields[AzureDevOpsWebHookResponseDto.Fields.Title].ToString()!,
+            Type = MapTypeFromDevOps(workItem.Fields[AzureDevOpsWebHookResponseDto.WorkItemFields.WorkItemType].ToString()!),
+            CreationDateTime = DateTimeOffset.Parse(workItem.Fields[AzureDevOpsWebHookResponseDto.WorkItemFields.CreatedDate].ToString()!, CultureInfo.InvariantCulture),
+            Title = workItem.Fields[AzureDevOpsWebHookResponseDto.WorkItemFields.Title].ToString()!,
             Description = cleanDescription,
-            Priority = MapPriorityFromDevOps(int.Parse(workItem.Fields[AzureDevOpsWebHookResponseDto.Fields.Priority].ToString()!)),
+            Priority = MapPriorityFromDevOps(int.Parse(workItem.Fields[AzureDevOpsWebHookResponseDto.WorkItemFields.Priority].ToString()!)),
             Status = operatorUser is null ? Status.Unassigned : Status.WaitingOperator,
             WorkItemId = workItem.Id!.Value,
             PlatformId = platform.Id,
@@ -354,22 +362,24 @@ public sealed class WebhookController(
 
         // Find the platform by project name
         var platforms = await platformRepository.GetPlatformsAsync();
-        var platform = platforms.First(p => p.Name == workItem.Fields[AzureDevOpsWebHookResponseDto.Fields.TeamProject].ToString());
+        var platform = platforms.First(p => p.Name == workItem.Revision.Fields[AzureDevOpsWebHookResponseDto.WorkItemFields.TeamProject].ToString());
 
         // Find the users by user email
         var users = await userRepository.GetUsersAsync();
-        var operatorUser = users.FirstOrDefault(u => (workItem.Fields.GetValueOrDefault(AzureDevOpsWebHookResponseDto.Fields.AssignedTo)?.ToString() ?? "").Contains(u.Email));
+        var operatorUser = users.FirstOrDefault(u => (workItem.Revision.Fields.TryGetValue(AzureDevOpsWebHookResponseDto.WorkItemFields.AssignedTo, out object? value)
+            ? value?.ToString() ?? ""
+            : "").Contains(u.Email));
 
         // Clean the description from HTML and Markdown
-        var rawDescription = workItem.Fields[AzureDevOpsWebHookResponseDto.Fields.Description].ToString()!;
+        var rawDescription = workItem.Revision.Fields[AzureDevOpsWebHookResponseDto.WorkItemFields.Description].ToString()!;
         var cleanDescription = SanitizeText(rawDescription);
 
         // Apply only the fields that should be updated from DevOps
-        existingTicket.Type = MapTypeFromDevOps(workItem.Fields[AzureDevOpsWebHookResponseDto.Fields.WorkItemType].ToString()!);
-        existingTicket.Title = workItem.Fields[AzureDevOpsWebHookResponseDto.Fields.Title].ToString()!;
+        existingTicket.Type = MapTypeFromDevOps(workItem.Revision.Fields[AzureDevOpsWebHookResponseDto.WorkItemFields.WorkItemType].ToString()!);
+        existingTicket.Title = workItem.Revision.Fields[AzureDevOpsWebHookResponseDto.WorkItemFields.Title].ToString()!;
         existingTicket.Description = cleanDescription;
-        existingTicket.Priority = MapPriorityFromDevOps(int.Parse(workItem.Fields[AzureDevOpsWebHookResponseDto.Fields.Priority].ToString()!));
-        existingTicket.Status = MapStatusFromDevOps(workItem.Fields[AzureDevOpsWebHookResponseDto.Fields.State].ToString()!);
+        existingTicket.Priority = MapPriorityFromDevOps(int.Parse(workItem.Revision.Fields[AzureDevOpsWebHookResponseDto.WorkItemFields.Priority].ToString()!));
+        existingTicket.Status = MapStatusFromDevOps(workItem.Revision.Fields[AzureDevOpsWebHookResponseDto.WorkItemFields.State].ToString()!);
         existingTicket.PlatformId = platform.Id;
         existingTicket.OperatorUserId = existingTicket.Status == Status.Unassigned ? null : operatorUser?.Id;
 
@@ -383,7 +393,7 @@ public sealed class WebhookController(
         var workItem = payload.Resource;
 
         // Fetch the item platform name
-        var platformName = workItem.Fields[AzureDevOpsWebHookResponseDto.Fields.TeamProject].ToString()!;
+        var platformName = workItem.Fields[AzureDevOpsWebHookResponseDto.WorkItemFields.TeamProject].ToString()!;
 
         var comment = await azureDevOpsController.GetLastCommentAzureDevOpsWorkItemAsync(workItem.Id!.Value, platformName);
 
@@ -407,7 +417,7 @@ public sealed class WebhookController(
 
     private async Task<Guid> GetUserIdFromWorkItemAsync(AzureDevOpsWebHookResponseDto payload)
     {
-        var userIdentity = payload.Resource.Fields[AzureDevOpsWebHookResponseDto.Fields.ChangedBy].ToString()!;
+        var userIdentity = payload.Resource.Fields[AzureDevOpsWebHookResponseDto.WorkItemFields.ChangedBy].ToString()!;
         var userEmail = Regex.Match(userIdentity, "<(?<email>.+?)>", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100))
             .Groups["email"]
             .Value;

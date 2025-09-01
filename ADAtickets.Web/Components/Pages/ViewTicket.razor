@@ -157,7 +157,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 }
                 else
                 {
-                    <RepliesList Ticket="ticket" />
+                    <RepliesList Ticket="ticket" AllowReply="@(ticket.Status != Status.Closed && ticket.Status != Status.Unassigned)" />
                 }
             </FluentCard>
         </FluentStack>

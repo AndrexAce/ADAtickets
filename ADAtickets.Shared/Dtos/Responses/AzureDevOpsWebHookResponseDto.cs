@@ -17,17 +17,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
-
 namespace ADAtickets.Shared.Dtos.Responses;
 
 public sealed record AzureDevOpsWebHookResponseDto
 {
     public string EventType { get; init; } = string.Empty;
 
-    public WorkItem Resource { get; init; } = new WorkItem();
+    public WebHookResource Resource { get; init; } = new();
 
-    public static class Fields
+    public sealed record WebHookResource
+    {
+        public int? Id { get; init; }
+
+        public Dictionary<string, object> Fields { get; init; } = [];
+
+        public WebHookRevision Revision { get; init; } = new();
+    }
+
+    public sealed record class WebHookRevision
+    {
+        public int? Id { get; init; }
+
+        public Dictionary<string, object> Fields { get; init; } = [];
+    }
+
+    public static class WorkItemFields
     {
         public const string CreatedDate = "System.CreatedDate";
 
