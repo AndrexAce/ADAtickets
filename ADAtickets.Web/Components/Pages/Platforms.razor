@@ -99,10 +99,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         try
         {
             // Update the remote data source
-            await platformsClient.PostAsync(new() { Name = platform.Name, RepositoryUrl = platform.RepositoryUrl });
+            var createdPlatform = await platformsClient.PostAsync(new() { Name = platform.Name, RepositoryUrl = platform.RepositoryUrl });
 
             // Update the local data source
-            importedPlatforms = importedPlatforms?.Append(platform);
+            importedPlatforms = importedPlatforms?.Append(createdPlatform);
             availablePlatforms = availablePlatforms?.Where(p => p.RepositoryUrl != platform.RepositoryUrl);
         }
         catch (Exception ex)
