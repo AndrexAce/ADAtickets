@@ -19,13 +19,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
 @inject NavigationManager navigationManager
 
-<FluentSelect TOption="CultureInfo"
-              Items="supportedCultures"
-              OptionText="@(c => c.DisplayName)"
+<FluentSelect Items="supportedCultures"
               OptionValue="@(c => c.Name)"
               OptionSelected="@(c => c == selectedCulture)"
               @bind-SelectedOption="@selectedCulture"
-              @bind-SelectedOption:after="ApplySelectedCulture"/>
+              @bind-SelectedOption:after="ApplySelectedCulture">
+    <OptionTemplate>
+        @GetCultureFlag(context) @context.DisplayName
+    </OptionTemplate>
+</FluentSelect>
 
 @code
 {
@@ -36,6 +38,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     ];
 
     private CultureInfo selectedCulture = CultureInfo.CurrentCulture;
+
+    private string GetCultureFlag(CultureInfo culture)
+    {
+        return culture.Name switch
+        {
+            "en" => "🇺🇸",
+            "it" => "🇮🇹",
+            _ => "🌐"
+        };
+    }
 
     private void ApplySelectedCulture()
     {

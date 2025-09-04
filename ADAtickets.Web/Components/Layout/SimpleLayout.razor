@@ -20,6 +20,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
 <CascadingValue Value="@IsDarkThemeActive">
     <FluentLayout>
+        <FluentHeader>
+            <Toolbar @bind-IsDarkThemeActive="@IsDarkThemeActive" />
+        </FluentHeader>
         <FluentStack Class="main" Orientation="Orientation.Vertical">
             <FluentBodyContent>
                 <div class="content">
@@ -27,9 +30,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 </div>
             </FluentBodyContent>
         </FluentStack>
-        <FluentFooter>
-            <Footer @bind-IsDarkThemeActive="@IsDarkThemeActive"/>
-        </FluentFooter>
     </FluentLayout>
 </CascadingValue>
 

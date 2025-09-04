@@ -18,9 +18,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 @using Microsoft.FluentUI.AspNetCore.Components.Icons.Regular
 @inherits ComponentBase
 
-<FluentButton Appearance="Appearance.Accent" IconStart="@themeIcon" OnClick="UpdateTheme"></FluentButton>
-<CultureSelector/>
-
+<FluentStack Orientation="Orientation.Horizontal" HorizontalAlignment="HorizontalAlignment.Right">
+    <FluentButton Appearance="Appearance.Neutral" IconStart="@themeIcon" OnClick="UpdateTheme"></FluentButton>
+    <CultureSelector />
+</FluentStack>
 <FluentDesignTheme @bind-Mode="@mode" CustomColor="#7A6040" StorageName="theme" OnLuminanceChanged="UpdateTheme"/>
 
 @code {
