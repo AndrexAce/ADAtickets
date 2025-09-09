@@ -19,8 +19,9 @@
  */
 
 using ADAtickets.Shared.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
 namespace ADAtickets.Shared.Dtos.Forms;
 
@@ -34,7 +35,7 @@ public sealed class TicketFormDto
     ///     The type of user request bound to the ticket.
     /// </summary>
     [Required]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter))]
     public TicketType Type { get; set; } = TicketType.Bug;
 
     /// <summary>
@@ -60,14 +61,14 @@ public sealed class TicketFormDto
     ///     The urgency of the ticket.
     /// </summary>
     [Required]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter))]
     public Priority Priority { get; set; } = Priority.Low;
 
     /// <summary>
     ///     The status of the ticket.
     /// </summary>
     [Required]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter))]
     public Status Status { get; set; } = Status.Unassigned;
 
     /// <summary>

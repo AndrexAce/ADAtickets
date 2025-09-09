@@ -32,7 +32,6 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web.Resource;
 using System.Net.Mime;
-using System.Net.Sockets;
 using Controller = ADAtickets.Shared.Constants.Controller;
 
 namespace ADAtickets.ApiService.Controllers;
@@ -59,32 +58,49 @@ public sealed class EditsController(IEditRepository editRepository, IMapper mapp
     /// </summary>
     /// <remarks>
     ///     For example, the following request:
-    ///     <c>GET /api/Edits?ticketId=123e4567-e89b-12d3-a456-426614174000&amp;oldStatus=unassigned</c>
+    ///     <c>GET /api/Edits?ticketId=123e4567-e89b-12d3-a456-426614174000&amp;oldStatus=unassigned&amp;pageNumber=1&amp;pageSize=10</c>
     ///     Retrieves the entities linked to the ticket with id <b>123e4567-e89b-12d3-a456-426614174000</b> and which were,
-    ///     before the edit, in the <b>Unassigned</b> status.
+    ///     before the edit, in the <b>Unassigned</b> status, returning the first page with 10 items.
     /// </remarks>
+    /// <param name="pageNumber">The page number to retrieve (optional, defaults to returning all items unpaged).</param>
+    /// <param name="pageSize">The number of items per page (optional, required when pageNumber is specified).</param>
     /// <param name="filters">
     ///     A group of key-value pairs defining the property name and value <see cref="Edit" /> entities
     ///     should be filtered by.
     /// </param>
     /// <returns>
-    ///     A <see cref="Task" /> returning an <see cref="ActionResult" />, which wraps the server response and the list
+    ///     A <see cref="Task" /> returning an <see cref="ActionResult" />, which wraps the server response and the paginated list
     ///     of entities.
     /// </returns>
     /// <response code="200">The entities were found.</response>
-    /// <response code="400">The provided filters were not formatted correctly.</response>
+    /// <response code="400">The provided filters were not formatted correctly or pagination parameters are invalid.</response>
     /// <response code="401">The client was not authenticated.</response>
     /// <response code="403">The client was authenticated but had not enough privileges.</response>
     /// <response code="406">The client asked for an unsupported response format.</response>
     [HttpGet]
     [Authorize(Policy = Policy.Everyone)]
     [RequiredScope(Scope.Read)]
-    public async Task<ActionResult<IEnumerable<EditResponseDto>>> GetEdits(
-        [FromQuery] Dictionary<string, string>? filters)
+    public async Task<ActionResult<Page<EditResponseDto>>> GetEdits(
+        [FromQuery] int? pageNumber = null,
+        [FromQuery] int? pageSize = null,
+        [FromQuery] Dictionary<string, string>? filters = null)
     {
         var edits = await (filters != null ? editRepository.GetEditsByAsync(filters) : editRepository.GetEditsAsync());
+        var editDtos = edits.Select(mapper.Map<EditResponseDto>);
 
-        return Ok(edits.Select(mapper.Map<EditResponseDto>));
+        // Return paginated or unpaginated results based on parameters
+        Page<EditResponseDto> result;
+
+        if (pageNumber.HasValue && pageSize.HasValue)
+        {
+            result = new Page<EditResponseDto>(editDtos, pageNumber.Value, pageSize.Value);
+        }
+        else
+        {
+            result = new Page<EditResponseDto>(editDtos);
+        }
+
+        return Ok(result);
     }
 
     /// <summary>
@@ -117,8 +133,8 @@ public sealed class EditsController(IEditRepository editRepository, IMapper mapp
     ///     Update a specific <see cref="Edit" /> entity.
     /// </summary>
     /// <remarks>
-    ///     JSON request body example:
-    ///     <code>
+    /// JSON request body example:
+    /// <code>
     /// {
     ///     "EditDateTime": "2025-04-27T16:31:17.512Z",
     ///     "Description": "Example description.",
@@ -128,8 +144,8 @@ public sealed class EditsController(IEditRepository editRepository, IMapper mapp
     ///     "UserId": "123e4567-e89b-12d3-a456-426614174000"
     /// }
     /// </code>
-    ///     XML request body example:
-    ///     <code>
+    /// XML request body example:
+    /// <code>
     /// &lt;EditRequestDto&gt;
     ///     &lt;EditDateTime&gt;2025-04-27T16:31:17.512Z&lt;/EditDateTime&gt;
     ///     &lt;Description&gt;Example description.&lt;/Description&gt;
@@ -183,8 +199,8 @@ public sealed class EditsController(IEditRepository editRepository, IMapper mapp
     ///     Create a new <see cref="Edit" /> entity.
     /// </summary>
     /// <remarks>
-    ///     JSON request body example:
-    ///     <code>
+    /// JSON request body example:
+    /// <code>
     /// {
     ///     "EditDateTime": "2025-04-27T16:31:17.512Z",
     ///     "Description": "Example description.",
@@ -194,8 +210,8 @@ public sealed class EditsController(IEditRepository editRepository, IMapper mapp
     ///     "UserId": "123e4567-e89b-12d3-a456-426614174000"
     /// }
     /// </code>
-    ///     XML request body example:
-    ///     <code>
+    /// XML request body example:
+    /// <code>
     /// &lt;EditRequestDto&gt;
     ///     &lt;EditDateTime&gt;2025-04-27T16:31:17.512Z&lt;/EditDateTime&gt;
     ///     &lt;Description&gt;Example description.&lt;/Description&gt;

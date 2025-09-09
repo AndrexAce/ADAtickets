@@ -39,7 +39,6 @@ using Scalar.AspNetCore;
 using StackExchange.Redis;
 using System.Net.Mime;
 using System.Reflection;
-using System.Text.Json.Serialization;
 
 namespace ADAtickets.ApiService;
 
@@ -118,10 +117,11 @@ internal static class Program
                     };
             })
             .AddXmlSerializerFormatters()
-            .AddJsonOptions(options =>
+            .AddNewtonsoftJson(options =>
             {
-                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(allowIntegerValues: false));
-                options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+                options.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+                options.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver();
+                options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
             });
 
         // Add Swagger documentation for the APIs.

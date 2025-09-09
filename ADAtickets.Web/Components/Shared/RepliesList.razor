@@ -114,9 +114,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     {
         try
         {
-            var fetchedReplies = await repliesClient.GetAllAsync(
+            var fetchedReplies = (await repliesClient.GetAllAsync(
                 new Dictionary<string, string> { { nameof(ReplyResponseDto.TicketId), Ticket.Id.ToString() } }
-            );
+            )).Items;
 
             replies = fetchedReplies.OrderByDescending(e => e.ReplyDateTime);
 

@@ -22,10 +22,10 @@ using ADAtickets.Shared.Constants;
 using ADAtickets.Shared.Dtos.Responses;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Identity.Abstractions;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using System.Net;
-using System.Net.Http.Json;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace ADAtickets.Client;
 
@@ -40,10 +40,11 @@ public sealed class AzureDevOpsClient(
 {
     private const string endpoint = $"v{Service.APIVersion}/{Controller.AzureDevOps}";
 
-    private readonly JsonSerializerOptions JsonOptions = new()
+    private readonly JsonSerializerSettings JsonSettings = new()
     {
-        Converters = { new JsonStringEnumConverter(allowIntegerValues: false) },
-        PropertyNameCaseInsensitive = true
+        Converters = { new StringEnumConverter() },
+        ContractResolver = new CamelCasePropertyNamesContractResolver(),
+        NullValueHandling = NullValueHandling.Ignore
     };
 
     /// <summary>
@@ -76,7 +77,8 @@ public sealed class AzureDevOpsClient(
 
         if (response.StatusCode is HttpStatusCode.OK)
         {
-            var responseEntity = await response.Content.ReadFromJsonAsync<ValueWrapper<bool>>(JsonOptions) ??
+            var content = await response.Content.ReadAsStringAsync();
+            var responseEntity = JsonConvert.DeserializeObject<ValueWrapper<bool>>(content, JsonSettings) ??
                                  throw new JsonException("Could not parse the JSON response object.");
             return responseEntity.Value;
         }
@@ -113,9 +115,9 @@ public sealed class AzureDevOpsClient(
 
         if (response.StatusCode is HttpStatusCode.OK)
         {
-            var responseEntity =
-                await response.Content.ReadFromJsonAsync<IEnumerable<PlatformResponseDto>>(JsonOptions) ??
-                throw new JsonException("Could not parse the JSON response object.");
+            var content = await response.Content.ReadAsStringAsync();
+            var responseEntity = JsonConvert.DeserializeObject<IEnumerable<PlatformResponseDto>>(content, JsonSettings) ??
+                                throw new JsonException("Could not parse the JSON response object.");
             return responseEntity;
         }
 

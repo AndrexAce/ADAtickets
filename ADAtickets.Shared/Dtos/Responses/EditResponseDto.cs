@@ -19,7 +19,8 @@
  */
 
 using ADAtickets.Shared.Models;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace ADAtickets.Shared.Dtos.Responses;
 
@@ -42,13 +43,13 @@ public sealed record EditResponseDto : ResponseDto
     /// <summary>
     ///     The status the ticket was in before the edit.
     /// </summary>
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter))]
     public Status OldStatus { get; init; } = Status.Unassigned;
 
     /// <summary>
     ///     The status the ticket will be after the edit.
     /// </summary>
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter))]
     public Status NewStatus { get; init; } = Status.Unassigned;
 
     /// <summary>

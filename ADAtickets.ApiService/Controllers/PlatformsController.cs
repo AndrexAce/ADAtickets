@@ -55,33 +55,51 @@ public sealed class PlatformsController(IPlatformRepository platformRepository, 
     /// </summary>
     /// <remarks>
     ///     For example, the following request:
-    ///     <c>GET /api/Platforms?name=example&amp;repositoryUrl=github.com</c>
-    ///     Retrieves the entities containing <b>example</b> in their name and <b>github.com</b> in their repositoryUrl.
+    ///     <c>GET /api/Platforms?name=example&amp;repositoryUrl=github.com&amp;pageNumber=1&amp;pageSize=10</c>
+    ///     Retrieves the entities containing <b>example</b> in their name and <b>github.com</b> in their repositoryUrl, returning the first page with 10 items.
     /// </remarks>
+    /// <param name="pageNumber">The page number to retrieve (optional, defaults to returning all items unpaged).</param>
+    /// <param name="pageSize">The number of items per page (optional, required when pageNumber is specified).</param>
     /// <param name="filters">
     ///     A group of key-value pairs defining the property name and value <see cref="Platform" /> entities
     ///     should be filtered by.
     /// </param>
     /// <returns>
-    ///     A <see cref="Task" /> returning an <see cref="ActionResult" />, which wraps the server response and the list
+    ///     A <see cref="Task" /> returning an <see cref="ActionResult" />, which wraps the server response and the paginated list
     ///     of entities.
     /// </returns>
     /// <response code="200">The entities were found.</response>
-    /// <response code="400">The provided filters were not formatted correctly.</response>
+    /// <response code="400">The provided filters were not formatted correctly or pagination parameters are invalid.</response>
     /// <response code="401">The client was not authenticated.</response>
     /// <response code="403">The client was authenticated but had not enough privileges.</response>
     /// <response code="406">The client asked for an unsupported response format.</response>
     [HttpGet]
     [RequiredScope(Scope.Read)]
     [Authorize(Policy = Policy.Everyone)]
-    public async Task<ActionResult<IEnumerable<PlatformResponseDto>>> GetPlatforms(
-        [FromQuery] Dictionary<string, string>? filters)
+    public async Task<ActionResult<Page<PlatformResponseDto>>> GetPlatforms(
+        [FromQuery] int? pageNumber = null,
+        [FromQuery] int? pageSize = null,
+        [FromQuery] Dictionary<string, string>? filters = null)
     {
         var platforms = await (filters != null
             ? platformRepository.GetPlatformsByAsync(filters)
             : platformRepository.GetPlatformsAsync());
 
-        return Ok(platforms.Select(mapper.Map<PlatformResponseDto>));
+        var platformDtos = platforms.Select(mapper.Map<PlatformResponseDto>);
+
+        // Return paginated or unpaginated results based on parameters
+        Page<PlatformResponseDto> result;
+
+        if (pageNumber.HasValue && pageSize.HasValue)
+        {
+            result = new Page<PlatformResponseDto>(platformDtos, pageNumber.Value, pageSize.Value);
+        }
+        else
+        {
+            result = new Page<PlatformResponseDto>(platformDtos);
+        }
+
+        return Ok(result);
     }
 
     /// <summary>
@@ -114,15 +132,15 @@ public sealed class PlatformsController(IPlatformRepository platformRepository, 
     ///     Update a specific <see cref="Platform" /> entity.
     /// </summary>
     /// <remarks>
-    ///     JSON request body example:
-    ///     <code>
+    /// JSON request body example:
+    /// <code>
     /// {
     ///     "Name": "Example",
     ///     "RepositoryUrl": "https://example.com",
     /// }
     /// </code>
-    ///     XML request body example:
-    ///     <code>
+    /// XML request body example:
+    /// <code>
     /// &lt;PlatformRequestDto&gt;
     ///     &lt;Name&gt;Example&lt;/Name&gt;
     ///     &lt;RepositoryUrl&gt;https://example.com&lt;/RepositoryUrl&gt;
@@ -173,15 +191,15 @@ public sealed class PlatformsController(IPlatformRepository platformRepository, 
     ///     Create a new <see cref="Platform" /> entity.
     /// </summary>
     /// <remarks>
-    ///     JSON request body example:
-    ///     <code>
+    /// JSON request body example:
+    /// <code>
     /// {
     ///     "Name": "Example",
     ///     "RepositoryUrl": "https://example.com",
     /// }
     /// </code>
-    ///     XML request body example:
-    ///     <code>
+    /// XML request body example:
+    /// <code>
     /// &lt;PlatformRequestDto&gt;
     ///     &lt;Name&gt;Example&lt;/Name&gt;
     ///     &lt;RepositoryUrl&gt;https://example.com&lt;/RepositoryUrl&gt;

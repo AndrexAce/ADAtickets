@@ -19,7 +19,8 @@
  */
 
 using ADAtickets.Shared.Models;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace ADAtickets.Shared.Dtos.Responses;
 
@@ -62,7 +63,7 @@ public sealed record UserResponseDto : ResponseDto
     /// <summary>
     ///     The role of the user in the system.
     /// </summary>
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter))]
     public UserType Type { get; init; } = UserType.User;
 
     /// <summary>

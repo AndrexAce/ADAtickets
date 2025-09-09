@@ -10,8 +10,8 @@
         <IncludeSymbols>True</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <NeutralLanguage>en</NeutralLanguage>
-        <AssemblyVersion>1.0.0</AssemblyVersion>
-        <FileVersion>1.0.0</FileVersion>
+        <AssemblyVersion>1.1.0</AssemblyVersion>
+        <FileVersion>1.1.0</FileVersion>
         <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
         <Description>Official .NET client library for interacting programmatically with ADAtickets APIs.</Description>
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
@@ -22,7 +22,7 @@
         <PackageIcon>NuGetIcon.png</PackageIcon>
         <PublishTrimmed>false</PublishTrimmed>
         <PublishSingleFile>true</PublishSingleFile>
-        <PackageReleaseNotes>First package version.</PackageReleaseNotes>
+        <PackageReleaseNotes>Added paginated calls to the ADAtickets APIs.</PackageReleaseNotes>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <Copyright>Copyright (C) 2025 Andrea Lucchese</Copyright>
         <PackageTags>adatickets;api;client;</PackageTags>
@@ -30,6 +30,7 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.Identity.Web.DownstreamApi" Version="3.14.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     </ItemGroup>
 
     <ItemGroup>

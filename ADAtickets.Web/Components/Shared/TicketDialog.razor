@@ -437,12 +437,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     private async Task<IEnumerable<UserResponseDto>> LoadUsersAsync(IEnumerable<KeyValuePair<string, string>> filters)
     {
-        return await usersClient.GetAllAsync(filters);
+        return (await usersClient.GetAllAsync(filters)).Items;
     }
 
     private async Task<IEnumerable<PlatformResponseDto>> LoadPlatformsAsync()
     {
-        return await platformsClient.GetAllAsync();
+        return (await platformsClient.GetAllAsync()).Items;
     }
 
     private async Task SetupSignalRAsync()
@@ -460,7 +460,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     private async Task<IEnumerable<AttachmentResponseDto>> LoadAttachmentsAsync(IEnumerable<KeyValuePair<string, string>> filters)
     {
-        return await attachmentsClient.GetAllAsync(filters);
+        return (await attachmentsClient.GetAllAsync(filters)).Items;
     }
 
     private async Task HandleRefreshRequested(Guid ticketId)

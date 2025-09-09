@@ -363,12 +363,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     private async Task LoadUsersAsync()
     {
-        Users = await usersClient.GetAllAsync();
+        Users = (await usersClient.GetAllAsync()).Items;
     }
 
     private async Task LoadTicketsAsync(IEnumerable<KeyValuePair<string, string>> filters)
     {
-        var result = await ticketsClient.GetAllAsync(filters);
+        var result = (await ticketsClient.GetAllAsync(filters)).Items;
 
         originalTickets = result.OrderByDescending(t => t.CreationDateTime);
         tickets = originalTickets;
@@ -379,7 +379,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     private async Task LoadPlatformsAsync()
     {
-        platforms = await platformsClient.GetAllAsync();
+        platforms = (await platformsClient.GetAllAsync()).Items;
     }
 
     #endregion

@@ -79,34 +79,52 @@ public sealed class NotificationsController(
     /// </summary>
     /// <remarks>
     ///     For example, the following request:
-    ///     <c>GET /api/Notifications?ticketId=123e4567-e89b-12d3-a456-426614174000&amp;isRead=true</c>
+    ///     <c>GET /api/Notifications?ticketId=123e4567-e89b-12d3-a456-426614174000&amp;isRead=true&amp;pageNumber=1&amp;pageSize=10</c>
     ///     Retrieves the entities linked to the ticket with id <b>123e4567-e89b-12d3-a456-426614174000</b> and which have been
-    ///     marked as read.
+    ///     marked as read, returning the first page with 10 items.
     /// </remarks>
+    /// <param name="pageNumber">The page number to retrieve (optional, defaults to returning all items unpaged).</param>
+    /// <param name="pageSize">The number of items per page (optional, required when pageNumber is specified).</param>
     /// <param name="filters">
     ///     A group of key-value pairs defining the property name and value <see cref="Notification" />
     ///     entities should be filtered by.
     /// </param>
     /// <returns>
-    ///     A <see cref="Task" /> returning an <see cref="ActionResult" />, which wraps the server response and the list
+    ///     A <see cref="Task" /> returning an <see cref="ActionResult" />, which wraps the server response and the paginated list
     ///     of entities.
     /// </returns>
     /// <response code="200">The entities were found.</response>
-    /// <response code="400">The provided filters were not formatted correctly.</response>
+    /// <response code="400">The provided filters were not formatted correctly or pagination parameters are invalid.</response>
     /// <response code="401">The client was not authenticated.</response>
     /// <response code="403">The client was authenticated but had not enough privileges.</response>
     /// <response code="406">The client asked for an unsupported response format.</response>
     [HttpGet]
     [Authorize(Policy = Policy.Everyone)]
     [RequiredScope(Scope.Read)]
-    public async Task<ActionResult<IEnumerable<NotificationResponseDto>>> GetNotifications(
-        [FromQuery] Dictionary<string, string>? filters)
+    public async Task<ActionResult<Page<NotificationResponseDto>>> GetNotifications(
+        [FromQuery] int? pageNumber = null,
+        [FromQuery] int? pageSize = null,
+        [FromQuery] Dictionary<string, string>? filters = null)
     {
         var notifications = await (filters != null
             ? notificationRepository.GetNotificationsByAsync(filters)
             : notificationRepository.GetNotificationsAsync());
 
-        return Ok(notifications.Select(mapper.Map<NotificationResponseDto>));
+        var notificationDtos = notifications.Select(mapper.Map<NotificationResponseDto>);
+
+        // Return paginated or unpaginated results based on parameters
+        Page<NotificationResponseDto> result;
+
+        if (pageNumber.HasValue && pageSize.HasValue)
+        {
+            result = new Page<NotificationResponseDto>(notificationDtos, pageNumber.Value, pageSize.Value);
+        }
+        else
+        {
+            result = new Page<NotificationResponseDto>(notificationDtos);
+        }
+
+        return Ok(result);
     }
 
     /// <summary>
@@ -140,8 +158,8 @@ public sealed class NotificationsController(
     ///     Update a specific <see cref="Notification" /> entity.
     /// </summary>
     /// <remarks>
-    ///     JSON request body example:
-    ///     <code>
+    /// JSON request body example:
+    /// <code>
     /// {
     ///     "SendDateTime": "2025-04-27T16:31:17.512Z",
     ///     "Message": "Example message.",
@@ -150,8 +168,8 @@ public sealed class NotificationsController(
     ///     "UserId": "123e4567-e89b-12d3-a456-426614174000"
     /// }
     /// </code>
-    ///     XML request body example:
-    ///     <code>
+    /// XML request body example:
+    /// <code>
     /// &lt;NotificationRequestDto&gt;
     ///     &lt;SendDateTime&gt;2025-04-27T16:31:17.512Z&lt;/SendDateTime&gt;
     ///     &lt;Message&gt;Example message.&lt;/Message&gt;
@@ -206,8 +224,8 @@ public sealed class NotificationsController(
     ///     Create a new <see cref="Edit" /> entity.
     /// </summary>
     /// <remarks>
-    ///     JSON request body example:
-    ///     <code>
+    /// JSON request body example:
+    /// <code>
     /// {
     ///     "SendDateTime": "2025-04-27T16:31:17.512Z",
     ///     "Message": "Example message.",
@@ -216,8 +234,8 @@ public sealed class NotificationsController(
     ///     "UserId": "123e4567-e89b-12d3-a456-426614174000"
     /// }
     /// </code>
-    ///     XML request body example:
-    ///     <code>
+    /// XML request body example:
+    /// <code>
     /// &lt;NotificationRequestDto&gt;
     ///     &lt;SendDateTime&gt;2025-04-27T16:31:17.512Z&lt;/SendDateTime&gt;
     ///     &lt;Message&gt;Example message.&lt;/Message&gt;

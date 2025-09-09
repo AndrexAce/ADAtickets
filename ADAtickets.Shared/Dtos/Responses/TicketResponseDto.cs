@@ -19,7 +19,8 @@
  */
 
 using ADAtickets.Shared.Models;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace ADAtickets.Shared.Dtos.Responses;
 
@@ -32,7 +33,7 @@ public sealed record TicketResponseDto : ResponseDto
     /// <summary>
     ///     The type of user request bound to the ticket.
     /// </summary>
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter))]
     public TicketType Type { get; init; } = TicketType.Bug;
 
     /// <summary>
@@ -53,13 +54,13 @@ public sealed record TicketResponseDto : ResponseDto
     /// <summary>
     ///     The urgency of the ticket.
     /// </summary>
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter))]
     public Priority Priority { get; init; } = Priority.Low;
 
     /// <summary>
     ///     The status of the ticket.
     /// </summary>
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter))]
     public Status Status { get; init; } = Status.Unassigned;
 
     /// <summary>
