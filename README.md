@@ -4,8 +4,8 @@
 ![Static Badge](https://img.shields.io/badge/Language-C%2313-8A2BE2)
 ![Static Badge](https://img.shields.io/badge/API-ASP.NET%20MVC%209-00A4EF)
 ![Static Badge](https://img.shields.io/badge/Web%20app-ASP.NET%20Blazor%209-244FFF)
-![Static Badge](https://img.shields.io/badge/Database-PostgreSQL%2017.5-CC2927)
-![Static Badge](https://img.shields.io/badge/Cache-Redis%208.2.0-FFF927)
+![Static Badge](https://img.shields.io/badge/Database-PostgreSQL%2017.6-CC2927)
+![Static Badge](https://img.shields.io/badge/Cache-Redis%208.2.1-FFF927)
 ![Static Badge](https://img.shields.io/badge/License-GPL%20v3-FF0000)
 ![Static Badge](https://img.shields.io/badge/Status-Active-32CD32)
 

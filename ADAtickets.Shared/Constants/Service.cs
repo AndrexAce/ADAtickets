@@ -58,12 +58,12 @@ internal static class Service
     /// <summary>
     ///     The version of the database service.
     /// </summary>
-    public const string DatabaseVersion = "17.5";
+    public const string DatabaseVersion = "17.6";
 
     /// <summary>
     ///     The name of the cache service.
     /// </summary>
-    public const string CacheVersion = "8.2.0";
+    public const string CacheVersion = "8.2.1";
 
     /// <summary>
     ///     The version of the API service.
