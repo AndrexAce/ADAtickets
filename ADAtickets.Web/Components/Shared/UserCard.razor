@@ -48,7 +48,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         </FluentStack>
         @if (CurrentUserId != User.Id)
         {
-            <FluentCheckbox Class="@(Selected ? "" : "hover-hide")" CheckStateChanged="HandleCheckStateChangedAsync" />
+            <FluentCheckbox Class="@(Selected ? "" : "hover-hide")" ThreeState="true" CheckState="Selected" CheckStateChanged="HandleCheckStateChangedAsync" />
         }
     </FluentStack>
 </FluentCard>
@@ -147,6 +147,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         {
             await usersClient.PutAsync(User.Id, mapper.Map<UserRequestDto>(User with { IsBlocked = true }));
 
+            // Deselect the item
+            Selected = false;
+            await OnSelectedChanged.InvokeAsync(new SelectedChangedEventArgs<UserResponseDto> { Item = User, IsSelected = false });
+
             toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["BlockSuccessToastTitle"], loc["BlockSuccessToastDetails"]));
 
             await OnUnblock.InvokeAsync(new SelectedChangedEventArgs<UserResponseDto> { Item = User, IsSelected = Selected });
@@ -162,6 +166,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         try
         {
             await usersClient.PutAsync(User.Id, mapper.Map<UserRequestDto>(User with { IsBlocked = false }));
+
+            // Deselect the item
+            Selected = false;
+            await OnSelectedChanged.InvokeAsync(new SelectedChangedEventArgs<UserResponseDto> { Item = User, IsSelected = false });
 
             toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["UnblockSuccessToastTitle"], loc["UnblockSuccessToastDetails"]));
 

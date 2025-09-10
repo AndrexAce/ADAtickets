@@ -80,7 +80,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     public FluentDialog Dialog { get; set; } = default!;
 
     private IEnumerable<UserNotificationResponseDto>? userNotifications;
-    private readonly HashSet<UserNotificationResponseDto> selectedUserNotifications = [];
+    private readonly List<UserNotificationResponseDto> selectedUserNotifications = [];
 
     protected override void OnInitialized()
     {
@@ -109,7 +109,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         }
         else
         {
-            selectedUserNotifications.Remove(args.Item);
+            selectedUserNotifications.RemoveAll(n => n.Id == args.Item.Id);
         }
     }
 

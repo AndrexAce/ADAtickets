@@ -146,7 +146,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     // State management
     public Guid? CurrentUserId { get; set; }
 
-    private readonly HashSet<UserResponseDto> selectedUsers = [];
+    private readonly List<UserResponseDto> selectedUsers = [];
 
     private string? currentTab;
     private string? currentSort;
@@ -212,7 +212,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         }
         else
         {
-            selectedUsers.Remove(args.Item);
+            selectedUsers.RemoveAll(u => u.Id == args.Item.Id);
         }
     }
 

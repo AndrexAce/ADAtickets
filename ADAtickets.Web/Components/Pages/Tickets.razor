@@ -313,7 +313,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     private IEnumerable<PlatformResponseDto>? platforms;
 
     // State management
-    private readonly HashSet<TicketResponseDto> selectedTickets = [];
+    private readonly List<TicketResponseDto> selectedTickets = [];
 
     private string? currentTab;
     private string? currentSort;
@@ -464,7 +464,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         }
         else
         {
-            selectedTickets.Remove(args.Item);
+            selectedTickets.RemoveAll(t => t.Id == args.Item.Id);
         }
     }
 

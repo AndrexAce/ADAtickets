@@ -70,7 +70,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 <FluentSpacer/>
                 @if (!isUser)
                 {
-                    <FluentCheckbox Class="@(Selected ? string.Empty : "hover-hide")" CheckStateChanged="HandleCheckStateChangedAsync" />
+                    <FluentCheckbox Class="@(Selected ? string.Empty : "hover-hide")" ThreeState="true" CheckState="Selected" CheckStateChanged="HandleCheckStateChangedAsync" />
                 }
             }
         </FluentStack>
@@ -257,6 +257,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         {
             await ticketsClient.DeleteAsync(Ticket.Id);
 
+            // Deselect the item
+            Selected = false;
+            await SelectedChanged.InvokeAsync(new SelectedChangedEventArgs<TicketResponseDto> { Item = Ticket, IsSelected = false });
+
             toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["DeleteSuccessToastTitle"], loc["DeleteSuccessToastDetails"]));
         }
         catch (Exception ex)
@@ -277,6 +281,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             requestDto.Requester = await GetUserIdAsync();
 
             await ticketsClient.PutAsync(Ticket.Id, requestDto);
+
+            // Deselect the item
+            Selected = false;
+            await SelectedChanged.InvokeAsync(new SelectedChangedEventArgs<TicketResponseDto> { Item = Ticket, IsSelected = false });
 
             toastService.ShowCommunicationToast(Toasts.ConfirmToastParameters(loc["CloseSuccessToastTitle"], loc["CloseSuccessToastDetails"]));
         }
