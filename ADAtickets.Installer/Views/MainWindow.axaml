@@ -28,16 +28,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterScreen"
         CanResize="False"
-        WindowState="Normal"
-        ExtendClientAreaToDecorationsHint="True"
-        ExtendClientAreaChromeHints="NoChrome"
-        ExtendClientAreaTitleBarHeightHint="-1">
+        WindowState="Normal">
     <Grid RowDefinitions="Auto,*">
         <Grid Grid.Row="0" Height="35">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
-                <Image Source="/Assets/favicon.ico" Width="20" Height="20" Margin="10 0 0 0" />
-            </StackPanel>
-
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button Name="ThemeButton"
                         Content="☀️"
@@ -47,14 +40,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                         VerticalContentAlignment="Center"
                         Background="Transparent"
                         Command="{Binding ChangeThemeCommand}" />
-                <Button Name="CloseButton"
-                        Content="✕"
-                        Width="50"
-                        Height="35"
-                        HorizontalContentAlignment="Center"
-                        VerticalContentAlignment="Center"
-                        Background="Transparent"
-                        Command="{Binding ExitAppCommand}" />
             </StackPanel>
         </Grid>
 

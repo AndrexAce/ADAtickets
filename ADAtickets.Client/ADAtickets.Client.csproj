@@ -10,9 +10,9 @@
         <IncludeSymbols>True</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <NeutralLanguage>en</NeutralLanguage>
-		<Version>1.1.1</Version>
-        <AssemblyVersion>1.1.1</AssemblyVersion>
-        <FileVersion>1.1.1</FileVersion>
+		<Version>1.1.2</Version>
+        <AssemblyVersion>1.1.2</AssemblyVersion>
+        <FileVersion>1.1.2</FileVersion>
         <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
         <Description>Official .NET client library for interacting programmatically with ADAtickets APIs.</Description>
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
@@ -23,7 +23,7 @@
         <PackageIcon>NuGetIcon.png</PackageIcon>
         <PublishTrimmed>false</PublishTrimmed>
         <PublishSingleFile>true</PublishSingleFile>
-        <PackageReleaseNotes>Updated dependencies.</PackageReleaseNotes>
+        <PackageReleaseNotes>Updated package icon.</PackageReleaseNotes>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <Copyright>Copyright (C) 2025 Andrea Lucchese</Copyright>
         <PackageTags>adatickets;api;client;</PackageTags>
