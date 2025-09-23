@@ -1,4 +1,4 @@
-# Per Linux x64
+# Linux x64
 dotnet publish ADAtickets.Installer.Desktop -c Release -r linux-x64
 $files_linux_x64 = @(
     "ADAtickets.Installer.Desktop\bin\Release\net9.0\linux-x64\publish\ADAticketsInstaller",
@@ -7,7 +7,7 @@ $files_linux_x64 = @(
 )
 Compress-Archive -Path $files_linux_x64 -DestinationPath "adaticketsinstaller-linux-x64.zip" -Force
 
-# Per Linux ARM64
+# Linux ARM64
 dotnet publish ADAtickets.Installer.Desktop -c Release -r linux-arm64
 $files_linux_arm64 = @(
     "ADAtickets.Installer.Desktop\bin\Release\net9.0\linux-arm64\publish\ADAticketsInstaller",
@@ -16,7 +16,7 @@ $files_linux_arm64 = @(
 )
 Compress-Archive -Path $files_linux_arm64 -DestinationPath "adaticketsinstaller-linux-arm64.zip" -Force
 
-# Per Windows x64
+# Windows x64
 dotnet publish ADAtickets.Installer.Desktop -c Release -r win-x64
 $files_win_x64 = @(
     "ADAtickets.Installer.Desktop\bin\Release\net9.0\win-x64\publish\ADAticketsInstaller.exe",
@@ -27,7 +27,7 @@ $files_win_x64 = @(
 )
 Compress-Archive -Path $files_win_x64 -DestinationPath "adaticketsinstaller-win-x64.zip" -Force
 
-# Per Windows ARM64
+# Windows ARM64
 dotnet publish ADAtickets.Installer.Desktop -c Release -r win-arm64
 $files_win_arm64 = @(
     "ADAtickets.Installer.Desktop\bin\Release\net9.0\win-arm64\publish\ADAticketsInstaller.exe",
@@ -38,7 +38,7 @@ $files_win_arm64 = @(
 )
 Compress-Archive -Path $files_win_arm64 -DestinationPath "adaticketsinstaller-win-arm64.zip" -Force
 
-# Per MacOS x64
+# MacOS x64
 dotnet publish ADAtickets.Installer.Desktop -c Release -r osx-x64
 $files_osx_x64 = @(
     "ADAtickets.Installer.Desktop\bin\Release\net9.0\osx-x64\publish\ADAticketsInstaller",
@@ -48,7 +48,7 @@ $files_osx_x64 = @(
 )
 Compress-Archive -Path $files_osx_x64 -DestinationPath "adaticketsinstaller-osx-x64.zip" -Force
 
-# Per MacOS ARM64
+# MacOS ARM64
 dotnet publish ADAtickets.Installer.Desktop -c Release -r osx-arm64
 $files_osx_arm64 = @(
     "ADAtickets.Installer.Desktop\bin\Release\net9.0\osx-arm64\publish\ADAticketsInstaller",

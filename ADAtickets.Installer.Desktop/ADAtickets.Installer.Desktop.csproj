@@ -17,6 +17,7 @@
 	
     <ItemGroup>
         <Content Include="favicon.ico" />
+        <Content Update="favicon.svg" />
     </ItemGroup>
 
     <ItemGroup>

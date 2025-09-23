@@ -416,3 +416,4 @@ global.json
 # Compressed archives
 *.zip
 *.tar.gz
+*.AppImage
