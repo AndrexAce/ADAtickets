@@ -322,6 +322,15 @@ namespace ADAtickets.Installer.Assets {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a Load .env file.
+        /// </summary>
+        public static string LoadEnv {
+            get {
+                return ResourceManager.GetString("LoadEnv", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a Next.
         /// </summary>
         public static string Next {
@@ -363,6 +372,15 @@ namespace ADAtickets.Installer.Assets {
         public static string Previous {
             get {
                 return ResourceManager.GetString("Previous", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Select your .env file.
+        /// </summary>
+        public static string SelectEnvFile {
+            get {
+                return ResourceManager.GetString("SelectEnvFile", resourceCulture);
             }
         }
         

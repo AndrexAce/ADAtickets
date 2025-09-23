@@ -23,11 +23,13 @@ using ADAtickets.Installer.Views;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using ReactiveUI;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace ADAtickets.Installer.ViewModels;
@@ -56,6 +58,8 @@ internal sealed class MainViewModel : ReactiveObject
     private string? _webAppId;
     private string? _webAuthCertificatePassword;
     private string? _webAuthCertificatePath;
+
+    public string? UploadedEnvFilePath { get; set; }
 
     public MainViewModel()
     {
@@ -267,8 +271,9 @@ internal sealed class MainViewModel : ReactiveObject
     public static ICommand ChangeThemeCommand => ReactiveCommand.Create(ChangeTheme);
     public ICommand GoToSecondStepCommand => ReactiveCommand.Create(GoToSecondStep);
     public ICommand GoToThirdStepCommand => ReactiveCommand.Create(GoToThirdStep);
-    public ICommand GoToLastStepCommand => ReactiveCommand.Create(GoToFinalStep);
+    public ICommand GoToLastStepCommand => ReactiveCommand.Create<bool?>(GoToLastStep);
     public ICommand GoToPreviousStepCommand => ReactiveCommand.Create(GoToSecondStep);
+    public ICommand UploadEnvFileCommand => ReactiveCommand.Create(UploadEnvFile);
 
     private static void ExitApp()
     {
@@ -303,13 +308,38 @@ internal sealed class MainViewModel : ReactiveObject
         }
     }
 
-    private void GoToFinalStep()
+    private void GoToLastStep(bool? isEnvFileUploaded = false)
     {
-        if (ValidateThirdStep())
+        if (isEnvFileUploaded == false || ValidateThirdStep())
         {
             CurrentView = new LastStep { DataContext = this };
 
             RepositionWindow();
+        }
+    }
+
+    private async Task UploadEnvFile()
+    {
+        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop && desktop.MainWindow is not null)
+        {
+            var files = await desktop.MainWindow.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+            {
+                Title = Resources.SelectEnvFile,
+                AllowMultiple = false,
+                FileTypeFilter =
+                [
+                    new FilePickerFileType(".env")
+                    {
+                        Patterns = [ "*.env" ]
+                    }
+                ]
+            });
+
+            if (files.Count == 1 && File.Exists(files[0].Path.AbsolutePath))
+            {
+                UploadedEnvFilePath = files[0].Path.AbsolutePath;
+                GoToLastStep();
+            }
         }
     }
 

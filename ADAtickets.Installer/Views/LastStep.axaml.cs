@@ -56,16 +56,28 @@ internal partial class LastStep : UserControl
 
     private async Task ExecuteSetupAsync()
     {
+        // Used to store the path of the temporary folder with the .env and .yml files
+        string? tempPath = null;
+
         // Get the ViewModel from DataContext
         if (DataContext is MainViewModel viewModel)
             try
             {
                 viewModel.PhaseText = Assets.Resources.EnvFileWriting;
 
-                var tempPath = CreateRandomTempFolder();
+                tempPath = CreateRandomTempFolder();
 
-                await Task.Run(() => WriteToEnvFileAsync(viewModel, tempPath));
-                await Task.Delay(3000);
+                if (viewModel.UploadedEnvFilePath is not null)
+                {
+                    // If the user provided a custom .env file, copy it to the temporary folder
+                    var destinationPath = Path.Combine(tempPath, ".env");
+                    File.Copy(viewModel.UploadedEnvFilePath, destinationPath, true);
+                }
+                else
+                {
+                    // Otherwise, create a new .env file based on the template and user input
+                    await Task.Run(() => WriteToEnvFileAsync(viewModel, tempPath));
+                }
 
                 viewModel.ProgressBarValue = 5;
 
@@ -75,32 +87,26 @@ internal partial class LastStep : UserControl
                 ).CreateClient();
 
                 await Task.Run(() => PullDbContainerAsync(viewModel, client));
-                await Task.Delay(3000);
 
                 viewModel.ProgressBarValue = 25;
 
                 await Task.Run(() => PullCacheContainerAsync(viewModel, client));
-                await Task.Delay(3000);
 
                 viewModel.ProgressBarValue = 45;
 
                 await Task.Run(() => PullAPIAsync(viewModel, client));
-                await Task.Delay(3000);
 
                 viewModel.ProgressBarValue = 65;
 
                 await Task.Run(() => PullWebAppAsync(viewModel, client));
-                await Task.Delay(3000);
 
                 viewModel.ProgressBarValue = 85;
 
                 await Task.Run(() => RunComposeAsync(viewModel, client, tempPath));
-                await Task.Delay(3000);
 
                 viewModel.ProgressBarValue = 95;
 
                 CleanTempFiles(viewModel, tempPath);
-                await Task.Delay(3000);
 
                 viewModel.ProgressBarValue = 100;
 
@@ -109,9 +115,10 @@ internal partial class LastStep : UserControl
             }
             catch (Exception e)
             {
-                // Other unexpected errors
+                CleanTempFiles(viewModel, tempPath);
+
                 viewModel.IsLoadingVisible = false;
-                viewModel.PhaseText = Assets.Resources.ErrorOccurred + " " + e.GetType();
+                viewModel.PhaseText = Assets.Resources.ErrorOccurred + Environment.NewLine + e.Message;
             }
     }
 
@@ -429,7 +436,7 @@ internal partial class LastStep : UserControl
             }
     }
 
-    private static void CleanTempFiles(MainViewModel viewModel, string tempPath)
+    private static void CleanTempFiles(MainViewModel viewModel, string? tempPath)
     {
         viewModel.PhaseText = $"{Assets.Resources.CleaningTemp}";
 

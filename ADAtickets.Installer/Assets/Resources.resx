@@ -258,4 +258,10 @@
   <data name="CertificatePathWatermark" xml:space="preserve">
     <value>/path/to/certificate.pfx</value>
   </data>
+  <data name="SelectEnvFile" xml:space="preserve">
+    <value>Select your .env file</value>
+  </data>
+  <data name="LoadEnv" xml:space="preserve">
+    <value>Load .env file</value>
+  </data>
 </root>

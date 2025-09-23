@@ -42,5 +42,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 FontFamily="Segoe UI"
                 Classes="accent"
                 Command="{Binding GoToSecondStepCommand}" />
+		<Button Content="{x:Static assets:Resources.LoadEnv}"
+                HorizontalAlignment="Center"
+                FontFamily="Segoe UI"
+                Classes="accent"
+                Command="{Binding UploadEnvFileCommand}" />
     </StackPanel>
 </UserControl>
