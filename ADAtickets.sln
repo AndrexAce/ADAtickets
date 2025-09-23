@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.13.35919.96
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11012.119
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ADAtickets.ApiService", "ADAtickets.ApiService\ADAtickets.ApiService.csproj", "{C83B3A11-EDE2-4707-BED3-2A4E79045D79}"
 EndProject
@@ -9,6 +9,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		publish.sh = publish.sh
+		publish.ps1 = publish.ps1
 		.github\workflows\quality.yml = .github\workflows\quality.yml
 		README.md = README.md
 		.github\workflows\update.yml = .github\workflows\update.yml

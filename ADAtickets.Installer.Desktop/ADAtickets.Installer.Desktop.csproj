@@ -1,12 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
+		<AssemblyName>ADAticketsInstaller</AssemblyName>
         <OutputType>WinExe</OutputType>
         <TargetFramework>net9.0</TargetFramework>
+		<RuntimeIdentifiers>win-x64;win-arm64;linux-x64;linux-arm64;osx-x64;osx-arm64</RuntimeIdentifiers>
+		<SelfContained>true</SelfContained>
+		<PublishSingleFile>true</PublishSingleFile>
         <Nullable>enable</Nullable>
-        <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
-        <ApplicationManifest>app.manifest</ApplicationManifest>
         <ApplicationIcon>favicon.ico</ApplicationIcon>
     </PropertyGroup>
+
+	<PropertyGroup Condition="'$(RuntimeIdentifier)' == 'win-x64' OR '$(RuntimeIdentifier)' == 'win-arm64'">
+		<BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+	</PropertyGroup>
+	
     <ItemGroup>
         <Content Include="favicon.ico" />
     </ItemGroup>

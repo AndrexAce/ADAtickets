@@ -412,3 +412,7 @@ ADAtickets.Web/wwwroot/uploads/*
 # Rider folders and files
 .idea/
 global.json
+
+# Compressed archives
+*.zip
+*.tar.gz
