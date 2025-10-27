@@ -28,15 +28,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         <vm:MainViewModel />
     </Design.DataContext>
 
-    <Grid RowDefinitions="Auto,*,Auto,Auto" Margin="20">
+    <Grid RowDefinitions="Auto,*,Auto,Auto" Margin="20" RowSpacing="30">
         <TextBlock Grid.Row="0"
                    Text="{x:Static assets:Resources.Installing}"
                    FontFamily="Segoe UI"
                    HorizontalAlignment="Center"
                    Margin="0,0,0,30" />
 
-        <Panel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,30">
-            <Ellipse Width="100" Height="100" Stroke="{DynamicResource SystemAccentColor}" StrokeDashArray="1"
+        <Panel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Ellipse Width="100" Height="100" Stroke="#7A6040" StrokeDashArray="1"
                      StrokeThickness="5" IsVisible="{Binding IsLoadingVisible}">
                 <Ellipse.Styles>
                     <Style Selector="Ellipse">
@@ -52,12 +52,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             </Ellipse>
         </Panel>
 
-        <ProgressBar Grid.Row="2" Minimum="0" Maximum="100" Foreground="{DynamicResource SystemAccentColor}"
+        <ProgressBar Grid.Row="2" Minimum="0" Maximum="100" Foreground="#7A6040"
                      Value="{Binding ProgressBarValue}" />
         <TextBlock Grid.Row="3"
                    Text="{Binding PhaseText}"
                    FontFamily="Segoe UI"
-                   HorizontalAlignment="Center"
-                   Margin="0,30,0,0" />
+                   HorizontalAlignment="Center" />
     </Grid>
 </UserControl>

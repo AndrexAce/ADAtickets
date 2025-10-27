@@ -24,7 +24,7 @@ using System;
 
 namespace ADAtickets.Installer.Desktop;
 
-internal static class Program
+file static class Program
 {
     [STAThread]
     public static void Main(string[] args)

@@ -27,7 +27,7 @@ using System.Globalization;
 
 namespace ADAtickets.Installer;
 
-public class App : Application
+public sealed class App : Application
 {
     public override void Initialize()
     {
@@ -40,11 +40,6 @@ public class App : Application
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             desktop.MainWindow = new MainWindow
-            {
-                DataContext = new MainViewModel()
-            };
-        else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
-            singleViewPlatform.MainView = new FirstStep
             {
                 DataContext = new MainViewModel()
             };

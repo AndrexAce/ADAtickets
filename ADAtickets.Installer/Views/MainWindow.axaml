@@ -30,17 +30,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         CanResize="False"
         WindowState="Normal">
     <Grid RowDefinitions="Auto,*">
-        <Grid Grid.Row="0" Height="35">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Name="ThemeButton"
-                        Content="☀️"
-                        Width="50"
-                        Height="35"
-                        HorizontalContentAlignment="Center"
-                        VerticalContentAlignment="Center"
-                        Background="Transparent"
-                        Command="{Binding ChangeThemeCommand}" />
-            </StackPanel>
+        <Grid Grid.Row="0" Height="35" HorizontalAlignment="Right">
+            <Button Name="ThemeButton"
+                    Content="☀️"
+                    Width="50"
+                    Height="35"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Background="Transparent"
+                    Command="{Binding ChangeThemeCommand}" />
         </Grid>
 
         <!-- Main content -->

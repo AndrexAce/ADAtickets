@@ -25,7 +25,6 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Platform.Storage;
 using Avalonia.Styling;
-using Avalonia.Threading;
 using ReactiveUI;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
@@ -36,10 +35,10 @@ namespace ADAtickets.Installer.ViewModels;
 
 internal sealed class MainViewModel : ReactiveObject
 {
+    private UserControl _currentView;
     private string? _apiAppId;
     private string? _apiAuthCertificatePassword;
     private string? _apiAuthCertificatePath;
-    private UserControl _currentView;
     private string? _dbPassword;
     private string? _dbUserName;
     private string? _devOpsOrganizationName;
@@ -59,7 +58,7 @@ internal sealed class MainViewModel : ReactiveObject
     private string? _webAuthCertificatePassword;
     private string? _webAuthCertificatePath;
 
-    public string? UploadedEnvFilePath { get; set; }
+    public string? UploadedEnvFilePath { get; private set; }
 
     public MainViewModel()
     {
@@ -138,7 +137,7 @@ internal sealed class MainViewModel : ReactiveObject
     }
 
     [Required(ErrorMessageResourceType = typeof(Resources),
-    ErrorMessageResourceName = "FieldRequired")]
+        ErrorMessageResourceName = "FieldRequired")]
     public string? BasicAuthPassword
     {
         get => _basicAuthPassword;
@@ -267,19 +266,12 @@ internal sealed class MainViewModel : ReactiveObject
         set => this.RaiseAndSetIfChanged(ref _isLoadingVisible, value);
     }
 
-    public static ICommand ExitAppCommand => ReactiveCommand.Create(ExitApp);
     public static ICommand ChangeThemeCommand => ReactiveCommand.Create(ChangeTheme);
     public ICommand GoToSecondStepCommand => ReactiveCommand.Create(GoToSecondStep);
     public ICommand GoToThirdStepCommand => ReactiveCommand.Create(GoToThirdStep);
     public ICommand GoToLastStepCommand => ReactiveCommand.Create<bool?>(GoToLastStep);
     public ICommand GoToPreviousStepCommand => ReactiveCommand.Create(GoToSecondStep);
     public ICommand UploadEnvFileCommand => ReactiveCommand.Create(UploadEnvFile);
-
-    private static void ExitApp()
-    {
-        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)
-            lifetime.Shutdown();
-    }
 
     private static void ChangeTheme()
     {
@@ -294,33 +286,28 @@ internal sealed class MainViewModel : ReactiveObject
     private void GoToSecondStep()
     {
         CurrentView = new SecondStep { DataContext = this };
-
-        RepositionWindow();
     }
 
     private void GoToThirdStep()
     {
-        if (ValidateSecondStepDocker() && ValidateSecondStepAzure())
-        {
-            CurrentView = new ThirdStep { DataContext = this };
+        if (!ValidateSecondStepDocker() || !ValidateSecondStepAzure()) return;
 
-            RepositionWindow();
-        }
+        CurrentView = new ThirdStep { DataContext = this };
     }
 
     private void GoToLastStep(bool? isEnvFileUploaded = false)
     {
-        if (isEnvFileUploaded == false || ValidateThirdStep())
-        {
-            CurrentView = new LastStep { DataContext = this };
+        if (isEnvFileUploaded != false && !ValidateThirdStep()) return;
 
-            RepositionWindow();
-        }
+        CurrentView = new LastStep { DataContext = this };
     }
 
     private async Task UploadEnvFile()
     {
-        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop && desktop.MainWindow is not null)
+        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime
+            {
+                MainWindow: not null
+            } desktop)
         {
             var files = await desktop.MainWindow.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
             {
@@ -330,7 +317,7 @@ internal sealed class MainViewModel : ReactiveObject
                 [
                     new FilePickerFileType(".env")
                     {
-                        Patterns = [ "*.env" ]
+                        Patterns = ["*.env"]
                     }
                 ]
             });
@@ -340,25 +327,6 @@ internal sealed class MainViewModel : ReactiveObject
                 UploadedEnvFilePath = files[0].Path.AbsolutePath;
                 GoToLastStep();
             }
-        }
-    }
-
-    private static void RepositionWindow()
-    {
-        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-        {
-            var mainWindow = desktop.MainWindow;
-            if (mainWindow != null)
-                Dispatcher.UIThread.Post(() =>
-                {
-                    var screen = mainWindow.Screens.ScreenFromWindow(mainWindow);
-                    if (screen != null)
-                    {
-                        var left = (screen.Bounds.Width - mainWindow.Bounds.Width) / 2;
-                        var top = (screen.Bounds.Height - mainWindow.Bounds.Height) / 2;
-                        mainWindow.Position = new PixelPoint((int)left, (int)top);
-                    }
-                });
         }
     }
 

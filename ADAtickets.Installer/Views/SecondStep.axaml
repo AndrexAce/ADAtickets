@@ -28,77 +28,79 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         <vm:MainViewModel />
     </Design.DataContext>
 
-    <StackPanel Orientation="Vertical" Margin="20 20 20 20" Spacing="20" HorizontalAlignment="Stretch">
+    <StackPanel Orientation="Vertical" Margin="20 20 20 20" Spacing="20">
         <TextBlock Text="{x:Static assets:Resources.PleaseInsert}"
                    FontFamily="Segoe UI"
                    HorizontalAlignment="Center" />
         <StackPanel Orientation="Horizontal" Spacing="20">
             <Image Source="/Assets/Docker.png" Width="100" />
-            <UniformGrid Columns="2" HorizontalAlignment="Stretch" ColumnSpacing="20" RowSpacing="20" Width="760">
-                <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+            <UniformGrid Columns="2" ColumnSpacing="20" RowSpacing="20" Width="760">
+                <StackPanel Orientation="Vertical">
                     <TextBlock Text="{x:Static assets:Resources.DbUserNameLabel}" FontFamily="Segoe UI" />
-                    <TextBox Text="{Binding DbUserName}" Watermark="postgres" HorizontalAlignment="Stretch" Width="NaN" />
+                    <TextBox Text="{Binding DbUserName}" Watermark="postgres" Width="NaN" />
                 </StackPanel>
-                <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+                <StackPanel Orientation="Vertical">
                     <TextBlock Text="{x:Static assets:Resources.DbPasswordLabel}" FontFamily="Segoe UI" />
-                    <TextBox Text="{Binding DbPassword}" Watermark="postgres" HorizontalAlignment="Stretch"
-							 Width="NaN" />
+                    <TextBox Text="{Binding DbPassword}" Watermark="postgres"
+                             Width="NaN" />
                 </StackPanel>
-                <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+                <StackPanel Orientation="Vertical">
                     <TextBlock Text="{x:Static assets:Resources.SslCertificatePathLabel}" FontFamily="Segoe UI" />
-                    <TextBox Text="{Binding SslCertificatePath}" Watermark="{x:Static assets:Resources.CertificatePathWatermark}"
-                             HorizontalAlignment="Stretch" Width="NaN" />
+                    <TextBox Text="{Binding SslCertificatePath}"
+                             Watermark="{x:Static assets:Resources.CertificatePathWatermark}"
+                             Width="NaN" />
                 </StackPanel>
-                <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+                <StackPanel Orientation="Vertical">
                     <TextBlock Text="{x:Static assets:Resources.SslCertificatePasswordLabel}" FontFamily="Segoe UI" />
-                    <TextBox Text="{Binding SslCertificatePassword}" Watermark="{x:Static assets:Resources.PasswordWatermark}" HorizontalAlignment="Stretch"
-							 Width="NaN" />
+                    <TextBox Text="{Binding SslCertificatePassword}"
+                             Watermark="{x:Static assets:Resources.PasswordWatermark}"
+                             Width="NaN" />
                 </StackPanel>
             </UniformGrid>
         </StackPanel>
         <Separator />
         <StackPanel Orientation="Horizontal" Spacing="20">
             <Image Source="/Assets/AzureDevOps.png" Width="100" />
-            <UniformGrid Columns="2" HorizontalAlignment="Stretch" ColumnSpacing="20" RowSpacing="20" Width="760">
-                <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+            <UniformGrid Columns="2" ColumnSpacing="20" RowSpacing="20" Width="760">
+                <StackPanel Orientation="Vertical">
                     <TextBlock Text="{x:Static assets:Resources.DevOpsOrganizationNameLabel}" FontFamily="Segoe UI" />
                     <TextBox Text="{Binding DevOpsOrganizationName}"
-                             Watermark="{x:Static assets:Resources.ExampleNameWatermark}" HorizontalAlignment="Stretch"
+                             Watermark="{x:Static assets:Resources.ExampleNameWatermark}"
                              Width="NaN" />
                 </StackPanel>
-				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-					<TextBlock Text="{x:Static assets:Resources.ServicePrincipalIdLabel}" FontFamily="Segoe UI" />
-					<TextBox Text="{Binding ServicePrincipalId}"
-                             Watermark="00000000-0000-0000-0000-000000000000" HorizontalAlignment="Stretch"
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="{x:Static assets:Resources.ServicePrincipalIdLabel}" FontFamily="Segoe UI" />
+                    <TextBox Text="{Binding ServicePrincipalId}"
+                             Watermark="00000000-0000-0000-0000-000000000000"
                              Width="NaN" />
-				</StackPanel>
-				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-					<TextBlock Text="{x:Static assets:Resources.BasicAuthUsernameLabel}" FontFamily="Segoe UI" />
-					<TextBox Text="{Binding BasicAuthUsername}"
-                             Watermark="{x:Static assets:Resources.BasicUsernameWatermark}" HorizontalAlignment="Stretch"
+                </StackPanel>
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="{x:Static assets:Resources.BasicAuthUsernameLabel}" FontFamily="Segoe UI" />
+                    <TextBox Text="{Binding BasicAuthUsername}"
+                             Watermark="{x:Static assets:Resources.BasicUsernameWatermark}"
                              Width="NaN" />
-				</StackPanel>
-				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
-					<TextBlock Text="{x:Static assets:Resources.BasicAuthPasswordLabel}" FontFamily="Segoe UI" />
-					<TextBox Text="{Binding BasicAuthPassword}"
-                             Watermark="{x:Static assets:Resources.PasswordWatermark}" HorizontalAlignment="Stretch"
+                </StackPanel>
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="{x:Static assets:Resources.BasicAuthPasswordLabel}" FontFamily="Segoe UI" />
+                    <TextBox Text="{Binding BasicAuthPassword}"
+                             Watermark="{x:Static assets:Resources.PasswordWatermark}"
                              Width="NaN" />
-				</StackPanel>
+                </StackPanel>
             </UniformGrid>
         </StackPanel>
         <Separator />
         <StackPanel Orientation="Horizontal" Spacing="20">
             <Image Source="/Assets/Azure.png" Width="100" />
-            <UniformGrid Columns="2" HorizontalAlignment="Stretch" ColumnSpacing="20" RowSpacing="20" Width="760">
-                <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+            <UniformGrid Columns="2" ColumnSpacing="20" RowSpacing="20" Width="760">
+                <StackPanel Orientation="Vertical">
                     <TextBlock Text="{x:Static assets:Resources.TenantIdLabel}" FontFamily="Segoe UI" />
                     <TextBox Text="{Binding TenantId}" Watermark="00000000-0000-0000-0000-000000000000"
-                             HorizontalAlignment="Stretch" Width="NaN" />
+                             Width="NaN" />
                 </StackPanel>
-                <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+                <StackPanel Orientation="Vertical">
                     <TextBlock Text="{x:Static assets:Resources.ExternalTenantIdLabel}" FontFamily="Segoe UI" />
                     <TextBox Text="{Binding ExternalTenantId}" Watermark="00000000-0000-0000-0000-000000000000"
-                             HorizontalAlignment="Stretch" Width="NaN" />
+                             Width="NaN" />
                 </StackPanel>
             </UniformGrid>
         </StackPanel>

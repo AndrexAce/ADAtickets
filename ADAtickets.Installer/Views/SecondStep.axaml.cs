@@ -22,7 +22,7 @@ using Avalonia.Controls;
 
 namespace ADAtickets.Installer.Views;
 
-internal partial class SecondStep : UserControl
+internal sealed partial class SecondStep : UserControl
 {
     public SecondStep()
     {

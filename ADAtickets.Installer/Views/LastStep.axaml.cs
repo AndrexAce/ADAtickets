@@ -28,19 +28,61 @@ using Docker.DotNet.Models;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Avalonia.Platform;
 
 namespace ADAtickets.Installer.Views;
 
-internal partial class LastStep : UserControl
+internal sealed partial class LastStep : UserControl
 {
-    private const string WINDOWS_DOCKERSERVER = "npipe://./pipe/docker_engine";
-    private const string LINUX_DOCKERSERVER = "unix:///var/run/docker.sock";
-    private const string WINDOWS_DOCKEREXE = @"C:\Program Files\Docker\Docker\resources\bin\docker.exe";
-    private const string LINUX_DOCKEREXE = "/usr/bin/docker";
+    private const string WindowsDockerServer = "npipe://./pipe/docker_engine";
+    private const string MacOsDockerServer = "unix:///var/run/docker.sock";
+
+    private static readonly string[] LinuxDockerServerCandidates =
+    [
+        "/var/run/docker.sock",
+        $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}/.docker/desktop/docker.sock",
+        $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}/.docker/desktop/docker-cli.sock"
+    ];
+
+    private const string WindowsDockerExe = @"C:\Program Files\Docker\Docker\resources\bin\docker.exe";
+
+    private static readonly string[] MacOsDockerExeCandidates =
+    [
+        "/usr/local/bin/docker",
+        "/opt/homebrew/bin/docker",
+        "/Applications/Docker.app/Contents/Resources/bin/docker"
+    ];
+
+    private static readonly string[] LinuxDockerExeCandidates =
+    [
+        "/usr/bin/docker",
+        "/bin/docker",
+        "/usr/local/bin/docker",
+        "/opt/docker-desktop/bin/docker"
+    ];
+
+    private static Uri GetDockerServerUri()
+    {
+        if (OperatingSystem.IsWindows()) return new Uri(WindowsDockerServer);
+
+        return OperatingSystem.IsMacOS()
+            ? new Uri(MacOsDockerServer)
+            : new Uri("unix://" + LinuxDockerServerCandidates.First(File.Exists));
+    }
+
+    private static string GetDockerExePath()
+    {
+        if (OperatingSystem.IsWindows()) return WindowsDockerExe;
+
+        var candidates = OperatingSystem.IsMacOS() ? MacOsDockerExeCandidates : LinuxDockerExeCandidates;
+        return candidates.First(File.Exists);
+    }
 
     public LastStep()
     {
@@ -82,9 +124,7 @@ internal partial class LastStep : UserControl
                 viewModel.ProgressBarValue = 5;
 
                 // Create a Docker client from the correct URI based on the OS
-                using var client = new DockerClientConfiguration(
-                    OperatingSystem.IsWindows() ? new Uri(WINDOWS_DOCKERSERVER) : new Uri(LINUX_DOCKERSERVER)
-                ).CreateClient();
+                using var client = new DockerClientConfiguration(GetDockerServerUri()).CreateClient();
 
                 await Task.Run(() => PullDbContainerAsync(viewModel, client));
 
@@ -94,7 +134,7 @@ internal partial class LastStep : UserControl
 
                 viewModel.ProgressBarValue = 45;
 
-                await Task.Run(() => PullAPIAsync(viewModel, client));
+                await Task.Run(() => PullApiAsync(viewModel, client));
 
                 viewModel.ProgressBarValue = 65;
 
@@ -137,14 +177,10 @@ internal partial class LastStep : UserControl
 
     private static async Task WriteToEnvFileAsync(MainViewModel viewModel, string path)
     {
-        // Get assembly containing the embedded resource
-        var assembly = Assembly.GetExecutingAssembly();
-        var resourceAssemblyPath = "ADAtickets.Installer.Assets.example.env";
-
-        // Read the template
-        using var stream = assembly.GetManifestResourceStream(resourceAssemblyPath) ??
-                           throw new IOException($"Could not find embedded resource: {resourceAssemblyPath}");
-        using StreamReader reader = new(stream);
+        // Get the resource
+        var envFileStream =
+            AssetLoader.Open(new Uri($"avares://{Assembly.GetExecutingAssembly().GetName().Name}/Assets/example.env"));
+        using StreamReader reader = new(envFileStream);
         var templateContent = await reader.ReadToEndAsync();
 
         // Replace variables with ViewModel data
@@ -156,25 +192,30 @@ internal partial class LastStep : UserControl
 
         // SSL certificate configuration
         fileContent = Regex.Replace(fileContent, "^SSLCERTIFICATEDISKPATH=.*$",
-            $"SSLCERTIFICATEDISKPATH={Path.GetDirectoryName(viewModel.SslCertificatePath)}", RegexOptions.Compiled | RegexOptions.Multiline,
+            $"SSLCERTIFICATEDISKPATH={Path.GetDirectoryName(viewModel.SslCertificatePath)}",
+            RegexOptions.Compiled | RegexOptions.Multiline,
             TimeSpan.FromMilliseconds(100));
         fileContent = Regex.Replace(fileContent, "^SSLCERTIFICATENAME=.*$",
-            $"SSLCERTIFICATENAME={Path.GetFileName(viewModel.SslCertificatePath)}", RegexOptions.Compiled | RegexOptions.Multiline,
+            $"SSLCERTIFICATENAME={Path.GetFileName(viewModel.SslCertificatePath)}",
+            RegexOptions.Compiled | RegexOptions.Multiline,
             TimeSpan.FromMilliseconds(100));
         fileContent = Regex.Replace(fileContent, "^SSLCERTIFICATEPASSWORD=.*$",
-            $"SSLCERTIFICATEPASSWORD={viewModel.SslCertificatePassword}", RegexOptions.Compiled | RegexOptions.Multiline,
+            $"SSLCERTIFICATEPASSWORD={viewModel.SslCertificatePassword}",
+            RegexOptions.Compiled | RegexOptions.Multiline,
             TimeSpan.FromMilliseconds(100));
 
         // DevOps configuration
         fileContent = Regex.Replace(fileContent, "^DEVOPSORGANIZATIONNAME=.*$",
-            $"DEVOPSORGANIZATIONNAME={viewModel.DevOpsOrganizationName}", RegexOptions.Compiled | RegexOptions.Multiline,
+            $"DEVOPSORGANIZATIONNAME={viewModel.DevOpsOrganizationName}",
+            RegexOptions.Compiled | RegexOptions.Multiline,
             TimeSpan.FromMilliseconds(100));
 
         // Tenant configuration
         fileContent = Regex.Replace(fileContent, "^TENANTID=.*$", $"TENANTID={viewModel.TenantId}",
             RegexOptions.Compiled | RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
         fileContent = Regex.Replace(fileContent, "^EXTERNALTENANTID=.*$",
-            $"EXTERNALTENANTID={viewModel.ExternalTenantId}", RegexOptions.Compiled | RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
+            $"EXTERNALTENANTID={viewModel.ExternalTenantId}", RegexOptions.Compiled | RegexOptions.Multiline,
+            TimeSpan.FromMilliseconds(100));
 
         // Entra ID configuration (API)
         fileContent = Regex.Replace(fileContent, "^APIAPPID=.*$", $"APIAPPID={viewModel.ApiAppId}",
@@ -182,7 +223,8 @@ internal partial class LastStep : UserControl
 
         // External Entra ID configuration (API)
         fileContent = Regex.Replace(fileContent, "^EXTERNALAPIAPPID=.*$",
-            $"EXTERNALAPIAPPID={viewModel.ExternalApiAppId}", RegexOptions.Compiled | RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
+            $"EXTERNALAPIAPPID={viewModel.ExternalApiAppId}", RegexOptions.Compiled | RegexOptions.Multiline,
+            TimeSpan.FromMilliseconds(100));
 
         // Entra ID configuration (web app)
         fileContent = Regex.Replace(fileContent, "^WEBAPPID=.*$", $"WEBAPPID={viewModel.WebAppId}",
@@ -190,17 +232,20 @@ internal partial class LastStep : UserControl
 
         // External Entra ID configuration (web app)
         fileContent = Regex.Replace(fileContent, "^EXTERNALWEBAPPID=.*$",
-            $"EXTERNALWEBAPPID={viewModel.ExternalWebAppId}", RegexOptions.Compiled | RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
+            $"EXTERNALWEBAPPID={viewModel.ExternalWebAppId}", RegexOptions.Compiled | RegexOptions.Multiline,
+            TimeSpan.FromMilliseconds(100));
 
         // Authentication configuration (API)
         fileContent = Regex.Replace(fileContent, "^APIAUTHCERTIFICATEDISKPATH=.*$",
             $"APIAUTHCERTIFICATEDISKPATH={Path.GetDirectoryName(viewModel.ApiAuthCertificatePath)}",
             RegexOptions.Compiled | RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
         fileContent = Regex.Replace(fileContent, "^APIAUTHCERTIFICATENAME=.*$",
-            $"APIAUTHCERTIFICATENAME={Path.GetFileName(viewModel.ApiAuthCertificatePath)}", RegexOptions.Compiled | RegexOptions.Multiline,
+            $"APIAUTHCERTIFICATENAME={Path.GetFileName(viewModel.ApiAuthCertificatePath)}",
+            RegexOptions.Compiled | RegexOptions.Multiline,
             TimeSpan.FromMilliseconds(100));
         fileContent = Regex.Replace(fileContent, "^APIAUTHCERTIFICATEPASSWORD=.*$",
-            $"APIAUTHCERTIFICATEPASSWORD={viewModel.ApiAuthCertificatePassword}", RegexOptions.Compiled | RegexOptions.Multiline,
+            $"APIAUTHCERTIFICATEPASSWORD={viewModel.ApiAuthCertificatePassword}",
+            RegexOptions.Compiled | RegexOptions.Multiline,
             TimeSpan.FromMilliseconds(100));
 
         // Authentication configuration (web app)
@@ -208,10 +253,12 @@ internal partial class LastStep : UserControl
             $"WEBAUTHCERTIFICATEDISKPATH={Path.GetDirectoryName(viewModel.WebAuthCertificatePath)}",
             RegexOptions.Compiled | RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
         fileContent = Regex.Replace(fileContent, "^WEBAUTHCERTIFICATENAME=.*$",
-            $"WEBAUTHCERTIFICATENAME={Path.GetFileName(viewModel.WebAuthCertificatePath)}", RegexOptions.Compiled | RegexOptions.Multiline,
+            $"WEBAUTHCERTIFICATENAME={Path.GetFileName(viewModel.WebAuthCertificatePath)}",
+            RegexOptions.Compiled | RegexOptions.Multiline,
             TimeSpan.FromMilliseconds(100));
         fileContent = Regex.Replace(fileContent, "^WEBAUTHCERTIFICATEPASSWORD=.*$",
-            $"WEBAUTHCERTIFICATEPASSWORD={viewModel.WebAuthCertificatePassword}", RegexOptions.Compiled | RegexOptions.Multiline,
+            $"WEBAUTHCERTIFICATEPASSWORD={viewModel.WebAuthCertificatePassword}",
+            RegexOptions.Compiled | RegexOptions.Multiline,
             TimeSpan.FromMilliseconds(100));
 
         // Webhooks configuration (API)
@@ -225,7 +272,7 @@ internal partial class LastStep : UserControl
             $"BASICAUTHPASSWORD={viewModel.BasicAuthPassword}",
             RegexOptions.Compiled | RegexOptions.Multiline, TimeSpan.FromMilliseconds(100));
 
-        // Write to temporary location
+        // Write to the temporary location
         var tempEnvPath = Path.Combine(path, ".env");
         await File.WriteAllTextAsync(tempEnvPath, fileContent);
     }
@@ -235,7 +282,7 @@ internal partial class LastStep : UserControl
         while (true)
             try
             {
-                Dispatcher.UIThread.Post(() => viewModel.PhaseText = $"{Assets.Resources.CacheContainerPull}");
+                Dispatcher.UIThread.Post(() => { viewModel.PhaseText = $"{Assets.Resources.CacheContainerPull}"; });
 
                 // Pull the Redis image
                 await client.Images.CreateImageAsync(
@@ -251,10 +298,10 @@ internal partial class LastStep : UserControl
 
                 return;
             }
-            catch (TimeoutException)
+            catch (Exception exception) when (exception is TimeoutException or HttpRequestException)
             {
                 // If Docker was closed, wait for it to be reopened
-                Dispatcher.UIThread.Post(() => viewModel.PhaseText = $"{Assets.Resources.WaitingDocker}");
+                Dispatcher.UIThread.Post(() => { viewModel.PhaseText = $"{Assets.Resources.WaitingDocker}"; });
 
                 await WaitForDockerAsync(viewModel, client);
             }
@@ -265,7 +312,7 @@ internal partial class LastStep : UserControl
         while (true)
             try
             {
-                Dispatcher.UIThread.Post(() => viewModel.PhaseText = $"{Assets.Resources.DbContainerPull}");
+                Dispatcher.UIThread.Post(() => { viewModel.PhaseText = $"{Assets.Resources.DbContainerPull}"; });
 
                 // Pull the PostgreSQL image
                 await client.Images.CreateImageAsync(
@@ -281,21 +328,21 @@ internal partial class LastStep : UserControl
 
                 return;
             }
-            catch (TimeoutException)
+            catch (Exception exception) when (exception is TimeoutException or HttpRequestException)
             {
                 // If Docker was closed, wait for it to be reopened
-                Dispatcher.UIThread.Post(() => viewModel.PhaseText = $"{Assets.Resources.WaitingDocker}");
+                Dispatcher.UIThread.Post(() => { viewModel.PhaseText = $"{Assets.Resources.WaitingDocker}"; });
 
                 await WaitForDockerAsync(viewModel, client);
             }
     }
 
-    private static async Task PullAPIAsync(MainViewModel viewModel, DockerClient client)
+    private static async Task PullApiAsync(MainViewModel viewModel, DockerClient client)
     {
         while (true)
             try
             {
-                Dispatcher.UIThread.Post(() => viewModel.PhaseText = $"{Assets.Resources.ApiContainerPull}");
+                Dispatcher.UIThread.Post(() => { viewModel.PhaseText = $"{Assets.Resources.ApiContainerPull}"; });
 
                 // Pull the API image
                 await client.Images.CreateImageAsync(
@@ -311,10 +358,10 @@ internal partial class LastStep : UserControl
 
                 return;
             }
-            catch (TimeoutException)
+            catch (Exception exception) when (exception is TimeoutException or HttpRequestException)
             {
                 // If Docker was closed, wait for it to be reopened
-                Dispatcher.UIThread.Post(() => viewModel.PhaseText = $"{Assets.Resources.WaitingDocker}");
+                Dispatcher.UIThread.Post(() => { viewModel.PhaseText = $"{Assets.Resources.WaitingDocker}"; });
 
                 await WaitForDockerAsync(viewModel, client);
             }
@@ -325,7 +372,7 @@ internal partial class LastStep : UserControl
         while (true)
             try
             {
-                Dispatcher.UIThread.Post(() => viewModel.PhaseText = $"{Assets.Resources.WebContainerPull}");
+                Dispatcher.UIThread.Post(() => { viewModel.PhaseText = $"{Assets.Resources.WebContainerPull}"; });
 
                 // Pull the web image
                 await client.Images.CreateImageAsync(
@@ -341,10 +388,10 @@ internal partial class LastStep : UserControl
 
                 return;
             }
-            catch (TimeoutException)
+            catch (Exception exception) when (exception is TimeoutException or HttpRequestException)
             {
                 // If Docker was closed, wait for it to be reopened
-                Dispatcher.UIThread.Post(() => viewModel.PhaseText = $"{Assets.Resources.WaitingDocker}");
+                Dispatcher.UIThread.Post(() => { viewModel.PhaseText = $"{Assets.Resources.WaitingDocker}"; });
 
                 await WaitForDockerAsync(viewModel, client);
             }
@@ -355,27 +402,24 @@ internal partial class LastStep : UserControl
         while (true)
             try
             {
-                Dispatcher.UIThread.Post(() => viewModel.PhaseText = $"{Assets.Resources.ComposeStartup}");
+                Dispatcher.UIThread.Post(() => { viewModel.PhaseText = $"{Assets.Resources.ComposeStartup}"; });
 
-                // Get assembly containing the embedded resource
-                var assembly = Assembly.GetExecutingAssembly();
-                var composeAssemblyPath = "ADAtickets.Installer.Assets.docker-compose.yml";
-                var overrideAssemblyPath = "ADAtickets.Installer.Assets.docker-compose.override-prod.yml";
+                // Get the resource
+                var composeStream =
+                    AssetLoader.Open(
+                        new Uri(
+                            $"avares://{Assembly.GetExecutingAssembly().GetName().Name}/Assets/docker-compose.yml"));
+                var overrideStream = AssetLoader.Open(new Uri(
+                    $"avares://{Assembly.GetExecutingAssembly().GetName().Name}/Assets/docker-compose.override-prod.yml"));
 
-                // Read the template
-                using var composeStream = assembly.GetManifestResourceStream(composeAssemblyPath) ??
-                                          throw new IOException(
-                                              $"Could not find embedded resource: {composeAssemblyPath}");
+                // Read the templates
                 using StreamReader composeReader = new(composeStream);
                 var composeContent = await composeReader.ReadToEndAsync();
 
-                using var overrideStream = assembly.GetManifestResourceStream(overrideAssemblyPath) ??
-                                           throw new IOException(
-                                               $"Could not find embedded resource: {overrideAssemblyPath}");
                 using StreamReader reader = new(overrideStream);
                 var overrideContent = await reader.ReadToEndAsync();
 
-                // Write to temporary location
+                // Write to the temporary location
                 var tempComposePath = Path.Combine(path, "docker-compose.yml");
                 await File.WriteAllTextAsync(tempComposePath, composeContent);
 
@@ -383,7 +427,7 @@ internal partial class LastStep : UserControl
                 await File.WriteAllTextAsync(tempOverridePath, overrideContent);
 
                 // Find the Docker executable in the known paths
-                var dockerExePath = OperatingSystem.IsWindows() ? WINDOWS_DOCKEREXE : LINUX_DOCKEREXE;
+                var dockerExePath = GetDockerExePath();
 
                 // Run the docker-compose command
                 Process process = new()
@@ -408,10 +452,10 @@ internal partial class LastStep : UserControl
 
                 return;
             }
-            catch (TimeoutException)
+            catch (Exception exception) when (exception is TimeoutException or HttpRequestException)
             {
                 // If Docker was closed, wait for it to be reopened
-                Dispatcher.UIThread.Post(() => viewModel.PhaseText = $"{Assets.Resources.WaitingDocker}");
+                Dispatcher.UIThread.Post(() => { viewModel.PhaseText = $"{Assets.Resources.WaitingDocker}"; });
 
                 await WaitForDockerAsync(viewModel, client);
             }
@@ -427,12 +471,12 @@ internal partial class LastStep : UserControl
 
                 return;
             }
-            catch (TimeoutException)
+            catch (Exception exception) when (exception is TimeoutException or HttpRequestException)
             {
                 // If it's unavailable, update the message and wait for it to be ready
                 await Task.Delay(5000);
 
-                Dispatcher.UIThread.Post(() => viewModel.PhaseText = $"{Assets.Resources.StillWaitingDocker}");
+                Dispatcher.UIThread.Post(() => { viewModel.PhaseText = $"{Assets.Resources.StillWaitingDocker}"; });
             }
     }
 
