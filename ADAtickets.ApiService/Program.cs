@@ -34,7 +34,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Identity.Web;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Scalar.AspNetCore;
 using StackExchange.Redis;
 using System.Net.Mime;
@@ -82,8 +82,7 @@ internal static class Program
                         .MapEnum<TicketType>("ticket_type")
                         .MapEnum<UserType>("user_type")
                         .EnableRetryOnFailure();
-                })
-                .UseSnakeCaseNamingConvention();
+                });
         }, ServiceLifetime.Transient);
 
         // Add JWTs decoding for both Entra ID and Entra External ID.

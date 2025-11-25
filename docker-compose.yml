@@ -10,7 +10,7 @@ services:
       interval: 10s
       timeout: 3s
       retries: 3
-    image: postgres:18.0
+    image: postgres:18.1
     networks:
       - dev-network
     volumes:
@@ -25,7 +25,7 @@ services:
       - dev-network
     ports:
       - "5433:80"
-    image: dpage/pgadmin4:9.9.0
+    image: dpage/pgadmin4:9.10.0
     environment:
       - PGADMIN_DEFAULT_EMAIL=${PGADMINDEFAULTEMAIL:?error}
       - PGADMIN_DEFAULT_PASSWORD=${PGADMINDEFAULTPASSWORD:?error}
@@ -35,7 +35,7 @@ services:
   adatickets.redis:
     container_name: Dev-Cache
     command: redis-server --appendonly yes
-    image: redis:8.2.2
+    image: redis:8.4.0
     networks:
       - dev-network
     volumes:

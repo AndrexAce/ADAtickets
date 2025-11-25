@@ -2,7 +2,7 @@
     <PropertyGroup>
         <AssemblyName>ADAticketsInstaller</AssemblyName>
         <OutputType>WinExe</OutputType>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <RuntimeIdentifiers>win-x64;win-arm64;linux-x64;linux-arm64;osx-x64;osx-arm64</RuntimeIdentifiers>
         <SelfContained>true</SelfContained>
         <PublishSingleFile>true</PublishSingleFile>
@@ -16,14 +16,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Content Include="favicon.ico"/>
+        <Content Include="favicon.ico" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia.Desktop" Version="11.3.8"/>
+        <PackageReference Include="Avalonia.Desktop" Version="11.3.9" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\ADAtickets.Installer\ADAtickets.Installer.csproj"/>
+        <ProjectReference Include="..\ADAtickets.Installer\ADAtickets.Installer.csproj" />
     </ItemGroup>
 </Project>

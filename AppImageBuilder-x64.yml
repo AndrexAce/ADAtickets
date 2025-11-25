@@ -64,9 +64,9 @@ AppDir:
 
 script: |
   mkdir -p "AppDir/usr/bin"
-  cp "ADAtickets.Installer.Desktop/bin/Release/net9.0/linux-x64/publish/ADAticketsInstaller" "AppDir/usr/bin/ADAticketsInstaller"
-  cp "ADAtickets.Installer.Desktop/bin/Release/net9.0/linux-x64/publish/libSkiaSharp.so" "AppDir/usr/bin/libSkiaSharp.so"
-  cp "ADAtickets.Installer.Desktop/bin/Release/net9.0/linux-x64/publish/libHarfBuzzSharp.so" "AppDir/usr/bin/libHarfBuzzSharp.so"
+  cp "ADAtickets.Installer.Desktop/bin/Release/net10.0/linux-x64/publish/ADAticketsInstaller" "AppDir/usr/bin/ADAticketsInstaller"
+  cp "ADAtickets.Installer.Desktop/bin/Release/net10.0/linux-x64/publish/libSkiaSharp.so" "AppDir/usr/bin/libSkiaSharp.so"
+  cp "ADAtickets.Installer.Desktop/bin/Release/net10.0/linux-x64/publish/libHarfBuzzSharp.so" "AppDir/usr/bin/libHarfBuzzSharp.so"
   mkdir -p "AppDir/usr/share/icons"
   cp "ADAtickets.Installer.Desktop/favicon.svg" "AppDir/usr/share/icons/favicon.svg"
   

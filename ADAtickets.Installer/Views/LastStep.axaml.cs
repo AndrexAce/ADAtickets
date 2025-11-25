@@ -22,6 +22,7 @@ using ADAtickets.Installer.ViewModels;
 using ADAtickets.Shared.Constants;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Platform;
 using Avalonia.Threading;
 using Docker.DotNet;
 using Docker.DotNet.Models;
@@ -34,7 +35,6 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Avalonia.Platform;
 
 namespace ADAtickets.Installer.Views;
 
