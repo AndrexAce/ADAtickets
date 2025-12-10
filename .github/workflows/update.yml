@@ -1,6 +1,7 @@
+name: Update
 on:
   workflow_run:
-    workflows: [ quality.yml ]
+    workflows: [ Quality ]
     types: [ completed ]
 
 jobs:
