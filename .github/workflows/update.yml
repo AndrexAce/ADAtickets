@@ -11,6 +11,7 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     permissions:
       contents: write
+      packages: write
     steps:
       - name: Setup .NET 10
         uses: actions/setup-dotnet@v5
@@ -47,8 +48,10 @@ jobs:
 
       - name: Publish NuGet package to GitHub Packages
         run: |
-          dotnet nuget add source --username ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
-          dotnet nuget push "./nupkg/*.nupkg" --source "github" --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
+          dotnet nuget push "./nupkg/*.nupkg" \
+          --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" \
+          --api-key ${{ secrets.GITHUB_TOKEN }} \
+          --skip-duplicate
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
