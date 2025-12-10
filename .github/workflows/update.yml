@@ -1,25 +1,26 @@
-name: Tag, containerize and update
 on:
   workflow_run:
-    workflows: [ "Build, test and analyze" ]
-    types:
-      - completed
+    workflows: [ quality.yml ]
+    types: [ completed ]
 
 jobs:
   update:
     runs-on: ubuntu-latest
-    name: Tag, containerize and update
+    name: Push tag and deploy packages
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    permissions:
+      contents: write
     steps:
       - name: Setup .NET 10
         uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 10.0.x
 
-      - uses: actions/checkout@v5
+      - name: Checkout repository
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
-          token: ${{ secrets.PAT }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Git
         run: |
@@ -33,7 +34,6 @@ jobs:
         run: |
           if ! git ls-remote --tags origin | grep -q "refs/tags/${{ env.INSTALLER_VERSION }}$"; then
             git tag ${{ env.INSTALLER_VERSION }}
-            git remote set-url origin https://x-access-token:${{ secrets.PAT }}@github.com/${{ github.repository }}.git
             git push origin ${{ env.INSTALLER_VERSION }}
           else
             echo "Tag ${{ env.INSTALLER_VERSION }} already exists. Skipping tag creation."
@@ -46,36 +46,20 @@ jobs:
 
       - name: Publish NuGet package to GitHub Packages
         run: |
-          dotnet nuget add source --username ${{ github.actor }} --password ${{ secrets.PAT }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
-          dotnet nuget push "./nupkg/*.nupkg" --source "github" --api-key ${{ secrets.PAT }} --skip-duplicate
+          dotnet nuget add source --username ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+          dotnet nuget push "./nupkg/*.nupkg" --source "github" --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.PAT }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get API version
         run: echo "API_VERSION=v$(cat ADAtickets.ApiService/VERSION)" >> $GITHUB_ENV
 
-      - name: Check if API image exists
-        id: check-api-image
-        env:
-          PAT: ${{ secrets.PAT }}
-        run: |
-          response=$(curl -s -X GET "https://api.github.com/users/${{ github.repository_owner }}/packages/container/adatickets-api/versions" \
-            -H "Authorization: Bearer $PAT")
-          api_exists=$(echo "$response" | grep -F "${{ env.API_VERSION }}" | wc -l)
-          if [ "$api_exists" -gt 0 ]; then
-            echo "api_exists=true" >> $GITHUB_OUTPUT
-            echo "API image ${{ env.API_VERSION }} already exists"
-          else
-            echo "api_exists=false" >> $GITHUB_OUTPUT
-          fi
-
       - name: Build and push API
-        if: steps.check-api-image.outputs.api_exists == 'false'
         uses: docker/build-push-action@v6
         with:
           build-args: BUILD_CONFIGURATION=Release
@@ -89,23 +73,7 @@ jobs:
       - name: Get Web version
         run: echo "WEB_VERSION=v$(cat ADAtickets.Web/VERSION)" >> $GITHUB_ENV
 
-      - name: Check if Web image exists
-        id: check-web-image
-        env:
-          PAT: ${{ secrets.PAT }}
-        run: |
-          response=$(curl -s -X GET "https://api.github.com/users/${{ github.repository_owner }}/packages/container/adatickets-web/versions" \
-            -H "Authorization: Bearer $PAT")
-          web_exists=$(echo "$response" | grep -F "${{ env.WEB_VERSION }}" | wc -l)
-          if [ "$web_exists" -gt 0 ]; then
-            echo "web_exists=true" >> $GITHUB_OUTPUT
-            echo "Web image ${{ env.WEB_VERSION }} already exists"
-          else
-            echo "web_exists=false" >> $GITHUB_OUTPUT
-          fi
-
       - name: Build and push web app
-        if: steps.check-web-image.outputs.web_exists == 'false'
         uses: docker/build-push-action@v6
         with:
           build-args: BUILD_CONFIGURATION=Release

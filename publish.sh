@@ -6,11 +6,6 @@ zip -j "adaticketsinstaller-linux-x64.zip" \
   "ADAtickets.Installer.Desktop/bin/Release/net10.0/linux-x64/publish/ADAticketsInstaller" \
   "ADAtickets.Installer.Desktop/bin/Release/net10.0/linux-x64/publish/libSkiaSharp.so" \
   "ADAtickets.Installer.Desktop/bin/Release/net10.0/linux-x64/publish/libHarfBuzzSharp.so"
-# AppImage
-VERSION=$(cat "ADAtickets.Installer/VERSION") appimage-builder --recipe AppImageBuilder-x64.yml
-rm -rf "AppDir"
-rm -rf "appimage-build"
-rm -f "ADAticketsInstaller-$(cat "ADAtickets.Installer/VERSION")-x86_64.AppImage.zsync"
 
 # Linux ARM64
 dotnet publish ADAtickets.Installer.Desktop -c Release -r linux-arm64

@@ -1,15 +1,13 @@
-name: Build, test and analyze
 on:
   push:
-    branches:
-      - master
+    branches: [ master ]
   pull_request:
     types: [ opened, synchronize, reopened ]
 
 jobs:
   quality:
     runs-on: ubuntu-latest
-    name: Build, test and analyze
+    name: Code quality check and test
     steps:
       - name: Set up JDK 25
         uses: actions/setup-java@v5
@@ -22,18 +20,19 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
-      - uses: actions/checkout@v5
+      - name: Checkout repository
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
-      - name: Cache SonarQube Cloud packages
+      - name: Cache SonarCloud packages
         uses: actions/cache@v4
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
-      - name: Cache SonarQube Cloud scanner
+      - name: Cache SonarCloud scanner
         id: cache-sonar-scanner
         uses: actions/cache@v4
         with:
@@ -45,37 +44,28 @@ jobs:
         id: cache-nuget-packages
         uses: actions/cache@v4
         with:
-          path: |
-            ~/.nuget/packages
-            ~/.dotnet/tools
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
           restore-keys: ${{ runner.os }}-nuget-
 
-      - name: Install SonarQube Cloud scanner
+      - name: Install SonarCloud scanner
         if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
-        shell: bash
         run: |
           mkdir -p ./.sonar/scanner
           dotnet tool update dotnet-sonarscanner --tool-path ./.sonar/scanner
 
-      - name: Install Coverlet NuGet tool
-        if: steps.cache-nuget-packages.outputs.cache-hit != 'true'
-        shell: bash
-        run: dotnet tool install -g coverlet.console
-
       - name: Begin SonarCloud analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        shell: bash
         run: |
           ./.sonar/scanner/dotnet-sonarscanner begin \
           /k:"AndrexAce_ADAtickets" \
           /o:"andrexace" \
-          /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
+          /d:sonar.token="$SONAR_TOKEN" \
           /d:sonar.host.url="https://sonarcloud.io" \
           /d:sonar.scanner.skipJreProvisioning=true \
           /d:sonar.dotnet.excludeTestProjects=true \
-          /d:sonar.cs.opencover.reportsPaths=coverage.xml \
+          /d:sonar.cs.opencover.reportsPaths=ADAtickets.Tests/coverage.xml \
           /d:sonar.exclusions=**/Migrations/** \
           /d:sonar.coverage.exclusions=**/*.yml,**/*.json \
           /v:v$(cat ADAtickets.Installer/VERSION)
@@ -84,22 +74,21 @@ jobs:
         env:
           POSTGRES_USERNAME: ${{ secrets.POSTGRES_USERNAME }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-        run: dotnet build ADAtickets.sln -c Release --no-incremental --property:postgresUsername=$POSTGRES_USERNAME --property:postgresPassword=$POSTGRES_PASSWORD
+        run: dotnet build ADAtickets.sln -c Release --no-incremental --property:postgresUsername="$POSTGRES_USERNAME" --property:postgresPassword="$POSTGRES_PASSWORD"
 
-      - name: Run tests
+      - name: Run tests and collect coverage
         env:
           ASPNETCORE_ENVIRONMENT: Staging
         run: |
-          coverlet ./ADAtickets.Tests/bin/Release/net10.0/ADAtickets.Tests.dll \
-          --target "dotnet" \
-          --targetargs "test ./ADAtickets.Tests/ADAtickets.Tests.csproj --no-build --configuration Release" \
-          -f=opencover \
-          -o="coverage.xml"
+          dotnet test ADAtickets.Tests/ADAtickets.Tests.csproj \
+          --no-build \
+          --configuration Release \
+          /p:CollectCoverage=true \
+          /p:CoverletOutput=coverage.xml \
+          /p:CoverletOutputFormat=opencover
 
       - name: End SonarCloud analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         if: always()
-        shell: bash
-        run: |
-          ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+        run: ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="$SONAR_TOKEN"
