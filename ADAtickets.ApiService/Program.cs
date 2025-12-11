@@ -1,287 +1,49 @@
-/*
- * ADAtickets is a simple, lightweight, open source ticketing system
- * interacting with your enterprise repositories on Azure DevOps
- * with a two-way synchronization.
- * Copyright (C) 2025  Andrea Lucchese
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+using ADAtickets.ServiceDefaults;
 
-using ADAtickets.ApiService.Authentication;
-using ADAtickets.ApiService.Configs;
-using ADAtickets.ApiService.Controllers;
-using ADAtickets.ApiService.Hubs;
-using ADAtickets.ApiService.Repositories;
-using ADAtickets.ApiService.Services;
-using ADAtickets.Shared.Constants;
-using ADAtickets.Shared.Extensions;
-using ADAtickets.Shared.Models;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.FileProviders;
-using Microsoft.Identity.Web;
-using Microsoft.OpenApi;
-using Scalar.AspNetCore;
-using StackExchange.Redis;
-using System.Net.Mime;
-using System.Reflection;
+var builder = WebApplication.CreateBuilder(args);
 
-namespace ADAtickets.ApiService;
+// Add service defaults & Aspire client integrations.
+builder.AddServiceDefaults();
 
-/// <summary>
-///     Bootstrap class for the application.
-/// </summary>
-internal static class Program
+// Add services to the container.
+builder.Services.AddProblemDetails();
+
+// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddOpenApi();
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+app.UseExceptionHandler();
+
+if (app.Environment.IsDevelopment())
 {
-    /// <summary>
-    ///     Entrypoint of the application.
-    /// </summary>
-    /// <param name="args">Additional arguments passed by command line.</param>
-    /// <returns>The <see cref="Task" /> running the application.</returns>
-    public static async Task Main(string[] args)
-    {
-        var builder = WebApplication.CreateBuilder(args);
-        ConfigureServices(builder);
+    app.MapOpenApi();
+}
 
-        var app = builder.Build();
-        await ConfigureApplicationAsync(app);
+string[] summaries = ["Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"];
 
-        // Start the application.
-        await app.RunAsync();
-    }
+app.MapGet("/", () => "API service is running. Navigate to /weatherforecast to see sample data.");
 
-    /// <summary>
-    ///     Configures the services used by the application.
-    /// </summary>
-    /// <param name="builder">The <see cref="WebApplicationBuilder" /> that creates the required services.</param>
-    public static void ConfigureServices(WebApplicationBuilder builder)
-    {
-        // Add the DBContext to execute queries against the database.
-        _ = builder.Services.AddDbContext<ADAticketsDbContext>(options =>
-        {
-            // Configure the DBContext to use PostgreSQL.
-            _ = options.UseNpgsql(builder.Configuration.GetConnectionString(Service.Database), options =>
-                {
-                    // Create the enumerations in the connected database.
-                    _ = options.MapEnum<Priority>("priority")
-                        .MapEnum<Status>("status")
-                        .MapEnum<TicketType>("ticket_type")
-                        .MapEnum<UserType>("user_type")
-                        .EnableRetryOnFailure();
-                });
-        }, ServiceLifetime.Transient);
+app.MapGet("/weatherforecast", () =>
+{
+    var forecast = Enumerable.Range(1, 5).Select(index =>
+        new WeatherForecast
+        (
+            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
+            Random.Shared.Next(-20, 55),
+            summaries[Random.Shared.Next(summaries.Length)]
+        ))
+        .ToArray();
+    return forecast;
+})
+.WithName("GetWeatherForecast");
 
-        // Add JWTs decoding for both Entra ID and Entra External ID.
-        var authBuilder = builder.Services.AddAuthentication();
-        _ = authBuilder.AddMicrosoftIdentityWebApi(builder.Configuration.GetSection(Scheme.OpenIdConnectDefault),
-            Scheme.OpenIdConnectDefault);
-        _ = authBuilder.AddMicrosoftIdentityWebApi(
-            builder.Configuration.GetSection(Scheme.ExternalOpenIdConnectDefault), Scheme.ExternalOpenIdConnectDefault);
+app.MapDefaultEndpoints();
 
-        // Add Basic Authentication for webhooks
-        _ = authBuilder.AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>(Scheme.AzureDevOpsDefault, null);
+app.Run();
 
-        // Add authorization policies.
-        CreatePolicies(builder.Services.AddAuthorizationBuilder(), builder.Configuration);
-
-        // Add services commonly used with controllers APIs.
-        _ = builder.Services
-            .AddControllers(options =>
-            {
-                // Require the APIs to respect the browser request media type
-                options.RespectBrowserAcceptHeader = true;
-                options.ReturnHttpNotAcceptable = true;
-            })
-            .ConfigureApiBehaviorOptions(options =>
-            {
-                // Configure API behavior for invalid model state
-                options.InvalidModelStateResponseFactory = context =>
-                    new BadRequestObjectResult(context.ModelState)
-                    {
-                        ContentTypes = { MediaTypeNames.Application.Json, MediaTypeNames.Application.Xml }
-                    };
-            })
-            .AddXmlSerializerFormatters()
-            .AddNewtonsoftJson(options =>
-            {
-                options.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
-                options.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver();
-                options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
-            });
-
-        // Add Swagger documentation for the APIs.
-        _ = builder.Services.AddEndpointsApiExplorer();
-        _ = builder.Services.AddSwaggerGen(options =>
-        {
-            options.SwaggerDoc($"v{Service.APIVersion}", new OpenApiInfo
-            {
-                Version = $"v{Service.APIVersion}",
-                Title = "ADAtickets API",
-                Description =
-                    "Web API to interact with the ADAtickets ticketing system with authentication endpoints and JWT validation.",
-                Contact = new OpenApiContact
-                {
-                    Name = "Andrea Lucchese",
-                    Email = "andrylook14@gmail.com"
-                },
-                License = new OpenApiLicense
-                {
-                    Name = "GPL v3",
-                    Url = new Uri("https://github.com/AndrexAce/ADAtickets/blob/master/LICENSE.txt")
-                }
-            });
-
-            var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-            options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
-        });
-
-        // Add services used to return detailed error messages for failed requests.
-        _ = builder.Services.AddProblemDetails();
-
-        // Configure the scoped repositories for dependency injection.
-        _ = builder.Services.AddScoped<IAttachmentRepository, AttachmentRepository>();
-        _ = builder.Services.AddScoped<IEditRepository, EditRepository>();
-        _ = builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
-        _ = builder.Services.AddScoped<IPlatformRepository, PlatformRepository>();
-        _ = builder.Services.AddScoped<IReplyRepository, ReplyRepository>();
-        _ = builder.Services.AddScoped<ITicketRepository, TicketRepository>();
-        _ = builder.Services.AddScoped<IUserRepository, UserRepository>();
-        _ = builder.Services.AddScoped<IUserPlatformRepository, UserPlatformRepository>();
-        _ = builder.Services.AddScoped<IUserNotificationRepository, UserNotificationRepository>();
-        _ = builder.Services.AddScoped<NotificationsController>();
-        _ = builder.Services.AddScoped<EditsController>();
-        _ = builder.Services.AddScoped<RepliesController>();
-        _ = builder.Services.AddScoped<TicketsController>();
-        _ = builder.Services.AddScoped<AzureDevOpsController>();
-
-        // Add automapping of entities.
-        _ = builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
-
-        // Add Redis cache and data protection persistance layers
-        _ = builder.Services.AddStackExchangeRedisCache(options =>
-        {
-            options.Configuration = builder.Configuration.GetConnectionString(Service.Cache);
-        });
-
-        if (!builder.Environment.IsStaging())
-            _ = builder.Services.AddDataProtection()
-                .PersistKeysToStackExchangeRedis(
-                    ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString(Service.Cache)!),
-                    "ApiService-DataProtection-Keys");
-
-        // Add real-time communication with SignalR.
-        builder.Services.AddSignalR();
-    }
-
-    /// <summary>
-    ///     Configures the application.
-    /// </summary>
-    /// <param name="app">The <see cref="WebApplication" /> with the created services.</param>
-    public static async Task ConfigureApplicationAsync(WebApplication app)
-    {
-        if (app.Environment.IsDevelopment())
-        {
-            // Map endpoint to access the API documentation.
-            _ = app.UseSwagger(options => { options.RouteTemplate = "/openapi/{documentName}.json"; });
-
-            // Map endpoint to access the API documentation via Scalar.
-            _ = app.MapScalarApiReference(options => { options.Theme = ScalarTheme.BluePlanet; });
-
-            // Show detailed exception screen during development.
-            _ = app.UseDeveloperExceptionPage();
-        }
-
-        // Apply migrations on startup if not executing the tests
-        if (!app.Environment.IsStaging())
-        {
-            var scope = app.Services.CreateScope();
-            var db = scope.ServiceProvider.GetRequiredService<ADAticketsDbContext>();
-            await db.Database.MigrateAsync();
-        }
-
-        // Create an exception handler for APIs.
-        _ = app.UseExceptionHandler();
-
-        // Configure interceptor for 4xx and 5xx errors.
-        _ = app.UseStatusCodePages();
-
-        // Add authentication middleware.
-        _ = app.UseAuthentication();
-
-        // Add authorization middleware.
-        _ = app.UseAuthorization();
-
-        // Enable serving static files.
-        _ = app.UseStaticFiles(new StaticFileOptions
-        {
-            FileProvider = new PhysicalFileProvider(Directory.GetCurrentDirectory()),
-            RequestPath = ""
-        });
-
-        // Map the controllers endpoints for business logic APIs.
-        _ = app.MapControllers();
-
-        // Map hubs endpoints.
-        app.MapHub<TicketsHub>("/ticketsHub");
-        app.MapHub<NotificationsHub>("/notificationsHub");
-        app.MapHub<EditsHub>("/editsHub");
-        app.MapHub<RepliesHub>("/repliesHub");
-    }
-
-    private static void CreatePolicies(AuthorizationBuilder authorizationBuilder, ConfigurationManager configuration)
-    {
-        _ = authorizationBuilder.AddDefaultPolicy(Policy.AdminOnly, policy =>
-            {
-                _ = policy.RequireAuthenticatedUser()
-                    .RequireAssertion(context =>
-                    {
-                        return context.User.IsDevOpsAdmin() &&
-                               context.User.GetTenantId() == configuration["Entra:TenantId"];
-                    })
-                    .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault, Scheme.ExternalOpenIdConnectDefault);
-            })
-            .AddPolicy(Policy.UserOnly, policy =>
-            {
-                _ = policy.RequireAuthenticatedUser()
-                    .RequireAssertion(context =>
-                    {
-                        return context.User.GetTenantId() == configuration["ExternalEntra:TenantId"];
-                    })
-                    .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault, Scheme.ExternalOpenIdConnectDefault);
-            })
-            .AddPolicy(Policy.OperatorOrAdmin, policy =>
-            {
-                _ = policy.RequireAuthenticatedUser()
-                    .RequireAssertion(context =>
-                    {
-                        return context.User.GetTenantId() == configuration["Entra:TenantId"];
-                    })
-                    .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault, Scheme.ExternalOpenIdConnectDefault);
-            })
-            .AddPolicy(Policy.Everyone, policy =>
-            {
-                _ = policy.RequireAuthenticatedUser()
-                    .AddAuthenticationSchemes(Scheme.OpenIdConnectDefault, Scheme.ExternalOpenIdConnectDefault);
-            })
-            .AddPolicy(Policy.WebHook, policy =>
-            {
-                policy.RequireAuthenticatedUser()
-                    .RequireClaim("webhook", "true")
-                    .AddAuthenticationSchemes(Scheme.AzureDevOpsDefault);
-            });
-    }
+record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
+{
+    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
 }

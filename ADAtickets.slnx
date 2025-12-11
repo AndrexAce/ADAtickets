@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="ADAtickets.AppHost/ADAtickets.AppHost.csproj" />
+  <Project Path="ADAtickets.ServiceDefaults/ADAtickets.ServiceDefaults.csproj" />
+</Solution>
