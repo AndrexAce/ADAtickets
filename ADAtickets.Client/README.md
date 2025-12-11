@@ -1,4 +1,4 @@
-![Static Badge](https://img.shields.io/badge/Framework-.NET%2010.0.0-512BD4)
+![Static Badge](https://img.shields.io/badge/Framework-.NET%2010.0.1-512BD4)
 ![Static Badge](https://img.shields.io/badge/Language-C%2314-8A2BE2)
 ![Static Badge](https://img.shields.io/badge/License-GPL%20v3-FF0000)
 ![Static Badge](https://img.shields.io/badge/Status-Active-32CD32)

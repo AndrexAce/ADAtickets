@@ -1,6 +1,6 @@
 [![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=AndrexAce_ADAtickets&token=5e4556b655d4ea59dadb70371521d437de829163)](https://sonarcloud.io/summary/overall?id=AndrexAce_ADAtickets&branch=master)
 
-![Static Badge](https://img.shields.io/badge/Framework-.NET%2010.0.0-512BD4)
+![Static Badge](https://img.shields.io/badge/Framework-.NET%2010.0.1-512BD4)
 ![Static Badge](https://img.shields.io/badge/Language-C%2314-8A2BE2)
 ![Static Badge](https://img.shields.io/badge/API-ASP.NET%20MVC%2010-00A4EF)
 ![Static Badge](https://img.shields.io/badge/Web%20app-ASP.NET%20Blazor%2010-244FFF)
