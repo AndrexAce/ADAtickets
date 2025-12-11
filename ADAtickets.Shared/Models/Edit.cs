@@ -1,0 +1,92 @@
+/*
+ * ADAtickets is a simple, lightweight, open source ticketing system
+ * interacting with your enterprise repositories on Azure DevOps
+ * with a two-way synchronization.
+ * Copyright (C) 2025  Andrea Lucchese
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using ADAtickets.Shared.Enums;
+using Mapster;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+
+namespace ADAtickets.Shared.Models;
+
+/// <summary>
+///     Represents a modification made to a ticket, either by a user or by the system.
+/// </summary>
+internal sealed class Edit : Entity
+{
+    /// <summary>
+    ///     The date and time when the edit was made.
+    /// </summary>
+    [Required]
+    public DateTimeOffset EditDateTime { get; set; }
+
+    /// <summary>
+    ///     The message the edit comes with.
+    /// </summary>
+    [Required]
+    [MaxLength(200)]
+    [Unicode]
+    public string Description { get; set; } = string.Empty;
+
+    /// <summary>
+    ///     The status of the ticket before the edit.
+    /// </summary>
+    [Required]
+    public Status OldStatus { get; set; }
+
+    /// <summary>
+    ///     The status of the ticket after the edit.
+    /// </summary>
+    [Required]
+    public Status NewStatus { get; set; }
+
+    /// <summary>
+    ///     The id of the ticket this edit is related to.
+    /// </summary>
+    [Required]
+    [ForeignKey(nameof(Ticket))]
+    public Guid TicketId { get; set; }
+
+    /// <summary>
+    ///     The ticket this edit is related to.
+    /// </summary>
+    [Required]
+    [AdaptIgnore]
+    [JsonIgnore]
+    [DeleteBehavior(DeleteBehavior.Cascade)]
+    public Ticket Ticket { get; set; } = new();
+
+    /// <summary>
+    ///     The id of the user who made the edit.
+    /// </summary>
+    [Required]
+    [ForeignKey(nameof(User))]
+    public Guid UserId { get; set; }
+
+    /// <summary>
+    ///     The user who made the edit.
+    /// </summary>
+    [Required]
+    [AdaptIgnore]
+    [JsonIgnore]
+    [DeleteBehavior(DeleteBehavior.Cascade)]
+    public User User { get; set; } = new();
+}
