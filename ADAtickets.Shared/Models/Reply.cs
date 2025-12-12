@@ -29,7 +29,7 @@ namespace ADAtickets.Shared.Models;
 /// <summary>
 ///     Represents a reply in a ticket comment thread.
 /// </summary>
-internal sealed class Reply : Entity
+public sealed class Reply : Entity
 {
     /// <summary>
     ///     The date and time when the reply was sent.

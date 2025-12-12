@@ -29,7 +29,7 @@ namespace ADAtickets.Shared.Models;
 ///     <para>Base class for all entities in the ADAtickets model.</para>
 ///     <para>Contains common properties and methods.</para>
 /// </summary>
-internal abstract class Entity
+public abstract class Entity
 {
     /// <summary>
     ///     The unique identifier of the entity.

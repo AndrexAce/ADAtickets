@@ -30,7 +30,7 @@ namespace ADAtickets.Shared.Models;
 /// <summary>
 ///     Represents a ticket sent by a user to the system.
 /// </summary>
-internal sealed class Ticket : Entity
+public sealed class Ticket : Entity
 {
     /// <summary>
     ///     The type of user request bound to the ticket.

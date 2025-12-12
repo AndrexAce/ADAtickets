@@ -30,7 +30,7 @@ namespace ADAtickets.Shared.Models;
 ///     Represents the link between users and their preferred platforms.
 /// </summary>
 [Index(nameof(UserId), nameof(PlatformId))]
-internal sealed class UserPlatform : Entity
+public sealed class UserPlatform : Entity
 {
     /// <summary>
     ///     The unique identifier of the user who marked the platform as preferred.

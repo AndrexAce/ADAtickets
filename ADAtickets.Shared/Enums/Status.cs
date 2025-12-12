@@ -23,7 +23,7 @@ namespace ADAtickets.Shared.Enums;
 /// <summary>
 ///     Represents the status of the ticket.
 /// </summary>
-internal enum Status
+public enum Status
 {
     /// <summary>
     ///     The ticket is open and waiting to be assigned to an operator.

@@ -31,7 +31,7 @@ namespace ADAtickets.Shared.Models;
 ///     Represents a platform managed by the enterprise which tickets are related to.
 /// </summary>
 [Index(nameof(RepositoryUrl), IsUnique = true)]
-internal sealed class Platform : Entity
+public sealed class Platform : Entity
 {
     /// <summary>
     ///     The name of the platform.

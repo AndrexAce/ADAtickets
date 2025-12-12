@@ -30,7 +30,7 @@ namespace ADAtickets.Shared.Models;
 /// <summary>
 ///     Represents a modification made to a ticket, either by a user or by the system.
 /// </summary>
-internal sealed class Edit : Entity
+public sealed class Edit : Entity
 {
     /// <summary>
     ///     The date and time when the edit was made.

@@ -23,7 +23,7 @@ namespace ADAtickets.Shared.Enums;
 /// <summary>
 ///     Represents the type of user request bound to the ticket.
 /// </summary>
-internal enum TicketType
+public enum TicketType
 {
     /// <summary>
     ///     The ticket is a bug report.

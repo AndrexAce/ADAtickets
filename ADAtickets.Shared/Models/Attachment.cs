@@ -30,7 +30,7 @@ namespace ADAtickets.Shared.Models;
 ///     Represents an attachment associated with a ticket.
 /// </summary>
 [Index(nameof(ObjectKey), IsUnique = true)]
-internal sealed class Attachment : Entity
+public sealed class Attachment : Entity
 {
     /// <summary>
     ///     The MinIO object key of the attachment.

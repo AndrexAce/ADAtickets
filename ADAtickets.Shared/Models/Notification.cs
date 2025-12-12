@@ -29,7 +29,7 @@ namespace ADAtickets.Shared.Models;
 /// <summary>
 ///     Represents a notification sent to a user triggered by an action like ticket modification, reply, or assignment.
 /// </summary>
-internal sealed class Notification : Entity
+public sealed class Notification : Entity
 {
     /// <summary>
     ///     The date and time when the notification was sent.

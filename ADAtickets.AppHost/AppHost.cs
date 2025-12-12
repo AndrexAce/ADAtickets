@@ -18,6 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+using Projects;
+
 namespace ADAtickets.AppHost;
 
 file abstract class Program
@@ -31,22 +33,36 @@ file abstract class Program
             .WithDashboard(false);
 
         // Add the Redis cache
-        var cache = builder.AddRedis("Redis")
+        var cache = builder.AddRedis("redis")
             .WithDataVolume("dev-redis-data")
             .WithArgs("--appendonly", "yes")
             .PublishAsDockerComposeService(static (_, service) => { service.Name = "redis"; });
 
         // Add the Postgres database with PgAdmin
-        var database = builder.AddPostgres("Postgres")
+        var database = builder.AddPostgres("postgres")
             .WithDataVolume("dev-postgres-data")
             .WithPgAdmin(static pgadmin =>
-                pgadmin.WithVolume("dev-pgadmin-data", "/var/lib/pgadmin"), "PgAdmin")
-            .AddDatabase("ADAtickets");
+                pgadmin.WithVolume("dev-pgadmin-data", "/var/lib/pgadmin"), "pgadmin")
+            .AddDatabase("adatickets");
 
         // Add the Minio storage
-        var storage = builder.AddMinioContainer("Minio")
+        var storage = builder.AddMinioContainer("minio")
             .WithDataVolume("dev-minio-data")
             .PublishAsDockerComposeService(static (_, service) => { service.Name = "minio"; });
+
+        // Add the API project
+        builder.AddProject<ADAtickets_Api>("api")
+            .WithReference(cache)
+            .WithReference(database)
+            .WithReference(storage)
+            .WaitFor(cache)
+            .WaitFor(database)
+            .WaitFor(storage)
+            .PublishAsDockerComposeService(static (_, service) =>
+            {
+                service.Name = "api";
+                service.Image = "ghcr.io/andrexace/adatickets-api:latest";
+            });
 
         builder.Build().Run();
     }

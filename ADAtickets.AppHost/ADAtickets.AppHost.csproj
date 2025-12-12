@@ -15,4 +15,8 @@
         <PackageReference Include="CommunityToolkit.Aspire.Hosting.Minio" Version="13.0.0"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\ADAtickets.Api\ADAtickets.Api.csproj"/>
+    </ItemGroup>
+
 </Project>

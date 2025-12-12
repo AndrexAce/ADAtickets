@@ -30,7 +30,7 @@ namespace ADAtickets.Shared.Models;
 ///     Represents the link between users and sent notifications.
 /// </summary>
 [Index(nameof(ReceiverUserId), nameof(NotificationId))]
-internal sealed class UserNotification : Entity
+public sealed class UserNotification : Entity
 {
     /// <summary>
     ///     The unique identifier of the user who received the notification.

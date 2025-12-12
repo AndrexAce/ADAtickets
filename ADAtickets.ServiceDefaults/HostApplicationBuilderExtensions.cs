@@ -18,8 +18,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
@@ -30,22 +28,29 @@ using OpenTelemetry.Trace;
 
 namespace ADAtickets.ServiceDefaults;
 
-public static class Extensions
+/// <summary>
+///     Defines common extensions to configure <see cref="IHostApplicationBuilder" /> Aspire services.
+/// </summary>
+public static class HostApplicationBuilderExtensions
 {
     private const string HealthEndpointPath = "/health";
     private const string AlivenessEndpointPath = "/alive";
 
     extension(IHostApplicationBuilder builder)
     {
+        /// <summary>
+        ///     Adds common service defaults to the application builder.
+        /// </summary>
+        /// <returns>The <see cref="IHostApplicationBuilder" />.</returns>
         public IHostApplicationBuilder AddServiceDefaults()
         {
-            builder.ConfigureOpenTelemetry();
+            _ = builder.ConfigureOpenTelemetry();
 
-            builder.AddDefaultHealthChecks();
+            _ = builder.AddDefaultHealthChecks();
 
-            builder.Services.AddServiceDiscovery();
+            _ = builder.Services.AddServiceDiscovery();
 
-            builder.Services.ConfigureHttpClientDefaults(http =>
+            builder.Services.ConfigureHttpClientDefaults(static http =>
             {
                 // Turn on resilience by default
                 http.AddStandardResilienceHandler();
@@ -57,16 +62,20 @@ public static class Extensions
             return builder;
         }
 
-        public IHostApplicationBuilder ConfigureOpenTelemetry()
+        /// <summary>
+        ///     Adds OpenTelemetry configuration to the application builder.
+        /// </summary>
+        /// <returns>The <see cref="IHostApplicationBuilder" />.</returns>
+        private IHostApplicationBuilder ConfigureOpenTelemetry()
         {
-            builder.Logging.AddOpenTelemetry(logging =>
+            builder.Logging.AddOpenTelemetry(static logging =>
             {
                 logging.IncludeFormattedMessage = true;
                 logging.IncludeScopes = true;
             });
 
             builder.Services.AddOpenTelemetry()
-                .WithMetrics(metrics =>
+                .WithMetrics(static metrics =>
                 {
                     metrics.AddAspNetCoreInstrumentation()
                         .AddHttpClientInstrumentation()
@@ -85,7 +94,7 @@ public static class Extensions
                         .AddHttpClientInstrumentation();
                 });
 
-            builder.AddOpenTelemetryExporters();
+            _ = builder.AddOpenTelemetryExporters();
 
             return builder;
         }
@@ -99,32 +108,17 @@ public static class Extensions
             return builder;
         }
 
-        public IHostApplicationBuilder AddDefaultHealthChecks()
+        /// <summary>
+        ///     Adds default health checks to the application builder.
+        /// </summary>
+        /// <returns>The <see cref="IHostApplicationBuilder" />.</returns>
+        private IHostApplicationBuilder AddDefaultHealthChecks()
         {
             builder.Services.AddHealthChecks()
-                // Add a default liveness check to ensure app is responsive
-                .AddCheck("self", () => HealthCheckResult.Healthy(), ["live"]);
+                // Add a default liveness check to ensure the app is responsive
+                .AddCheck("self", static () => HealthCheckResult.Healthy(), ["live"]);
 
             return builder;
-        }
-    }
-
-    extension(WebApplication app)
-    {
-        public WebApplication MapDefaultEndpoints()
-        {
-            if (!app.Environment.IsDevelopment()) return app;
-
-            // All health checks must pass for app to be considered ready to accept traffic after starting
-            app.MapHealthChecks(HealthEndpointPath);
-
-            // Only health checks tagged with the "live" tag must pass for app to be considered alive
-            app.MapHealthChecks(AlivenessEndpointPath, new HealthCheckOptions
-            {
-                Predicate = static r => r.Tags.Contains("live")
-            });
-
-            return app;
         }
     }
 }

@@ -31,7 +31,7 @@ namespace ADAtickets.Shared.Models;
 ///     Represents a user of the system.
 /// </summary>
 [Index(nameof(Email), IsUnique = true)]
-internal sealed class User : Entity
+public sealed class User : Entity
 {
     /// <summary>
     ///     The email address of the user.

@@ -23,7 +23,7 @@ namespace ADAtickets.Shared.Enums;
 /// <summary>
 ///     Represents the urgency of a ticket.
 /// </summary>
-internal enum Priority
+public enum Priority
 {
     /// <summary>
     ///     The ticket can be dealt with at a later time.
