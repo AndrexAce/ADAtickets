@@ -36,7 +36,7 @@ public sealed class UserNotification : Entity
     ///     The unique identifier of the user who received the notification.
     /// </summary>
     [Required]
-    [ForeignKey(nameof(ReceiverUser))]
+    [ForeignKey(nameof(ReceiverAppUser))]
     public Guid ReceiverUserId { get; set; }
 
     /// <summary>
@@ -46,7 +46,7 @@ public sealed class UserNotification : Entity
     [AdaptIgnore]
     [JsonIgnore]
     [DeleteBehavior(DeleteBehavior.Cascade)]
-    public User ReceiverUser { get; set; } = new();
+    public AppUser ReceiverAppUser { get; set; } = new();
 
     /// <summary>
     ///     The unique identifier of the sent notification.

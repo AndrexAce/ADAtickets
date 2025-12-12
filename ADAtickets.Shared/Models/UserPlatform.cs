@@ -36,7 +36,7 @@ public sealed class UserPlatform : Entity
     ///     The unique identifier of the user who marked the platform as preferred.
     /// </summary>
     [Required]
-    [ForeignKey(nameof(User))]
+    [ForeignKey(nameof(AppUser))]
     public Guid UserId { get; set; }
 
     /// <summary>
@@ -46,7 +46,7 @@ public sealed class UserPlatform : Entity
     [AdaptIgnore]
     [JsonIgnore]
     [DeleteBehavior(DeleteBehavior.Cascade)]
-    public User User { get; set; } = new();
+    public AppUser AppUser { get; set; } = new();
 
     /// <summary>
     ///     The unique identifier of the platform that was marked as preferred.

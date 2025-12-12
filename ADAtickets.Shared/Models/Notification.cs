@@ -64,7 +64,7 @@ public sealed class Notification : Entity
     ///     The id of the user this notification is related to.
     /// </summary>
     [Required]
-    [ForeignKey(nameof(User))]
+    [ForeignKey(nameof(AppUser))]
     public Guid UserId { get; set; }
 
     /// <summary>
@@ -74,7 +74,7 @@ public sealed class Notification : Entity
     [AdaptIgnore]
     [JsonIgnore]
     [DeleteBehavior(DeleteBehavior.Cascade)]
-    public User User { get; set; } = new();
+    public AppUser AppUser { get; set; } = new();
 
     /// <summary>
     ///     Join-entity between the notification and the users it was sent to.

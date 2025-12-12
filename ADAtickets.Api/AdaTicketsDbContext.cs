@@ -19,6 +19,8 @@
  */
 
 using ADAtickets.Shared.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace ADAtickets.Api;
@@ -27,15 +29,9 @@ namespace ADAtickets.Api;
 ///     <para>Represents the Entity Framework Core database context for the ADAtickets application.</para>
 ///     <para>This context is used to interact with the database and manage the application entities.</para>
 /// </summary>
-internal class AdaTicketsDbContext(DbContextOptions<AdaTicketsDbContext> options) : DbContext(options)
+internal class AdaTicketsDbContext(DbContextOptions<AdaTicketsDbContext> options)
+    : IdentityDbContext<IdentityUser<Guid>, IdentityRole<Guid>, Guid>(options)
 {
-    /// <summary>
-    ///     Parameterless constructor for testing purposes.
-    /// </summary>
-    public AdaTicketsDbContext() : this(new DbContextOptions<AdaTicketsDbContext>())
-    {
-    }
-
     /// <summary>
     ///     Gets or sets the DbSet for managing <see cref="Attachment" /> entities.
     /// </summary>
@@ -67,9 +63,9 @@ internal class AdaTicketsDbContext(DbContextOptions<AdaTicketsDbContext> options
     public virtual DbSet<Ticket> Tickets { get; set; }
 
     /// <summary>
-    ///     Gets or sets the DbSet for managing <see cref="User" /> entities.
+    ///     Gets or sets the DbSet for managing <see cref="AppUser" /> entities.
     /// </summary>
-    public virtual DbSet<User> Users { get; set; }
+    public virtual DbSet<AppUser> AppUsers { get; set; }
 
     /// <summary>
     ///     Gets or sets the DbSet for managing <see cref="UserNotification" /> entities.

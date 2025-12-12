@@ -22,8 +22,10 @@ using System.Net.Mime;
 using ADAtickets.ServiceDefaults;
 using ADAtickets.Shared.Enums;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Web;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
@@ -73,10 +75,24 @@ file static class Program
                 npgsqlOptions.MapEnum<Priority>("priority")
                     .MapEnum<Status>("status")
                     .MapEnum<TicketType>("ticket_type")
-                    .MapEnum<UserType>("user_type")
                     .EnableRetryOnFailure();
             });
         });
+
+        // Add identity management with EF
+        builder.Services.AddIdentity<IdentityUser<Guid>, IdentityRole<Guid>>(static options =>
+            {
+                options.User.RequireUniqueEmail = true;
+            })
+            .AddEntityFrameworkStores<AdaTicketsDbContext>();
+
+        // Add authentication with EF and Entra ID and configure DI for the authentication service
+        builder.Services.AddAuthentication()
+            .AddBearerToken(IdentityConstants.BearerScheme)
+            .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+
+        // Configure DI for the authorization services
+        builder.Services.AddAuthorization();
 
         // Add Redis with Aspire
         builder.AddRedisClient("redis");
@@ -91,7 +107,7 @@ file static class Program
             var mux = ConnectionMultiplexer.Connect(redisConnection);
             builder.Services.AddSingleton<IConnectionMultiplexer>(mux);
 
-            // Persist data protection keys to the SAME multiplexer
+            // Persist data protection keys to the same multiplexer
             builder.Services.AddDataProtection()
                 .PersistKeysToStackExchangeRedis(mux, "ApiService-DataProtection-Keys");
         }
@@ -169,6 +185,9 @@ file static class Program
 
         // Map default endpoints (health checks, etc.) with Aspire
         _ = app.MapDefaultEndpoints();
+
+        // Map identity endpoints
+        _ = app.MapIdentityApi<IdentityUser<Guid>>();
 
         // Map controllers endpoints
         app.MapControllers();

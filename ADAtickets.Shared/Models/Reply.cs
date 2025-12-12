@@ -49,7 +49,7 @@ public sealed class Reply : Entity
     ///     The id of the user who sent the reply.
     /// </summary>
     [Required]
-    [ForeignKey(nameof(AuthorUser))]
+    [ForeignKey(nameof(AuthorAppUser))]
     public Guid AuthorUserId { get; set; }
 
     /// <summary>
@@ -59,7 +59,7 @@ public sealed class Reply : Entity
     [AdaptIgnore]
     [JsonIgnore]
     [DeleteBehavior(DeleteBehavior.Cascade)]
-    public User AuthorUser { get; set; } = new();
+    public AppUser AuthorAppUser { get; set; } = new();
 
     /// <summary>
     ///     The id of the ticket this reply was sent to.

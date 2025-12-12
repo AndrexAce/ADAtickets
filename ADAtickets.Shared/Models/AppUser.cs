@@ -20,8 +20,8 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using ADAtickets.Shared.Enums;
 using Mapster;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
@@ -30,25 +30,24 @@ namespace ADAtickets.Shared.Models;
 /// <summary>
 ///     Represents a user of the system.
 /// </summary>
-[Index(nameof(Email), IsUnique = true)]
-public sealed class User : Entity
+[Index(nameof(IdentityUserId), IsUnique = true)]
+public sealed class AppUser : Entity
 {
     /// <summary>
-    ///     The email address of the user.
+    ///     The id of the identity associated with the user.
     /// </summary>
     [Required]
-    [EmailAddress]
-    [MaxLength(50)]
-    [Unicode]
-    public string Email { get; set; } = string.Empty;
+    [ForeignKey(nameof(IdentityUser))]
+    public Guid IdentityUserId { get; set; }
 
     /// <summary>
-    ///     The username of the user.
+    ///     The identity associated with the user.
     /// </summary>
     [Required]
-    [MaxLength(50)]
-    [Unicode]
-    public string Username { get; set; } = string.Empty;
+    [AdaptIgnore]
+    [JsonIgnore]
+    [DeleteBehavior(DeleteBehavior.Cascade)]
+    public IdentityUser<Guid> IdentityUser { get; set; } = new();
 
     /// <summary>
     ///     The name of the user.
@@ -67,22 +66,10 @@ public sealed class User : Entity
     public string Surname { get; set; } = string.Empty;
 
     /// <summary>
-    ///     Whether the user can log in the application.
-    /// </summary>
-    [Required]
-    public bool IsBlocked { get; init; }
-
-    /// <summary>
-    ///     The role of the user in the system.
-    /// </summary>
-    [Required]
-    public UserType Type { get; set; }
-
-    /// <summary>
     ///     The collection of tickets created by the user (if they are a user, otherwise it must be empty).
     /// </summary>
     [Required]
-    [InverseProperty(nameof(Ticket.CreatorUser))]
+    [InverseProperty(nameof(Ticket.CreatorAppUser))]
     [AdaptIgnore]
     [JsonIgnore]
     public ICollection<Ticket> CreatedTickets { get; } = [];
@@ -100,7 +87,7 @@ public sealed class User : Entity
     ///     The collection of replies sent by the user to any ticket.
     /// </summary>
     [Required]
-    [InverseProperty(nameof(Reply.AuthorUser))]
+    [InverseProperty(nameof(Reply.AuthorAppUser))]
     [AdaptIgnore]
     [JsonIgnore]
     public ICollection<Reply> Replies { get; } = [];
@@ -109,7 +96,7 @@ public sealed class User : Entity
     ///     The collection of edits made by the user to any ticket.
     /// </summary>
     [Required]
-    [InverseProperty(nameof(Edit.User))]
+    [InverseProperty(nameof(Edit.AppUser))]
     [AdaptIgnore]
     [JsonIgnore]
     public ICollection<Edit> Edits { get; } = [];
@@ -118,7 +105,7 @@ public sealed class User : Entity
     ///     Join-entity between the platform and the users who marked it as preferred.
     /// </summary>
     [Required]
-    [InverseProperty(nameof(UserPlatform.User))]
+    [InverseProperty(nameof(UserPlatform.AppUser))]
     [AdaptIgnore]
     [JsonIgnore]
     public ICollection<UserPlatform> UserPlatforms { get; } = [];
@@ -127,7 +114,7 @@ public sealed class User : Entity
     ///     The collection of notifications the user triggered the sending of.
     /// </summary>
     [Required]
-    [InverseProperty(nameof(Notification.User))]
+    [InverseProperty(nameof(Notification.AppUser))]
     [AdaptIgnore]
     [JsonIgnore]
     public ICollection<Notification> SentNotifications { get; } = [];
@@ -136,7 +123,7 @@ public sealed class User : Entity
     ///     Join-entity between the user and the notifications they received.
     /// </summary>
     [Required]
-    [InverseProperty(nameof(UserNotification.ReceiverUser))]
+    [InverseProperty(nameof(UserNotification.ReceiverAppUser))]
     [AdaptIgnore]
     [JsonIgnore]
     public ICollection<UserNotification> UserNotifications { get; } = [];

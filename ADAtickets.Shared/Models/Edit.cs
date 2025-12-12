@@ -78,7 +78,7 @@ public sealed class Edit : Entity
     ///     The id of the user who made the edit.
     /// </summary>
     [Required]
-    [ForeignKey(nameof(User))]
+    [ForeignKey(nameof(AppUser))]
     public Guid UserId { get; set; }
 
     /// <summary>
@@ -88,5 +88,5 @@ public sealed class Edit : Entity
     [AdaptIgnore]
     [JsonIgnore]
     [DeleteBehavior(DeleteBehavior.Cascade)]
-    public User User { get; set; } = new();
+    public AppUser AppUser { get; set; } = new();
 }

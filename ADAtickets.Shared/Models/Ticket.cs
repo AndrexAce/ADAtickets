@@ -98,7 +98,7 @@ public sealed class Ticket : Entity
     ///     The id of the user who created the ticket.
     /// </summary>
     [Required]
-    [ForeignKey(nameof(CreatorUser))]
+    [ForeignKey(nameof(CreatorAppUser))]
     public Guid CreatorUserId { get; set; }
 
     /// <summary>
@@ -108,7 +108,7 @@ public sealed class Ticket : Entity
     [AdaptIgnore]
     [JsonIgnore]
     [DeleteBehavior(DeleteBehavior.Cascade)]
-    public User CreatorUser { get; set; } = new();
+    public AppUser CreatorAppUser { get; set; } = new();
 
     /// <summary>
     ///     The id of the operator assigned to the ticket.
@@ -122,7 +122,7 @@ public sealed class Ticket : Entity
     [AdaptIgnore]
     [JsonIgnore]
     [DeleteBehavior(DeleteBehavior.SetNull)]
-    public User? OperatorUser { get; set; }
+    public AppUser? OperatorUser { get; set; }
 
     /// <summary>
     ///     The collection of edits made to the ticket.
