@@ -62,10 +62,6 @@ public static class HostApplicationBuilderExtensions
             return builder;
         }
 
-        /// <summary>
-        ///     Adds OpenTelemetry configuration to the application builder.
-        /// </summary>
-        /// <returns>The <see cref="IHostApplicationBuilder" />.</returns>
         private IHostApplicationBuilder ConfigureOpenTelemetry()
         {
             builder.Logging.AddOpenTelemetry(static logging =>
@@ -108,10 +104,6 @@ public static class HostApplicationBuilderExtensions
             return builder;
         }
 
-        /// <summary>
-        ///     Adds default health checks to the application builder.
-        /// </summary>
-        /// <returns>The <see cref="IHostApplicationBuilder" />.</returns>
         private IHostApplicationBuilder AddDefaultHealthChecks()
         {
             builder.Services.AddHealthChecks()

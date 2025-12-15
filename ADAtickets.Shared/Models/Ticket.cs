@@ -20,10 +20,10 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using ADAtickets.Shared.Enums;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 
 namespace ADAtickets.Shared.Models;
 

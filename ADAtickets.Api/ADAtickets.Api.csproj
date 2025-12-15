@@ -6,6 +6,8 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <InterceptorsNamespaces>$(InterceptorsNamespaces);Microsoft.AspNetCore.OpenApi.Generated</InterceptorsNamespaces>
+        <Version>$([System.IO.File]::ReadAllText('$(MSBuildProjectDirectory)/VERSION'))</Version>
+        <IncludeOpenAPIAnalyzers>true</IncludeOpenAPIAnalyzers>
     </PropertyGroup>
 
     <ItemGroup>
@@ -13,13 +15,12 @@
         <PackageReference Include="Aspire.StackExchange.Redis.DistributedCaching" Version="13.0.2"/>
         <PackageReference Include="CommunityToolkit.Aspire.Minio.Client" Version="13.0.0"/>
         <PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="10.0.1"/>
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="10.0.1"/>
+        <PackageReference Include="Microsoft.AspNetCore.JsonPatch.SystemTextJson" Version="10.0.1"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.1">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.Identity.Web" Version="4.1.1"/>
-        <PackageReference Include="Scalar.AspNetCore.Microsoft" Version="2.11.5"/>
+        <PackageReference Include="Scalar.AspNetCore.Microsoft" Version="2.11.6"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -31,10 +32,6 @@
         <Content Include="..\.dockerignore">
             <Link>.dockerignore</Link>
         </Content>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Folder Include="Migrations\"/>
     </ItemGroup>
 
 </Project>

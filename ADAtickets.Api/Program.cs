@@ -19,32 +19,25 @@
  */
 
 using System.Net.Mime;
+using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using ADAtickets.Api.Services;
 using ADAtickets.ServiceDefaults;
 using ADAtickets.Shared.Enums;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Web;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
+using Microsoft.OpenApi;
 using Scalar.AspNetCore;
 using StackExchange.Redis;
 using Status = ADAtickets.Shared.Enums.Status;
 
 namespace ADAtickets.Api;
 
-/// <summary>
-///     Bootstrap class for the application.
-/// </summary>
 file static class Program
 {
-    /// <summary>
-    ///     Entrypoint of the application.
-    /// </summary>
-    /// <param name="args">Additional arguments passed by the command line.</param>
-    /// <returns>The <see cref="Task" /> running the application.</returns>
     public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
@@ -57,17 +50,16 @@ file static class Program
         await app.RunAsync();
     }
 
-    /// <summary>
-    ///     Configures the services used by the application.
-    /// </summary>
-    /// <param name="builder">The <see cref="WebApplicationBuilder" /> that creates the required services.</param>
     private static void ConfigureServices(WebApplicationBuilder builder)
     {
+        // Add services to DI
+        builder.Services.AddSingleton<IEmailSender<IdentityUser<Guid>>, EmailSender>();
+
         // Add service defaults for Aspire
         _ = builder.AddServiceDefaults();
 
         // Add PostgreSQL with Aspire
-        builder.AddNpgsqlDbContext<AdaTicketsDbContext>("ADAtickets", configureDbContextOptions: static options =>
+        builder.AddNpgsqlDbContext<AdaTicketsDbContext>("adatickets", configureDbContextOptions: static options =>
         {
             // Create the enumerations in the connected database.
             options.UseNpgsql(static npgsqlOptions =>
@@ -80,16 +72,12 @@ file static class Program
         });
 
         // Add identity management with EF
-        builder.Services.AddIdentity<IdentityUser<Guid>, IdentityRole<Guid>>(static options =>
+        builder.Services.AddIdentityApiEndpoints<IdentityUser<Guid>>(static options =>
             {
                 options.User.RequireUniqueEmail = true;
             })
+            .AddRoles<IdentityRole<Guid>>()
             .AddEntityFrameworkStores<AdaTicketsDbContext>();
-
-        // Add authentication with EF and Entra ID and configure DI for the authentication service
-        builder.Services.AddAuthentication()
-            .AddBearerToken(IdentityConstants.BearerScheme)
-            .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
 
         // Configure DI for the authorization services
         builder.Services.AddAuthorization();
@@ -131,15 +119,32 @@ file static class Program
                     };
             })
             .AddXmlSerializerFormatters()
-            .AddNewtonsoftJson(static options =>
+            .AddJsonOptions(static options =>
             {
-                options.SerializerSettings.Converters.Add(new StringEnumConverter());
-                options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-                options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
             });
 
+
         // Add OpenAPI documentation for the APIs.
-        builder.Services.AddOpenApi(static options => options.AddScalarTransformers());
+        builder.Services.AddOpenApi(static options =>
+        {
+            options.AddDocumentTransformer(static (document, _, _) =>
+            {
+                var version = Assembly.GetExecutingAssembly().GetName().Version;
+                document.Info.Version = $"{version?.Major}.{version?.Minor}.{version?.Build}";
+                document.Info.Title = "ADAtickets API reference";
+                document.Info.License = new OpenApiLicense
+                {
+                    Name = "GNU General Public License v3.0",
+                    Url = new Uri("https://www.gnu.org/licenses/gpl-3.0.en.html")
+                };
+                return Task.CompletedTask;
+            });
+
+            options.AddScalarTransformers();
+        });
 
         // Add the API explorer for endpoint discovery.
         builder.Services.AddEndpointsApiExplorer();
@@ -147,15 +152,21 @@ file static class Program
         // Add services used to return detailed error messages for failed requests.
         builder.Services.AddProblemDetails();
 
+        // Add CORS support.
+        builder.Services.AddCors(static options =>
+        {
+            options.AddDefaultPolicy(static policy =>
+            {
+                policy.AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+            });
+        });
+
         // Add real-time communication with SignalR.
         builder.Services.AddSignalR();
     }
 
-
-    /// <summary>
-    ///     Configures the application.
-    /// </summary>
-    /// <param name="app">The <see cref="WebApplication" /> with the created services.</param>
     private static async Task ConfigureApplicationAsync(WebApplication app)
     {
         // Add error handling and OpenAPI in development environment
@@ -171,6 +182,7 @@ file static class Program
         }
 
         // Add middlewares
+        app.UseCors();
         app.UseExceptionHandler();
         app.UseStatusCodePages();
         app.UseAuthentication();
