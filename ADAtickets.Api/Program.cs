@@ -36,8 +36,16 @@ using Status = ADAtickets.Shared.Enums.Status;
 
 namespace ADAtickets.Api;
 
+/// <summary>
+///     Starting class for the application.
+/// </summary>
 file static class Program
 {
+    /// <summary>
+    ///     Entrypoint of the application.
+    /// </summary>
+    /// <param name="args">Additional arguments passed by the command line.</param>
+    /// <returns>The <see cref="Task" /> running the application.</returns>
     public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
@@ -50,6 +58,10 @@ file static class Program
         await app.RunAsync();
     }
 
+    /// <summary>
+    ///     Configures the services used by the application.
+    /// </summary>
+    /// <param name="builder">The <see cref="WebApplicationBuilder" /> that creates the required services.</param>
     private static void ConfigureServices(WebApplicationBuilder builder)
     {
         // Add services to DI
@@ -168,6 +180,10 @@ file static class Program
         builder.Services.AddSignalR();
     }
 
+    /// <summary>
+    ///     Configures the application.
+    /// </summary>
+    /// <param name="app">The <see cref="WebApplication" /> with the created services.</param>
     private static async Task ConfigureApplicationAsync(WebApplication app)
     {
         // Add error handling and OpenAPI in development environment
