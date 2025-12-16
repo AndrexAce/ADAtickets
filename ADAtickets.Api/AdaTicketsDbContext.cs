@@ -30,7 +30,8 @@ namespace ADAtickets.Api;
 ///     <para>This context is used to interact with the database and manage the application entities.</para>
 /// </summary>
 internal sealed class AdaTicketsDbContext(DbContextOptions<AdaTicketsDbContext> options)
-    : IdentityDbContext<IdentityUser<Guid>, IdentityRole<Guid>, Guid>(options)
+    : IdentityDbContext<IdentityUser<Guid>, IdentityRole<Guid>, Guid, IdentityUserClaim<Guid>, IdentityUserRole<Guid>,
+        IdentityUserLogin<Guid>, IdentityRoleClaim<Guid>, IdentityUserToken<Guid>, IdentityUserPasskey<Guid>>(options)
 {
     /// <summary>
     ///     Gets or sets the DbSet for managing <see cref="Attachment" /> entities.

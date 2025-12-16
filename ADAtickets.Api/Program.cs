@@ -26,6 +26,7 @@ using ADAtickets.Api.Services;
 using ADAtickets.ServiceDefaults;
 using ADAtickets.Shared.Enums;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -196,6 +197,10 @@ file static class Program
         else
         {
             app.UseExceptionHandler();
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
             app.UseHttpsRedirection();
             app.UseHsts();
         }
