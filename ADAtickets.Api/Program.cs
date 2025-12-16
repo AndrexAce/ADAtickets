@@ -121,6 +121,7 @@ file static class Program
             .AddXmlSerializerFormatters()
             .AddJsonOptions(static options =>
             {
+                options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.Strict;
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                 options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
@@ -179,6 +180,8 @@ file static class Program
         else
         {
             app.UseExceptionHandler();
+            app.UseHttpsRedirection();
+            app.UseHsts();
         }
 
         // Add middlewares
