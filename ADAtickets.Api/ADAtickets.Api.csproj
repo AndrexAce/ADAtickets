@@ -12,8 +12,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="13.0.2" />
-		<PackageReference Include="Aspire.StackExchange.Redis.DistributedCaching" Version="13.0.2" />
+		<PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="13.1.0" />
+		<PackageReference Include="Aspire.StackExchange.Redis.DistributedCaching" Version="13.1.0" />
 		<PackageReference Include="CommunityToolkit.Aspire.Minio.Client" Version="13.0.0" />
 		<PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="10.0.1" />
 		<PackageReference Include="Microsoft.AspNetCore.JsonPatch.SystemTextJson" Version="10.0.1" />
@@ -21,7 +21,7 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Scalar.AspNetCore.Microsoft" Version="2.11.6" />
+		<PackageReference Include="Scalar.AspNetCore.Microsoft" Version="2.11.9" />
 	</ItemGroup>
 
 	<ItemGroup>
